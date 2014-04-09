@@ -6,6 +6,8 @@ import org.visminer.util.DetailAST;
 
 public class NOMMetric implements IMetric{
 
+	private int accumNOM = 0;
+	
 	public Metrics getId(){
 		return Metrics.NOM;
 	}
@@ -19,8 +21,14 @@ public class NOMMetric implements IMetric{
 			methodCounter += type.getMethods().length;
 		}
 		
+		accumNOM += methodCounter;
 		return methodCounter;
 		
+	}
+
+	@Override
+	public int getAccumulatedValue() {
+		return accumNOM;
 	}
 	
 }

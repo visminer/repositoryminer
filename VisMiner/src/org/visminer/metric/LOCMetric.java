@@ -6,6 +6,8 @@ import org.visminer.util.DetailAST;
 
 public class LOCMetric implements IMetric{
 
+	private int accumLOC = 0;
+	
 	public Metrics getId(){
 		return Metrics.LOC;
 	}
@@ -13,8 +15,14 @@ public class LOCMetric implements IMetric{
 	public int calculate(DetailAST ast){
 		
 		Document doc = new Document(ast.getSource());
+		accumLOC += doc.getNumberOfLines();
 		return doc.getNumberOfLines();
 		
+	}
+
+	@Override
+	public int getAccumulatedValue() {
+		return accumLOC;
 	}
 
 }

@@ -23,6 +23,8 @@ public class SupportedMetrics {
 		metrics.add(new CCMetric());
 		metrics.add(new LOCMetric());
 		metrics.add(new NOMMetric());
+		metrics.add(new NOPMetric());
+		metrics.add(new NOCMetric());
 		
 		return metrics;
 		

@@ -19,7 +19,7 @@ public class Main {
 		props.put(PersistenceUnitProperties.DDL_GENERATION, "create-tables");
 
 		VisMiner visMiner = new VisMiner(props, "C:/Users/Felipe/git/Test/.git");
-		
+
 	}
 	
 

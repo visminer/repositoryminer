@@ -7,9 +7,11 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.errors.AmbiguousObjectException;
 import org.eclipse.jgit.errors.CorruptObjectException;
 import org.eclipse.jgit.errors.IncorrectObjectTypeException;
 import org.eclipse.jgit.errors.MissingObjectException;
+import org.eclipse.jgit.errors.RevisionSyntaxException;
 import org.visminer.metric.IMetric;
 import org.visminer.metric.SupportedMetrics;
 import org.visminer.model.Commit;
@@ -73,7 +75,7 @@ public class AnalyzeRepository implements Runnable{
 		
 	}
 	
-	private void saveCommits(){
+	private void saveCommits() throws RevisionSyntaxException, MissingObjectException, IncorrectObjectTypeException, AmbiguousObjectException, IOException{
 		
 		CommitDAO commitDAO = new CommitDAO();
 		VersionDAO versionDAO = new VersionDAO();
@@ -82,7 +84,7 @@ public class AnalyzeRepository implements Runnable{
 		for(Version version : repository.getVersions()){
 			List<Commit> commits = new ArrayList<Commit>();
 			for(Committer committer : repository.getCommitters()){
-				for(Commit commit : gitUtil.getCommits(version, committer)){
+				for(Commit commit : gitUtil.getCommits(version.getPath(), committer)){
 					commitDAO.save(commit);
 					commits.add(commit);
 					this.commits.add(commit);
@@ -91,6 +93,7 @@ public class AnalyzeRepository implements Runnable{
 			
 			version.setCommits(commits);
 			versionDAO.save(version);
+			saveVersionMetrics(version);
 		}
 		
 	}
@@ -100,14 +103,14 @@ public class AnalyzeRepository implements Runnable{
 		FileDAO fileDAO = new FileDAO();
 		for(Commit commit : this.commits){
 			
-			for(String path : gitUtil.getFilesNameByCommit(commit)){
+			for(String path : gitUtil.getFilesNameByCommit(commit.getSha())){
 				
 				File file = new File();
 				file.setCommit(commit);
 				file.setPath(path);
 				
 				file = fileDAO.save(file);
-				saveMetricsValues(file, commit);
+				saveFileMetrics(file, commit.getSha());
 				
 			}
 			
@@ -115,18 +118,21 @@ public class AnalyzeRepository implements Runnable{
 		
 	}
 
-	private void saveMetricsValues(File file, Commit commit) throws MissingObjectException, IncorrectObjectTypeException, CorruptObjectException, IOException{
+	private void saveFileMetrics(File file, String commitSha) throws MissingObjectException, IncorrectObjectTypeException, CorruptObjectException, IOException{
 		
-		MetricDAO metricDAO = new MetricDAO();
 		MetricValueDAO metricValueDAO = new MetricValueDAO();
 		
-		String source = gitUtil.getFileStates(commit, file);
+		String source = gitUtil.getFileStates(commitSha, file.getPath());
+		
+		if(source == null)
+			return;
+		
 		DetailAST ast = new DetailAST();
 		ast.parserFromString(source);
 		
 		for(IMetric metric : SupportedMetrics.codeMetrics()){
 			MetricValue metricValue = new MetricValue();
-			Metric metric2 = metricDAO.getOne(metric.getId().getValue());
+			Metric metric2 = new Metric(metric.getId().getValue());
 			metricValue.setFile(file);
 			metricValue.setMetric(metric2);
 			metricValue.setValue(metric.calculate(ast));
@@ -136,6 +142,31 @@ public class AnalyzeRepository implements Runnable{
 		}
 	}
 
+	private void saveVersionMetrics(Version version) throws RevisionSyntaxException, MissingObjectException, IncorrectObjectTypeException, AmbiguousObjectException, IOException{
+		
+		MetricValueDAO dao = new MetricValueDAO();
+		Commit lastCommit = gitUtil.getLastCommit(version.getPath());
+		List<String> files = gitUtil.getFilesInVersion(version.getPath());
+		
+		for(IMetric metric : SupportedMetrics.projectMetrics()){
+			for(String file : files){
+				
+				String content = gitUtil.getFileStates(lastCommit.getSha(), file);
+				DetailAST ast = new DetailAST();
+				ast.parserFromString(content);
+				metric.calculate(ast);
+				
+			}
+			
+			MetricValue metricValue = new MetricValue();
+			metricValue.setMetric(new Metric(metric.getId().getValue()));
+			metricValue.setValue(metric.getAccumulatedValue());
+			metricValue.setVersion(version);
+			dao.save(metricValue);
+		}
+		
+	}
+	
 	@Override
 	public void run() {
 
@@ -147,9 +178,8 @@ public class AnalyzeRepository implements Runnable{
 			e.printStackTrace();
 		}
 		
-		saveCommits();
-		
 		try {
+			saveCommits();
 			saveFiles();
 		} catch (MissingObjectException e) {
 			// TODO Auto-generated catch block

@@ -11,9 +11,14 @@ import org.visminer.util.DetailAST;
 
 public class CCMetric implements IMetric{
 
+	private int accumCC = 0;
 
 	public Metrics getId(){
 		return Metrics.CC;
+	}
+	
+	public int getAccumulatedValue() {
+		return accumCC;
 	}
 	
 	public int calculate(DetailAST ast){
@@ -32,6 +37,7 @@ public class CCMetric implements IMetric{
 			
 		}
 		
+		accumCC += ccTotal;
 		return ccTotal;
 		
 	}
@@ -73,5 +79,6 @@ public class CCMetric implements IMetric{
 		}
 		
 	}
+
 	
 }

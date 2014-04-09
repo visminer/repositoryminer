@@ -8,9 +8,11 @@ import java.util.List;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.errors.AmbiguousObjectException;
 import org.eclipse.jgit.errors.CorruptObjectException;
 import org.eclipse.jgit.errors.IncorrectObjectTypeException;
 import org.eclipse.jgit.errors.MissingObjectException;
+import org.eclipse.jgit.errors.RevisionSyntaxException;
 import org.eclipse.jgit.internal.storage.file.FileRepository;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.ObjectReader;
@@ -28,7 +30,6 @@ import org.gitective.core.filter.commit.AuthorSetFilter;
 import org.gitective.core.filter.commit.CommitListFilter;
 import org.visminer.model.Commit;
 import org.visminer.model.Committer;
-import org.visminer.model.File;
 import org.visminer.model.Version;
 
 public class GitUtil {
@@ -103,7 +104,7 @@ public class GitUtil {
 		
 	}
 	
-	public List<Commit> getCommits(Version version, Committer committer){
+	public List<Commit> getCommits(String version, Committer committer){
 		
 		AndCommitFilter filters = new AndCommitFilter();
 		CommitListFilter revCommits = new CommitListFilter();
@@ -113,7 +114,7 @@ public class GitUtil {
 		
 		CommitFinder finder = new CommitFinder(repository);
 		finder.setFilter(filters);
-		finder.findFrom(version.getPath());
+		finder.findFrom(version);
 		
 		List<Commit> commits = new ArrayList<Commit>();
 
@@ -132,7 +133,7 @@ public class GitUtil {
 		
 	}	
 	
-	public List<String> getFilesNameByCommit(Commit myCommit) throws MissingObjectException, IncorrectObjectTypeException, IOException{
+	public List<String> getFilesNameByCommit(String commitSha) throws MissingObjectException, IncorrectObjectTypeException, IOException{
 		
 		java.io.File gitDir = new java.io.File(repository.getDirectory().toString());
 		
@@ -144,7 +145,8 @@ public class GitUtil {
 		commands.add("show");
 		commands.add("--pretty=format:");
 		commands.add("--name-only");
-		commands.add(myCommit.getSha());
+		commands.add("--no-commit-id");
+		commands.add(commitSha);
 		
 		
 		builder.command(commands);
@@ -164,13 +166,52 @@ public class GitUtil {
 		
 	}
 	
-	public String getFileStates(Commit commit, File file) throws MissingObjectException, IncorrectObjectTypeException, CorruptObjectException, IOException{
+	public List<String> getFilesInVersion(String version) throws MissingObjectException, IncorrectObjectTypeException, CorruptObjectException, IOException{
+		
+		RevWalk revWalk = new RevWalk(repository);
+		RevCommit lastCommit = revWalk.parseCommit(repository.resolve(version));
+		
+		TreeWalk treeWalk = new TreeWalk(repository);
+		treeWalk.addTree(lastCommit.getTree());
+		treeWalk.setRecursive(true);
+		
+		List<String> files = new ArrayList<String>();
+		while(treeWalk.next()){
+			files.add(treeWalk.getPathString());
+		}
+		
+		return files;
+		
+	}
+	
+	public Commit getLastCommit(String version) throws RevisionSyntaxException, MissingObjectException, IncorrectObjectTypeException, AmbiguousObjectException, IOException{
+		
+		RevWalk revWalk = new RevWalk(repository);
+		RevCommit lastCommit = revWalk.parseCommit(repository.resolve(version));
+		
+		Commit commit = new Commit();
+		commit.setDate(lastCommit.getAuthorIdent().getWhen());
+		commit.setMessage(lastCommit.getFullMessage());
+		commit.setSha(lastCommit.getName());
+		
+		return commit;
+		
+	}
+	
+	public String getFileStates(String commitSha, String filePath) throws MissingObjectException, IncorrectObjectTypeException, CorruptObjectException, IOException{
 		
 		RevWalk walk = new RevWalk(repository);
-		RevCommit revCommit =  walk.parseCommit(ObjectId.fromString(commit.getSha()));
+		RevCommit revCommit =  walk.parseCommit(ObjectId.fromString(commitSha));
 		RevTree tree = revCommit.getTree();
 		ObjectReader reader = repository.newObjectReader();
-		TreeWalk treeWalk = TreeWalk.forPath(reader, file.getPath(), tree);
+		
+		TreeWalk treeWalk = TreeWalk.forPath(reader, filePath, tree);
+		
+		if(treeWalk == null)
+			return null;
+		
+		treeWalk.setRecursive(true);
+
 		
 		byte[] data = reader.open(treeWalk.getObjectId(0)).getBytes();
 		return new String(data);

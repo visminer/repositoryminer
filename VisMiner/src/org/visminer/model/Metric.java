@@ -34,6 +34,11 @@ public class Metric implements Serializable {
 	public Metric() {
 	}
 
+	public Metric(int idmetric) {
+		super();
+		this.idmetric = idmetric;
+	}
+
 	public int getIdmetric() {
 		return this.idmetric;
 	}
