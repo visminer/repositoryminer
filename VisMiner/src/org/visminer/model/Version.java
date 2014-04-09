@@ -36,10 +36,10 @@ public class Version implements Serializable {
 	@JoinTable(
 		name="commit_version"
 		, joinColumns={
-			@JoinColumn(name="commit_sha", nullable=false)
+			@JoinColumn(name="version_idversion", nullable=false)
 			}
 		, inverseJoinColumns={
-			@JoinColumn(name="version_idversion", nullable=false)
+			@JoinColumn(name="commit_sha", nullable=false)
 			}
 		)
 	private List<Commit> commits;
