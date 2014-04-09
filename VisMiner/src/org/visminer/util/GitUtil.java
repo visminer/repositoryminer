@@ -23,6 +23,7 @@ import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevTree;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.treewalk.TreeWalk;
+import org.eclipse.jgit.treewalk.filter.PathSuffixFilter;
 import org.gitective.core.CommitFinder;
 import org.gitective.core.filter.commit.AndCommitFilter;
 import org.gitective.core.filter.commit.AuthorFilter;
@@ -133,7 +134,7 @@ public class GitUtil {
 		
 	}	
 	
-	public List<String> getFilesNameByCommit(String commitSha) throws MissingObjectException, IncorrectObjectTypeException, IOException{
+	public List<String> getFilesNameInCommit(String commitSha) throws MissingObjectException, IncorrectObjectTypeException, IOException{
 		
 		java.io.File gitDir = new java.io.File(repository.getDirectory().toString());
 		
@@ -166,13 +167,14 @@ public class GitUtil {
 		
 	}
 	
-	public List<String> getFilesInVersion(String version) throws MissingObjectException, IncorrectObjectTypeException, CorruptObjectException, IOException{
+	public List<String> getFilesNameInVersion(String version) throws MissingObjectException, IncorrectObjectTypeException, CorruptObjectException, IOException{
 		
 		RevWalk revWalk = new RevWalk(repository);
 		RevCommit lastCommit = revWalk.parseCommit(repository.resolve(version));
 		
 		TreeWalk treeWalk = new TreeWalk(repository);
 		treeWalk.addTree(lastCommit.getTree());
+		treeWalk.setFilter(PathSuffixFilter.create(".java"));
 		treeWalk.setRecursive(true);
 		
 		List<String> files = new ArrayList<String>();
@@ -209,9 +211,6 @@ public class GitUtil {
 		
 		if(treeWalk == null)
 			return null;
-		
-		treeWalk.setRecursive(true);
-
 		
 		byte[] data = reader.open(treeWalk.getObjectId(0)).getBytes();
 		return new String(data);

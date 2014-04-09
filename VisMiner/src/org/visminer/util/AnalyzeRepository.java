@@ -103,7 +103,7 @@ public class AnalyzeRepository implements Runnable{
 		FileDAO fileDAO = new FileDAO();
 		for(Commit commit : this.commits){
 			
-			for(String path : gitUtil.getFilesNameByCommit(commit.getSha())){
+			for(String path : gitUtil.getFilesNameInCommit(commit.getSha())){
 				
 				File file = new File();
 				file.setCommit(commit);
@@ -146,7 +146,7 @@ public class AnalyzeRepository implements Runnable{
 		
 		MetricValueDAO dao = new MetricValueDAO();
 		Commit lastCommit = gitUtil.getLastCommit(version.getPath());
-		List<String> files = gitUtil.getFilesInVersion(version.getPath());
+		List<String> files = gitUtil.getFilesNameInVersion(version.getPath());
 		
 		for(IMetric metric : SupportedMetrics.projectMetrics()){
 			for(String file : files){
