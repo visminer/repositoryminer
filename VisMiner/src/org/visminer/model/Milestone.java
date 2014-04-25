@@ -2,7 +2,7 @@ package org.visminer.model;
 
 import java.io.Serializable;
 import javax.persistence.*;
-import java.util.Date;
+
 import java.util.List;
 
 
@@ -12,21 +12,25 @@ import java.util.List;
  */
 @Entity
 @Table(name="milestone")
+@IdClass(MilestonePK.class)
 @NamedQuery(name="Milestone.findAll", query="SELECT m FROM Milestone m")
 public class Milestone implements Serializable {
 	private static final long serialVersionUID = 1L;
 
+	@Id 
+	@Column(name = "number")
+	private int number;
+	
 	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	@Column(name="idmilestone", unique=true, nullable=false)
-	private int idmilestone;
+	@ManyToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "repository_idGit", referencedColumnName = "idGit")
+	private Repository repository;
 
 	@Column(name="closed_issues", nullable=false)
 	private int closedIssues;
 
-	@Temporal(TemporalType.DATE)
-	@Column(name="create_date", nullable=false)
-	private Date createDate;
+	@Column(name = "create_date", nullable = false)
+	private long create_date;
 
 	@Column(name="creator", nullable=false, length=100)
 	private String creator;
@@ -34,12 +38,8 @@ public class Milestone implements Serializable {
 	@Column(name="description", length=1000)
 	private String description;
 
-	@Temporal(TemporalType.DATE)
-	@Column(name="due_date")
-	private Date dueDate;
-
-	@Column(name="number", nullable=false)
-	private int number;
+	@Column(name = "due_date")
+	private long due_date;
 
 	@Column(name="opened_issues", nullable=false)
 	private int openedIssues;
@@ -47,29 +47,19 @@ public class Milestone implements Serializable {
 	@Column(name="state", nullable=false, length=6)
 	private String state;
 
-	@Column(name="title", nullable=false, length=100)
+	@Column(name="title", nullable=false, length=500)
 	private String title;
 
 	//bi-directional many-to-one association to Issue
 	@OneToMany(mappedBy="milestone")
 	private List<Issue> issues;
 
-	//bi-directional many-to-one association to Repository
-	@ManyToOne
-	@JoinColumn(name="repository_idrepository", nullable=false)
-	private Repository repository;
-
+	
 	public Milestone() {
 	}
+	
 
-	public int getIdmilestone() {
-		return this.idmilestone;
-	}
-
-	public void setIdmilestone(int idmilestone) {
-		this.idmilestone = idmilestone;
-	}
-
+	//getters and setters
 	public int getClosedIssues() {
 		return this.closedIssues;
 	}
@@ -78,12 +68,20 @@ public class Milestone implements Serializable {
 		this.closedIssues = closedIssues;
 	}
 
-	public Date getCreateDate() {
-		return this.createDate;
+	public long getCreate_date() {
+		return create_date;
 	}
 
-	public void setCreateDate(Date createDate) {
-		this.createDate = createDate;
+	public void setCreate_date(long create_date) {
+		this.create_date = create_date;
+	}
+
+	public long getDue_date() {
+		return due_date;
+	}
+
+	public void setDue_date(long due_date) {
+		this.due_date = due_date;
 	}
 
 	public String getCreator() {
@@ -100,14 +98,6 @@ public class Milestone implements Serializable {
 
 	public void setDescription(String description) {
 		this.description = description;
-	}
-
-	public Date getDueDate() {
-		return this.dueDate;
-	}
-
-	public void setDueDate(Date dueDate) {
-		this.dueDate = dueDate;
 	}
 
 	public int getNumber() {
@@ -149,7 +139,15 @@ public class Milestone implements Serializable {
 	public void setIssues(List<Issue> issues) {
 		this.issues = issues;
 	}
+	
+	public Repository getRepository() {
+		return this.repository;
+	}
 
+	public void setRepository(Repository repository) {
+		this.repository = repository;
+	}
+	
 	public Issue addIssue(Issue issue) {
 		getIssues().add(issue);
 		issue.setMilestone(this);
@@ -164,12 +162,18 @@ public class Milestone implements Serializable {
 		return issue;
 	}
 
-	public Repository getRepository() {
-		return this.repository;
+}
+
+class MilestonePK implements Serializable{
+	
+	private static final long serialVersionUID = 1L;
+	
+	private int number;
+	private String repository;
+	
+	public MilestonePK(){
+		
 	}
 
-	public void setRepository(Repository repository) {
-		this.repository = repository;
-	}
 
 }

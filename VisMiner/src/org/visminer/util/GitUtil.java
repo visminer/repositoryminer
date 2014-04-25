@@ -39,10 +39,14 @@ public class GitUtil {
 	private final String TYPE_TAG = "tag";
 	
 	private Repository repository;
+	private String ownerRepository;
+	private String nameRepository;
 	
-	public GitUtil(String path) throws IOException{
+	public GitUtil(String path, String ownerRepository,	String nameRepository) throws IOException{
 	
 		repository = new FileRepository(path);
+		this.ownerRepository = ownerRepository;
+		this.nameRepository = nameRepository;
 		
 	}
 	
@@ -52,6 +56,7 @@ public class GitUtil {
 		userRepo.setPath(repository.getDirectory().getPath().replace("\\", "/"));
 		String[] parts = userRepo.getPath().split("/");
 		userRepo.setName(parts[parts.length - 2]);
+		userRepo.setIdGit(ownerRepository+"/"+nameRepository);
 		
 		return userRepo;
 		

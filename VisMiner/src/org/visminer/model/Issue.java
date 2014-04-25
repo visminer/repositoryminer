@@ -2,7 +2,8 @@ package org.visminer.model;
 
 import java.io.Serializable;
 import javax.persistence.*;
-import java.util.Date;
+
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -12,68 +13,61 @@ import java.util.List;
  */
 @Entity
 @Table(name="issue")
+@IdClass(IssuePK.class)
 @NamedQuery(name="Issue.findAll", query="SELECT i FROM Issue i")
 public class Issue implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	@Column(name="idissue", unique=true, nullable=false)
-	private int idissue;
+	@Column(name = "number")
+	private int number;
+	
+	@Id
+	@ManyToOne(optional = false, cascade = CascadeType.ALL)
+	@JoinColumn(name = "repository_idGit", referencedColumnName = "idGit")
+	private Repository repository;
 
-	@Column(name="assignee", nullable=false, length=100)
+	@Column(name="assignee", length=39)
 	private String assignee;
 
-	@Temporal(TemporalType.DATE)
-	@Column(name="closed_date")
-	private Date closedDate;
+	@Column(name = "closed_date")
+	private long closed_date;
+	
+	@Column(name = "create_date", nullable = false)
+	private long create_date;
+	
+	@Column(name = "updated_date")
+	private long updated_date;
 
-	@Temporal(TemporalType.DATE)
-	@Column(name="create_date", nullable=false)
-	private Date createDate;
-
-	@Lob
 	@Column(name="labels")
-	private byte[] labels;
+	private  ArrayList<String> labels = new ArrayList<String>();
 
-	@Column(name="number", nullable=false)
-	private int number;
-
-	@Column(name="status", length=6)
+	@Column(name="status", nullable = false, length=6)
 	private String status;
 
-	@Column(name="title", nullable=false, length=100)
+	@Column(name="title", nullable=false, length=500)
 	private String title;
-
-	@Temporal(TemporalType.DATE)
-	@Column(name="update_date")
-	private Date updateDate;
 
 	//bi-directional many-to-many association to Commit
 	@ManyToMany(mappedBy="issues")
 	private List<Commit> commits;
 
 	//bi-directional many-to-one association to Milestone
-	@ManyToOne
-	@JoinColumn(name="milestone_idmilestone")
+	@ManyToOne(optional = true, cascade = CascadeType.ALL)
+	@JoinColumns({
+        @JoinColumn(name = "milestone_number", referencedColumnName = "number"),
+        @JoinColumn(name = "milestone_repository_idGit", referencedColumnName = "repository_idGit")
+    })
 	private Milestone milestone;
-
-	//bi-directional many-to-one association to Repository
-	@ManyToOne
-	@JoinColumn(name="repository_idrepository")
-	private Repository repository;
+	
+	@Column(name = "numberOfComments", nullable = false)
+	private int numberOfComments;
 
 	public Issue() {
 	}
 
-	public int getIdissue() {
-		return this.idissue;
-	}
-
-	public void setIdissue(int idissue) {
-		this.idissue = idissue;
-	}
-
+	
+	//getters and setters
 	public String getAssignee() {
 		return this.assignee;
 	}
@@ -82,29 +76,47 @@ public class Issue implements Serializable {
 		this.assignee = assignee;
 	}
 
-	public Date getClosedDate() {
-		return this.closedDate;
+	public long getClosed_date() {
+		return closed_date;
 	}
 
-	public void setClosedDate(Date closedDate) {
-		this.closedDate = closedDate;
+	public void setClosed_date(long closed_date) {
+		this.closed_date = closed_date;
 	}
 
-	public Date getCreateDate() {
-		return this.createDate;
+	public long getCreate_date() {
+		return create_date;
 	}
 
-	public void setCreateDate(Date createDate) {
-		this.createDate = createDate;
+	public void setCreate_date(long create_date) {
+		this.create_date = create_date;
 	}
 
-	public byte[] getLabels() {
-		return this.labels;
+	public long getUpdated_date() {
+		return updated_date;
 	}
 
-	public void setLabels(byte[] labels) {
+	public void setUpdated_date(long updated_date) {
+		this.updated_date = updated_date;
+	}
+
+	public int getNumberOfComments() {
+		return numberOfComments;
+	}
+
+	public void setNumberOfComments(int numberOfComments) {
+		this.numberOfComments = numberOfComments;
+	}
+
+	public ArrayList<String> getLabels() {
+		return labels;
+	}
+
+
+	public void setLabels(ArrayList<String> labels) {
 		this.labels = labels;
 	}
+
 
 	public int getNumber() {
 		return this.number;
@@ -130,14 +142,6 @@ public class Issue implements Serializable {
 		this.title = title;
 	}
 
-	public Date getUpdateDate() {
-		return this.updateDate;
-	}
-
-	public void setUpdateDate(Date updateDate) {
-		this.updateDate = updateDate;
-	}
-
 	public List<Commit> getCommits() {
 		return this.commits;
 	}
@@ -161,5 +165,19 @@ public class Issue implements Serializable {
 	public void setRepository(Repository repository) {
 		this.repository = repository;
 	}
+
+}
+
+class IssuePK implements Serializable{
+
+	private static final long serialVersionUID = 1L;
+	
+	private int number;
+	private String repository;
+	
+	public IssuePK(){
+		
+	}
+
 
 }

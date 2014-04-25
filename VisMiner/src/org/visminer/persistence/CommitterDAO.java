@@ -28,7 +28,7 @@ public class CommitterDAO{
 		
 		EntityManager em = connection.getEntityManager();
 		TypedQuery<Committer> query = em.createQuery("select c from Committer c where c.repository.idrepository=:arg1", Committer.class);
-		query.setParameter("arg1", repository.getIdrepository());
+		query.setParameter("arg1", repository.getIdGit());
 		
 		try{
 			return query.getResultList();

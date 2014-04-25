@@ -15,18 +15,21 @@ import java.util.List;
 @Table(name="repository")
 @NamedQuery(name="Repository.findAll", query="SELECT r FROM Repository r")
 public class Repository implements Serializable {
+	
 	private static final long serialVersionUID = 1L;
-
+	
 	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	@Column(name="idrepository", unique=true, nullable=false)
-	private int idrepository;
+	@Column(name="idGit")
+	private String idGit;
 
-	@Column(name="name", nullable=false, length=45)
+	@Column(name="name", length=45, nullable=false)
 	private String name;
 
-	@Column(name="path", nullable=false, length=1024)
+	@Column(name="path", length=1024, nullable=false)
 	private String path;
+	
+	@Column(name = "createdAt")
+	private long createdAt;
 
 	//bi-directional many-to-one association to Committer
 	@OneToMany(mappedBy="repository", fetch=FetchType.LAZY)
@@ -44,15 +47,26 @@ public class Repository implements Serializable {
 	@OneToMany(mappedBy="repository", fetch=FetchType.LAZY)
 	private List<Version> versions;
 
+	
 	public Repository() {
 	}
 
-	public int getIdrepository() {
-		return this.idrepository;
+	
+	//getters and setters
+	public String getIdGit() {
+		return idGit;
 	}
 
-	public void setIdrepository(int idrepository) {
-		this.idrepository = idrepository;
+	public void setIdGit(String idGit) {
+		this.idGit = idGit;
+	}
+
+	public long getCreatedAt() {
+		return createdAt;
+	}
+
+	public void setCreatedAt(long createdAt) {
+		this.createdAt = createdAt;
 	}
 
 	public String getName() {
@@ -78,6 +92,31 @@ public class Repository implements Serializable {
 	public void setCommitters(List<Committer> committers) {
 		this.committers = committers;
 	}
+	
+	public List<Version> getVersions() {
+		return this.versions;
+	}
+
+	public void setVersions(List<Version> versions) {
+		this.versions = versions;
+	}
+	
+	public List<Issue> getIssues() {
+		return this.issues;
+	}
+
+	public void setIssues(List<Issue> issues) {
+		this.issues = issues;
+	}
+	
+	public List<Milestone> getMilestones() {
+		return this.milestones;
+	}
+
+	public void setMilestones(List<Milestone> milestones) {
+		this.milestones = milestones;
+	}
+
 
 	public Committer addCommitter(Committer committer) {
 		getCommitters().add(committer);
@@ -91,14 +130,6 @@ public class Repository implements Serializable {
 		committer.setRepository(null);
 
 		return committer;
-	}
-
-	public List<Issue> getIssues() {
-		return this.issues;
-	}
-
-	public void setIssues(List<Issue> issues) {
-		this.issues = issues;
 	}
 
 	public Issue addIssue(Issue issue) {
@@ -115,14 +146,6 @@ public class Repository implements Serializable {
 		return issue;
 	}
 
-	public List<Milestone> getMilestones() {
-		return this.milestones;
-	}
-
-	public void setMilestones(List<Milestone> milestones) {
-		this.milestones = milestones;
-	}
-
 	public Milestone addMilestone(Milestone milestone) {
 		getMilestones().add(milestone);
 		milestone.setRepository(this);
@@ -135,14 +158,6 @@ public class Repository implements Serializable {
 		milestone.setRepository(null);
 
 		return milestone;
-	}
-
-	public List<Version> getVersions() {
-		return this.versions;
-	}
-
-	public void setVersions(List<Version> versions) {
-		this.versions = versions;
 	}
 
 	public Version addVersion(Version version) {

@@ -3,8 +3,16 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="libs/jpa/mysql-connector-java-5.1.29-bin.jar"/>
-	<classpathentry kind="lib" path="libs/jpa/javax.persistence_2.1.0.v201304241213.jar"/>
-	<classpathentry kind="lib" path="libs/jpa/eclipselink.jar"/>
+	<classpathentry kind="lib" path="libs/jpa/javax.persistence_2.1.0.v201304241213.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="file:/home/heron/workspaces-eclipses/workspace_pibiti/Visminer/VisMiner/libs/jpa/eclipselink-javadocs/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="libs/jpa/eclipselink.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="file:/home/heron/workspaces-eclipses/workspace_pibiti/Visminer/VisMiner/libs/jpa/eclipselink-javadocs/"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="lib" path="libs/jdt/commons-collections-3.2.1.jar"/>
 	<classpathentry kind="lib" path="libs/jdt/commons-configuration-1.6.jar"/>
 	<classpathentry kind="lib" path="libs/jdt/commons-lang-2.5.jar"/>
@@ -20,5 +28,12 @@
 	<classpathentry kind="lib" path="libs/util/org.eclipse.text_3.5.0.jar"/>
 	<classpathentry kind="lib" path="libs/jgit/org.eclipse.jgit-3.3.0.201403021825-r.jar"/>
 	<classpathentry kind="lib" path="libs/jgit/gitective-core-0.9.9.jar"/>
+	<classpathentry kind="lib" path="libs/github/github-api-1.50_kohsuke/dependencies/commons-codec-1.7.jar"/>
+	<classpathentry kind="lib" path="libs/github/github-api-1.50_kohsuke/dependencies/commons-io-1.4.jar"/>
+	<classpathentry kind="lib" path="libs/github/github-api-1.50_kohsuke/dependencies/commons-lang-2.6.jar"/>
+	<classpathentry kind="lib" path="libs/github/github-api-1.50_kohsuke/dependencies/jackson-annotations-2.2.3.jar"/>
+	<classpathentry kind="lib" path="libs/github/github-api-1.50_kohsuke/dependencies/jackson-core-2.2.3.jar"/>
+	<classpathentry kind="lib" path="libs/github/github-api-1.50_kohsuke/dependencies/jackson-databind-2.2.3.jar"/>
+	<classpathentry kind="lib" path="libs/github/github-api-1.50_kohsuke/github-api-1.50.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -29,7 +29,7 @@ public class VersionDAO{
 		
 		EntityManager em = connection.getEntityManager();
 		TypedQuery<Version> query = em.createQuery("select v from Version v where v.repository.idrepository=:arg1", Version.class);
-		query.setParameter("arg1", repository.getIdrepository());
+		query.setParameter("arg1", repository.getIdGit());
 
 		try{
 			return query.getResultList();
