@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.EntityManager;
+
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.visminer.constants.Metrics;
 import org.visminer.model.Commit;
@@ -25,16 +27,17 @@ public class VisMiner {
 
 	private Repository repository;
 	
-	public VisMiner(Map<String, String> databaseProperties, String repositoryPath) throws IOException, GitAPIException{
+	public VisMiner(Map<String, String> databaseProperties, String repositoryPath,
+		String ownerRepository,	String nameRepository) throws IOException, GitAPIException{
 		
-		Connection.setDataBaseInfo(databaseProperties);
 		init();
 
 		RepositoryDAO repoDAO = new RepositoryDAO();
 		repository = repoDAO.getByPath(repositoryPath);
 		
 		if(repository == null){
-			AnalyzeRepository analyzeRepo = new AnalyzeRepository(repositoryPath);
+			AnalyzeRepository analyzeRepo = new AnalyzeRepository(repositoryPath, ownerRepository,
+				nameRepository);
 			Thread thread = new Thread(analyzeRepo);
 			thread.start();
 			repository = analyzeRepo.getRepository();

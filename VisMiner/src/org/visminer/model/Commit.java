@@ -36,16 +36,17 @@ public class Commit implements Serializable {
 
 	//bi-directional many-to-many association to Issue
 	@ManyToMany(fetch=FetchType.LAZY)
-	@JoinTable(
-		name="commit_issue"
-		, joinColumns={
-			@JoinColumn(name="commit_sha", nullable=false)
-			}
-		, inverseJoinColumns={
-			@JoinColumn(name="issue_idissue", nullable=false)
-			}
-		)
+	@JoinTable(name="commit_reference_issue",
+		joinColumns = {
+			@JoinColumn(name="commit_sha", nullable=false, referencedColumnName = "sha")
+		},
+		inverseJoinColumns={
+			@JoinColumn(name = "issue_number", referencedColumnName = "number"),
+			@JoinColumn(name = "issue_repository_idGit", referencedColumnName = "repository_idGit")
+		}
+	)
 	private List<Issue> issues;
+	
 
 	//bi-directional many-to-many association to Version
 	@ManyToMany(mappedBy="commits", fetch=FetchType.LAZY)

@@ -35,9 +35,10 @@ public class AnalyzeRepository implements Runnable{
 	private GitUtil gitUtil;
 	private Set<Commit> commits;
 	
-	public AnalyzeRepository(String repository_path) throws IOException, GitAPIException{
+	public AnalyzeRepository(String repository_path, String ownerRepository,
+			String nameRepository) throws IOException, GitAPIException{
 		
-		gitUtil = new GitUtil(repository_path);
+		gitUtil = new GitUtil(repository_path, ownerRepository, nameRepository);
 		RepositoryDAO repoDAO = new RepositoryDAO();
 		repository = repoDAO.save(gitUtil.getRepository());
 		
