@@ -33,5 +33,19 @@ public class RepositoryDAO{
 			return null;
 		}
 	}
+	
+	
+	public Repository getByIdGit(String idGit){
+		
+		EntityManager em = connection.getEntityManager();
+		TypedQuery<Repository> query = em.createQuery("select r from Repository r where r.idGit = :arg1", Repository.class);
+		query.setParameter("arg1", idGit);
+		
+		try{
+			return query.getSingleResult();
+		}catch(NoResultException e){
+			return null;
+		}
+	}
 
 }

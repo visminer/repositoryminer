@@ -6,15 +6,13 @@ import org.kohsuke.github.GitHub;
 
 public class ConnectionToRepository {
 	
-	private String ownerRepository;	
-	private String nameRepository;
+	private String idGit;
 	private NameRepositories nameRepRemote;
 	
 	
 	public ConnectionToRepository(String ownerRepository, String nameRepository, NameRepositories nameRepRemote){
 		
-		this.ownerRepository = ownerRepository;
-		this.nameRepository = nameRepository;
+		this.idGit = ownerRepository+ "/"+ nameRepository;
 		this.nameRepRemote = nameRepRemote;
 		
 	}
@@ -26,11 +24,13 @@ public class ConnectionToRepository {
 			
 			try {
 				GitHub gh = GitHub.connectUsingPassword(login, password);
-				return gh.getRepository(ownerRepository+ "/"+ nameRepository);
+				return gh.getRepository(idGit);
 
 			} catch (IOException e) {
-				System.out.println("Problems in connection:\n1-probable this repository doesn't exist" +
-						"\n2-login or password wrong\n");
+				System.out.println("Problems in connection:\n" +
+						"\n1-probable this repository doesn't exist:" +
+						"\n   verify ownerRepository and nameRepository\n"+
+						"\n2- probable login or password wrong\n");
 			}
 		
 		}

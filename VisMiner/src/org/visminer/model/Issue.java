@@ -23,7 +23,7 @@ public class Issue implements Serializable {
 	private int number;
 	
 	@Id
-	@ManyToOne(optional = false, cascade = CascadeType.ALL)
+	@ManyToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "repository_idGit", referencedColumnName = "idGit")
 	private Repository repository;
 
