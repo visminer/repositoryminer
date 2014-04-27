@@ -15,8 +15,8 @@ import org.visminer.main.VisMiner;
 import org.visminer.persistence.Connection;
 
 
-
 public class Main {
+	
 	private static String login = ""; //login of the your GitHub's user
 	private static String password = ""; //password of the your GitHub's user
 	
@@ -34,17 +34,19 @@ public class Main {
 		props.put(PersistenceUnitProperties.DDL_GENERATION, "create-tables");
 		Connection.setDataBaseInfo(props);
 		
-		VisMiner visminer = new VisMiner(props, "path...path.../folderGit",
-			ownerRepository, nameRepository);
-
 		//Make remote connection in the specified repository and get it
 		ConnectionToRepository ctr = new ConnectionToRepository(ownerRepository, nameRepository, NameRepositories.GITHUB);
 		GHRepository ghr = (GHRepository) ctr.getConnection(login, password);
-		
-		//update milestones and issues
+
+		//initialize VisMiner if remote repository exist, and update milestones and issues
 		if(ghr != null){
+			
+			VisMiner visminer = new VisMiner(props, "path...path.../folderGit",
+				ownerRepository, nameRepository);
+			
 			IssueUpdate.updateIssue(ghr, visminer);
 			MilestoneUpdate.updateMilestone(ghr, visminer);
+			
 		}
 	
 	}

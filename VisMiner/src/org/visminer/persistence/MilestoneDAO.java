@@ -1,11 +1,13 @@
 package org.visminer.persistence;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 
+import org.kohsuke.github.GHIssueState;
 import org.visminer.model.Issue;
 import org.visminer.model.Milestone;
 import org.visminer.model.Repository;
@@ -29,7 +31,7 @@ public class MilestoneDAO{
 		
 		EntityManager em = connection.getEntityManager();
 		
-		TypedQuery<Milestone> query = em.createQuery("SELECT m FROM Milestone m WHERE m.number = :arg1 and" +
+		TypedQuery<Milestone> query = em.createQuery("SELECT m FROM Milestone m WHERE m.number = :arg1 AND" +
 				" m.repository = :arg2", Milestone.class);
 		
 		query.setParameter("arg1", number);
@@ -42,19 +44,85 @@ public class MilestoneDAO{
 		}
 		
 	}
+	
+	public int deleteAll(Repository repository){
+		
+		int qtdeDeletions = 0;
+		
+		EntityManager em = connection.getEntityManager();
+		em.getTransaction().begin();
+		
+		TypedQuery<Milestone> query = em.createQuery("DELETE FROM Milestone m WHERE m.repository = :arg1",
+				Milestone.class);
+		
+		query.setParameter("arg1", repository);
+		
+		qtdeDeletions =  query.executeUpdate();
+		em.getTransaction().commit();
+		em.close();
+			
+		return qtdeDeletions;
+	
+		
+	}
+	
+	public int deleteOne(int number, Repository repository){
+		
+		int qtdeDeleted = 0;
+				
+		EntityManager em = connection.getEntityManager();
+		em.getTransaction().begin();
+		
+		TypedQuery<Milestone> query = em.createQuery("DELETE FROM Milestone m WHERE m.repository = :arg1"+
+				" AND m.number = :arg2", Milestone.class);
+		
+		query.setParameter("arg1", repository);
+		query.setParameter("arg2", number);
+		
+		qtdeDeleted = query.executeUpdate();
+		em.getTransaction().commit();
+		em.close();
+		return qtdeDeleted;
+		
+	}
 
 	public List<Milestone> getAll(Repository repository){
 	
 		EntityManager em = connection.getEntityManager();
 		
-		TypedQuery<Milestone> query = em.createQuery("SELECT i FROM Milestone i WHERE i.repository = :arg1", Milestone.class);
+		TypedQuery<Milestone> query = em.createQuery("SELECT m FROM Milestone m WHERE m.repository = :arg1", Milestone.class);
 		
 		query.setParameter("arg1", repository);
 		
 		try{
+			
 			return query.getResultList();
+
 		}catch(NoResultException e){
+		
 			return null;
+		
+		}
+	}
+	
+	public List<Milestone> getByStatus(Repository repository, String state){
+		
+		EntityManager em = connection.getEntityManager();
+		
+		TypedQuery<Milestone> query = em.createQuery("SELECT m FROM Milestone m WHERE m.repository = :arg1" +
+				" AND m.state = :arg2", Milestone.class);
+		
+		query.setParameter("arg1", repository);
+		query.setParameter("arg2", state);
+		
+		try{
+			
+			return query.getResultList();
+
+		}catch(NoResultException e){
+		
+			return null;
+		
 		}
 	}
 	

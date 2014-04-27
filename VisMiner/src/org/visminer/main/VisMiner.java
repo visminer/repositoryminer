@@ -32,12 +32,13 @@ public class VisMiner {
 		
 		init();
 
+		String idGit = ownerRepository+ "/"+ nameRepository;
+		
 		RepositoryDAO repoDAO = new RepositoryDAO();
-		repository = repoDAO.getByPath(repositoryPath);
+		repository = repoDAO.getByIdGit(idGit);
 		
 		if(repository == null){
-			AnalyzeRepository analyzeRepo = new AnalyzeRepository(repositoryPath, ownerRepository,
-				nameRepository);
+			AnalyzeRepository analyzeRepo = new AnalyzeRepository(repositoryPath, idGit);
 			Thread thread = new Thread(analyzeRepo);
 			thread.start();
 			repository = analyzeRepo.getRepository();
