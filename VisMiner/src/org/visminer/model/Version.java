@@ -50,7 +50,7 @@ public class Version implements Serializable {
 
 	//bi-directional many-to-one association to Repository
 	@ManyToOne(fetch=FetchType.LAZY)
-	@JoinColumn(name="repository_idrepository", nullable=false)
+	@JoinColumn(name="repository_idGit", nullable=false)
 	private Repository repository;
 
 	public Version() {
