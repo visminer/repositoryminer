@@ -33,14 +33,14 @@ import org.visminer.util.DetailAST;
 public class AnalyzeRepository implements Runnable{
 
 	private Repository repository;
-	private GitUtil gitUtil;
+	private GitLocal gitLocal;
 	private Set<Commit> commits;
 	
 	public AnalyzeRepository(String repository_path, String idGit) throws IOException, GitAPIException{
 		
-		gitUtil = new GitUtil(repository_path, idGit);
+		gitLocal = new GitLocal(repository_path, idGit);
 		RepositoryDAO repoDAO = new RepositoryDAO();
-		repository = repoDAO.save(gitUtil.getRepository());
+		repository = repoDAO.save(gitLocal.getRepository());
 		
 	}
 	
@@ -51,7 +51,7 @@ public class AnalyzeRepository implements Runnable{
 	private void saveCommitters(){
 		
 		CommitterDAO committerDAO = new CommitterDAO();
-		List<Committer> committers = gitUtil.getCommitters();
+		List<Committer> committers = gitLocal.getCommitters();
 		for(Committer committer : committers){
 			
 			committer.setRepository(repository);
@@ -65,7 +65,7 @@ public class AnalyzeRepository implements Runnable{
 	private void saveVersions() throws GitAPIException{
 		
 		VersionDAO versionDAO = new VersionDAO();
-		List<Version> versions = gitUtil.getVersions();
+		List<Version> versions = gitLocal.getVersions();
 		for(Version version : versions){
 			
 			version.setRepository(repository);
@@ -85,7 +85,7 @@ public class AnalyzeRepository implements Runnable{
 		for(Version version : repository.getVersions()){
 			List<Commit> commits = new ArrayList<Commit>();
 			for(Committer committer : repository.getCommitters()){
-				for(Commit commit : gitUtil.getCommits(version.getPath(), committer)){
+				for(Commit commit : gitLocal.getCommits(version.getPath(), committer)){
 					commitDAO.save(commit);
 					commits.add(commit);
 					this.commits.add(commit);
@@ -104,7 +104,7 @@ public class AnalyzeRepository implements Runnable{
 		FileDAO fileDAO = new FileDAO();
 		for(Commit commit : this.commits){
 			
-			for(String path : gitUtil.getFilesNameInCommit(commit.getSha())){
+			for(String path : gitLocal.getFilesNameInCommit(commit.getSha())){
 				
 				File file = new File();
 				file.setCommit(commit);
@@ -123,7 +123,7 @@ public class AnalyzeRepository implements Runnable{
 		
 		MetricValueDAO metricValueDAO = new MetricValueDAO();
 		
-		String source = gitUtil.getFileStates(commitSha, file.getPath());
+		String source = gitLocal.getFileStates(commitSha, file.getPath());
 		
 		if(source == null)
 			return;
@@ -146,13 +146,13 @@ public class AnalyzeRepository implements Runnable{
 	private void saveVersionMetrics(Version version) throws RevisionSyntaxException, MissingObjectException, IncorrectObjectTypeException, AmbiguousObjectException, IOException{
 		
 		MetricValueDAO dao = new MetricValueDAO();
-		Commit lastCommit = gitUtil.getLastCommit(version.getPath());
-		List<String> files = gitUtil.getFilesNameInVersion(version.getPath());
+		Commit lastCommit = gitLocal.getLastCommit(version.getPath());
+		List<String> files = gitLocal.getFilesNameInVersion(version.getPath());
 		
 		for(IMetric metric : SupportedMetrics.projectMetrics()){
 			for(String file : files){
 				
-				String content = gitUtil.getFileStates(lastCommit.getSha(), file);
+				String content = gitLocal.getFileStates(lastCommit.getSha(), file);
 				DetailAST ast = new DetailAST();
 				ast.parserFromString(content);
 				metric.calculate(ast);

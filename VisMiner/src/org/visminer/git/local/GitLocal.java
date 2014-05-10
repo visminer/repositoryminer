@@ -33,7 +33,7 @@ import org.visminer.model.Commit;
 import org.visminer.model.Committer;
 import org.visminer.model.Version;
 
-public class GitUtil {
+public class GitLocal {
 
 	private final String TYPE_BRANCH = "branch";
 	private final String TYPE_TAG = "tag";
@@ -41,7 +41,7 @@ public class GitUtil {
 	private Repository repository;
 	private String idGit;
 	
-	public GitUtil(String path, String idGit) throws IOException{
+	public GitLocal(String path, String idGit) throws IOException{
 	
 		repository = new FileRepository(path);
 		this.idGit = idGit;
