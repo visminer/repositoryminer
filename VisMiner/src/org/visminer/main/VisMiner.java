@@ -8,6 +8,7 @@ import javax.persistence.EntityManager;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.visminer.constants.Metrics;
+import org.visminer.git.local.AnalyzeRepository;
 import org.visminer.model.Commit;
 import org.visminer.model.Committer;
 import org.visminer.model.File;
@@ -21,7 +22,6 @@ import org.visminer.persistence.FileDAO;
 import org.visminer.persistence.MetricDAO;
 import org.visminer.persistence.RepositoryDAO;
 import org.visminer.persistence.VersionDAO;
-import org.visminer.util.AnalyzeRepository;
 
 public class VisMiner {
 

@@ -1,4 +1,4 @@
-package org.visminer.util;
+package org.visminer.git.local;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -28,6 +28,7 @@ import org.visminer.persistence.MetricDAO;
 import org.visminer.persistence.MetricValueDAO;
 import org.visminer.persistence.RepositoryDAO;
 import org.visminer.persistence.VersionDAO;
+import org.visminer.util.DetailAST;
 
 public class AnalyzeRepository implements Runnable{
 

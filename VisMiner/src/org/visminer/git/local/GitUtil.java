@@ -1,4 +1,4 @@
-package org.visminer.util;
+package org.visminer.git.local;
 
 import java.io.BufferedReader;
 import java.io.IOException;
