@@ -18,11 +18,11 @@ import org.visminer.persistence.Connection;
 
 public class Main {
 	
-	private static String login = "heronsanches"; //login of the your GitHub's user
-	private static String password = "s@fL10.mps"; //password of the your GitHub's user
+	private static String login = ""; //login of the your GitHub's user
+	private static String password = ""; //password of the your GitHub's user
 	
-	private static String ownerRepository = "heronsanches";	//login of the owner of a specified repository GitHub
-	private static String nameRepository = "abcde"; //name of this specified repository
+	private static String ownerRepository = "visminer";	//login of the owner of a specified repository GitHub
+	private static String nameRepository = "Visminer"; //name of this specified repository
 	
 
 	public static void main(String[] args) throws IOException, GitAPIException {
@@ -30,8 +30,8 @@ public class Main {
 		Map<String, String> props = new HashMap<String, String>();
 		props.put(PersistenceUnitProperties.JDBC_DRIVER, "com.mysql.jdbc.Driver");
 		props.put(PersistenceUnitProperties.JDBC_URL, "jdbc:mysql://localhost/visminer");
-		props.put(PersistenceUnitProperties.JDBC_USER, "root");
-		props.put(PersistenceUnitProperties.JDBC_PASSWORD, "admindenovo"); 
+		props.put(PersistenceUnitProperties.JDBC_USER, "");
+		props.put(PersistenceUnitProperties.JDBC_PASSWORD, ""); 
 		props.put(PersistenceUnitProperties.DDL_GENERATION, "create-tables");
 		Connection.setDataBaseInfo(props);
 		
