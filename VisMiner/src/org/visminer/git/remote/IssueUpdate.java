@@ -3,6 +3,7 @@ package org.visminer.git.remote;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import org.eclipse.jdt.internal.compiler.ast.OR_OR_Expression;
 import org.kohsuke.github.GHIssue;
 import org.kohsuke.github.GHIssue.Label;
 import org.kohsuke.github.GHIssueState;
@@ -11,23 +12,40 @@ import org.visminer.main.VisMiner;
 import org.visminer.model.Milestone;
 import org.visminer.model.Repository;
 import org.visminer.persistence.IssueDAO;
-
+/**
+ * To update Issues in the local database
+ */
 public abstract class IssueUpdate {
 	
-		
-	public static void updateIssue(Object ghr, VisMiner visminer) throws IOException{
+	/**
+	 * 
+	 * Update(insert, update) the issues of the local database for stay how
+	 * is in the remote repository. If this method is called first the method "updateMilestone" 
+	 * {@link MilestoneUpdate} it will create a milestone's register in the local database, if this milestone's
+	 * register don't exist. Or will update milestone's register, if the issue is related with them.
+	 * 
+	 * @param gh :the git's repository remote object. {@link ConnectionToRepository}
+	 * @param visminer :{@linkplain VisMiner} object
+	 * @throws IOException
+	 */
+	public static void updateIssue(Object gh, VisMiner visminer) throws IOException{
 			
-		if( ((GHRepository) ghr).hasIssues() ){
+		if( ((GHRepository) gh).hasIssues() ){
 
-			update(ghr, visminer, GHIssueState.OPEN);
-			update(ghr, visminer, GHIssueState.CLOSED);
+			update(gh, visminer, GHIssueState.OPEN);
+			update(gh, visminer, GHIssueState.CLOSED);
 			
 		}
 				
 	}
 	
-	
-	private static void update(Object ghr, VisMiner visminer, GHIssueState status) throws IOException{
+	/**
+	 * @param gh
+	 * @param visminer
+	 * @param status :the issues has two status "OPEN" or "CLOSED"
+	 * @throws IOException
+	 */
+	private static void update(Object gh, VisMiner visminer, GHIssueState status) throws IOException{
 		
 			IssueDAO issueDAO = new IssueDAO();
 			org.visminer.model.Issue issue = new org.visminer.model.Issue();
@@ -37,9 +55,9 @@ public abstract class IssueUpdate {
 			repository.setName(visminer.getRepository().getName());
 			repository.setPath(visminer.getRepository().getPath());
 			
-			if( ((GHRepository) ghr).getIssues(status) != null ){
+			if( ((GHRepository) gh).getIssues(status) != null ){
 				
-				for(GHIssue ghIssue: ((GHRepository) ghr).getIssues(status)){
+				for(GHIssue ghIssue: ((GHRepository) gh).getIssues(status)){
 					
 					issue.setRepository(repository);
 					

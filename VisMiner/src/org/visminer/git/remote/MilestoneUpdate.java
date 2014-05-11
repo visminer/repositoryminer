@@ -1,7 +1,6 @@
 package org.visminer.git.remote;
 
 import java.util.HashMap;
-
 import org.kohsuke.github.GHIssueState;
 import org.kohsuke.github.GHMilestone;
 import org.kohsuke.github.GHRepository;
@@ -11,8 +10,10 @@ import org.visminer.model.Milestone;
 import org.visminer.model.Repository;
 import org.visminer.persistence.MilestoneDAO;
 
+/**
+ *To update milestones in the local database
+ */
 public abstract class MilestoneUpdate {
-	
 	
 	public static void updateMilestone(Object ghr, VisMiner visminer){
 		
@@ -32,8 +33,10 @@ public abstract class MilestoneUpdate {
 				
 			}
 			
-			//if doesn't exist at least one milestone in the specified remote repository
-			//delete all milestone the local database
+			/*
+			 * If doesn't exist at least one milestone in the specified remote repository
+			 * delete all milestone the local database
+			 */
 			if(!hasMilestones){
 
 				System.out.println("Probable repository doesn't have milestones");
@@ -56,9 +59,17 @@ public abstract class MilestoneUpdate {
 		repository.setPath(visminer.getRepository().getPath());
 		
 	
-		//save milestone's number existing in the specified remote repository
+		/*
+		 * This HashMap saves milestone's number existing in the specified remote repository.
+		 * It is used to make a comparison between milestones that exist in local database
+		 * but didn't exist more in the remote repository.
+		 */
 		HashMap<Integer, Integer> milestonesNumbers = new HashMap<Integer, Integer>();
 				
+		/*
+		 * captures milestone by status in the remote repository and update(insert, update)
+		 * in the local database
+		 */
 		for(GHMilestone ghm: ((GHRepository) ghr).listMilestones(status).asList()){
 					
 			milestone.setClosedIssues(ghm.getClosedIssues());
@@ -80,8 +91,10 @@ public abstract class MilestoneUpdate {
 				
 		}
 				
-		//verifying if some database's milestone doesn't exist more in the remote repository and delete them
-		//of local repository
+		/*
+		 * Verifying if some database's register milestone doesn't exist more in the remote repository 
+		 * and delete them of local repository.
+		 */
 		String st;
 		
 		if(GHIssueState.OPEN == status)

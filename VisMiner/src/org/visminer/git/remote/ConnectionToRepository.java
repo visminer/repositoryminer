@@ -3,13 +3,19 @@ package org.visminer.git.remote;
 import java.io.IOException;
 
 import org.kohsuke.github.GitHub;
-
+/**
+ * Provide a connection to a specific remote repository git
+ */
 public class ConnectionToRepository {
-	
+
 	private String idGit;
 	private NameRepositories nameRepRemote;
 	
-	
+	/**
+	 * @param ownerRepository :owner's login of a specified repository Git
+	 * @param nameRepository :name of this specified repository
+	 * @param nameRepRemote : see {@link NameRepositories} enum
+	 */
 	public ConnectionToRepository(String ownerRepository, String nameRepository, NameRepositories nameRepRemote){
 		
 		this.idGit = ownerRepository+ "/"+ nameRepository;
@@ -17,7 +23,13 @@ public class ConnectionToRepository {
 		
 	}
 	
-	
+	/**
+	 * 
+	 * @param login :login of the your Git's remote user
+	 * @param password :password of the your Git's remote user
+	 * @return a repository's object referent to repository specified in 
+	 * third constructor parameter "NameRepositories nameRepRemote"
+	 */
 	public Object getConnection(String login, String password){
 		
 		if(nameRepRemote == NameRepositories.GITHUB){
@@ -39,11 +51,5 @@ public class ConnectionToRepository {
 		
 	}
 
-
-	public NameRepositories getNameRepRemote() {
-		return nameRepRemote;
-	}
-	
-	
 
 }
