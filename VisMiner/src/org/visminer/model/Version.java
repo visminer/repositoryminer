@@ -8,8 +8,13 @@ import java.util.List;
 
 
 /**
+ * <p>
  * The persistent class for the version database table.
+ * <b>Note: Version can be a branch or tag</b>
+ * </p>
  * 
+ * @author Felipe
+ * @version 1.0
  */
 @Entity
 @Table(name="version")
@@ -55,55 +60,110 @@ public class Version implements Serializable {
 
 	public Version() {
 	}
-
+	
+	/**
+	 * @return the idversion
+	 */
 	public int getIdversion() {
-		return this.idversion;
+		return idversion;
 	}
 
+	/**
+	 * @param idversion the idversion to set
+	 */
 	public void setIdversion(int idversion) {
 		this.idversion = idversion;
 	}
 
+	/**
+	 * @return the name
+	 */
 	public String getName() {
-		return this.name;
+		return name;
 	}
 
+	/**
+	 * @param name the name to set
+	 */
 	public void setName(String name) {
 		this.name = name;
 	}
 
+	/**
+	 * @return the path
+	 */
 	public String getPath() {
-		return this.path;
+		return path;
 	}
 
+	/**
+	 * @param path the path to set
+	 */
 	public void setPath(String path) {
 		this.path = path;
 	}
 
+	/**
+	 * @return the type
+	 */
 	public String getType() {
-		return this.type;
+		return type;
 	}
 
+	/**
+	 * @param type the type to set
+	 */
 	public void setType(String type) {
 		this.type = type;
 	}
 
+	/**
+	 * @return the commits
+	 */
 	public List<Commit> getCommits() {
-		return this.commits;
+		return commits;
 	}
 
+	/**
+	 * @param commits the commits to set
+	 */
 	public void setCommits(List<Commit> commits) {
 		this.commits = commits;
 	}
 
+	/**
+	 * @return the metricValues
+	 */
 	public List<MetricValue> getMetricValues() {
-		return this.metricValues;
+		return metricValues;
 	}
 
+	/**
+	 * @param metricValues the metricValues to set
+	 */
 	public void setMetricValues(List<MetricValue> metricValues) {
 		this.metricValues = metricValues;
 	}
 
+	/**
+	 * @return the repository
+	 */
+	public Repository getRepository() {
+		return repository;
+	}
+
+	/**
+	 * @param repository the repository to set
+	 */
+	public void setRepository(Repository repository) {
+		this.repository = repository;
+	}
+
+	/**
+	 * 
+	 * @param metricValue
+	 * @return metricValue added
+	 */
 	public MetricValue addMetricValue(MetricValue metricValue) {
 		getMetricValues().add(metricValue);
 		metricValue.setVersion(this);
@@ -111,19 +171,16 @@ public class Version implements Serializable {
 		return metricValue;
 	}
 
+	/**
+	 * 
+	 * @param metricValue
+	 * @return metricValue removed
+	 */
 	public MetricValue removeMetricValue(MetricValue metricValue) {
 		getMetricValues().remove(metricValue);
 		metricValue.setVersion(null);
 
 		return metricValue;
-	}
-
-	public Repository getRepository() {
-		return this.repository;
-	}
-
-	public void setRepository(Repository repository) {
-		this.repository = repository;
 	}
 
 }

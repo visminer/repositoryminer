@@ -4,6 +4,14 @@ import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.visminer.constants.Metrics;
 import org.visminer.util.DetailAST;
 
+/**
+ * <p>
+ * Calculates Number of Methods metric
+ * </p>
+ * 
+ * @author Felipe
+ * @version 1.0
+ */
 public class NOMMetric implements IMetric{
 
 	private int accumNOM = 0;

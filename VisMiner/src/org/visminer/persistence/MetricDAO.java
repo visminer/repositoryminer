@@ -8,10 +8,24 @@ import javax.persistence.TypedQuery;
 
 import org.visminer.model.Metric;
 
+/**
+ * <p>
+ * The operation class for the metric database table.
+ * </p>
+ * @author Felipe
+ * @version 1.0
+ */
 public class MetricDAO{
 
 	private Connection connection = Connection.getInstance();
 	
+	/**
+	 * <p>
+	 * saves the metric in database if id is set otherwise updates the metric in database
+	 * </p>
+	 * @param metric
+	 * @return metric saved
+	 */
 	public Metric save(Metric metric){
 		
 		EntityManager em = connection.getEntityManager();
@@ -23,6 +37,11 @@ public class MetricDAO{
 		
 	}
 	
+	/**
+	 * 
+	 * @param idmetric
+	 * @return metric by id
+	 */
 	public Metric getOne(int idmetric){
 		
 		EntityManager em = connection.getEntityManager();
@@ -36,6 +55,10 @@ public class MetricDAO{
 		}
 	}
 	
+	/**
+	 * 
+	 * @return all metrics
+	 */
 	public List<Metric> getAll(){
 		
 		EntityManager em = connection.getEntityManager();

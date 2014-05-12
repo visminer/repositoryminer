@@ -6,8 +6,12 @@ import javax.persistence.*;
 
 
 /**
+ * <p>
  * The persistent class for the metric_value database table.
+ * </p>
  * 
+ * @author Felipe
+ * @version 1.0
  */
 @Entity
 @Table(name="metric_value")
@@ -41,42 +45,72 @@ public class MetricValue implements Serializable {
 	public MetricValue() {
 	}
 
+	/**
+	 * @return the idmetricValue
+	 */
 	public int getIdmetricValue() {
-		return this.idmetricValue;
+		return idmetricValue;
 	}
 
+	/**
+	 * @param idmetricValue the idmetricValue to set
+	 */
 	public void setIdmetricValue(int idmetricValue) {
 		this.idmetricValue = idmetricValue;
 	}
 
+	/**
+	 * @return the value
+	 */
 	public int getValue() {
-		return this.value;
+		return value;
 	}
 
+	/**
+	 * @param value the value to set
+	 */
 	public void setValue(int value) {
 		this.value = value;
 	}
 
+	/**
+	 * @return the metric
+	 */
 	public Metric getMetric() {
-		return this.metric;
+		return metric;
 	}
 
+	/**
+	 * @param metric the metric to set
+	 */
 	public void setMetric(Metric metric) {
 		this.metric = metric;
 	}
 
+	/**
+	 * @return the file
+	 */
 	public File getFile() {
-		return this.file;
+		return file;
 	}
 
+	/**
+	 * @param file the file to set
+	 */
 	public void setFile(File file) {
 		this.file = file;
 	}
 
+	/**
+	 * @return the version
+	 */
 	public Version getVersion() {
-		return this.version;
+		return version;
 	}
 
+	/**
+	 * @param version the version to set
+	 */
 	public void setVersion(Version version) {
 		this.version = version;
 	}

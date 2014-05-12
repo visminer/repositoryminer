@@ -24,18 +24,32 @@ import org.visminer.model.Version;
 import org.visminer.persistence.CommitDAO;
 import org.visminer.persistence.CommitterDAO;
 import org.visminer.persistence.FileDAO;
-import org.visminer.persistence.MetricDAO;
 import org.visminer.persistence.MetricValueDAO;
 import org.visminer.persistence.RepositoryDAO;
 import org.visminer.persistence.VersionDAO;
 import org.visminer.util.DetailAST;
 
+/**
+ * <p>
+ * Save informations from local git repository in database
+ * </p>
+ * 
+ * @author Felipe
+ * @version 1.0
+ */
 public class AnalyzeRepository implements Runnable{
 
 	private Repository repository;
 	private GitLocal gitLocal;
 	private Set<Commit> commits;
 	
+	/**
+	 * 
+	 * @param repository_path : local git repository path
+	 * @param idGit : <repository owner>/<repository name>
+	 * @throws IOException
+	 * @throws GitAPIException
+	 */
 	public AnalyzeRepository(String repository_path, String idGit) throws IOException, GitAPIException{
 		
 		gitLocal = new GitLocal(repository_path, idGit);
@@ -44,10 +58,19 @@ public class AnalyzeRepository implements Runnable{
 		
 	}
 	
+	/**
+	 * 
+	 * @return repository analyzed
+	 */
 	public Repository getRepository(){
 		return this.repository;
 	}
 	
+	/**
+	 * <p>
+	 * Save repository committers in database
+	 * </p>
+	 */
 	private void saveCommitters(){
 		
 		CommitterDAO committerDAO = new CommitterDAO();
@@ -62,6 +85,12 @@ public class AnalyzeRepository implements Runnable{
 		
 	}
 	
+	/**
+	 * <p>
+	 * Save repository versions in database
+	 * </p>
+	 * @throws GitAPIException
+	 */
 	private void saveVersions() throws GitAPIException{
 		
 		VersionDAO versionDAO = new VersionDAO();
@@ -76,6 +105,17 @@ public class AnalyzeRepository implements Runnable{
 		
 	}
 	
+	/**
+	 * <p>
+	 * Save repository commits in database
+	 * </p>
+	 * 
+	 * @throws RevisionSyntaxException
+	 * @throws MissingObjectException
+	 * @throws IncorrectObjectTypeException
+	 * @throws AmbiguousObjectException
+	 * @throws IOException
+	 */
 	private void saveCommits() throws RevisionSyntaxException, MissingObjectException, IncorrectObjectTypeException, AmbiguousObjectException, IOException{
 		
 		CommitDAO commitDAO = new CommitDAO();
@@ -99,6 +139,15 @@ public class AnalyzeRepository implements Runnable{
 		
 	}
 	
+	/**
+	 * <p>
+	 * Save files in repository commit and the metrics values of  files states
+	 * </p>
+	 * 
+	 * @throws MissingObjectException
+	 * @throws IncorrectObjectTypeException
+	 * @throws IOException
+	 */
 	private void saveFiles() throws MissingObjectException, IncorrectObjectTypeException, IOException{
 		
 		FileDAO fileDAO = new FileDAO();
@@ -119,6 +168,7 @@ public class AnalyzeRepository implements Runnable{
 		
 	}
 
+	//save file metrics values
 	private void saveFileMetrics(File file, String commitSha) throws MissingObjectException, IncorrectObjectTypeException, CorruptObjectException, IOException{
 		
 		MetricValueDAO metricValueDAO = new MetricValueDAO();
@@ -143,6 +193,7 @@ public class AnalyzeRepository implements Runnable{
 		}
 	}
 
+	//save versions metrics values
 	private void saveVersionMetrics(Version version) throws RevisionSyntaxException, MissingObjectException, IncorrectObjectTypeException, AmbiguousObjectException, IOException{
 		
 		MetricValueDAO dao = new MetricValueDAO();

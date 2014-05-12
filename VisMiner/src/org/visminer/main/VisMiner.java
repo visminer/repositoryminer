@@ -23,10 +23,27 @@ import org.visminer.persistence.MetricDAO;
 import org.visminer.persistence.RepositoryDAO;
 import org.visminer.persistence.VersionDAO;
 
+/**
+ * <p>
+ * interface between user and VisMiner. Provide access to API features
+ * </p>
+ * 
+ * @author Felipe
+ * @version 1.0
+ */
 public class VisMiner {
 
 	private Repository repository;
 	
+	/**
+	 * 
+	 * @param databaseProperties : database configuration informations
+	 * @param repositoryPath : local repository path
+	 * @param ownerRepository : owner of remote repository
+	 * @param nameRepository : name of remote repository
+	 * @throws IOException
+	 * @throws GitAPIException
+	 */
 	public VisMiner(Map<String, String> databaseProperties, String repositoryPath,
 		String ownerRepository,	String nameRepository) throws IOException, GitAPIException{
 		
@@ -46,6 +63,7 @@ public class VisMiner {
 		
 	}
 	
+	//save the default metrics in database
 	private void init(){
 		
 		MetricDAO metricDAO = new MetricDAO();
@@ -63,18 +81,30 @@ public class VisMiner {
 		
 	}
 	
+	/**
+	 * 
+	 * @return repository
+	 */
 	public Repository getRepository(){
 		
 		return this.repository;
 		
 	}
 	
+	/**
+	 * 
+	 * @return committers in repository
+	 */
 	public List<Committer> getCommitters(){
 		
 		CommitterDAO committerDAO = new CommitterDAO();
 		return committerDAO.getByRepository(repository);
 	}
 	
+	/**
+	 * 
+	 * @return versions in repository
+	 */
 	public List<Version> getVersions(){
 		
 		VersionDAO versionDAO = new VersionDAO();
@@ -82,6 +112,12 @@ public class VisMiner {
 		
 	}
 	
+	/**
+	 * 
+	 * @param version
+	 * @param committer
+	 * @return commits in repository by version and committer
+	 */
 	public List<Commit> getCommits(Version version, Committer committer){
 		
 		CommitDAO commitDAO = new CommitDAO();
@@ -89,6 +125,11 @@ public class VisMiner {
 		
 	}
 	
+	/**
+	 * 
+	 * @param version
+	 * @return commits in repository by version
+	 */
 	public List<Commit> getCommits(Version version){
 		
 		CommitDAO commitDAO = new CommitDAO();
@@ -96,6 +137,11 @@ public class VisMiner {
 		
 	}	
 	
+	/**
+	 * 
+	 * @param committer
+	 * @return commits in repository by committer
+	 */
 	public List<Commit> getCommits(Committer committer){
 		
 		CommitDAO commitDAO = new CommitDAO();
@@ -103,6 +149,11 @@ public class VisMiner {
 		
 	}	
 	
+	/**
+	 * 
+	 * @param commit
+	 * @return files in data
+	 */
 	public List<File> getFiles(Commit commit){
 		
 		FileDAO fileDAO = new FileDAO();
@@ -110,6 +161,10 @@ public class VisMiner {
 		
 	}
 	
+	/**
+	 * 
+	 * @return all metrics
+	 */
 	public List<Metric> getMetrics(){
 		
 		MetricDAO metricDAO = new MetricDAO();

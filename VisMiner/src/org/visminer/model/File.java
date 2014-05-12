@@ -8,8 +8,12 @@ import java.util.List;
 
 
 /**
+ * <p>
  * The persistent class for the file database table.
+ * </p>
  * 
+ * @author Felipe
+ * @version 1.0
  */
 @Entity
 @Table(name="file")
@@ -36,39 +40,68 @@ public class File implements Serializable {
 
 	public File() {
 	}
-
+	
+	/**
+	 * @return the idfile
+	 */
 	public int getIdfile() {
-		return this.idfile;
+		return idfile;
 	}
 
+	/**
+	 * @param idfile the idfile to set
+	 */
 	public void setIdfile(int idfile) {
 		this.idfile = idfile;
 	}
 
+	/**
+	 * @return the path
+	 */
 	public String getPath() {
-		return this.path;
+		return path;
 	}
 
+	/**
+	 * @param path the path to set
+	 */
 	public void setPath(String path) {
 		this.path = path;
 	}
 
+	/**
+	 * @return the commit
+	 */
 	public Commit getCommit() {
-		return this.commit;
+		return commit;
 	}
 
+	/**
+	 * @param commit the commit to set
+	 */
 	public void setCommit(Commit commit) {
 		this.commit = commit;
 	}
 
+	/**
+	 * @return the metricValues
+	 */
 	public List<MetricValue> getMetricValues() {
-		return this.metricValues;
+		return metricValues;
 	}
 
+	/**
+	 * @param metricValues the metricValues to set
+	 */
 	public void setMetricValues(List<MetricValue> metricValues) {
 		this.metricValues = metricValues;
 	}
 
+	/**
+	 * 
+	 * @param metricValue
+	 * @return metricValue added
+	 */
 	public MetricValue addMetricValue(MetricValue metricValue) {
 		getMetricValues().add(metricValue);
 		metricValue.setFile(this);
@@ -76,6 +109,11 @@ public class File implements Serializable {
 		return metricValue;
 	}
 
+	/**
+	 * 
+	 * @param metricValue
+	 * @return metricValue removed
+	 */
 	public MetricValue removeMetricValue(MetricValue metricValue) {
 		getMetricValues().remove(metricValue);
 		metricValue.setFile(null);

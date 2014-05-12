@@ -9,8 +9,11 @@ import java.util.List;
 
 
 /**
+ * <p>
  * The persistent class for the commit database table.
- * 
+ * </p>
+ * @author Felipe
+ * @version 1.0
  */
 @Entity
 @Table(name="commit")
@@ -58,63 +61,110 @@ public class Commit implements Serializable {
 
 	public Commit() {
 	}
-
+	
+	/**
+	 * @return the sha
+	 */
 	public String getSha() {
-		return this.sha;
+		return sha;
 	}
 
+	/**
+	 * @param sha the sha to set
+	 */
 	public void setSha(String sha) {
 		this.sha = sha;
 	}
 
+	/**
+	 * @return the date
+	 */
 	public Date getDate() {
-		return this.date;
+		return date;
 	}
 
+	/**
+	 * @param date the date to set
+	 */
 	public void setDate(Date date) {
 		this.date = date;
 	}
 
+	/**
+	 * @return the message
+	 */
 	public String getMessage() {
-		return this.message;
+		return message;
 	}
 
+	/**
+	 * @param message the message to set
+	 */
 	public void setMessage(String message) {
 		this.message = message;
 	}
 
+	/**
+	 * @return the committer
+	 */
 	public Committer getCommitter() {
-		return this.committer;
+		return committer;
 	}
 
+	/**
+	 * @param committer the committer to set
+	 */
 	public void setCommitter(Committer committer) {
 		this.committer = committer;
 	}
 
+	/**
+	 * @return the issues
+	 */
 	public List<Issue> getIssues() {
-		return this.issues;
+		return issues;
 	}
 
+	/**
+	 * @param issues the issues to set
+	 */
 	public void setIssues(List<Issue> issues) {
 		this.issues = issues;
 	}
 
+	/**
+	 * @return the versions
+	 */
 	public List<Version> getVersions() {
-		return this.versions;
+		return versions;
 	}
 
+	/**
+	 * @param versions the versions to set
+	 */
 	public void setVersions(List<Version> versions) {
 		this.versions = versions;
 	}
 
+	/**
+	 * @return the files
+	 */
 	public List<File> getFiles() {
-		return this.files;
+		return files;
 	}
 
+	/**
+	 * @param files the files to set
+	 */
 	public void setFiles(List<File> files) {
 		this.files = files;
 	}
 
+	/**
+	 * 
+	 * @param file
+	 * @return file added
+	 */
 	public File addFile(File file) {
 		getFiles().add(file);
 		file.setCommit(this);
@@ -122,6 +172,11 @@ public class Commit implements Serializable {
 		return file;
 	}
 
+	/**
+	 * 
+	 * @param file
+	 * @return file removed
+	 */
 	public File removeFile(File file) {
 		getFiles().remove(file);
 		file.setCommit(null);

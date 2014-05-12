@@ -4,7 +4,14 @@ import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.visminer.constants.Metrics;
 import org.visminer.util.DetailAST;
 
-
+/**
+ * <p>
+ * Calculates Number of Classes metric
+ * </p>
+ * 
+ * @author Felipe
+ * @version 1.0
+ */
 public class NOCMetric implements IMetric{
 
 	private int accumNOC = 0;

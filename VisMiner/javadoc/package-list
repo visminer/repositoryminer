@@ -1,0 +1,10 @@
+
+org.visminer.constants
+org.visminer.git.local
+org.visminer.git.remote
+org.visminer.main
+org.visminer.metric
+org.visminer.model
+org.visminer.persistence
+org.visminer.util
+test

@@ -14,9 +14,12 @@ import org.eclipse.jdt.core.dom.IBinding;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 
 /**
+ * <p>
  * The utility class to create AST from source code
+ * </p>
  * 
- * @author felipe
+ * @author Felipe
+ * @version 1.0
  */
 public class DetailAST {
 

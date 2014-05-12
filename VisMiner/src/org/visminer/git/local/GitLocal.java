@@ -33,6 +33,14 @@ import org.visminer.model.Commit;
 import org.visminer.model.Committer;
 import org.visminer.model.Version;
 
+/**
+ * <p>
+ * Get informations from local git repository
+ * </p>
+ * 
+ * @author Felipe
+ * @version 1.0
+ */
 public class GitLocal {
 
 	private final String TYPE_BRANCH = "branch";
@@ -41,6 +49,12 @@ public class GitLocal {
 	private Repository repository;
 	private String idGit;
 	
+	/**
+	 * 
+	 * @param path : local git repository path
+	 * @param idGit : <repository owner>/<repository name>
+	 * @throws IOException
+	 */
 	public GitLocal(String path, String idGit) throws IOException{
 	
 		repository = new FileRepository(path);
@@ -48,6 +62,10 @@ public class GitLocal {
 		
 	}
 	
+	/**
+	 * 
+	 * @return local git repository
+	 */
 	public org.visminer.model.Repository getRepository(){
 		
 		org.visminer.model.Repository userRepo = new org.visminer.model.Repository();
@@ -60,6 +78,11 @@ public class GitLocal {
 		
 	}
 	
+	/**
+	 * 
+	 * @return repository versions
+	 * @throws GitAPIException
+	 */
 	public List<Version> getVersions() throws GitAPIException{
 		
 		Git git = new Git(repository);
@@ -70,6 +93,7 @@ public class GitLocal {
 		return versions;
 	}
 	
+	//convert tags and branchs refs to Version object
 	private List<Version> analyzeRefs(List<Ref> refs, String type){
 		
 		List<Version> versions = new ArrayList<Version>();
@@ -91,6 +115,10 @@ public class GitLocal {
 		
 	}
 	
+	/**
+	 * 
+	 * @return repository committers
+	 */
 	public List<Committer> getCommitters(){
 		
 		AuthorSetFilter authorFilter = new AuthorSetFilter();
@@ -108,6 +136,12 @@ public class GitLocal {
 		
 	}
 	
+	/**
+	 * 
+	 * @param version
+	 * @param committer
+	 * @return repository commits
+	 */
 	public List<Commit> getCommits(String version, Committer committer){
 		
 		AndCommitFilter filters = new AndCommitFilter();
@@ -137,6 +171,14 @@ public class GitLocal {
 		
 	}	
 	
+	/**
+	 * 
+	 * @param commitSha
+	 * @return files in commit
+	 * @throws MissingObjectException
+	 * @throws IncorrectObjectTypeException
+	 * @throws IOException
+	 */
 	public List<String> getFilesNameInCommit(String commitSha) throws MissingObjectException, IncorrectObjectTypeException, IOException{
 		
 		java.io.File gitDir = new java.io.File(repository.getDirectory().toString());
@@ -170,6 +212,15 @@ public class GitLocal {
 		
 	}
 	
+	/**
+	 * 
+	 * @param version
+	 * @return all files in a version
+	 * @throws MissingObjectException
+	 * @throws IncorrectObjectTypeException
+	 * @throws CorruptObjectException
+	 * @throws IOException
+	 */
 	public List<String> getFilesNameInVersion(String version) throws MissingObjectException, IncorrectObjectTypeException, CorruptObjectException, IOException{
 		
 		RevWalk revWalk = new RevWalk(repository);
@@ -188,7 +239,16 @@ public class GitLocal {
 		return files;
 		
 	}
-	
+	/**
+	 * 
+	 * @param version
+	 * @return the last commit
+	 * @throws RevisionSyntaxException
+	 * @throws MissingObjectException
+	 * @throws IncorrectObjectTypeException
+	 * @throws AmbiguousObjectException
+	 * @throws IOException
+	 */
 	public Commit getLastCommit(String version) throws RevisionSyntaxException, MissingObjectException, IncorrectObjectTypeException, AmbiguousObjectException, IOException{
 		
 		RevWalk revWalk = new RevWalk(repository);
@@ -203,6 +263,16 @@ public class GitLocal {
 		
 	}
 	
+	/**
+	 * 
+	 * @param commitSha
+	 * @param filePath
+	 * @return file state in a given commit
+	 * @throws MissingObjectException
+	 * @throws IncorrectObjectTypeException
+	 * @throws CorruptObjectException
+	 * @throws IOException
+	 */
 	public String getFileStates(String commitSha, String filePath) throws MissingObjectException, IncorrectObjectTypeException, CorruptObjectException, IOException{
 		
 		RevWalk walk = new RevWalk(repository);
