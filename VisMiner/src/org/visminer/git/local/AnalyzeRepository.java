@@ -52,9 +52,11 @@ public class AnalyzeRepository implements Runnable{
 	 */
 	public AnalyzeRepository(String repository_path, String idGit) throws IOException, GitAPIException{
 		
-		gitLocal = new GitLocal(repository_path, idGit);
+		gitLocal = new GitLocal(repository_path);
 		RepositoryDAO repoDAO = new RepositoryDAO();
-		repository = repoDAO.save(gitLocal.getRepository());
+		repository = gitLocal.getRepository();
+		repository.setIdGit(idGit);
+		repoDAO.save(repository);
 		
 	}
 	

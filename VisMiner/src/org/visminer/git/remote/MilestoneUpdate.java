@@ -55,7 +55,6 @@ public abstract class MilestoneUpdate {
 		org.visminer.persistence.MilestoneDAO milestoneDAO = new MilestoneDAO();
 		
 		repository.setIdGit(visminer.getRepository().getIdGit());
-		repository.setName(visminer.getRepository().getName());
 		repository.setPath(visminer.getRepository().getPath());
 		
 	

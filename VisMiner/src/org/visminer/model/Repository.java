@@ -26,9 +26,6 @@ public class Repository implements Serializable {
 	@Column(name="idGit")
 	private String idGit;
 
-	@Column(name="name", length=45, nullable=false)
-	private String name;
-
 	@Column(name="path", length=1024, nullable=false)
 	private String path;
 	
@@ -67,20 +64,6 @@ public class Repository implements Serializable {
 	 */
 	public void setIdGit(String idGit) {
 		this.idGit = idGit;
-	}
-
-	/**
-	 * @return the name
-	 */
-	public String getName() {
-		return name;
-	}
-
-	/**
-	 * @param name the name to set
-	 */
-	public void setName(String name) {
-		this.name = name;
 	}
 
 	/**

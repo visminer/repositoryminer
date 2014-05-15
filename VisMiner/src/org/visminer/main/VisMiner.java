@@ -8,7 +8,9 @@ import javax.persistence.EntityManager;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.visminer.constants.Metrics;
+import org.visminer.constants.Services;
 import org.visminer.git.local.AnalyzeRepository;
+import org.visminer.git.remote.ConnectionToRepository;
 import org.visminer.model.Commit;
 import org.visminer.model.Committer;
 import org.visminer.model.File;
@@ -33,32 +35,40 @@ import org.visminer.persistence.VersionDAO;
  */
 public class VisMiner {
 
+	public static final String REMOTE_REPOSITORY_USER = "user";
+	public static final String REMOTE_REPOSITORY_PASSWORD = "password";
+	public static final String REMOTE_REPOSITORY_OWNER = "owner";
+	public static final String REMOTE_REPOSITORY_NAME = "repository_name";
+	public static final String LOCAL_REPOSITORY_PATH = "repository_path";
+	public static final String REMOTE_REPOSITORY_SERVICE = "service";
+	
 	private Repository repository;
 	
 	/**
-	 * 
-	 * @param databaseProperties : database configuration informations
-	 * @param repositoryPath : local repository path
-	 * @param ownerRepository : owner of remote repository
-	 * @param nameRepository : name of remote repository
+	 * @param config : Map containing pair key and value used to configure the API 
 	 * @throws IOException
 	 * @throws GitAPIException
 	 */
-	public VisMiner(Map<String, String> databaseProperties, String repositoryPath,
-		String ownerRepository,	String nameRepository) throws IOException, GitAPIException{
+	public VisMiner(Map<String, String> visminer_cfg, Map<String, String> db_cfg) throws IOException, GitAPIException{
 		
 		init();
-
-		String idGit = ownerRepository+ "/"+ nameRepository;
+		Connection.setDataBaseInfo(db_cfg);
 		
-		RepositoryDAO repoDAO = new RepositoryDAO();
-		repository = repoDAO.getByIdGit(idGit);
+		if(visminer_cfg.get(VisMiner.LOCAL_REPOSITORY_PATH) != null){
 		
-		if(repository == null){
-			AnalyzeRepository analyzeRepo = new AnalyzeRepository(repositoryPath, idGit);
-			Thread thread = new Thread(analyzeRepo);
-			thread.start();
-			repository = analyzeRepo.getRepository();
+			RepositoryDAO repoDAO = new RepositoryDAO();
+			Repository repo = repoDAO.getByPath(visminer_cfg.get(VisMiner.LOCAL_REPOSITORY_PATH));
+			if(repo == null){
+				String idGit = visminer_cfg.get(VisMiner.REMOTE_REPOSITORY_OWNER) + "/" + visminer_cfg.get(VisMiner.REMOTE_REPOSITORY_NAME);
+				AnalyzeRepository analyze = new AnalyzeRepository(visminer_cfg.get(VisMiner.LOCAL_REPOSITORY_PATH), idGit);
+			}
+			
+			if(visminer_cfg.get(VisMiner.REMOTE_REPOSITORY_SERVICE) != null){
+				ConnectionToRepository connection = new ConnectionToRepository(visminer_cfg.get(VisMiner.REMOTE_REPOSITORY_OWNER),
+						visminer_cfg.get(VisMiner.REMOTE_REPOSITORY_NAME), Services.valueOf(visminer_cfg.get(VisMiner.REMOTE_REPOSITORY_NAME)));
+				//faz parte do github
+			}
+			
 		}
 		
 	}

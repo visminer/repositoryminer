@@ -52,7 +52,6 @@ public abstract class IssueUpdate {
 			org.visminer.model.Repository repository = new Repository();
 			
 			repository.setIdGit(visminer.getRepository().getIdGit());
-			repository.setName(visminer.getRepository().getName());
 			repository.setPath(visminer.getRepository().getPath());
 			
 			if( ((GHRepository) gh).getIssues(status) != null ){

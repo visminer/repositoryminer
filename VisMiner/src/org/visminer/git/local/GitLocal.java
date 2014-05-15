@@ -47,18 +47,15 @@ public class GitLocal {
 	private final String TYPE_TAG = "tag";
 	
 	private Repository repository;
-	private String idGit;
 	
 	/**
 	 * 
 	 * @param path : local git repository path
-	 * @param idGit : <repository owner>/<repository name>
 	 * @throws IOException
 	 */
-	public GitLocal(String path, String idGit) throws IOException{
+	public GitLocal(String path) throws IOException{
 	
 		repository = new FileRepository(path);
-		this.idGit = idGit;
 		
 	}
 	
@@ -70,9 +67,6 @@ public class GitLocal {
 		
 		org.visminer.model.Repository userRepo = new org.visminer.model.Repository();
 		userRepo.setPath(repository.getDirectory().getPath().replace("\\", "/"));
-		String[] parts = userRepo.getPath().split("/");
-		userRepo.setName(parts[parts.length - 2]);
-		userRepo.setIdGit(idGit);
 		
 		return userRepo;
 		
