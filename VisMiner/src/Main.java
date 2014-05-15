@@ -18,12 +18,12 @@ import org.visminer.persistence.Connection;
 
 public class Main {
 	
-	private static String login = ""; //login of the your GitHub's user
-	private static String password = ""; //password of the your GitHub's user
+	private static String loginGitHub = ""; //login of the your GitHub's user
+	private static String passwordGitHub = ""; //password of the your GitHub's user
 	
-	private static String ownerRepository = "visminer";	//login of the owner of a specified repository GitHub
-	private static String nameRepository = "Visminer"; //name of this specified repository
-	
+	private static String ownerRepositoryGitHub = "visminer";	//login of the owner of a specified repository GitHub
+	private static String nameRepositoryGitHub = "Visminer"; //name of this specified repository
+	private static String urlLocalGitRepository = "/home/heron/workspaces-eclipses/workspace_pibiti/Visminer/";
 
 	public static void main(String[] args) throws IOException, GitAPIException {
 
@@ -35,23 +35,32 @@ public class Main {
 		props.put(PersistenceUnitProperties.DDL_GENERATION, "create-tables");
 		Connection.setDataBaseInfo(props);
 		
-		//Make remote connection in the specified repository and get it
-		ConnectionToRepository ctr = new ConnectionToRepository(ownerRepository, nameRepository, NameRepositories.GITHUB);
-		GHRepository gh = (GHRepository) ctr.getConnection(login, password);
+		
+		//if you want to use github to access milestones and issues 
+		if (!loginGitHub.equals("") && !passwordGitHub.equals("") && !ownerRepositoryGitHub.equals("") && !nameRepositoryGitHub.equals("")){
+			//Make remote connection in the specified repository and get it
+			ConnectionToRepository ctr = new ConnectionToRepository(ownerRepositoryGitHub, nameRepositoryGitHub, NameRepositories.GITHUB);
+			GHRepository gh = (GHRepository) ctr.getConnection(loginGitHub, passwordGitHub);
 
-		//initialize VisMiner if remote repository exist, and update milestones(insert, delete, update) 
-		//and issues(insert, update)
-		if(gh != null){
-			
-			//TODO ENHANCEMENT verifying to put automatic update the local repository path the database, if the user 
-			//modify the local path in your computer
-			VisMiner visminer = new VisMiner(props, "/home/heron/workspaces-eclipses/workspace_pibiti/Visminer/",
-				ownerRepository, nameRepository);
-			
-			IssueUpdate.updateIssue(gh, visminer);
-			MilestoneUpdate.updateMilestone(gh, visminer);
+			//initialize VisMiner if remote repository exist, and update milestones(insert, delete, update) 
+			//and issues(insert, update)
+			if(gh != null){
+				
+				//TODO ENHANCEMENT verifying to put automatic update the local repository path the database, if the user 
+				//modify the local path in your computer
+				VisMiner visminer = new VisMiner(props, urlLocalGitRepository,
+					ownerRepositoryGitHub, nameRepositoryGitHub);
+				
+				IssueUpdate.updateIssue(gh, visminer);
+				MilestoneUpdate.updateMilestone(gh, visminer);
+				
+			}
+		}else{
+			VisMiner visminer = new VisMiner(props, urlLocalGitRepository,
+					null, null);
 			
 		}
+		
 	
 	}
 	
