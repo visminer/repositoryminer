@@ -8,13 +8,8 @@ import java.util.List;
 
 
 /**
- * <p>
  * The persistent class for the version database table.
- * <b>Note: Version can be a branch or tag</b>
- * </p>
  * 
- * @author Felipe
- * @version 1.0
  */
 @Entity
 @Table(name="version")
@@ -37,7 +32,7 @@ public class Version implements Serializable {
 	private String type;
 
 	//bi-directional many-to-many association to Commit
-	@ManyToMany(fetch=FetchType.LAZY)
+	@ManyToMany(fetch=FetchType.EAGER)
 	@JoinTable(
 		name="commit_version"
 		, joinColumns={
@@ -54,116 +49,61 @@ public class Version implements Serializable {
 	private List<MetricValue> metricValues;
 
 	//bi-directional many-to-one association to Repository
-	@ManyToOne(fetch=FetchType.LAZY)
-	@JoinColumn(name="repository_idGit", nullable=false)
+	@ManyToOne(fetch=FetchType.EAGER)
+	@JoinColumn(name="repository_idrepository", nullable=false)
 	private Repository repository;
 
 	public Version() {
 	}
-	
-	/**
-	 * @return the idversion
-	 */
+
 	public int getIdversion() {
-		return idversion;
+		return this.idversion;
 	}
 
-	/**
-	 * @param idversion the idversion to set
-	 */
 	public void setIdversion(int idversion) {
 		this.idversion = idversion;
 	}
 
-	/**
-	 * @return the name
-	 */
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
-	/**
-	 * @param name the name to set
-	 */
 	public void setName(String name) {
 		this.name = name;
 	}
 
-	/**
-	 * @return the path
-	 */
 	public String getPath() {
-		return path;
+		return this.path;
 	}
 
-	/**
-	 * @param path the path to set
-	 */
 	public void setPath(String path) {
 		this.path = path;
 	}
 
-	/**
-	 * @return the type
-	 */
 	public String getType() {
-		return type;
+		return this.type;
 	}
 
-	/**
-	 * @param type the type to set
-	 */
 	public void setType(String type) {
 		this.type = type;
 	}
 
-	/**
-	 * @return the commits
-	 */
 	public List<Commit> getCommits() {
-		return commits;
+		return this.commits;
 	}
 
-	/**
-	 * @param commits the commits to set
-	 */
 	public void setCommits(List<Commit> commits) {
 		this.commits = commits;
 	}
 
-	/**
-	 * @return the metricValues
-	 */
 	public List<MetricValue> getMetricValues() {
-		return metricValues;
+		return this.metricValues;
 	}
 
-	/**
-	 * @param metricValues the metricValues to set
-	 */
 	public void setMetricValues(List<MetricValue> metricValues) {
 		this.metricValues = metricValues;
 	}
 
-	/**
-	 * @return the repository
-	 */
-	public Repository getRepository() {
-		return repository;
-	}
-
-	/**
-	 * @param repository the repository to set
-	 */
-	public void setRepository(Repository repository) {
-		this.repository = repository;
-	}
-
-	/**
-	 * 
-	 * @param metricValue
-	 * @return metricValue added
-	 */
 	public MetricValue addMetricValue(MetricValue metricValue) {
 		getMetricValues().add(metricValue);
 		metricValue.setVersion(this);
@@ -171,16 +111,19 @@ public class Version implements Serializable {
 		return metricValue;
 	}
 
-	/**
-	 * 
-	 * @param metricValue
-	 * @return metricValue removed
-	 */
 	public MetricValue removeMetricValue(MetricValue metricValue) {
 		getMetricValues().remove(metricValue);
 		metricValue.setVersion(null);
 
 		return metricValue;
+	}
+
+	public Repository getRepository() {
+		return this.repository;
+	}
+
+	public void setRepository(Repository repository) {
+		this.repository = repository;
 	}
 
 }

@@ -9,14 +9,6 @@ import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.visminer.constants.Metrics;
 import org.visminer.util.DetailAST;
 
-/**
- * <p>
- * Calculates Complexity Cyclomatic metric
- * </p>
- * 
- * @author Felipe
- * @version 1.0
- */
 public class CCMetric implements IMetric{
 
 	private int accumCC = 0;
@@ -50,7 +42,6 @@ public class CCMetric implements IMetric{
 		
 	}
 	
-	//process mthod code
 	private int processBlock(Block body){
 		
 		int cc = 1;
@@ -73,7 +64,6 @@ public class CCMetric implements IMetric{
 		
 	}
 	
-	//verify if a statement count or not count to cc value
 	private int processStatement(Statement statement){
 		switch(statement.getNodeType()){
 		

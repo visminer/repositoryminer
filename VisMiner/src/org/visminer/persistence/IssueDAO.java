@@ -11,24 +11,10 @@ import org.visminer.model.Metric;
 import org.visminer.model.Milestone;
 import org.visminer.model.Repository;
 
-/**
- * <p>
- * The operation class for the issue database table.
- * </p>
- * @author Heron
- * @version 1.0
- */
 public class IssueDAO{
 
 	private Connection connection = Connection.getInstance();
 	
-	/**
-	 * <p>
-	 * saves the issue in database if id is set otherwise updates the issue in database
-	 * </p>
-	 * @param issue
-	 * @return issue saved
-	 */
 	public Issue save(Issue issue){
 		
 		EntityManager em = connection.getEntityManager();
@@ -40,12 +26,6 @@ public class IssueDAO{
 		
 	}
 	
-	/**
-	 * 
-	 * @param number
-	 * @param repository
-	 * @return issue by number and repository
-	 */
 	public Issue getOne(int number, Repository repository){
 			
 			EntityManager em = connection.getEntityManager();
@@ -63,11 +43,6 @@ public class IssueDAO{
 			}
 	}
 	
-	/**
-	 * 
-	 * @param repository
-	 * @return issues by repository
-	 */
 	public List<Issue> getAll(Repository repository){
 		
 		EntityManager em = connection.getEntityManager();
@@ -83,11 +58,6 @@ public class IssueDAO{
 		}
 	}
 	
-	/**
-	 * 
-	 * @param milestone
-	 * @return issues by milestone
-	 */
 	public List<Issue> getAllbyMilestone(Milestone milestone){
 		
 		EntityManager em = connection.getEntityManager();

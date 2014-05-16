@@ -8,12 +8,8 @@ import java.util.List;
 
 
 /**
- * <p>
  * The persistent class for the committer database table.
- * </p>
  * 
- * @author Felipe
- * @version 1.0
  */
 @Entity
 @Table(name="committer")
@@ -33,12 +29,12 @@ public class Committer implements Serializable {
 	private String name;
 
 	//bi-directional many-to-one association to Commit
-	@OneToMany(mappedBy="committer", fetch=FetchType.LAZY)
+	@OneToMany(mappedBy="committer", fetch=FetchType.EAGER)
 	private List<Commit> commits;
 
 	//bi-directional many-to-one association to Repository
-	@ManyToOne(fetch=FetchType.LAZY)
-	@JoinColumn(name="repository_idGit", nullable=false)
+	@ManyToOne(fetch=FetchType.EAGER)
+	@JoinColumn(name="repository_idrepository", nullable=false)
 	private Repository repository;
 
 	public Committer() {
@@ -50,81 +46,38 @@ public class Committer implements Serializable {
 		this.name = name;
 	}
 
-	/**
-	 * @return the idcommitter
-	 */
 	public int getIdcommitter() {
-		return idcommitter;
+		return this.idcommitter;
 	}
 
-	/**
-	 * @param idcommitter the idcommitter to set
-	 */
 	public void setIdcommitter(int idcommitter) {
 		this.idcommitter = idcommitter;
 	}
 
-	/**
-	 * @return the email
-	 */
 	public String getEmail() {
-		return email;
+		return this.email;
 	}
 
-	/**
-	 * @param email the email to set
-	 */
 	public void setEmail(String email) {
 		this.email = email;
 	}
 
-	/**
-	 * @return the name
-	 */
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
-	/**
-	 * @param name the name to set
-	 */
 	public void setName(String name) {
 		this.name = name;
 	}
 
-	/**
-	 * @return the commits
-	 */
 	public List<Commit> getCommits() {
-		return commits;
+		return this.commits;
 	}
 
-	/**
-	 * @param commits the commits to set
-	 */
 	public void setCommits(List<Commit> commits) {
 		this.commits = commits;
 	}
 
-	/**
-	 * @return the repository
-	 */
-	public Repository getRepository() {
-		return repository;
-	}
-
-	/**
-	 * @param repository the repository to set
-	 */
-	public void setRepository(Repository repository) {
-		this.repository = repository;
-	}
-
-	/**
-	 * 
-	 * @param commit
-	 * @return commit added
-	 */
 	public Commit addCommit(Commit commit) {
 		getCommits().add(commit);
 		commit.setCommitter(this);
@@ -132,16 +85,19 @@ public class Committer implements Serializable {
 		return commit;
 	}
 
-	/**
-	 * 
-	 * @param commit
-	 * @return commit removed
-	 */
 	public Commit removeCommit(Commit commit) {
 		getCommits().remove(commit);
 		commit.setCommitter(null);
 
 		return commit;
+	}
+
+	public Repository getRepository() {
+		return this.repository;
+	}
+
+	public void setRepository(Repository repository) {
+		this.repository = repository;
 	}
 
 }

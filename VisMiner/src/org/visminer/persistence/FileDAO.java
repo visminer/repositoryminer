@@ -7,26 +7,13 @@ import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 
 import org.visminer.model.Commit;
+import org.visminer.model.Committer;
 import org.visminer.model.File;
 
-/**
- * <p>
- * The operation class for the file database table.
- * </p>
- * @author Felipe
- * @version 1.0
- */
 public class FileDAO{
 
 	private Connection connection = Connection.getInstance();
 	
-	/**
-	 * <p>
-	 * saves the file in database if id is set otherwise updates the file in database
-	 * </p>
-	 * @param file
-	 * @return file saved
-	 */
 	public File save(File file){
 		
 		EntityManager em = connection.getEntityManager();
@@ -38,11 +25,6 @@ public class FileDAO{
 		
 	}
 	
-	/**
-	 * 
-	 * @param commit
-	 * @return files by commit
-	 */
 	public List<File> getByCommit(Commit commit){
 		
 		EntityManager em = connection.getEntityManager();

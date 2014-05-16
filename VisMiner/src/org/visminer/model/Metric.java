@@ -8,12 +8,8 @@ import java.util.List;
 
 
 /**
- * <p>
  * The persistent class for the metric database table.
- * </p>
  * 
- * @author Felipe
- * @version 1.0
  */
 @Entity
 @Table(name="metric")
@@ -43,67 +39,38 @@ public class Metric implements Serializable {
 		this.idmetric = idmetric;
 	}
 
-	/**
-	 * @return the idmetric
-	 */
 	public int getIdmetric() {
-		return idmetric;
+		return this.idmetric;
 	}
 
-	/**
-	 * @param idmetric the idmetric to set
-	 */
 	public void setIdmetric(int idmetric) {
 		this.idmetric = idmetric;
 	}
 
-	/**
-	 * @return the name
-	 */
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
-	/**
-	 * @param name the name to set
-	 */
 	public void setName(String name) {
 		this.name = name;
 	}
-
-	/**
-	 * @return the description
-	 */
+	
 	public String getDescription() {
-		return description;
+		return this.description;
 	}
 
-	/**
-	 * @param description the description to set
-	 */
 	public void setDescription(String description) {
 		this.description = description;
-	}
+	}	
 
-	/**
-	 * @return the metricValues
-	 */
 	public List<MetricValue> getMetricValues() {
-		return metricValues;
+		return this.metricValues;
 	}
 
-	/**
-	 * @param metricValues the metricValues to set
-	 */
 	public void setMetricValues(List<MetricValue> metricValues) {
 		this.metricValues = metricValues;
 	}
 
-	/**
-	 * 
-	 * @param metricValue
-	 * @return metricValue added
-	 */
 	public MetricValue addMetricValue(MetricValue metricValue) {
 		getMetricValues().add(metricValue);
 		metricValue.setMetric(this);
@@ -111,11 +78,6 @@ public class Metric implements Serializable {
 		return metricValue;
 	}
 
-	/**
-	 * 
-	 * @param metricValue
-	 * @return metricValue removed
-	 */
 	public MetricValue removeMetricValue(MetricValue metricValue) {
 		getMetricValues().remove(metricValue);
 		metricValue.setMetric(null);

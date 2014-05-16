@@ -12,24 +12,10 @@ import org.visminer.model.Issue;
 import org.visminer.model.Milestone;
 import org.visminer.model.Repository;
 
-/**
- * <p>
- * The operation class for the milestone database table.
- * </p>
- * @author Heron
- * @version 1.0
- */
 public class MilestoneDAO{
 
 	private Connection connection = Connection.getInstance();
 	
-	/**
-	 * <p>
-	 * saves the milestone in database if id is set otherwise updates the milestone in database
-	 * </p>
-	 * @param milestone
-	 * @return milestone saved
-	 */
 	public Milestone save(Milestone milestone){
 		
 		EntityManager em = connection.getEntityManager();
@@ -41,12 +27,6 @@ public class MilestoneDAO{
 		
 	}
 	
-	/**
-	 * 
-	 * @param number
-	 * @param repository
-	 * @return milestone by number and repository
-	 */
 	public Milestone getOne(int number, Repository repository){
 		
 		EntityManager em = connection.getEntityManager();
@@ -65,11 +45,6 @@ public class MilestoneDAO{
 		
 	}
 	
-	/**
-	 * 
-	 * @param repository
-	 * @return number of milestones deleted
-	 */
 	public int deleteAll(Repository repository){
 		
 		int qtdeDeletions = 0;
@@ -91,12 +66,6 @@ public class MilestoneDAO{
 		
 	}
 	
-	/**
-	 * 
-	 * @param number
-	 * @param repository
-	 * @return 1 if milestone was deleted otherwise 0
-	 */
 	public int deleteOne(int number, Repository repository){
 		
 		int qtdeDeleted = 0;
@@ -117,11 +86,6 @@ public class MilestoneDAO{
 		
 	}
 
-	/**
-	 * 
-	 * @param repository
-	 * @return milestones by repository
-	 */
 	public List<Milestone> getAll(Repository repository){
 	
 		EntityManager em = connection.getEntityManager();
@@ -141,12 +105,6 @@ public class MilestoneDAO{
 		}
 	}
 	
-	/**
-	 * 
-	 * @param repository
-	 * @param state : milestone state can be "CLOSED" or "OPEN"
-	 * @return milestones by repository and state
-	 */
 	public List<Milestone> getByStatus(Repository repository, String state){
 		
 		EntityManager em = connection.getEntityManager();
