@@ -1,4 +1,3 @@
-
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,7 +25,6 @@ public class Main {
 		
 		VisMiner visminer = new VisMiner(props, "/home/felipe/git/Visminer/.git", "visminer", "visminer");
 		
-		
 		for(Committer committer : visminer.getCommitters()){
 			for(Commit commit : visminer.getCommits(committer)){
 				if(visminer.getFiles(commit).size() > 0){
@@ -35,9 +33,6 @@ public class Main {
 			}
 		}
 		System.out.println(visminer.getMetrics().get(0).getDescription());
-		
-		
-		
 		
 		
 		//github part
