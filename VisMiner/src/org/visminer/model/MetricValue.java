@@ -1,7 +1,6 @@
 package org.visminer.model;
 
 import java.io.Serializable;
-
 import javax.persistence.*;
 
 
@@ -16,37 +15,38 @@ public class MetricValue implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
+	@Column(name="id_metric_value")
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	@Column(name="idmetric_value", unique=true, nullable=false)
-	private int idmetricValue;
+	private int idMetricValue;
 
 	@Column(name="value", nullable=false)
 	private int value;
 
 	//bi-directional many-to-one association to Metric
 	@ManyToOne
-	@JoinColumn(name="metric_idmetric", nullable=false)
 	private Metric metric;
 
 	//bi-directional many-to-one association to File
-	@ManyToOne(fetch=FetchType.EAGER)
-	@JoinColumn(name="file_idfile")
+	@ManyToOne
 	private File file;
 
-	//bi-directional many-to-one association to Version
-	@ManyToOne(fetch=FetchType.EAGER)
-	@JoinColumn(name="version_idversion")
-	private Version version;
+	//bi-directional many-to-one association to Tag
+	@ManyToOne
+	@JoinColumns({
+		@JoinColumn(name="tag_name", referencedColumnName="name"),
+		@JoinColumn(name="tag_repository_id_git", referencedColumnName="repository_id_git")
+		})
+	private Tag tag;
 
 	public MetricValue() {
 	}
 
-	public int getIdmetricValue() {
-		return this.idmetricValue;
+	public int getIdMetricValue() {
+		return this.idMetricValue;
 	}
 
-	public void setIdmetricValue(int idmetricValue) {
-		this.idmetricValue = idmetricValue;
+	public void setIdMetricValue(int idMetricValue) {
+		this.idMetricValue = idMetricValue;
 	}
 
 	public int getValue() {
@@ -73,12 +73,12 @@ public class MetricValue implements Serializable {
 		this.file = file;
 	}
 
-	public Version getVersion() {
-		return this.version;
+	public Tag getTag() {
+		return this.tag;
 	}
 
-	public void setVersion(Version version) {
-		this.version = version;
+	public void setTag(Tag tag) {
+		this.tag = tag;
 	}
 
 }

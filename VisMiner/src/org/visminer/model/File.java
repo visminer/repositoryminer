@@ -1,9 +1,7 @@
 package org.visminer.model;
 
 import java.io.Serializable;
-
 import javax.persistence.*;
-
 import java.util.List;
 
 
@@ -18,31 +16,30 @@ public class File implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
+	@Column(name="id_file")
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	@Column(name="idfile", unique=true, nullable=false)
-	private int idfile;
+	private int idFile;
 
 	@Column(name="path", nullable=false, length=400)
 	private String path;
 
 	//bi-directional many-to-one association to Commit
-	@ManyToOne(fetch=FetchType.EAGER)
-	@JoinColumn(name="commit_sha", nullable=false)
+	@ManyToOne
 	private Commit commit;
 
 	//bi-directional many-to-one association to MetricValue
-	@OneToMany(mappedBy="file", fetch=FetchType.EAGER)
+	@OneToMany(mappedBy="file")
 	private List<MetricValue> metricValues;
 
 	public File() {
 	}
 
-	public int getIdfile() {
-		return this.idfile;
+	public int getIdFile() {
+		return this.idFile;
 	}
 
-	public void setIdfile(int idfile) {
-		this.idfile = idfile;
+	public void setIdFile(int idFile) {
+		this.idFile = idFile;
 	}
 
 	public String getPath() {

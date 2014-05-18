@@ -6,48 +6,48 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 
-import org.visminer.model.Commit;
-import org.visminer.model.File;
+import org.visminer.model.Branch;
+import org.visminer.model.Repository;
 
-public class FileDAO{
+public class BranchDAO {
 
 	private Connection connection = Connection.getInstance();
 	
-	public File save(File file){
+	public Branch save(Branch branch){
 		
 		EntityManager em = connection.getEntityManager();
 		em.getTransaction().begin();
-		file = em.merge(file);
+		branch = em.merge(branch);
 		em.getTransaction().commit();
 		em.close();
-		return file;
+		return branch;
 		
 	}
 	
-	public void saveMany(List<File> files){
+	public void saveMany(List<Branch> branches){
 		
 		EntityManager em = connection.getEntityManager();
 		em.getTransaction().begin();
 		
-		for(File file : files){
-			file = em.merge(file);
+		for(Branch branch : branches){
+			branch = em.merge(branch);
 		}
 		
 		em.getTransaction().commit();
-		em.close();
+		em.close();		
 		
-	}	
+	}
 	
-	public List<File> getByCommit(Commit commit){
+	public List<Branch> getByRepository(Repository repository){
 		
 		EntityManager em = connection.getEntityManager();
-		TypedQuery<File> query = em.createQuery("select f from File f where f.commit.sha = :arg1", File.class);
-		query.setParameter("arg1", commit.getSha());
+		TypedQuery<Branch> query = em.createQuery("select b from Branch b where b.repository.idGit = :arg0", Branch.class);
+		query.setParameter("arg0", repository.getIdGit());
 		try{
 			return query.getResultList();
 		}catch(NoResultException e){
 			return null;
 		}
-	}	
+	}
 	
 }

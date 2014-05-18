@@ -26,7 +26,7 @@ public class MetricDAO{
 	public Metric getOne(int idmetric){
 		
 		EntityManager em = connection.getEntityManager();
-		TypedQuery<Metric> query = em.createQuery("SELECT m FROM Metric m WHERE m.idmetric = :arg1", Metric.class);
+		TypedQuery<Metric> query = em.createQuery("SELECT m FROM Metric m WHERE m.idMetric = :arg1", Metric.class);
 		query.setParameter("arg1", idmetric);
 		
 		try{

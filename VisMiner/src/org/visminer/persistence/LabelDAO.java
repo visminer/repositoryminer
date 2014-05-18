@@ -4,33 +4,33 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
+import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
-import org.visminer.model.Committer;
-import org.visminer.model.Repository;
-import org.visminer.model.Version;
+import org.visminer.model.Issue;
+import org.visminer.model.Label;
 
-public class VersionDAO{
+public class LabelDAO {
 
 	private Connection connection = Connection.getInstance();
 	
-	public Version save(Version version){
+	public Label save(Label label){
 		
 		EntityManager em = connection.getEntityManager();
 		em.getTransaction().begin();
-		version = em.merge(version);
+		label = em.merge(label);
 		em.getTransaction().commit();
 		em.close();
-		return version;
+		return label;
 		
 	}
 	
-	public List<Version> getByRepository(Repository repository){
+	public List<Label> getByIssue(Issue issue){
 		
 		EntityManager em = connection.getEntityManager();
-		TypedQuery<Version> query = em.createQuery("select v from Version v where v.repository.idGit=:arg1", Version.class);
-		query.setParameter("arg1", repository.getIdGit());
-
+		TypedQuery<Label> query = em.createQuery("select l from Label l where l.issue.number = :arg0 and l.issue.repository.idGit = :arg1", Label.class);
+		query.setParameter("arg0", issue.getId().getNumber());
+		query.setParameter("arg1", issue.getId().getRepositoryIdGit());
 		try{
 			return query.getResultList();
 		}catch(NoResultException e){

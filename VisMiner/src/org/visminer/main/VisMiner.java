@@ -4,63 +4,51 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-import javax.persistence.EntityManager;
-
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.visminer.constants.Metrics;
+import org.visminer.model.Branch;
 import org.visminer.model.Commit;
 import org.visminer.model.Committer;
 import org.visminer.model.File;
 import org.visminer.model.Metric;
 import org.visminer.model.Repository;
-import org.visminer.model.Version;
+import org.visminer.model.Tag;
+import org.visminer.persistence.BranchDAO;
 import org.visminer.persistence.CommitDAO;
 import org.visminer.persistence.CommitterDAO;
-import org.visminer.persistence.Connection;
 import org.visminer.persistence.FileDAO;
 import org.visminer.persistence.MetricDAO;
-import org.visminer.persistence.RepositoryDAO;
-import org.visminer.persistence.VersionDAO;
-import org.visminer.util.AnalyzeRepository;
+import org.visminer.persistence.TagDAO;
 
 public class VisMiner {
 
-	private Repository repository;
+	private Repository repository = null;
+	private Map<String, String> db_cfg = null;
+	private Map<Integer, String> visminer_cfg = null;
 	
-	public VisMiner(Map<String, String> databaseProperties, String repositoryPath,
-		String ownerRepository,	String nameRepository) throws IOException, GitAPIException{
+	public static final int LOCAL_REPOSITORY_PATH = 0;
+	public static final int LOCAL_REPOSITORY_OWNER = 1;
+	public static final int LOCAL_REPOSITORY_NAME = 2;
+	
+	//TODO : for the future
+	public static final int REMOTE_REPOSITOY_USER = 3;
+	public static final int REMOTE_REPOSITORY_PASSWORD = 4;
+	public static final int REMOTE_REPOSITORY_URL = 5;
+	
+	public VisMiner(Map<String, String> db_cfg, Map<Integer, String> visminer_cfg) throws IOException, GitAPIException{
 		
-		init();
-
-		String idGit = ownerRepository+ "/"+ nameRepository;
+		this.db_cfg = db_cfg;
+		this.visminer_cfg = visminer_cfg;
 		
-		RepositoryDAO repoDAO = new RepositoryDAO();
-		repository = repoDAO.getByIdGit(idGit);
-		
-		if(repository == null){
-			AnalyzeRepository analyzeRepo = new AnalyzeRepository(repositoryPath, idGit);
-			Thread thread = new Thread(analyzeRepo);
-			thread.start();
-			repository = analyzeRepo.getRepository();
-		}
+		this.repository = Initializer.init(db_cfg, visminer_cfg);
 		
 	}
 	
-	private void init(){
-		
-		MetricDAO metricDAO = new MetricDAO();
-		for(Metrics m : Metrics.values()){
-			
-			if(metricDAO.getOne(m.getValue()) == null){
-				Metric metric = new Metric();
-				metric.setIdmetric(m.getValue());
-				metric.setName(m.toString());
-				metric.setDescription(m.getDescription());
-				metricDAO.save(metric);
-			}
-			
-		}
-		
+	public Map<String, String> getDatabaseConfiguration(){
+		return this.db_cfg;
+	}
+	
+	public Map<Integer, String> getVisMinerConfiguration(){
+		return this.visminer_cfg;
 	}
 	
 	public Repository getRepository(){
@@ -75,10 +63,17 @@ public class VisMiner {
 		return committerDAO.getByRepository(repository);
 	}
 	
-	public List<Version> getVersions(){
+	public List<Tag> getTags(){
 		
-		VersionDAO versionDAO = new VersionDAO();
-		return versionDAO.getByRepository(repository);
+		TagDAO tagDAO = new TagDAO();
+		return tagDAO.getByRepository(repository);
+		
+	}
+	
+	public List<Branch> getBranches(){
+		
+		BranchDAO branchDAO = new BranchDAO();
+		return branchDAO.getByRepository(repository);
 		
 	}
 	

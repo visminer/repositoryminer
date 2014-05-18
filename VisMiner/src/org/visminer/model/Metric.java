@@ -1,9 +1,7 @@
 package org.visminer.model;
 
 import java.io.Serializable;
-
 import javax.persistence.*;
-
 import java.util.List;
 
 
@@ -18,33 +16,41 @@ public class Metric implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@Column(name="idmetric", unique=true, nullable=false)
-	private int idmetric;
+	@Column(name="id_metric")
+	private int idMetric;
 
-	@Column(name="name", nullable=false, length=6)
+	@Column(name="description", nullable=false, length=255)
+	private String description;
+
+	@Column(name="name", nullable=false, length=45)
 	private String name;
-	
-	@Column(name="description", nullable=false, length=100)
-	private String description;	
 
 	//bi-directional many-to-one association to MetricValue
-	@OneToMany(mappedBy="metric", fetch=FetchType.LAZY)
+	@OneToMany(mappedBy="metric")
 	private List<MetricValue> metricValues;
 
 	public Metric() {
 	}
 
-	public Metric(int idmetric) {
+	public Metric(int idMetric) {
 		super();
-		this.idmetric = idmetric;
+		this.idMetric = idMetric;
 	}
 
-	public int getIdmetric() {
-		return this.idmetric;
+	public int getIdMetric() {
+		return this.idMetric;
 	}
 
-	public void setIdmetric(int idmetric) {
-		this.idmetric = idmetric;
+	public void setIdMetric(int idMetric) {
+		this.idMetric = idMetric;
+	}
+
+	public String getDescription() {
+		return this.description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
 	public String getName() {
@@ -54,14 +60,6 @@ public class Metric implements Serializable {
 	public void setName(String name) {
 		this.name = name;
 	}
-	
-	public String getDescription() {
-		return this.description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}	
 
 	public List<MetricValue> getMetricValues() {
 		return this.metricValues;

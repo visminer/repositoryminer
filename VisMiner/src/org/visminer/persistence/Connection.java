@@ -10,8 +10,8 @@ import javax.persistence.Persistence;
 public class Connection {
 
 	private static Connection instance = null;
-	private EntityManagerFactory managerFactory;
-	private static Map<String, String> properties;
+	private EntityManagerFactory managerFactory = null;
+	private static Map<String, String> properties = null;
 	
 	private Connection(){
 		
@@ -22,6 +22,7 @@ public class Connection {
 	public static void setDataBaseInfo(Map<String, String> myProperties){
 		
 		properties = myProperties;
+		getInstance();
 		
 	}
 

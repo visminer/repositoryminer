@@ -24,10 +24,24 @@ public class CommitterDAO{
 		
 	}
 	
+	public void saveMany(List<Committer> committers){
+		
+		EntityManager em = connection.getEntityManager();
+		em.getTransaction().begin();
+		
+		for(Committer committer : committers){
+			em.merge(committer);
+		}
+		
+		em.getTransaction().commit();
+		em.close();
+		
+	}
+	
 	public List<Committer> getByRepository(Repository repository){
 		
 		EntityManager em = connection.getEntityManager();
-		TypedQuery<Committer> query = em.createQuery("select c from Committer c where c.repository.idGit=:arg1", Committer.class);
+		TypedQuery<Committer> query = em.createQuery("select c from Committer c where c.repository.idGit =:arg1", Committer.class);
 		query.setParameter("arg1", repository.getIdGit());
 		
 		try{

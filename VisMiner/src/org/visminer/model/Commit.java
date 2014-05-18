@@ -1,9 +1,7 @@
 package org.visminer.model;
 
 import java.io.Serializable;
-
 import javax.persistence.*;
-
 import java.util.Date;
 import java.util.List;
 
@@ -19,41 +17,29 @@ public class Commit implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@Column(name="sha", unique=true, nullable=false, length=45)
+	@Column(name="sha", nullable=false, length=45)
 	private String sha;
 
 	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name="date", nullable=false)
 	private Date date;
 
-	@Column(name="message", nullable=false, length=10000)
+	@Column(name="message", nullable=true, length=10000)
 	private String message;
 
 	//bi-directional many-to-one association to Committer
-	@ManyToOne(fetch=FetchType.EAGER)
-	@JoinColumn(name="committer_idcommitter", nullable=false)
+	@ManyToOne
 	private Committer committer;
 
 	//bi-directional many-to-many association to Issue
-	@ManyToMany(fetch=FetchType.EAGER)
-	@JoinTable(name="commit_reference_issue",
-		joinColumns = {
-			@JoinColumn(name="commit_sha", nullable=false, referencedColumnName = "sha")
-		},
-		inverseJoinColumns={
-			@JoinColumn(name = "issue_number", referencedColumnName = "number"),
-			@JoinColumn(name = "issue_repository_idGit", referencedColumnName = "repository_idGit")
-		}
-	)
+	@ManyToMany(mappedBy="commits")
 	private List<Issue> issues;
-	
 
-	//bi-directional many-to-many association to Version
-	@ManyToMany(mappedBy="commits", fetch=FetchType.EAGER)
-	private List<Version> versions;
+	//bi-directional many-to-many association to Tag
+	@ManyToMany(mappedBy="commits")
+	private List<Tag> tags;
 
 	//bi-directional many-to-one association to File
-	@OneToMany(mappedBy="commit", fetch=FetchType.EAGER)
+	@OneToMany(mappedBy="commit")
 	private List<File> files;
 
 	public Commit() {
@@ -99,12 +85,12 @@ public class Commit implements Serializable {
 		this.issues = issues;
 	}
 
-	public List<Version> getVersions() {
-		return this.versions;
+	public List<Tag> getTags() {
+		return this.tags;
 	}
 
-	public void setVersions(List<Version> versions) {
-		this.versions = versions;
+	public void setTags(List<Tag> tags) {
+		this.tags = tags;
 	}
 
 	public List<File> getFiles() {
@@ -129,29 +115,4 @@ public class Commit implements Serializable {
 		return file;
 	}
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((sha == null) ? 0 : sha.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Commit other = (Commit) obj;
-		if (sha == null) {
-			if (other.sha != null)
-				return false;
-		} else if (!sha.equals(other.sha))
-			return false;
-		return true;
-	}
-	
 }

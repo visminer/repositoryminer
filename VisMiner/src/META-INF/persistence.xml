@@ -1,14 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <persistence version="2.1" xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
-   <persistence-unit name="VisMiner">
-      <class>org.visminer.model.Commit</class>
-      <class>org.visminer.model.Committer</class>
-      <class>org.visminer.model.File</class>
-      <class>org.visminer.model.Issue</class>
-      <class>org.visminer.model.Metric</class>
-      <class>org.visminer.model.MetricValue</class>
-      <class>org.visminer.model.Milestone</class>
-      <class>org.visminer.model.Repository</class>
-      <class>org.visminer.model.Version</class>
-   </persistence-unit>
+	<persistence-unit name="VisMiner">
+		<class>org.visminer.model.Branch</class>
+		<class>org.visminer.model.BranchPK</class>
+		<class>org.visminer.model.Commit</class>
+		<class>org.visminer.model.Committer</class>
+		<class>org.visminer.model.File</class>
+		<class>org.visminer.model.Issue</class>
+		<class>org.visminer.model.IssuePK</class>
+		<class>org.visminer.model.Label</class>
+		<class>org.visminer.model.LabelPK</class>
+		<class>org.visminer.model.Metric</class>
+		<class>org.visminer.model.MetricValue</class>
+		<class>org.visminer.model.Milestone</class>
+		<class>org.visminer.model.MilestonePK</class>
+		<class>org.visminer.model.Repository</class>
+		<class>org.visminer.model.Tag</class>
+		<class>org.visminer.model.TagPK</class>
+	</persistence-unit>
 </persistence>

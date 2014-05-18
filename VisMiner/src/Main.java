@@ -5,9 +5,14 @@ import java.util.Map;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.persistence.config.PersistenceUnitProperties;
 import org.visminer.main.VisMiner;
+import org.visminer.model.Branch;
 import org.visminer.model.Commit;
 import org.visminer.model.Committer;
+import org.visminer.model.File;
+import org.visminer.model.Metric;
+import org.visminer.model.Tag;
 import org.visminer.persistence.Connection;
+import org.visminer.persistence.RepositoryDAO;
 
 
 public class Main {
@@ -21,35 +26,14 @@ public class Main {
 		props.put(PersistenceUnitProperties.JDBC_USER, "root");
 		props.put(PersistenceUnitProperties.JDBC_PASSWORD, "1234"); 
 		props.put(PersistenceUnitProperties.DDL_GENERATION, "create-tables");
-		Connection.setDataBaseInfo(props);
 		
-		VisMiner visminer = new VisMiner(props, "/home/felipe/git/Visminer/.git", "visminer", "visminer");
+		Map<Integer, String> api_cfg = new HashMap<Integer, String>();
+		api_cfg.put(VisMiner.LOCAL_REPOSITORY_PATH, "/home/felipe/git/junit/.git");
+		api_cfg.put(VisMiner.LOCAL_REPOSITORY_NAME, "junit");
+		api_cfg.put(VisMiner.LOCAL_REPOSITORY_OWNER, "felipe");
 		
-		for(Committer committer : visminer.getCommitters()){
-			for(Commit commit : visminer.getCommits(committer)){
-				if(visminer.getFiles(commit).size() > 0){
-					System.out.println(visminer.getFiles(commit).get(0).getPath());
-				}
-			}
-		}
-		System.out.println(visminer.getMetrics().get(0).getDescription());
+		VisMiner visminer = new VisMiner(props, api_cfg);
 		
-		
-		//github part
-		/*//Make remote connection in the specified repository and get it
-		ConnectionToRepository ctr = new ConnectionToRepository(ownerRepository, nameRepository, NameRepositories.GITHUB);
-		GHRepository ghr = (GHRepository) ctr.getConnection(login, password);
-
-		//initialize VisMiner if remote repository exist, and update milestones and issues
-		if(ghr != null){
-			
-			VisMiner visminer = new VisMiner(props, "path...path.../folderGit",
-				ownerRepository, nameRepository);
-			
-			IssueUpdate.updateIssue(ghr, visminer);
-			MilestoneUpdate.updateMilestone(ghr, visminer);
-			
-		}*/
 	
 	}
 	

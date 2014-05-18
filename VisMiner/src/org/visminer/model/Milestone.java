@@ -2,7 +2,7 @@ package org.visminer.model;
 
 import java.io.Serializable;
 import javax.persistence.*;
-
+import java.util.Date;
 import java.util.List;
 
 
@@ -12,54 +12,58 @@ import java.util.List;
  */
 @Entity
 @Table(name="milestone")
-@IdClass(MilestonePK.class)
 @NamedQuery(name="Milestone.findAll", query="SELECT m FROM Milestone m")
 public class Milestone implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-	@Id 
-	@Column(name = "number")
-	private int number;
-	
-	@Id
-	@ManyToOne(cascade = CascadeType.ALL)
-	@JoinColumn(name = "repository_idGit", referencedColumnName = "idGit")
-	private Repository repository;
+	@EmbeddedId
+	private MilestonePK id;
 
-	@Column(name="closed_issues", nullable=false)
+	@Column(name="closed_issues")
 	private int closedIssues;
 
-	@Column(name = "create_date", nullable = false)
-	private long create_date;
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name="create_date")
+	private Date createDate;
 
-	@Column(name="creator", nullable=false, length=100)
+	@Column(name="creator", nullable=false, length=45)
 	private String creator;
 
-	@Column(name="description", length=1000)
+	@Column(nullable=true, name="description", length=1000)
 	private String description;
 
-	@Column(name = "due_date")
-	private long due_date;
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name="due_date")
+	private Date dueDate;
 
-	@Column(name="opened_issues", nullable=false)
+	@Column(name="opened_issues", nullable=true)
 	private int openedIssues;
 
 	@Column(name="state", nullable=false, length=6)
 	private String state;
 
-	@Column(name="title", nullable=false, length=500)
+	@Column(name="title", nullable=false, length=100)
 	private String title;
 
 	//bi-directional many-to-one association to Issue
 	@OneToMany(mappedBy="milestone")
 	private List<Issue> issues;
 
-	
+	//bi-directional many-to-one association to Repository
+	@ManyToOne
+	private Repository repository;
+
 	public Milestone() {
 	}
-	
 
-	//getters and setters
+	public MilestonePK getId() {
+		return this.id;
+	}
+
+	public void setId(MilestonePK id) {
+		this.id = id;
+	}
+
 	public int getClosedIssues() {
 		return this.closedIssues;
 	}
@@ -68,20 +72,12 @@ public class Milestone implements Serializable {
 		this.closedIssues = closedIssues;
 	}
 
-	public long getCreate_date() {
-		return create_date;
+	public Date getCreateDate() {
+		return this.createDate;
 	}
 
-	public void setCreate_date(long create_date) {
-		this.create_date = create_date;
-	}
-
-	public long getDue_date() {
-		return due_date;
-	}
-
-	public void setDue_date(long due_date) {
-		this.due_date = due_date;
+	public void setCreateDate(Date createDate) {
+		this.createDate = createDate;
 	}
 
 	public String getCreator() {
@@ -100,12 +96,12 @@ public class Milestone implements Serializable {
 		this.description = description;
 	}
 
-	public int getNumber() {
-		return this.number;
+	public Date getDueDate() {
+		return this.dueDate;
 	}
 
-	public void setNumber(int number) {
-		this.number = number;
+	public void setDueDate(Date dueDate) {
+		this.dueDate = dueDate;
 	}
 
 	public int getOpenedIssues() {
@@ -139,15 +135,7 @@ public class Milestone implements Serializable {
 	public void setIssues(List<Issue> issues) {
 		this.issues = issues;
 	}
-	
-	public Repository getRepository() {
-		return this.repository;
-	}
 
-	public void setRepository(Repository repository) {
-		this.repository = repository;
-	}
-	
 	public Issue addIssue(Issue issue) {
 		getIssues().add(issue);
 		issue.setMilestone(this);
@@ -162,18 +150,12 @@ public class Milestone implements Serializable {
 		return issue;
 	}
 
-}
-
-class MilestonePK implements Serializable{
-	
-	private static final long serialVersionUID = 1L;
-	
-	private int number;
-	private String repository;
-	
-	public MilestonePK(){
-		
+	public Repository getRepository() {
+		return this.repository;
 	}
 
+	public void setRepository(Repository repository) {
+		this.repository = repository;
+	}
 
 }

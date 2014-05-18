@@ -6,48 +6,50 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 
-import org.visminer.model.Commit;
-import org.visminer.model.File;
+import org.visminer.model.Repository;
+import org.visminer.model.Tag;
 
-public class FileDAO{
+public class TagDAO {
+
 
 	private Connection connection = Connection.getInstance();
 	
-	public File save(File file){
+	public Tag save(Tag tag){
 		
 		EntityManager em = connection.getEntityManager();
 		em.getTransaction().begin();
-		file = em.merge(file);
+		tag = em.merge(tag);
 		em.getTransaction().commit();
 		em.close();
-		return file;
+		return tag;
 		
 	}
 	
-	public void saveMany(List<File> files){
+	public void saveMany(List<Tag> tags){
 		
 		EntityManager em = connection.getEntityManager();
 		em.getTransaction().begin();
 		
-		for(File file : files){
-			file = em.merge(file);
+		for(Tag tag : tags){
+			tag = em.merge(tag);
 		}
 		
 		em.getTransaction().commit();
-		em.close();
+		em.close();		
 		
-	}	
+	}
 	
-	public List<File> getByCommit(Commit commit){
+	public List<Tag> getByRepository(Repository repository){
 		
 		EntityManager em = connection.getEntityManager();
-		TypedQuery<File> query = em.createQuery("select f from File f where f.commit.sha = :arg1", File.class);
-		query.setParameter("arg1", commit.getSha());
+		TypedQuery<Tag> query = em.createQuery("select t from Tag t where t.repository.idGit = :arg0", Tag.class);
+		query.setParameter("arg0", repository.getIdGit());
 		try{
 			return query.getResultList();
 		}catch(NoResultException e){
 			return null;
 		}
-	}	
+	}
+
 	
 }

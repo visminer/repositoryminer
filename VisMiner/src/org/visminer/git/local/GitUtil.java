@@ -1,4 +1,4 @@
-package org.visminer.util;
+package org.visminer.git.local;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -29,66 +29,62 @@ import org.gitective.core.filter.commit.AndCommitFilter;
 import org.gitective.core.filter.commit.AuthorFilter;
 import org.gitective.core.filter.commit.AuthorSetFilter;
 import org.gitective.core.filter.commit.CommitListFilter;
+import org.visminer.model.Branch;
+import org.visminer.model.BranchPK;
 import org.visminer.model.Commit;
 import org.visminer.model.Committer;
-import org.visminer.model.Version;
+import org.visminer.model.Tag;
+import org.visminer.model.TagPK;
 
 public class GitUtil {
-
-	private final String TYPE_BRANCH = "branch";
-	private final String TYPE_TAG = "tag";
 	
-	private Repository repository;
-	private String idGit;
+	private Repository repository = null;
+	private org.visminer.model.Repository myRepository = null;
 	
 	public GitUtil(String path, String idGit) throws IOException{
 	
 		repository = new FileRepository(path);
-		this.idGit = idGit;
+		myRepository = new org.visminer.model.Repository();
+		myRepository.setIdGit(idGit);
+		myRepository.setPath(repository.getDirectory().getAbsolutePath().replace("\\", "/"));
+		myRepository.setCreationDate(null);
 		
 	}
 	
 	public org.visminer.model.Repository getRepository(){
-		
-		org.visminer.model.Repository userRepo = new org.visminer.model.Repository();
-		userRepo.setPath(repository.getDirectory().getPath().replace("\\", "/"));
-		String[] parts = userRepo.getPath().split("/");
-		userRepo.setName(parts[parts.length - 2]);
-		userRepo.setIdGit(idGit);
-		
-		return userRepo;
-		
+		return myRepository;
 	}
+
 	
-	public List<Version> getVersions() throws GitAPIException{
+	public List<Tag> getTags() throws GitAPIException{
 		
 		Git git = new Git(repository);
-		List<Version> versions = new ArrayList<Version>();
-		versions.addAll(analyzeRefs(git.branchList().call(), TYPE_BRANCH));
-		versions.addAll(analyzeRefs(git.tagList().call(), TYPE_TAG));
+		List<Tag> tags = new ArrayList<Tag>();
 		
-		return versions;
+		for(Ref ref : git.tagList().call()){
+			Tag tag = new Tag();
+			tag.setId(new TagPK(ref.getName(), myRepository.getIdGit()));
+			tag.setRepository(myRepository);
+			tag.setCommits(getCommitsByTag(ref.getName()));
+			tags.add(tag);
+		}
+		
+		return tags;
 	}
 	
-	private List<Version> analyzeRefs(List<Ref> refs, String type){
+	public List<Branch> getBranchs() throws GitAPIException{
 		
-		List<Version> versions = new ArrayList<Version>();
+		Git git = new Git(repository);
+		List<Branch> branches = new ArrayList<Branch>();
 		
-		for(Ref ref : refs){
-			
-			Version version = new Version();
-			version.setPath(ref.getName());
-			version.setType(type);
-			
-			String[] parts = ref.getName().split("/");
-			version.setName(parts[parts.length - 1]);
-			
-			versions.add(version);
-			
-		}	
+		for(Ref ref : git.branchList().call()){
+			Branch branch = new Branch();
+			branch.setId(new BranchPK(ref.getName(), myRepository.getIdGit()));
+			branch.setRepository(myRepository);
+			branches.add(branch);
+		}
 		
-		return versions;
-		
+		return branches;
 	}
 	
 	public List<Committer> getCommitters(){
@@ -96,11 +92,13 @@ public class GitUtil {
 		AuthorSetFilter authorFilter = new AuthorSetFilter();
 		CommitFinder finder = new CommitFinder(repository);
 		finder.setFilter(authorFilter);
-		finder.findInBranches();
+		finder.find();
 		
 		List<Committer> committers = new ArrayList<Committer>();
 		for(PersonIdent person : authorFilter.getPersons()){
 			Committer committer = new Committer(person.getEmailAddress(), person.getName());
+			committer.setCommits(getCommitsByCommitter(committer));
+			committer.setRepository(myRepository);
 			committers.add(committer);
 		}
 		
@@ -108,7 +106,7 @@ public class GitUtil {
 		
 	}
 	
-	public List<Commit> getCommits(String version, Committer committer){
+	public List<Commit> getCommitsByCommitter(Committer committer){
 		
 		AndCommitFilter filters = new AndCommitFilter();
 		CommitListFilter revCommits = new CommitListFilter();
@@ -118,7 +116,7 @@ public class GitUtil {
 		
 		CommitFinder finder = new CommitFinder(repository);
 		finder.setFilter(filters);
-		finder.findFrom(version);
+		finder.find();
 		
 		List<Commit> commits = new ArrayList<Commit>();
 
@@ -128,14 +126,34 @@ public class GitUtil {
 			commit.setSha(revCommit.getName());
 			commit.setCommitter(committer);
 			commit.setDate(revCommit.getCommitterIdent().getWhen());
-			
 			commits.add(commit);
-			
 		}
 		
 		return commits;
 		
 	}	
+	
+	public List<Commit> getCommitsByTag(String tag){
+		
+		CommitListFilter revCommits = new CommitListFilter();
+		
+		CommitFinder finder = new CommitFinder(repository);
+		finder.setFilter(revCommits);
+		finder.findFrom(tag);
+		
+		List<Commit> commits = new ArrayList<Commit>();
+
+		for(RevCommit revCommit : revCommits.getCommits()){
+			Commit commit = new Commit();
+			commit.setMessage(revCommit.getFullMessage());
+			commit.setSha(revCommit.getName());
+			commit.setDate(revCommit.getCommitterIdent().getWhen());
+			commits.add(commit);
+		}
+		
+		return commits;
+		
+	}		
 	
 	public List<String> getFilesNameInCommit(String commitSha) throws MissingObjectException, IncorrectObjectTypeException, IOException{
 		
@@ -170,10 +188,10 @@ public class GitUtil {
 		
 	}
 	
-	public List<String> getFilesNameInVersion(String version) throws MissingObjectException, IncorrectObjectTypeException, CorruptObjectException, IOException{
+	public List<String> getFilesNameInVersion(String tag) throws MissingObjectException, IncorrectObjectTypeException, CorruptObjectException, IOException{
 		
 		RevWalk revWalk = new RevWalk(repository);
-		RevCommit lastCommit = revWalk.parseCommit(repository.resolve(version));
+		RevCommit lastCommit = revWalk.parseCommit(repository.resolve(tag));
 		
 		TreeWalk treeWalk = new TreeWalk(repository);
 		treeWalk.addTree(lastCommit.getTree());
@@ -189,10 +207,10 @@ public class GitUtil {
 		
 	}
 	
-	public Commit getLastCommit(String version) throws RevisionSyntaxException, MissingObjectException, IncorrectObjectTypeException, AmbiguousObjectException, IOException{
+	public Commit getLastCommit(String tag) throws RevisionSyntaxException, MissingObjectException, IncorrectObjectTypeException, AmbiguousObjectException, IOException{
 		
 		RevWalk revWalk = new RevWalk(repository);
-		RevCommit lastCommit = revWalk.parseCommit(repository.resolve(version));
+		RevCommit lastCommit = revWalk.parseCommit(repository.resolve(tag));
 		
 		Commit commit = new Commit();
 		commit.setDate(lastCommit.getAuthorIdent().getWhen());
