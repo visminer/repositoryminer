@@ -49,4 +49,18 @@ public class MetricDAO{
 		
 	}
 	
+	public Metric getByName(String name){
+
+		EntityManager em = connection.getEntityManager();
+		TypedQuery<Metric> query = em.createQuery("SELECT m FROM Metric m WHERE m.name = :arg1", Metric.class);
+		query.setParameter("arg1", name);
+		
+		try{
+			return query.getSingleResult();
+		}catch(NoResultException e){
+			return null;
+		}
+		
+	}
+	
 }

@@ -98,4 +98,11 @@ public class VisMiner {
 		
 	}
 	
+	public Metric getMetric(String name){
+		
+		MetricDAO metricDAO = new MetricDAO();
+		return metricDAO.getByName(name);
+		
+	}
+	
 }
