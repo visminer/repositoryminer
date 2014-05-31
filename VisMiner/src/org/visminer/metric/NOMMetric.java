@@ -8,10 +8,12 @@ public class NOMMetric implements IMetric{
 
 	private int accumNOM = 0;
 	
+	@Override
 	public Metrics getId(){
 		return Metrics.NOM;
 	}
 	
+	@Override
 	public int calculate(DetailAST ast){
 		
 		int methodCounter = 0;

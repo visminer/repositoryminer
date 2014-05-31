@@ -8,10 +8,12 @@ public class LOCMetric implements IMetric{
 
 	private int accumLOC = 0;
 	
+	@Override
 	public Metrics getId(){
 		return Metrics.LOC;
 	}
 	
+	@Override
 	public int calculate(DetailAST ast){
 		
 		Document doc = new Document(ast.getSource());

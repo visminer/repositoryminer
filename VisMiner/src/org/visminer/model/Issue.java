@@ -1,7 +1,12 @@
 package org.visminer.model;
 
 import java.io.Serializable;
+
 import javax.persistence.*;
+
+import org.eclipse.persistence.annotations.CascadeOnDelete;
+
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -12,80 +17,63 @@ import java.util.List;
  */
 @Entity
 @Table(name="issue")
+@IdClass(IssuePK.class)
 @NamedQuery(name="Issue.findAll", query="SELECT i FROM Issue i")
 public class Issue implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-	@EmbeddedId
-	private IssuePK id;
+	@Id
+	@Column(name = "number")
+	private int number;
+	
+	@Id
+	@ManyToOne
+	@JoinColumn(name = "repository_id_git", referencedColumnName = "id_git")
+	private Repository repository;
 
-	@Column(name="assignee", length=100, nullable=true)
+	@Column(name="assignee", length=39)
 	private String assignee;
 
 	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name="closed_date")
-	private Date closedDate;
-
+	@Column(name = "closed_date")
+	private Date closed_date;
+	
 	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name="create_date")
-	private Date createDate;
+	@Column(name = "create_date", nullable = false)
+	private Date create_date;
+	
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "updated_date")
+	private Date updated_date;
 
-	private String milestone_repository_idGit;
+	@Column(name="labels")
+	private  ArrayList<String> labels = new ArrayList<String>();
 
-	@Column(name="comments_number", nullable=false)
-	private int commentsNumber;
-
-	@Column(name="status", length=6, nullable=false)
+	@Column(name="status", nullable = false, length=6)
 	private String status;
 
-	@Column(name="title", length=500, nullable=false)
+	@Column(name="title", nullable=false, length=500)
 	private String title;
 
-	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name="updated_date")
-	private Date updatedDate;
-
 	//bi-directional many-to-many association to Commit
-	@ManyToMany
-	@JoinTable(
-		name="commit_has_issue"
-		, joinColumns={
-			@JoinColumn(name="issue_number", referencedColumnName="number"),
-			@JoinColumn(name="issue_repository_id_git", referencedColumnName="repository_id_git")
-			}
-		, inverseJoinColumns={
-			@JoinColumn(name="commit_sha")
-			}
-		)
+	@ManyToMany(mappedBy="issues")
 	private List<Commit> commits;
 
-	//bi-directional many-to-one association to Repository
-	@ManyToOne
-	private Repository repository;
-
 	//bi-directional many-to-one association to Milestone
-	@ManyToOne
+	@ManyToOne(optional = true, cascade = CascadeType.REFRESH)
 	@JoinColumns({
-		@JoinColumn(name="milestone_number", referencedColumnName="number"),
-		@JoinColumn(name="milestone_repository_id_git", referencedColumnName="repository_id_git")
-		})
+        @JoinColumn(name = "milestone_number", referencedColumnName = "number"),
+        @JoinColumn(name = "milestone_repository_id_git", referencedColumnName = "repository_id_git")
+    })
 	private Milestone milestone;
-
-	//bi-directional many-to-one association to Label
-	@OneToMany(mappedBy="issue")
-	private List<Label> labels;
+		
+	@Column(name = "numberOfComments", nullable = false)
+	private int numberOfComments;
 
 	public Issue() {
 	}
 
-	public IssuePK getId() {
-		return this.id;
-	}
-
-	public void setId(IssuePK id) {
-		this.id = id;
-	}
-
+	//getters and setters
 	public String getAssignee() {
 		return this.assignee;
 	}
@@ -94,36 +82,54 @@ public class Issue implements Serializable {
 		this.assignee = assignee;
 	}
 
-	public Date getClosedDate() {
-		return this.closedDate;
+	public Date getClosed_date() {
+		return closed_date;
 	}
 
-	public void setClosedDate(Date closedDate) {
-		this.closedDate = closedDate;
+	public void setClosed_date(Date closed_date) {
+		this.closed_date = closed_date;
 	}
 
-	public Date getCreateDate() {
-		return this.createDate;
+	public Date getCreate_date() {
+		return create_date;
 	}
 
-	public void setCreateDate(Date createDate) {
-		this.createDate = createDate;
+	public void setCreate_date(Date create_date) {
+		this.create_date = create_date;
 	}
 
-	public String getMilestone_repository_idGit() {
-		return this.milestone_repository_idGit;
+	public Date getUpdated_date() {
+		return updated_date;
 	}
 
-	public void setMilestone_repository_idGit(String milestone_repository_idGit) {
-		this.milestone_repository_idGit = milestone_repository_idGit;
+	public void setUpdated_date(Date updated_date) {
+		this.updated_date = updated_date;
 	}
 
-	public int getCommentsNumber() {
-		return this.commentsNumber;
+	public int getNumberOfComments() {
+		return numberOfComments;
 	}
 
-	public void setCommentsNumber(int commentsNumber) {
-		this.commentsNumber = commentsNumber;
+	public void setNumberOfComments(int numberOfComments) {
+		this.numberOfComments = numberOfComments;
+	}
+
+	public ArrayList<String> getLabels() {
+		return labels;
+	}
+
+
+	public void setLabels(ArrayList<String> labels) {
+		this.labels = labels;
+	}
+
+
+	public int getNumber() {
+		return this.number;
+	}
+
+	public void setNumber(int number) {
+		this.number = number;
 	}
 
 	public String getStatus() {
@@ -142,28 +148,12 @@ public class Issue implements Serializable {
 		this.title = title;
 	}
 
-	public Date getUpdatedDate() {
-		return this.updatedDate;
-	}
-
-	public void setUpdatedDate(Date updatedDate) {
-		this.updatedDate = updatedDate;
-	}
-
 	public List<Commit> getCommits() {
 		return this.commits;
 	}
 
 	public void setCommits(List<Commit> commits) {
 		this.commits = commits;
-	}
-
-	public Repository getRepository() {
-		return this.repository;
-	}
-
-	public void setRepository(Repository repository) {
-		this.repository = repository;
 	}
 
 	public Milestone getMilestone() {
@@ -174,26 +164,12 @@ public class Issue implements Serializable {
 		this.milestone = milestone;
 	}
 
-	public List<Label> getLabels() {
-		return this.labels;
+	public Repository getRepository() {
+		return this.repository;
 	}
 
-	public void setLabels(List<Label> labels) {
-		this.labels = labels;
-	}
-
-	public Label addLabel(Label label) {
-		getLabels().add(label);
-		label.setIssue(this);
-
-		return label;
-	}
-
-	public Label removeLabel(Label label) {
-		getLabels().remove(label);
-		label.setIssue(null);
-
-		return label;
+	public void setRepository(Repository repository) {
+		this.repository = repository;
 	}
 
 }

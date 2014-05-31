@@ -36,16 +36,17 @@ public class Repository implements Serializable {
 	private List<Committer> committers;
 
 	//bi-directional many-to-one association to Issue
-	@OneToMany(mappedBy="repository")
+	@OneToMany(mappedBy="repository", cascade = CascadeType.ALL)
 	private List<Issue> issues;
 
 	//bi-directional many-to-one association to Milestone
-	@OneToMany(mappedBy="repository")
+	
+	@OneToMany(mappedBy="repository", cascade = CascadeType.ALL)
 	private List<Milestone> milestones;
 
 	//bi-directional many-to-one association to Tag
 	@OneToMany(mappedBy="repository")
-	private List<Tag> tags;
+	private List<Tag> tags; 
 
 	public Repository() {
 	}

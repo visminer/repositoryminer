@@ -1,73 +1,77 @@
 package org.visminer.git.remote;
 
 import java.util.HashMap;
-
 import org.kohsuke.github.GHIssueState;
 import org.kohsuke.github.GHMilestone;
 import org.kohsuke.github.GHRepository;
 
-import org.visminer.main.VisMiner;
 import org.visminer.model.Milestone;
 import org.visminer.model.Repository;
 import org.visminer.persistence.MilestoneDAO;
 
+/**
+ *To update milestones in the local database
+ */
 public abstract class MilestoneUpdate {
 	
+	/*
+	 * This HashMap saves milestone's number existing in the specified remote repository.
+	 * It is used to make a comparison between milestones that exist in local database
+	 * but didn't exist more in the remote repository.
+	 */
+	private static HashMap<Integer, Integer> milestonesNumbers = new HashMap<Integer, Integer>();
+
+	private static org.visminer.persistence.MilestoneDAO milestoneDAO = new MilestoneDAO();
+
 	
-	public static void updateMilestone(Object ghr, VisMiner visminer){
+	public static void updateMilestone(Object gr, Repository repository){
 		
 		boolean hasMilestones = false;
 		
-			if( ! ((GHRepository) ghr).listMilestones(GHIssueState.OPEN).asList().isEmpty() ){
+			if( ! ((GHRepository) gr).listMilestones(GHIssueState.OPEN).asList().isEmpty() ){
 				
-				update(ghr, visminer, GHIssueState.OPEN);
+				update(gr, repository, GHIssueState.OPEN);
 				hasMilestones = true;
 
 			}
 			
-			if( ! ((GHRepository) ghr).listMilestones(GHIssueState.CLOSED).asList().isEmpty() ){
+			if( ! ((GHRepository) gr).listMilestones(GHIssueState.CLOSED).asList().isEmpty() ){
 				
-				update(ghr, visminer, GHIssueState.CLOSED);
+				update(gr, repository, GHIssueState.CLOSED);
 				hasMilestones = true;
 				
 			}
 			
-			//if doesn't exist at least one milestone in the specified remote repository
-			//delete all milestone the local database
-			if(!hasMilestones){
-
+			if(!hasMilestones)
 				System.out.println("Probable repository doesn't have milestones");
-				org.visminer.persistence.MilestoneDAO milestoneDAO = new MilestoneDAO();
-				milestoneDAO.deleteAll(visminer.getRepository());
+
+			/*
+			 * Verifying if some database's register milestone doesn't exist more in the remote repository 
+			 * and delete them of local repository.
+			 */
+			for(Milestone m: milestoneDAO.getAll(repository)){
+
+				if( !milestonesNumbers.containsKey(m.getNumber()))
+					milestoneDAO.deleteOne(m.getNumber(), repository);
 				
 			}
 			
 	}
 		
 		
-	private static void update(Object ghr, VisMiner visminer, GHIssueState status){
+	private static void update(Object ghr, Repository repository, GHIssueState status){
 		
 		org.visminer.model.Milestone milestone = new Milestone();
-		org.visminer.model.Repository repository = new Repository();
-		org.visminer.persistence.MilestoneDAO milestoneDAO = new MilestoneDAO();
-		
-		repository.setIdGit(visminer.getRepository().getIdGit());
-		repository.setName(visminer.getRepository().getName());
-		repository.setPath(visminer.getRepository().getPath());
-		
-	
-		//save milestone's number existing in the specified remote repository
-		HashMap<Integer, Integer> milestonesNumbers = new HashMap<Integer, Integer>();
 				
 		for(GHMilestone ghm: ((GHRepository) ghr).listMilestones(status).asList()){
 					
 			milestone.setClosedIssues(ghm.getClosedIssues());
-			milestone.setCreate_date(ghm.getCreatedAt().getTime());
+			milestone.setCreate_date(ghm.getCreatedAt());
 			milestone.setCreator(ghm.getCreator().getLogin());
 			milestone.setDescription(ghm.getDescription());
 					
 			if(ghm.getDueOn() != null)
-				milestone.setDue_date(ghm.getDueOn().getTime());
+				milestone.setDue_date(ghm.getDueOn());
 					
 			milestone.setNumber(ghm.getNumber());
 			milestone.setOpenedIssues(ghm.getOpenIssues());
@@ -80,21 +84,6 @@ public abstract class MilestoneUpdate {
 				
 		}
 				
-		//verifying if some database's milestone doesn't exist more in the remote repository and delete them
-		//of local repository
-		String st;
-		
-		if(GHIssueState.OPEN == status)
-			st = "open";
-		else
-			st = "closed";
-				
-		for(Milestone m: milestoneDAO.getByStatus(repository, st)){
-
-			if( !milestonesNumbers.containsKey(m.getNumber()))
-				milestoneDAO.deleteOne(m.getNumber(), repository);
-			
-		}
 	
 	}
 		

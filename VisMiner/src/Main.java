@@ -4,14 +4,12 @@ import java.util.Map;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.persistence.config.PersistenceUnitProperties;
+import org.kohsuke.github.GHRepository;
+import org.visminer.git.remote.GitHub;
+import org.visminer.git.remote.IssueUpdate;
+import org.visminer.git.remote.MilestoneUpdate;
 import org.visminer.main.VisMiner;
-import org.visminer.model.Branch;
-import org.visminer.model.Commit;
-import org.visminer.model.Committer;
-import org.visminer.model.File;
-import org.visminer.model.Metric;
-import org.visminer.model.Tag;
-import org.visminer.persistence.Connection;
+import org.visminer.model.Milestone;
 import org.visminer.persistence.RepositoryDAO;
 
 
@@ -20,21 +18,42 @@ public class Main {
 
 	public static void main(String[] args) throws IOException, GitAPIException {
 
-		Map<String, String> props = new HashMap<String, String>();
+		Map<String, String> props = new HashMap<String, String>(5);
 		props.put(PersistenceUnitProperties.JDBC_DRIVER, "com.mysql.jdbc.Driver");
 		props.put(PersistenceUnitProperties.JDBC_URL, "jdbc:mysql://localhost/visminer");
-		props.put(PersistenceUnitProperties.JDBC_USER, "root");
-		props.put(PersistenceUnitProperties.JDBC_PASSWORD, "1234"); 	
+		props.put(PersistenceUnitProperties.JDBC_USER, "");
+		props.put(PersistenceUnitProperties.JDBC_PASSWORD, ""); 	
 		props.put(PersistenceUnitProperties.DDL_GENERATION, "create-tables");
+
+		Map<Integer, String> api_cfg = new HashMap<Integer, String>(3);
+		api_cfg.put(VisMiner.LOCAL_REPOSITORY_PATH,
+				"path/.git");
 		
-		Map<Integer, String> api_cfg = new HashMap<Integer, String>();
-		api_cfg.put(VisMiner.LOCAL_REPOSITORY_PATH, "/home/felipe/git/junit/.git");
-		api_cfg.put(VisMiner.LOCAL_REPOSITORY_NAME, "junit");
-		api_cfg.put(VisMiner.LOCAL_REPOSITORY_OWNER, "felipe");
+		/*
+		 * TODO Insert the LOCAL_REPOSITORY_NAME and LOCAL_REPOSITORY_OWNER (idGit) without a validation,
+		 * can get bad work when update(insert, delete) "Issues" and "Milestones" of remote repository.
+		 */
+		api_cfg.put(VisMiner.LOCAL_REPOSITORY_NAME, "");
+		api_cfg.put(VisMiner.LOCAL_REPOSITORY_OWNER, "");
 		
-		VisMiner visminer = new VisMiner(props, api_cfg);
+		//these isn't obligatory 
+		Map<Integer, Object> api_cfg_remote = new HashMap<Integer, Object>(3);
+		api_cfg_remote.put(VisMiner.REMOTE_REPOSITORY_LOGIN, "");
+		api_cfg_remote.put(VisMiner.REMOTE_REPOSITORY_PASSWORD, "");
 		
+		//Object that implements the interface Connection, this object
+		//is some remote repository that works with git.
+		api_cfg_remote.put(VisMiner.REMOTE_REPOSITORY_GIT, new GitHub());
+				
+		VisMiner visminer = new VisMiner(props, api_cfg, api_cfg_remote);
+		
+		/*
+		Object gr = visminer.getRepositoryRemote("login", "password", new GitHub());
+		MilestoneUpdate.updateMilestone(gr, visminer.getRepository());
+		IssueUpdate.updateIssue(gr, visminer.getRepository());*/
+	
 		System.out.print(visminer.getMetric("NOP").getDescription());
+
 		
 	}
 	
