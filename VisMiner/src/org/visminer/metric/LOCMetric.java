@@ -28,7 +28,6 @@ public class LOCMetric implements IMetric{
 		
 	}
 
-	@Override
 	public int getAccumulatedValue() {
 		return accumLOC;
 	}

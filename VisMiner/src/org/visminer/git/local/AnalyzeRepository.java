@@ -219,7 +219,6 @@ public class AnalyzeRepository implements Runnable{
 		
 	}
 	
-	@Override
 	public void run() {
 
 		saveCommitters();

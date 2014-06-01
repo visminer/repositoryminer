@@ -41,6 +41,7 @@ public class SupportedMetrics {
 		metrics.add(new NOMMetric());
 		metrics.add(new NOPMetric());
 		metrics.add(new NOCMetric());
+		metrics.add(new NOIMetric());
 		
 		return metrics;
 		

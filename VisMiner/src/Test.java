@@ -23,7 +23,7 @@ public class Test {
 		props.put(PersistenceUnitProperties.DDL_GENERATION, "create-tables");
 		Connection.setDataBaseInfo(props);
 		
-		VisMiner visminer = new VisMiner(props, "D:/GIT/Visminer/.git", "visminer", "visminer");
+		VisMiner visminer = new VisMiner(props, "D:/Desenvolvimento de Aplicações/git/Visminer/.git", "visminer", "visminer");
 		
 		for(Committer committer : visminer.getCommitters()){
 			for(Commit commit : visminer.getCommits(committer)){

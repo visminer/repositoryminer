@@ -19,7 +19,6 @@ public class NOPMetric implements IMetric{
 
 	private Set<String> packges = new HashSet<String>();
 
-	@Override
 	public int calculate(DetailAST ast) {
 		
 		PackageDeclaration pd = ast.getRoot().getPackage();
@@ -32,12 +31,10 @@ public class NOPMetric implements IMetric{
 		
 	}
 
-	@Override
 	public int getAccumulatedValue() {
 		return packges.size();
 	}
 
-	@Override
 	public Metrics getId() {
 		return Metrics.NOP;
 	}

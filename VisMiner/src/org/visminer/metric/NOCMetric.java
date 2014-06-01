@@ -16,7 +16,6 @@ public class NOCMetric implements IMetric{
 
 	private int accumNOC = 0;
 
-	@Override
 	public int calculate(DetailAST ast) {
 		
 		int classes = 0;
@@ -30,12 +29,10 @@ public class NOCMetric implements IMetric{
         
 	}
 
-	@Override
 	public int getAccumulatedValue() {
 		return accumNOC;
 	}
 
-	@Override
 	public Metrics getId() {
 		return Metrics.NOC;
 	}

@@ -34,7 +34,6 @@ public class NOMMetric implements IMetric{
 		
 	}
 
-	@Override
 	public int getAccumulatedValue() {
 		return accumNOM;
 	}

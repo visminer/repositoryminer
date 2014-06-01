@@ -30,7 +30,11 @@ public enum Metrics {
 	/**
 	 * Number of Packages
 	 */
-	NOP(5);
+	NOP(5),
+	/**
+	 * Number of Interfaces
+	 */
+	NOI(6);
 	
 	private int value;
 	
@@ -58,6 +62,7 @@ public enum Metrics {
 			case CC: return "Cyclomatic Complexity";
 			case NOC: return "Number of Classes";
 			case NOP: return "Number of Packages";
+			case NOI: return "Number of Interfaces";
 			default: return null;
 		}
 		
