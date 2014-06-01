@@ -21,7 +21,7 @@ public class NOIMetric implements IMetric{
 		int interfaces = 0;
         for(Object object : ast.getRoot().types()){
             TypeDeclaration type = (TypeDeclaration) object;
-            if(! type.isInterface())
+            if(type.isInterface())
             	interfaces++;
         }
         accumNOI += interfaces;
