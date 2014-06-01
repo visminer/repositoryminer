@@ -4,20 +4,28 @@ import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.visminer.constants.Metrics;
 import org.visminer.util.DetailAST;
 
+/**
+ * <p>
+ * Calculates Number of Interfaces metric
+ * </p>
+ * 
+ * @author FabioRosario
+ * @version 1.0
+ */
 public class NOIMetric implements IMetric{
 
 	private int accumNOI = 0;
 
 	public int calculate(DetailAST ast) {
 		
-		int classes = 0;
+		int interfaces = 0;
         for(Object object : ast.getRoot().types()){
             TypeDeclaration type = (TypeDeclaration) object;
-            if(type.isInterface())
-            	classes++;
+            if(! type.isInterface())
+            	interfaces++;
         }
-        accumNOI += classes;
-        return classes;
+        accumNOI += interfaces;
+        return interfaces;
         
 	}
 
