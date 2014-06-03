@@ -24,7 +24,7 @@ public class Main {
 		props.put(PersistenceUnitProperties.JDBC_DRIVER, "com.mysql.jdbc.Driver");
 		props.put(PersistenceUnitProperties.JDBC_URL, "jdbc:mysql://localhost/visminer");
 		props.put(PersistenceUnitProperties.JDBC_USER, "root");
-		props.put(PersistenceUnitProperties.JDBC_PASSWORD, "1234"); 
+		props.put(PersistenceUnitProperties.JDBC_PASSWORD, "1234"); 	
 		props.put(PersistenceUnitProperties.DDL_GENERATION, "create-tables");
 		
 		Map<Integer, String> api_cfg = new HashMap<Integer, String>();
@@ -34,7 +34,8 @@ public class Main {
 		
 		VisMiner visminer = new VisMiner(props, api_cfg);
 		
-	
+		System.out.print(visminer.getMetric("NOP").getDescription());
+		
 	}
 	
 }
