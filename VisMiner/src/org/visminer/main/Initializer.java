@@ -6,6 +6,8 @@ import java.util.Map;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.visminer.constants.Metrics;
 import org.visminer.git.local.AnalyzeRepository;
+import org.visminer.git.remote.IssueUpdate;
+import org.visminer.git.remote.MilestoneUpdate;
 import org.visminer.model.Metric;
 import org.visminer.model.Repository;
 import org.visminer.persistence.Connection;
@@ -14,29 +16,46 @@ import org.visminer.persistence.RepositoryDAO;
 
 public class Initializer {
 
-	public static Repository init(Map<String, String> db_cfg, Map<Integer, String> visminer_cfg) throws IOException, GitAPIException{
+	public static Repository init(VisMiner visminer) throws IOException, GitAPIException{
 		
-		Connection.setDataBaseInfo(db_cfg);
+		Connection.setDataBaseInfo(visminer.getDb_cfg());
 		verifyMetrics();
 		
 		RepositoryDAO repoDAO = new RepositoryDAO();
 		
-		String idGit = visminer_cfg.get(VisMiner.LOCAL_REPOSITORY_OWNER)+"/"+visminer_cfg.get(VisMiner.LOCAL_REPOSITORY_NAME);
+		String idGit = visminer.getVisminer_cfg_local().get(VisMiner.LOCAL_REPOSITORY_OWNER)+ "/"+
+				visminer.getVisminer_cfg_local().get(VisMiner.LOCAL_REPOSITORY_NAME);
+		
 		Repository repository = repoDAO.getByIdGit(idGit);
 		
 		if(repository == null){
-			AnalyzeRepository analyzer = new AnalyzeRepository(visminer_cfg.get(VisMiner.LOCAL_REPOSITORY_PATH), idGit);
+			
+			AnalyzeRepository analyzer = new AnalyzeRepository(
+					visminer.getVisminer_cfg_local().get(VisMiner.LOCAL_REPOSITORY_PATH), idGit);
+			
 			analyzer.run();
+			
 			repository = analyzer.getRepository();
+			
 		}
 		
-		/* for the future
-		 * if(visminer_cfg.get(VisMiner.REMOTE_REPOSITORY_URL) !=null){
-		 * connect to remote service
-		 * }
-		 */
+		if( (visminer.getVisminer_cfg_remote().get(VisMiner.REMOTE_REPOSITORY_GIT) != null) &&
+			(visminer.getVisminer_cfg_remote().get(VisMiner.REMOTE_REPOSITORY_LOGIN) != null) &&
+			(visminer.getVisminer_cfg_remote().get(VisMiner.REMOTE_REPOSITORY_PASSWORD) != null)){
+			
+			Object gr = visminer.getRepositoryRemote(
+					(String)visminer.getVisminer_cfg_remote().get(VisMiner.REMOTE_REPOSITORY_LOGIN), 
+					(String)visminer.getVisminer_cfg_remote().get(VisMiner.REMOTE_REPOSITORY_PASSWORD), 
+					(org.visminer.git.remote.Connection)visminer.getVisminer_cfg_remote().get(VisMiner.REMOTE_REPOSITORY_GIT));
+			
+			MilestoneUpdate.updateMilestone(gr, repository);
+			
+			IssueUpdate.updateIssue(gr, repository);
+			
+		}
 		
 		return repository;
+		
 	}
 	
 	private static void verifyMetrics(){

@@ -11,35 +11,45 @@ import org.visminer.main.VisMiner;
 import org.visminer.model.Milestone;
 import org.visminer.model.Repository;
 import org.visminer.persistence.IssueDAO;
-
+/**
+ * To update (insert, update) Issues in the local database
+ */
 public abstract class IssueUpdate {
 	
-		
-	public static void updateIssue(Object ghr, VisMiner visminer) throws IOException{
+	/**
+	 * 
+	 * This method besides update issues, can create a milestone's register, if them don't exist or will update milestone's register, if the issue is related with them.
+	 * 
+	 * @param gh :the git's repository remote object. {@link ConnectionToRepository}
+	 * @param visminer :{@linkplain VisMiner} object
+	 * @throws IOException
+	 */
+	public static void updateIssue(Object gh, Repository repository) throws IOException{
 			
-		if( ((GHRepository) ghr).hasIssues() ){
+		if( ((GHRepository) gh).hasIssues() ){
 
-			update(ghr, visminer, GHIssueState.OPEN);
-			update(ghr, visminer, GHIssueState.CLOSED);
+			update(gh, repository, GHIssueState.OPEN);
+			update(gh, repository, GHIssueState.CLOSED);
 			
 		}
 				
 	}
 	
-	
-	private static void update(Object ghr, VisMiner visminer, GHIssueState status) throws IOException{
+	/**
+	 * @param gh
+	 * @param visminer
+	 * @param status :the issues has two status "OPEN" or "CLOSED"
+	 * @throws IOException
+	 */
+	private static void update(Object gh, Repository repository, GHIssueState status) throws IOException{
 		
 			IssueDAO issueDAO = new IssueDAO();
 			org.visminer.model.Issue issue = new org.visminer.model.Issue();
-			org.visminer.model.Repository repository = new Repository();
 			
-			repository.setIdGit(visminer.getRepository().getIdGit());
-			repository.setName(visminer.getRepository().getName());
-			repository.setPath(visminer.getRepository().getPath());
 			
-			if( ((GHRepository) ghr).getIssues(status) != null ){
+			if( ((GHRepository) gh).getIssues(status) != null ){
 				
-				for(GHIssue ghIssue: ((GHRepository) ghr).getIssues(status)){
+				for(GHIssue ghIssue: ((GHRepository) gh).getIssues(status)){
 					
 					issue.setRepository(repository);
 					
@@ -48,10 +58,10 @@ public abstract class IssueUpdate {
 					else
 						issue.setAssignee(null);
 					
-					issue.setCreate_date(ghIssue.getCreatedAt().getTime());
+					issue.setCreate_date(ghIssue.getCreatedAt());
 					
 					if(ghIssue.getClosedAt() != null)
-						issue.setClosed_date(ghIssue.getClosedAt().getTime());
+						issue.setClosed_date(ghIssue.getClosedAt());
 
 					ArrayList<String> labels = new ArrayList<String>();
 					if(ghIssue.getLabels() != null){
@@ -70,12 +80,12 @@ public abstract class IssueUpdate {
 						
 						milestone.setNumber(ghIssue.getMilestone().getNumber());
 						milestone.setClosedIssues(ghIssue.getMilestone().getClosedIssues());
-						milestone.setCreate_date(ghIssue.getMilestone().getCreatedAt().getTime());
+						milestone.setCreate_date(ghIssue.getMilestone().getCreatedAt());
 						milestone.setCreator(ghIssue.getMilestone().getCreator().getLogin());
 						milestone.setDescription(ghIssue.getMilestone().getDescription());
 						
 						if(ghIssue.getMilestone().getDueOn() != null)
-							milestone.setDue_date(ghIssue.getMilestone().getDueOn().getTime());
+							milestone.setDue_date(ghIssue.getMilestone().getDueOn());
 						
 						milestone.setOpenedIssues(ghIssue.getMilestone().getOpenIssues());
 						milestone.setRepository(repository);
@@ -93,7 +103,7 @@ public abstract class IssueUpdate {
 					
 					issue.setStatus(ghIssue.getState().name());
 					issue.setTitle(ghIssue.getTitle());
-					issue.setUpdated_date(ghIssue.getUpdatedAt().getTime());
+					issue.setUpdated_date(ghIssue.getUpdatedAt());
 					
 					issueDAO.save(issue);
 

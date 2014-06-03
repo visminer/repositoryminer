@@ -2,6 +2,7 @@ package org.visminer.metric;
 
 import java.util.List;
 
+import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.Statement;
@@ -13,14 +14,17 @@ public class CCMetric implements IMetric{
 
 	private int accumCC = 0;
 
+	@Override
 	public Metrics getId(){
 		return Metrics.CC;
 	}
 	
+	@Override
 	public int getAccumulatedValue() {
 		return accumCC;
 	}
 	
+	@Override
 	public int calculate(DetailAST ast){
 		
 		int ccTotal = 0;
@@ -67,11 +71,11 @@ public class CCMetric implements IMetric{
 	private int processStatement(Statement statement){
 		switch(statement.getNodeType()){
 		
-		case Statement.IF_STATEMENT:
-		case Statement.SWITCH_CASE:
-		case Statement.FOR_STATEMENT:
-		case Statement.DO_STATEMENT:
-		case Statement.WHILE_STATEMENT:
+		case ASTNode.IF_STATEMENT:
+		case ASTNode.SWITCH_CASE:
+		case ASTNode.FOR_STATEMENT:
+		case ASTNode.DO_STATEMENT:
+		case ASTNode.WHILE_STATEMENT:
 			return 1;
 			
 		default:

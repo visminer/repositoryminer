@@ -69,6 +69,9 @@ public class MilestoneDAO{
 	public int deleteOne(int number, Repository repository){
 		
 		int qtdeDeleted = 0;
+		IssueDAO id = new IssueDAO();
+		Milestone m = getOne(number, repository);
+		id.setNullMilestone(m);
 				
 		EntityManager em = connection.getEntityManager();
 		em.getTransaction().begin();

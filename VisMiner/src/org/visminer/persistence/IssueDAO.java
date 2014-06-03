@@ -73,4 +73,23 @@ public class IssueDAO{
 		}
 	}
 	
+	/**
+	 * update to null all Milestone (a specified) referencing of the Issues
+	 * @param milestone
+	 */
+	public void setNullMilestone(Milestone milestone){
+		
+		EntityManager em = connection.getEntityManager();
+		em.getTransaction().begin();
+		
+		for(Issue i : getAllbyMilestone(milestone)){
+			i.setMilestone(null);
+			em.merge(i);
+		}
+		
+		em.getTransaction().commit();
+		em.close();
+		
+	}
+	
 }

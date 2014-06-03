@@ -41,6 +41,7 @@ public class BranchPK implements Serializable {
 		this.repositoryIdGit = repositoryIdGit;
 	}
 
+	@Override
 	public boolean equals(Object other) {
 		if (this == other) {
 			return true;
@@ -54,6 +55,7 @@ public class BranchPK implements Serializable {
 			&& this.repositoryIdGit.equals(castOther.repositoryIdGit);
 	}
 
+	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int hash = 17;
