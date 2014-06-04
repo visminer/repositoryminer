@@ -9,7 +9,7 @@ import org.visminer.util.DetailAST;
  * Calculates Number of Interfaces metric
  * </p>
  * 
- * @author FabioRosario
+ * @author FabioRosarioSantos
  * @version 1.0
  */
 public class NOIMetric implements IMetric{
