@@ -39,7 +39,8 @@ public class Initializer {
 			
 		}
 		
-		if( (visminer.getVisminer_cfg_remote().get(VisMiner.REMOTE_REPOSITORY_GIT) != null) &&
+		if( (visminer.getVisminer_cfg_remote() != null) &&
+			(visminer.getVisminer_cfg_remote().get(VisMiner.REMOTE_REPOSITORY_GIT) != null) &&
 			(visminer.getVisminer_cfg_remote().get(VisMiner.REMOTE_REPOSITORY_LOGIN) != null) &&
 			(visminer.getVisminer_cfg_remote().get(VisMiner.REMOTE_REPOSITORY_PASSWORD) != null)){
 			
