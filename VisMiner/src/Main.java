@@ -21,13 +21,13 @@ public class Main {
 		Map<String, String> props = new HashMap<String, String>(5);
 		props.put(PersistenceUnitProperties.JDBC_DRIVER, "com.mysql.jdbc.Driver");
 		props.put(PersistenceUnitProperties.JDBC_URL, "jdbc:mysql://localhost/visminer");
-		props.put(PersistenceUnitProperties.JDBC_USER, "");
-		props.put(PersistenceUnitProperties.JDBC_PASSWORD, ""); 	
+		props.put(PersistenceUnitProperties.JDBC_USER, "root");
+		props.put(PersistenceUnitProperties.JDBC_PASSWORD, "1234"); 	
 		props.put(PersistenceUnitProperties.DDL_GENERATION, "create-tables");
 
 		Map<Integer, String> api_cfg = new HashMap<Integer, String>(3);
 		api_cfg.put(VisMiner.LOCAL_REPOSITORY_PATH,
-				"path/.git");
+				"C:\\Users\\Felipe\\git\\TestVisMiner\\.git");
 		
 		/*
 		 * TODO Insert the LOCAL_REPOSITORY_NAME and LOCAL_REPOSITORY_OWNER (idGit) without a validation,
@@ -38,8 +38,8 @@ public class Main {
 		
 		//these isn't obligatory 
 		Map<Integer, Object> api_cfg_remote = new HashMap<Integer, Object>(3);
-		api_cfg_remote.put(VisMiner.REMOTE_REPOSITORY_LOGIN, "");
-		api_cfg_remote.put(VisMiner.REMOTE_REPOSITORY_PASSWORD, "");
+		api_cfg_remote.put(VisMiner.REMOTE_REPOSITORY_LOGIN, null);
+		api_cfg_remote.put(VisMiner.REMOTE_REPOSITORY_PASSWORD, null);
 		
 		//Object that implements the interface Connection, this object
 		//is some remote repository that works with git.

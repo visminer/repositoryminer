@@ -3,10 +3,10 @@ package org.visminer.util;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.nio.file.Files;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.commons.io.FileUtils;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
@@ -30,7 +30,7 @@ public class DetailAST {
     public void parserFromFile(File file){
         
         try {        
-            byte[] bytes = Files.readAllBytes(file.toPath());
+            byte[] bytes = FileUtils.readFileToByteArray(file);
             String source = new String(bytes, "UTF-8");
             this.source = source;
             setRoot(source);
