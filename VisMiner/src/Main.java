@@ -20,6 +20,7 @@ public class Main {
 
 		Map<String, String> props = new HashMap<String, String>(5);
 		props.put(PersistenceUnitProperties.JDBC_DRIVER, "com.mysql.jdbc.Driver");
+
 		props.put(PersistenceUnitProperties.JDBC_URL, "jdbc:mysql://localhost/visminer4");
 		props.put(PersistenceUnitProperties.JDBC_USER, "");
 		props.put(PersistenceUnitProperties.JDBC_PASSWORD, ""); 	
@@ -38,8 +39,8 @@ public class Main {
 		 * set how null.	
 		 */
 		Map<Integer, Object> api_cfg_remote = new HashMap<Integer, Object>(3);
-		api_cfg_remote.put(VisMiner.REMOTE_REPOSITORY_LOGIN, "");
-		api_cfg_remote.put(VisMiner.REMOTE_REPOSITORY_PASSWORD, "");
+		api_cfg_remote.put(VisMiner.REMOTE_REPOSITORY_LOGIN, null);
+		api_cfg_remote.put(VisMiner.REMOTE_REPOSITORY_PASSWORD, null);
 		
 		/*
 		 * Object that implements the interface Connection, this object
