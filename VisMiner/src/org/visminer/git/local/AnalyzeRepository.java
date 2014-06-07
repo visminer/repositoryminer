@@ -134,6 +134,8 @@ public class AnalyzeRepository implements Runnable{
 	private List<MetricValue> getMetricsValues(File file, String commitSha) throws MissingObjectException, IncorrectObjectTypeException, CorruptObjectException, IOException{
 		
 		String content = gitUtil.getFileStates(commitSha, file.getPath());
+	
+		System.out.println("Content:"+content);
 		
 		if(content == null)
 			return null;

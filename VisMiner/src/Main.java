@@ -21,14 +21,14 @@ public class Main {
 		Map<String, String> props = new HashMap<String, String>(5);
 		props.put(PersistenceUnitProperties.JDBC_DRIVER, "com.mysql.jdbc.Driver");
 
-		props.put(PersistenceUnitProperties.JDBC_URL, "jdbc:mysql://localhost/visminer4");
-		props.put(PersistenceUnitProperties.JDBC_USER, "");
-		props.put(PersistenceUnitProperties.JDBC_PASSWORD, ""); 	
+		props.put(PersistenceUnitProperties.JDBC_URL, "jdbc:mysql://localhost/visminer");
+		props.put(PersistenceUnitProperties.JDBC_USER, "root");
+		props.put(PersistenceUnitProperties.JDBC_PASSWORD, "1234"); 	
 		props.put(PersistenceUnitProperties.DDL_GENERATION, "create-tables");
 
 		Map<Integer, String> api_cfg_local = new HashMap<Integer, String>(3);
 		api_cfg_local.put(VisMiner.LOCAL_REPOSITORY_PATH,
-				"/path/.git");
+				"C:\\Users\\Felipe\\git\\Visminer\\.git");
 		
 
 		api_cfg_local.put(VisMiner.LOCAL_REPOSITORY_NAME, "visminer");
@@ -50,9 +50,6 @@ public class Main {
 				
 		VisMiner visminer = new VisMiner(props, api_cfg_local, api_cfg_remote);
 	
-		System.out.print(visminer.getMetric("NOP").getDescription());
-
-		
 	}
 	
 }
