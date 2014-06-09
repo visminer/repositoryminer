@@ -42,17 +42,27 @@ public class Initializer {
 		if( (visminer.getVisminer_cfg_remote() != null) &&
 			(visminer.getVisminer_cfg_remote().get(VisMiner.REMOTE_REPOSITORY_GIT) != null) &&
 			(visminer.getVisminer_cfg_remote().get(VisMiner.REMOTE_REPOSITORY_LOGIN) != null) &&
-			(visminer.getVisminer_cfg_remote().get(VisMiner.REMOTE_REPOSITORY_PASSWORD) != null)){
+			(visminer.getVisminer_cfg_remote().get(VisMiner.REMOTE_REPOSITORY_PASSWORD) != null) ){
 			
-			Object gr = visminer.getRepositoryRemote(
+			try {
+				Object gr = visminer.getRepositoryRemote(
 					(String)visminer.getVisminer_cfg_remote().get(VisMiner.REMOTE_REPOSITORY_LOGIN), 
 					(String)visminer.getVisminer_cfg_remote().get(VisMiner.REMOTE_REPOSITORY_PASSWORD), 
 					(org.visminer.git.remote.Connection)visminer.getVisminer_cfg_remote().get(VisMiner.REMOTE_REPOSITORY_GIT));
+				
+				if(gr != null){
+					
+					MilestoneUpdate.updateMilestone(gr, repository);
+					IssueUpdate.updateIssue(gr, repository);
+					
+				}
+				
+			} catch (Exception e) {
 			
-			MilestoneUpdate.updateMilestone(gr, repository);
-			
-			IssueUpdate.updateIssue(gr, repository);
-			
+				System.out.println(e);
+				
+			}
+		
 		}
 		
 		return repository;

@@ -4,13 +4,8 @@ import java.util.Map;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.persistence.config.PersistenceUnitProperties;
-import org.kohsuke.github.GHRepository;
 import org.visminer.git.remote.GitHub;
-import org.visminer.git.remote.IssueUpdate;
-import org.visminer.git.remote.MilestoneUpdate;
 import org.visminer.main.VisMiner;
-import org.visminer.model.Milestone;
-import org.visminer.persistence.RepositoryDAO;
 
 
 public class Main {
@@ -21,7 +16,7 @@ public class Main {
 		Map<String, String> props = new HashMap<String, String>(5);
 		props.put(PersistenceUnitProperties.JDBC_DRIVER, "com.mysql.jdbc.Driver");
 
-		props.put(PersistenceUnitProperties.JDBC_URL, "jdbc:mysql://localhost/visminer4");
+		props.put(PersistenceUnitProperties.JDBC_URL, "jdbc:mysql://localhost/visminer");
 		props.put(PersistenceUnitProperties.JDBC_USER, "");
 		props.put(PersistenceUnitProperties.JDBC_PASSWORD, ""); 	
 		props.put(PersistenceUnitProperties.DDL_GENERATION, "create-tables");
@@ -31,12 +26,12 @@ public class Main {
 				"/path/.git");
 		
 
-		api_cfg_local.put(VisMiner.LOCAL_REPOSITORY_NAME, "visminer");
-		api_cfg_local.put(VisMiner.LOCAL_REPOSITORY_OWNER, "visminer");
+		api_cfg_local.put(VisMiner.LOCAL_REPOSITORY_NAME, "");
+		api_cfg_local.put(VisMiner.LOCAL_REPOSITORY_OWNER, "");
 		
 		/*
 		 * These isn't obligatory, all parameters of "api_cfg_remote" could be
-		 * set how null.	
+		 * set how null or could be don't set.
 		 */
 		Map<Integer, Object> api_cfg_remote = new HashMap<Integer, Object>(3);
 		api_cfg_remote.put(VisMiner.REMOTE_REPOSITORY_LOGIN, null);
