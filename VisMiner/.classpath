@@ -35,6 +35,6 @@
 	<classpathentry kind="lib" path="libs/github/github-api-1.50_kohsuke/dependencies/jackson-core-2.2.3.jar"/>
 	<classpathentry kind="lib" path="libs/github/github-api-1.50_kohsuke/dependencies/jackson-databind-2.2.3.jar"/>
 	<classpathentry kind="lib" path="libs/github/github-api-1.50_kohsuke/github-api-1.50.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Luana/Downloads/postgresql-9.2-1004.jdbc41.jar"/>
+	<classpathentry kind="lib" path="libs/jpa/postgresql-9.2-1004.jdbc41.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
