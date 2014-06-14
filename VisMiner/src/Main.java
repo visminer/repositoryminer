@@ -17,8 +17,8 @@ public class Main {
 
 	public static void main(String[] args) throws IOException, GitAPIException {
 
-		  ConfigConnection config = new ConfigConnectionMysql();
-		  //ConfigConnection config = new ConfigConnectionPostgre();
+		  //ConfigConnection config = new ConfigConnectionMysql();
+		  ConfigConnection config = new ConfigConnectionPostgre();
 		   
 		   HashMap<String, String> props = config.sgbdConnection();
 		 
