@@ -74,7 +74,7 @@ public class IssueDAO{
 	}
 	
 	/**
-	 * update to null all Milestone (a specified) referencing of the Issues
+	 * update to null all Milestone (a specified) referencing in the Issues
 	 * @param milestone
 	 */
 	public void setNullMilestone(Milestone milestone){

@@ -3,25 +3,32 @@ package org.visminer.git.local;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.errors.AmbiguousObjectException;
 import org.eclipse.jgit.errors.CorruptObjectException;
 import org.eclipse.jgit.errors.IncorrectObjectTypeException;
 import org.eclipse.jgit.errors.MissingObjectException;
 import org.eclipse.jgit.errors.RevisionSyntaxException;
+import org.visminer.main.VisMiner;
 import org.visminer.metric.IMetric;
 import org.visminer.metric.SupportedMetrics;
 import org.visminer.model.Branch;
 import org.visminer.model.Commit;
 import org.visminer.model.Committer;
 import org.visminer.model.File;
+import org.visminer.model.Issue;
 import org.visminer.model.Metric;
 import org.visminer.model.MetricValue;
 import org.visminer.model.Repository;
 import org.visminer.model.Tag;
 import org.visminer.persistence.BranchDAO;
+import org.visminer.persistence.CommitDAO;
 import org.visminer.persistence.CommitterDAO;
 import org.visminer.persistence.FileDAO;
+import org.visminer.persistence.IssueDAO;
 import org.visminer.persistence.RepositoryDAO;
 import org.visminer.persistence.TagDAO;
 import org.visminer.util.DetailAST;
@@ -46,19 +53,43 @@ public class AnalyzeRepository implements Runnable{
 		
 	}
 	
+	/**
+	 * save committers and commits them, besides to verify each commit references issues
+	 */
 	private void saveCommitters(){
 		
 		this.commits = new ArrayList<Commit>();
 		
-		CommitterDAO committerDAO = new CommitterDAO();
 		List<Committer> committers = gitUtil.getCommitters();
+				
+		IssueDAO issueDAO = new IssueDAO();
+		Issue issue;
+		ArrayList<Issue> issues = new ArrayList<Issue>();
 		
 		for(Committer committer : committers){
-			commits.addAll(committer.getCommits());
+
+			for(Commit commit: committer.getCommits()){
+				
+				issues.clear();
+
+				for(Integer issueNumber: verifyCommitReferenceToIssues(commit.getMessage()) ){
+					
+					if( (issue = issueDAO.getOne((int)issueNumber, repository)) != null)
+						issues.add(issue);
+						
+				}
+
+				commit.setIssues(issues);
+				CommitDAO commitDAO = new CommitDAO();
+				commitDAO.save(commit);
+				commits.add(commit);
+				
+			}
+
 		}
 		
-		committerDAO.saveMany(committers);
 	}
+	
 	
 	private void saveBraches() throws GitAPIException{
 		
@@ -114,10 +145,12 @@ public class AnalyzeRepository implements Runnable{
 
 		List<File> files = new ArrayList<File>();
 		
+		
 		for(Commit commit : this.commits){
 			
 			for(String fileName : gitUtil.getFilesNameInCommit(commit.getSha())){
 				File file = new File();
+				
 				file.setCommit(commit);
 				file.setPath(fileName);
 				file.setMetricValues(getMetricsValues(file, commit.getSha()));
@@ -128,6 +161,48 @@ public class AnalyzeRepository implements Runnable{
 		
 		FileDAO fileDAO = new FileDAO();
 		fileDAO.saveMany(files);
+		
+	}
+	
+	/**
+	 * Algorithm for capture the number issues on message commit.
+	 * Doesn't permit before "#number_commit": "number", "letters", "_".
+	 * Doesn't permit after "#number_commit": "letters", "_".
+	 *
+	 * @param message: commit's message
+	 * @return ArrayList<Integer> with the numbers of issues, if exist any, or a empty array, if 
+	 * don't exist any issue.
+	 */
+	private ArrayList<Integer> verifyCommitReferenceToIssues(String message){
+		
+		String regex = "([^\\w]|^|\\G)+(#){1}([0-9])+([^\\w]|$)";
+		
+		Pattern pattern = Pattern.compile(regex);
+			
+		String regexForSplit = "(([^\\w]|^|\\G)+(#){1})|([^\\w]|$)";
+		
+		ArrayList<Integer> issues = new ArrayList<Integer>();
+		Integer number;
+		Matcher matcher;
+
+		matcher = pattern.matcher(message);
+		
+		if(matcher.find()){
+			
+			matcher.reset();
+
+			while (matcher.find()) {
+		
+				number = Integer.valueOf(matcher.group().split(regexForSplit)[1]);
+				
+			    if(!issues.contains(number))
+			    	issues.add(number);
+			    
+			}
+			
+		}
+		
+		return issues;
 		
 	}
 	

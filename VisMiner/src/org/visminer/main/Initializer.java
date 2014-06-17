@@ -33,41 +33,18 @@ public class Initializer {
 			AnalyzeRepository analyzer = new AnalyzeRepository(
 					visminer.getVisminer_cfg_local().get(VisMiner.LOCAL_REPOSITORY_PATH), idGit);
 			
+			visminer.updateIssuesMilestones(analyzer.getRepository());
+
 			analyzer.run();
-			
+
 			repository = analyzer.getRepository();
 			
 		}
-		
-		if( (visminer.getVisminer_cfg_remote() != null) &&
-			(visminer.getVisminer_cfg_remote().get(VisMiner.REMOTE_REPOSITORY_GIT) != null) &&
-			(visminer.getVisminer_cfg_remote().get(VisMiner.REMOTE_REPOSITORY_LOGIN) != null) &&
-			(visminer.getVisminer_cfg_remote().get(VisMiner.REMOTE_REPOSITORY_PASSWORD) != null) ){
-			
-			try {
-				Object gr = visminer.getRepositoryRemote(
-					(String)visminer.getVisminer_cfg_remote().get(VisMiner.REMOTE_REPOSITORY_LOGIN), 
-					(String)visminer.getVisminer_cfg_remote().get(VisMiner.REMOTE_REPOSITORY_PASSWORD), 
-					(org.visminer.git.remote.Connection)visminer.getVisminer_cfg_remote().get(VisMiner.REMOTE_REPOSITORY_GIT));
 				
-				if(gr != null){
-					
-					MilestoneUpdate.updateMilestone(gr, repository);
-					IssueUpdate.updateIssue(gr, repository);
-					
-				}
-				
-			} catch (Exception e) {
-			
-				System.out.println(e);
-				
-			}
-		
-		}
-		
 		return repository;
 		
 	}
+	
 	
 	private static void verifyMetrics(){
 		
