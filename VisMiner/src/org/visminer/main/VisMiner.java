@@ -7,6 +7,8 @@ import java.util.Map;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.visminer.git.remote.Connection;
 import org.visminer.git.remote.ConnectionToRepository;
+import org.visminer.git.remote.IssueUpdate;
+import org.visminer.git.remote.MilestoneUpdate;
 import org.visminer.model.Branch;
 import org.visminer.model.Commit;
 import org.visminer.model.Committer;
@@ -68,17 +70,46 @@ public class VisMiner {
 		return ctr.getConnection(login, password);
 		
 	}
+	
+	public void updateIssuesMilestones(Repository repository){
 		
+		if( (visminer_cfg_remote != null) &&
+				(visminer_cfg_remote.get(VisMiner.REMOTE_REPOSITORY_GIT) != null) &&
+				(visminer_cfg_remote.get(VisMiner.REMOTE_REPOSITORY_LOGIN) != null) &&
+				(visminer_cfg_remote.get(VisMiner.REMOTE_REPOSITORY_PASSWORD) != null) ){
+				
+			try {
+				Object gr = getRepositoryRemote(
+					(String)visminer_cfg_remote.get(VisMiner.REMOTE_REPOSITORY_LOGIN), 
+					(String)visminer_cfg_remote.get(VisMiner.REMOTE_REPOSITORY_PASSWORD), 
+					(org.visminer.git.remote.Connection)visminer_cfg_remote.get(VisMiner.REMOTE_REPOSITORY_GIT));
+				
+				if(gr != null){
+					
+					MilestoneUpdate.updateMilestone(gr, repository);
+					IssueUpdate.updateIssue(gr, repository);
+					
+				}
+				
+			} catch (Exception e) {
+			
+				System.out.println(e);
+				
+			}
+		}
+		
+	}
+		
+	public Map<Integer, Object> getVisminer_cfg_remote() {
+		return visminer_cfg_remote;
+	}
+
 	public Map<String, String> getDb_cfg() {
 		return db_cfg;
 	}
 
 	public Map<Integer, String> getVisminer_cfg_local() {
 		return visminer_cfg_local;
-	}
-
-	public Map<Integer, Object> getVisminer_cfg_remote() {
-		return visminer_cfg_remote;
 	}
 
 	public Repository getRepository(){

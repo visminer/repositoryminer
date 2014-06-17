@@ -4,8 +4,6 @@ import java.io.Serializable;
 
 import javax.persistence.*;
 
-import org.eclipse.persistence.annotations.CascadeOnDelete;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
