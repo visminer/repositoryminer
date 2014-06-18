@@ -1,10 +1,14 @@
 package org.visminer.main;
 
 import java.io.IOException;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.persistence.config.PersistenceUnitProperties;
 import org.visminer.git.remote.Connection;
 import org.visminer.git.remote.ConnectionToRepository;
 import org.visminer.git.remote.IssueUpdate;
@@ -30,29 +34,63 @@ public class VisMiner {
 	private Map<Integer, String> visminer_cfg_local = null;
 	private Map<Integer, Object> visminer_cfg_remote = null;
 	
+	public static final String DB_NAME = "DB_NAME";
+	public static final String JDBC_DRIVER = PersistenceUnitProperties.JDBC_DRIVER;
+	public static final String JDBC_URL = PersistenceUnitProperties.JDBC_URL;
+	public static final String JDBC_USER = PersistenceUnitProperties.JDBC_USER;
+	public static final String JDBC_PASSWORD = PersistenceUnitProperties.JDBC_PASSWORD;
+	public static final String DDL_GENERATION = PersistenceUnitProperties.DDL_GENERATION;
+	
 	public static final int LOCAL_REPOSITORY_PATH = 0;
 	public static final int LOCAL_REPOSITORY_OWNER = 1;
 	public static final int LOCAL_REPOSITORY_NAME = 2;
 	
 	public static final int REMOTE_REPOSITORY_LOGIN = 3;
 	public static final int REMOTE_REPOSITORY_PASSWORD = 4;
-	
+
 	//Object that implements the interface Connection, this object
 	//is some remote repository that works with git
 	public static final int REMOTE_REPOSITORY_GIT = 5;
 
 	
-	public VisMiner(Map<String, String> db_cfg, Map<Integer, String> visminer_cfg,
+	public VisMiner(Map<String, String> db_cfg, Map<Integer, String> visminer_cfg_local,
 			Map<Integer, Object> visminer_cfg_remote) throws IOException, GitAPIException{
 		
 		this.db_cfg = db_cfg;
-		this.visminer_cfg_local = visminer_cfg;
+		this.visminer_cfg_local = visminer_cfg_local;
 		this.visminer_cfg_remote = visminer_cfg_remote;
+		
+		createDatabase();
 		
 		this.repository = Initializer.init(this);
 		
 	}
 
+	/**
+	 * create database if not exist and put the work path to JDBC_URL
+	 */
+	private void createDatabase(){
+		
+		java.sql.Connection connection;
+		try {
+			
+			connection = DriverManager.getConnection(db_cfg.get(JDBC_URL), db_cfg.get(JDBC_USER),
+					db_cfg.get(JDBC_PASSWORD));
+			
+			Statement stmt = connection.createStatement();
+			stmt.executeUpdate("CREATE DATABASE IF NOT EXISTS "+ db_cfg.get(DB_NAME));
+			stmt.close();
+			
+			db_cfg.put(JDBC_URL, db_cfg.get(JDBC_URL) + db_cfg.get(DB_NAME));
+			
+		} catch (SQLException e) {
+			
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+	
 	/**
 	 * 
 	 * @param login: for a specified git repository.

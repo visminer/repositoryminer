@@ -1,7 +1,9 @@
 package org.visminer.model;
 
 import java.io.Serializable;
+
 import javax.persistence.*;
+
 import java.util.List;
 
 
@@ -25,6 +27,7 @@ public class File implements Serializable {
 
 	//bi-directional many-to-one association to Commit
 	@ManyToOne
+	@JoinColumn(name = "commit_sha", referencedColumnName = "sha")
 	private Commit commit;
 
 	//bi-directional many-to-one association to MetricValue

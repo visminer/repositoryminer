@@ -32,7 +32,7 @@ public class Repository implements Serializable {
 	private List<Branch> branches;
 
 	//bi-directional many-to-one association to Committer
-	@OneToMany(mappedBy="repository")
+	@ManyToMany(mappedBy="repositories")
 	private List<Committer> committers;
 
 	//bi-directional many-to-one association to Issue
@@ -104,7 +104,7 @@ public class Repository implements Serializable {
 	public void setCommitters(List<Committer> committers) {
 		this.committers = committers;
 	}
-
+/*
 	public Committer addCommitter(Committer committer) {
 		getCommitters().add(committer);
 		committer.setRepository(this);
@@ -117,7 +117,7 @@ public class Repository implements Serializable {
 		committer.setRepository(null);
 
 		return committer;
-	}
+	}*/
 
 	public List<Issue> getIssues() {
 		return this.issues;

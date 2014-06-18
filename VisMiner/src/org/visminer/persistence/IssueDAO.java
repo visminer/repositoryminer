@@ -7,7 +7,6 @@ import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 
 import org.visminer.model.Issue;
-import org.visminer.model.Metric;
 import org.visminer.model.Milestone;
 import org.visminer.model.Repository;
 

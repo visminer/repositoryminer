@@ -27,8 +27,8 @@ public class CommitDAO{
 	public List<Commit> getByCommitter(Committer committer){
 		
 		EntityManager em = connection.getEntityManager();
-		TypedQuery<Commit> query = em.createQuery("select c from Commit c where c.committer.idCommitter = :arg1", Commit.class);
-		query.setParameter("arg1", committer.getIdCommitter());
+		TypedQuery<Commit> query = em.createQuery("select c from Commit c where c.committer = :arg1", Commit.class);
+		query.setParameter("arg1", committer);
 		try{
 			return query.getResultList();
 		}catch(NoResultException e){

@@ -1,13 +1,10 @@
 package org.visminer.main;
 
 import java.io.IOException;
-import java.util.Map;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.visminer.constants.Metrics;
 import org.visminer.git.local.AnalyzeRepository;
-import org.visminer.git.remote.IssueUpdate;
-import org.visminer.git.remote.MilestoneUpdate;
 import org.visminer.model.Metric;
 import org.visminer.model.Repository;
 import org.visminer.persistence.Connection;
@@ -31,7 +28,7 @@ public class Initializer {
 		if(repository == null){
 			
 			AnalyzeRepository analyzer = new AnalyzeRepository(
-					visminer.getVisminer_cfg_local().get(VisMiner.LOCAL_REPOSITORY_PATH), idGit);
+					visminer.getVisminer_cfg_local().get(VisMiner.LOCAL_REPOSITORY_PATH), idGit, visminer);
 			
 			visminer.updateIssuesMilestones(analyzer.getRepository());
 

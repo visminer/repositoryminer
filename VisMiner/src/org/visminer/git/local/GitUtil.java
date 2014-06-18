@@ -95,10 +95,14 @@ public class GitUtil {
 		finder.find();
 		
 		List<Committer> committers = new ArrayList<Committer>();
+		ArrayList<org.visminer.model.Repository> rep = new ArrayList<org.visminer.model.Repository>();
+
 		for(PersonIdent person : authorFilter.getPersons()){
 			Committer committer = new Committer(person.getEmailAddress(), person.getName());
 			committer.setCommits(getCommitsByCommitter(committer));
-			committer.setRepository(myRepository);
+			rep.clear();
+			rep.add(myRepository);
+			committer.setRepositories(rep);
 			committers.add(committer);
 		}
 		

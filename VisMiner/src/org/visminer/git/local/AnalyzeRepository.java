@@ -38,12 +38,14 @@ public class AnalyzeRepository implements Runnable{
 	private Repository repository;
 	private GitUtil gitUtil;
 	private List<Commit> commits;
+	private VisMiner visminer;
 	
-	public AnalyzeRepository(String repository_path, String idGit) throws IOException, GitAPIException{
+	public AnalyzeRepository(String repository_path, String idGit, VisMiner visminer) throws IOException, GitAPIException{
 		
 		gitUtil = new GitUtil(repository_path, idGit);
 		RepositoryDAO repoDAO = new RepositoryDAO();
 		repository = repoDAO.save(gitUtil.getRepository());
+		this.visminer = visminer;
 		
 	}
 	
@@ -54,7 +56,9 @@ public class AnalyzeRepository implements Runnable{
 	}
 	
 	/**
-	 * save committers and commits them, besides to verify each commit references issues
+	 * save committers and commits them, besides to verify each commit references issues and
+	 * insert it into the table commit "references issues", besides to try to insert 
+	 * committer in "commiter_contributes_repository" table
 	 */
 	private void saveCommitters(){
 		
@@ -66,8 +70,10 @@ public class AnalyzeRepository implements Runnable{
 		Issue issue;
 		ArrayList<Issue> issues = new ArrayList<Issue>();
 		
+		CommitterDAO committerDAO = new CommitterDAO();
+		
 		for(Committer committer : committers){
-
+			
 			for(Commit commit: committer.getCommits()){
 				
 				issues.clear();
@@ -85,6 +91,9 @@ public class AnalyzeRepository implements Runnable{
 				commits.add(commit);
 				
 			}
+			
+			//try to insert the committer in "commiter_contributes_repository"
+			committerDAO.insertInContributes(committer, visminer, repository);
 
 		}
 		
