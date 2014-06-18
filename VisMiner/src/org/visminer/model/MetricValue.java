@@ -1,6 +1,7 @@
 package org.visminer.model;
 
 import java.io.Serializable;
+
 import javax.persistence.*;
 
 
@@ -24,10 +25,12 @@ public class MetricValue implements Serializable {
 
 	//bi-directional many-to-one association to Metric
 	@ManyToOne
+	@JoinColumn(name = "metric_id_metric", referencedColumnName = "id_metric")
 	private Metric metric;
 
 	//bi-directional many-to-one association to File
 	@ManyToOne
+	@JoinColumn(name = "file_id_file", referencedColumnName = "id_file")
 	private File file;
 
 	//bi-directional many-to-one association to Tag

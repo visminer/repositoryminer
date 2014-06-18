@@ -1,7 +1,9 @@
 package org.visminer.model;
 
 import java.io.Serializable;
+
 import javax.persistence.*;
+
 import java.util.Date;
 import java.util.List;
 
@@ -21,6 +23,7 @@ public class Commit implements Serializable {
 	private String sha;
 
 	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name="date", nullable=false)
 	private Date date;
 
 	@Column(name="message", nullable=true, length=10000)
@@ -28,10 +31,11 @@ public class Commit implements Serializable {
 
 	//bi-directional many-to-one association to Committer
 	@ManyToOne
+	@JoinColumn(name = "committer_email", referencedColumnName = "email")
 	private Committer committer;
 
 	//bi-directional many-to-many association to Issue
-	@ManyToMany(fetch=FetchType.LAZY)
+	@ManyToMany
 	@JoinTable(name="commit_reference_issue",
 		joinColumns = {
 			@JoinColumn(name="commit_sha", nullable=false, referencedColumnName = "sha")

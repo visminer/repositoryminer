@@ -18,11 +18,7 @@ public class Committer implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@Column(name="id_committer")
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int idCommitter;
-
-	@Column(name="email", nullable=false, length=255)
+	@Column(name="email", length=255)
 	private String email;
 
 	@Column(name="name", nullable=false, length=90)
@@ -32,9 +28,17 @@ public class Committer implements Serializable {
 	@OneToMany(mappedBy="committer")
 	private List<Commit> commits;
 
-	//bi-directional many-to-one association to Repository
-	@ManyToOne
-	private Repository repository;
+	//bi-directional many-to-many association to Repository
+	@ManyToMany
+	@JoinTable(name="committer_contributes_repository",
+		joinColumns = {
+			@JoinColumn(name="committer_email", nullable=false, referencedColumnName = "email")
+		},
+		inverseJoinColumns={
+			@JoinColumn(name = "repository_id_git", nullable=false ,referencedColumnName = "id_git"),
+		}
+	)
+	private List<Repository> repositories;
 
 	public Committer() {
 	}
@@ -43,14 +47,6 @@ public class Committer implements Serializable {
 		super();
 		this.email = email;
 		this.name = name;
-	}
-
-	public int getIdCommitter() {
-		return this.idCommitter;
-	}
-
-	public void setIdCommitter(int idCommitter) {
-		this.idCommitter = idCommitter;
 	}
 
 	public String getEmail() {
@@ -91,12 +87,13 @@ public class Committer implements Serializable {
 		return commit;
 	}
 
-	public Repository getRepository() {
-		return this.repository;
+	public List<Repository> getRepositories() {
+		return repositories;
 	}
 
-	public void setRepository(Repository repository) {
-		this.repository = repository;
+	public void setRepositories(List<Repository> repositories) {
+		this.repositories = repositories;
 	}
+
 
 }

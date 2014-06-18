@@ -1,14 +1,12 @@
 package org.visminer.persistence;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 
-import org.kohsuke.github.GHIssueState;
-import org.visminer.model.Issue;
+
 import org.visminer.model.Milestone;
 import org.visminer.model.Repository;
 
