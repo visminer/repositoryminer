@@ -91,4 +91,24 @@ public class IssueDAO{
 		
 	}
 	
+	public List<Issue> getIssuesReferencedInCommitsByRepository(Repository repository){
+		
+		EntityManager em = connection.getEntityManager();
+		
+		TypedQuery<Issue> query = em.createQuery("Select i from Issue i join i.commits c"
+				+" where i.repository =:arg1", Issue.class);
+		
+		query.setParameter("arg1", repository);
+		
+		try{
+			
+			return query.getResultList();
+			
+		}catch(NoResultException e){
+			
+			return null;
+		}
+		
+	}
+	
 }

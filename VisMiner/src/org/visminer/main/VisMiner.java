@@ -17,6 +17,7 @@ import org.visminer.model.Branch;
 import org.visminer.model.Commit;
 import org.visminer.model.Committer;
 import org.visminer.model.File;
+import org.visminer.model.Issue;
 import org.visminer.model.Metric;
 import org.visminer.model.Repository;
 import org.visminer.model.Tag;
@@ -24,6 +25,7 @@ import org.visminer.persistence.BranchDAO;
 import org.visminer.persistence.CommitDAO;
 import org.visminer.persistence.CommitterDAO;
 import org.visminer.persistence.FileDAO;
+import org.visminer.persistence.IssueDAO;
 import org.visminer.persistence.MetricDAO;
 import org.visminer.persistence.TagDAO;
 
@@ -201,6 +203,20 @@ public class VisMiner {
 		
 		MetricDAO metricDAO = new MetricDAO();
 		return metricDAO.getByName(name);
+		
+	}
+	
+	public List<Issue> getIssuesByRepository(){
+		
+		IssueDAO issueDAO = new IssueDAO();
+		return issueDAO.getAll(repository);
+		
+	}
+	
+	public List<Issue> getIssuesReferencedInCommitsByRepository(){
+		
+		IssueDAO issueDAO = new IssueDAO();
+		return issueDAO.getIssuesReferencedInCommitsByRepository(repository);
 		
 	}
 	
