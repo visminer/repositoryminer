@@ -75,7 +75,7 @@ public class VisMiner {
 		
 		java.sql.Connection connection;
 		try {
-			
+			Class.forName(db_cfg.get(JDBC_DRIVER));
 			connection = DriverManager.getConnection(db_cfg.get(JDBC_URL), db_cfg.get(JDBC_USER),
 					db_cfg.get(JDBC_PASSWORD));
 			
@@ -87,6 +87,9 @@ public class VisMiner {
 			
 		} catch (SQLException e) {
 			
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
