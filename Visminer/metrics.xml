@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metrics>
+	<metric on="true" filter_extension="java txt">LOC</metric>
+	<metric on="true" filter_extension="java">NOC</metric>
+	<metric on="true" filter_extension="java">CC</metric>
+	<metric on="true" filter_extension="java">NOM</metric>
+</metrics>

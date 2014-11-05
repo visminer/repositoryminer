@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
+	<classpathentry kind="lib" path="lib/jpa/eclipselink.jar"/>
+	<classpathentry kind="lib" path="lib/jpa/javax.persistence2.1.jar"/>
+	<classpathentry kind="lib" path="lib/jpa/mysql-connector5.1.jar"/>
+	<classpathentry kind="lib" path="lib/jgit/gitective-core-0.9.9.jar"/>
+	<classpathentry kind="lib" path="lib/jgit/org.eclipse.jgit-3.4.1.201406201815-r.jar"/>
+	<classpathentry kind="lib" path="lib/jdt/commons-collections-3.2.1.jar"/>
+	<classpathentry kind="lib" path="lib/jdt/commons-configuration-1.6.jar"/>
+	<classpathentry kind="lib" path="lib/jdt/commons-lang-2.5.jar"/>
+	<classpathentry kind="lib" path="lib/jdt/commons-logging-1.1.1.jar"/>
+	<classpathentry kind="lib" path="lib/jdt/org.eclipse.core.contenttype_3.4.1.R35x_v20090826-0451.jar"/>
+	<classpathentry kind="lib" path="lib/jdt/org.eclipse.core.jobs_3.4.100.v20090429-1800.jar"/>
+	<classpathentry kind="lib" path="lib/jdt/org.eclipse.core.resources_3.5.2.R35x_v20091203-1235.jar"/>
+	<classpathentry kind="lib" path="lib/jdt/org.eclipse.core.runtime_3.5.0.v20090525.jar"/>
+	<classpathentry kind="lib" path="lib/jdt/org.eclipse.equinox.common_3.5.1.R35x_v20090807-1100.jar"/>
+	<classpathentry kind="lib" path="lib/jdt/org.eclipse.equinox.preferences_3.2.301.R35x_v20091117.jar"/>
+	<classpathentry kind="lib" path="lib/jdt/org.eclipse.jdt.core_3.5.2.v_981_R35x.jar"/>
+	<classpathentry kind="lib" path="lib/jdt/org.eclipse.osgi_3.5.2.R35x_v20100126.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
