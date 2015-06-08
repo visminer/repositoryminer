@@ -1,7 +1,11 @@
-package br.edu.ufba.softvis.visminer.model;
+package br.edu.ufba.softvis.visminer.model.database;
 
 import java.io.Serializable;
+
 import javax.persistence.*;
+
+import br.edu.ufba.softvis.visminer.constant.SoftwareUnitType;
+
 import java.util.List;
 
 
@@ -83,12 +87,12 @@ public class SoftwareUnitDB implements Serializable {
 		this.name = name;
 	}
 
-	public int getType() {
-		return this.type;
+	public SoftwareUnitType getType() {
+		return SoftwareUnitType.parse(this.type);
 	}
 
-	public void setType(int type) {
-		this.type = type;
+	public void setType(SoftwareUnitType type) {
+		this.type = type.getId();
 	}
 
 	public String getUid() {

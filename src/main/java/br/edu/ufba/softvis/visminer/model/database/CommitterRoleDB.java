@@ -1,4 +1,4 @@
-package br.edu.ufba.softvis.visminer.model;
+package br.edu.ufba.softvis.visminer.model.database;
 
 import java.io.Serializable;
 import javax.persistence.*;
@@ -18,7 +18,7 @@ public class CommitterRoleDB implements Serializable {
 	private CommitterRolePK id;
 
 	@Column(nullable=false)
-	private byte contribuitor;
+	private boolean contributor;
 
 	//bi-directional many-to-one association to CommitterDB
 	@ManyToOne
@@ -33,6 +33,12 @@ public class CommitterRoleDB implements Serializable {
 	public CommitterRoleDB() {
 	}
 
+	public CommitterRoleDB(int repositoryId, int committerId, boolean contributor) {
+		super();
+		this.id = new CommitterRolePK(committerId, repositoryId);
+		this.contributor = contributor;
+	}
+
 	public CommitterRolePK getId() {
 		return this.id;
 	}
@@ -41,12 +47,12 @@ public class CommitterRoleDB implements Serializable {
 		this.id = id;
 	}
 
-	public byte getContribuitor() {
-		return this.contribuitor;
+	public boolean getContributor() {
+		return this.contributor;
 	}
 
-	public void setContribuitor(byte contribuitor) {
-		this.contribuitor = contribuitor;
+	public void setContribuitor(boolean contributor) {
+		this.contributor = contributor;
 	}
 
 	public CommitterDB getCommitter() {

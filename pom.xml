@@ -15,7 +15,6 @@
   	
   		<!-- dependencies versions -->
   		<eclipselink.version>2.6.0</eclipselink.version>
-  		<mysql-connector.version>5.1.35</mysql-connector.version>
   		<junit.version>4.12</junit.version>
   		<jgit.version>3.7.0.201502260915-r</jgit.version>
   		<gitective.version>0.9.9</gitective.version>
@@ -33,13 +32,6 @@
 			<version>${eclipselink.version}</version>
 		</dependency>
   		
-  		<!-- mysql connector -->
-		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
-			<version>${mysql-connector.version}</version>
-		</dependency>
-		
 		<!-- junit -->
 		<dependency>
 			<groupId>junit</groupId>
@@ -73,8 +65,13 @@
 			<artifactId>github-api</artifactId>
 			<version>${github-api.version}</version>
 		</dependency>
- 			
+		
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+			<version>1.6.2</version>
+		</dependency>
+
 	</dependencies>  
-  
   
 </project>

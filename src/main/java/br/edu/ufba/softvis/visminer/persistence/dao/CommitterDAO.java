@@ -1,6 +1,6 @@
 package br.edu.ufba.softvis.visminer.persistence.dao;
 
-import br.edu.ufba.softvis.visminer.model.CommitterDB;
+import br.edu.ufba.softvis.visminer.model.database.CommitterDB;
 
 public interface CommitterDAO extends DAO<CommitterDB, Integer>{
 

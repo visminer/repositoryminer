@@ -1,4 +1,4 @@
-package br.edu.ufba.softvis.visminer.model;
+package br.edu.ufba.softvis.visminer.model.database;
 
 import java.io.Serializable;
 import javax.persistence.*;
@@ -24,7 +24,7 @@ public class FileXCommitDB implements Serializable {
 	private int linesRemoved;
 
 	@Column(nullable=false)
-	private byte removed;
+	private boolean removed;
 
 	//bi-directional many-to-one association to CommitDB
 	@ManyToOne
@@ -39,6 +39,13 @@ public class FileXCommitDB implements Serializable {
 	public FileXCommitDB() {
 	}
 
+	public FileXCommitDB(int fileId, int commitId, br.edu.ufba.softvis.visminer.model.bean.FileState fileState){
+		this.id = new FileXCommitPK(fileId, commitId);
+		this.linesAdded = fileState.getLinesAdded();
+		this.linesRemoved = fileState.getLinesRemoved();
+		this.removed = fileState.isRemoved();
+	}
+	
 	public FileXCommitPK getId() {
 		return this.id;
 	}
@@ -63,11 +70,11 @@ public class FileXCommitDB implements Serializable {
 		this.linesRemoved = linesRemoved;
 	}
 
-	public byte getRemoved() {
+	public boolean getRemoved() {
 		return this.removed;
 	}
 
-	public void setRemoved(byte removed) {
+	public void setRemoved(boolean removed) {
 		this.removed = removed;
 	}
 

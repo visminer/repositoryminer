@@ -1,7 +1,12 @@
-package br.edu.ufba.softvis.visminer.model;
+package br.edu.ufba.softvis.visminer.model.database;
 
 import java.io.Serializable;
+
 import javax.persistence.*;
+
+import br.edu.ufba.softvis.visminer.constant.RepositoryServiceType;
+import br.edu.ufba.softvis.visminer.constant.RepositoryType;
+
 import java.util.List;
 
 
@@ -65,6 +70,15 @@ public class RepositoryDB implements Serializable {
 	public RepositoryDB() {
 	}
 
+	public RepositoryDB(br.edu.ufba.softvis.visminer.model.business.Repository repository){
+		this.description = repository.getDescription();
+		this.name = repository.getName();
+		this.path = repository.getPath();
+		this.remoteUrl = repository.getRemoteUrl();
+		this.type = repository.getType().getId();
+		this.serviceType = repository.getServiceType().getId();
+	}
+	
 	public int getId() {
 		return this.id;
 	}
@@ -105,12 +119,20 @@ public class RepositoryDB implements Serializable {
 		this.remoteUrl = remoteUrl;
 	}
 
-	public int getType() {
-		return this.type;
+	public RepositoryType getType() {
+		return RepositoryType.parse(this.type);
 	}
 
-	public void setType(int type) {
-		this.type = type;
+	public void setType(RepositoryType type) {
+		this.type = type.getId();
+	}
+
+	public RepositoryServiceType getServiceType() {
+		return RepositoryServiceType.parse(this.serviceType);
+	}
+
+	public void setServiceType(RepositoryServiceType serviceType) {
+		this.serviceType = serviceType.getId();
 	}
 
 	public String getUid() {
@@ -230,5 +252,5 @@ public class RepositoryDB implements Serializable {
 
 		return tree;
 	}
-
+	
 }

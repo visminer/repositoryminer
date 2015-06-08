@@ -1,11 +1,13 @@
 package br.edu.ufba.softvis.visminer.analyzer.local;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.jgit.api.Git;
@@ -23,129 +25,146 @@ import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.treewalk.TreeWalk;
 import org.gitective.core.CommitFinder;
 import org.gitective.core.filter.commit.AndCommitFilter;
-import org.gitective.core.filter.commit.AuthorFilter;
 import org.gitective.core.filter.commit.AuthorSetFilter;
 import org.gitective.core.filter.commit.CommitListFilter;
 
 import br.edu.ufba.softvis.visminer.constant.TreeType;
+import br.edu.ufba.softvis.visminer.model.bean.Commit;
+import br.edu.ufba.softvis.visminer.model.bean.Committer;
+import br.edu.ufba.softvis.visminer.model.bean.File;
+import br.edu.ufba.softvis.visminer.model.bean.FileState;
+import br.edu.ufba.softvis.visminer.model.bean.Tree;
+import br.edu.ufba.softvis.visminer.utility.AuthorEmailFilter;
+import br.edu.ufba.softvis.visminer.utility.StringUtils;
 
 public class GitRepositorySystem implements IRepositorySystem{
 
 	private Repository repository;
 	private Git git;
-	
+
 	@Override
 	public void open(String repositoryPath) {
+
 		try {
 			this.repository = new FileRepository(repositoryPath);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		this.git = new Git(this.repository);
+
 	}
-	
+
 	@Override
 	public String getAbsolutePath() {
-		return this.repository.getWorkTree().getAbsolutePath();	
+		return this.repository.getWorkTree().getAbsolutePath().replace("\\", "/");	
 	}
-	
+
 	@Override
-	public List<Committer> getCommitters() {
+	public List<Committer> getCommitters(){
+
 		AuthorSetFilter authorFilter = new AuthorSetFilter();
 		CommitFinder finder = new CommitFinder(repository);
 		finder.setFilter(authorFilter);
 		finder.find();
-		
+
 		Set<Committer> committers = new HashSet<Committer>();
 
 		for(PersonIdent person : authorFilter.getPersons()){
 			Committer committer = new Committer(person.getEmailAddress(), person.getName(), true);
 			committers.add(committer);
 		}
-		
+
 		try {
-			
+
 			Iterable<RevCommit> revCommits = git.log().all().call();
 			for(RevCommit revCommit : revCommits){
 				Committer committer = new Committer(revCommit.getAuthorIdent().getEmailAddress(), revCommit.getAuthorIdent().getName(), false);
 				committers.add(committer);
 			}
-			
+
 		} catch (GitAPIException | IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		List<Committer> committersList = new ArrayList<Committer>(committers.size());
 		committersList.addAll(committers);
-		
+
 		return committersList;
+
 	}
-	
+
 	@Override
-	public List<Tree> getTrees() {
+	public List<Tree> getTrees(){
+
 		try{
-			
-		List<Tree> trees = new ArrayList<Tree>();
-		
-		Iterable<Ref> refs = git.branchList().call();
-		for(Ref ref : refs){
-			Tree tree = new Tree(getLastCommitDate(ref.getName()), ref.getName().split("/")[2], ref.getName(), TreeType.BRANCH);
-			trees.add(tree);
-		}
 
-		refs = git.tagList().call();
-		for(Ref ref : refs){
-			Tree tree = new Tree(getLastCommitDate(ref.getName()), ref.getName().split("/")[2], ref.getName(), TreeType.TAG);
-			trees.add(tree);
-		}
+			List<Tree> trees = new ArrayList<Tree>();
 
-		return trees;	
-		
+			Iterable<Ref> refs = git.branchList().call();
+			for(Ref ref : refs){
+				Tree tree = new Tree(getLastCommitDate(ref.getName()), ref.getName().split("/")[2], ref.getName(), TreeType.BRANCH);
+				trees.add(tree);
+			}
+
+			refs = git.tagList().call();
+			for(Ref ref : refs){
+				Tree tree = new Tree(getLastCommitDate(ref.getName()), ref.getName().split("/")[2], ref.getName(), TreeType.TAG);
+				trees.add(tree);
+			}
+
+			return trees;	
+
 		}catch(GitAPIException e){
 			e.printStackTrace();
 			return null;
 		}
+
 	}
-	
+
 	@Override
-	public List<String> getCommitsNames(String treeName) {
+	public List<String> getCommitsNames(String treeName){
+
 		AndCommitFilter filters = new AndCommitFilter();
 		CommitListFilter revCommits = new CommitListFilter();
 		filters.add(revCommits);
-		
+
 		CommitFinder finder = new CommitFinder(repository);
 		finder.setFilter(filters);
 		finder.findFrom(treeName);
-		
+
 		List<String> names = new ArrayList<String>();
-		
+
 		for(RevCommit revCommit : revCommits.getCommits()){
 			names.add(revCommit.getName());
 		}
-	
+
 		return names;
+
 	}
-	
+
 	@Override
 	public Date getLastCommitDate(String treeName) {
+
 		try {
-			
+
 			RevWalk revWalk = new RevWalk(repository);
 			RevCommit lastCommit;
-			
+
 			lastCommit = revWalk.parseCommit(repository.resolve(treeName));
 			return lastCommit.getAuthorIdent().getWhen();
-			
+
 		} catch (RevisionSyntaxException | IOException e) {
 			e.printStackTrace();
 			return null;
 		}
+
 	}
-	
+
 	@Override
 	public List<Commit> getCommits() {
+
 		try {
-			
+
 			Iterable<RevCommit> revCommits;
 			revCommits = git.log().all().call();
 			List<Commit> commits = new ArrayList<Commit>();
@@ -156,80 +175,138 @@ public class GitRepositorySystem implements IRepositorySystem{
 			}
 
 			return commits;
-			
+
 		} catch (GitAPIException | IOException e) {
 			e.printStackTrace();
 			return null;
 		}
 
 	}
-	
+
 	@Override
-	public List<Commit> getCommits(Committer committer){
+	public List<Commit> getCommitsByCommitter(String committerEmail){
+
 		AndCommitFilter filters = new AndCommitFilter();
 		CommitListFilter revCommits = new CommitListFilter();
-		AuthorFilter authorFilter = new AuthorFilter(new PersonIdent(committer.getName(), committer.getEmail()));
+		AuthorEmailFilter authorFilter = new AuthorEmailFilter(committerEmail);
 		filters.add(authorFilter);
 		filters.add(revCommits);
-		
+
 		CommitFinder finder = new CommitFinder(repository);
 		finder.setFilter(filters);
 		finder.find();
-		
-		return createListCommit(revCommits);		
+
+		return createListCommit(revCommits);
+
 	}
 
-	public List<Commit> getCommits(String treeName) {
+	public List<Commit> getCommitsByTree(String treeName) {
+
 		AndCommitFilter filters = new AndCommitFilter();
 		CommitListFilter revCommits = new CommitListFilter();
 		filters.add(revCommits);
-		
+
 		CommitFinder finder = new CommitFinder(repository);
 		finder.setFilter(filters);
 		finder.findFrom(treeName);
-		
+
 		return createListCommit(revCommits);
+
 	}
-	
+
 	@Override
-	public AST getAST(String commitName, String filePath) {
+	public byte[] getData(String commitName, String filePath) {
+
 		try {
-			
+
 			RevWalk walk = new RevWalk(repository);
-			RevCommit revCommit;
-			TreeWalk treeWalk;
-			
-			revCommit = walk.parseCommit(ObjectId.fromString(commitName));
+			RevCommit revCommit = walk.parseCommit(ObjectId.fromString(commitName));
 			RevTree tree = revCommit.getTree();
 			ObjectReader reader = repository.newObjectReader();
-			treeWalk = TreeWalk.forPath(reader, filePath, tree);
-			
+			TreeWalk treeWalk = TreeWalk.forPath(reader, filePath, tree);
+
 			if(treeWalk == null)
 				return null;
 			else
-				return null;//reader.open(treeWalk.getObjectId(0)).getBytes();
-			
+				return reader.open(treeWalk.getObjectId(0)).getBytes();
+
 		} catch (IOException e) {
 			e.printStackTrace();
 			return null;
 		}
+
 	}
-	
+
 	@Override
-	public Map<File, FileState> getCommitedFiles(String commitName) {
-		return null;
+	public List<File> getCommitedFiles(String commitName) {
+
+		java.io.File gitDir = new java.io.File(repository.getDirectory().toString());
+
+		ProcessBuilder builder = new ProcessBuilder();
+		builder.directory(gitDir);
+
+		List<String> commands = Arrays.asList("git", "log", "--numstat", "--oneline", "--max-count=1", commitName);
+		builder.command(commands);
+		Process process;
+
+		try {
+			process = builder.start();
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
+
+		BufferedReader buffer = new BufferedReader(new InputStreamReader(process.getInputStream()));
+		String str = null;
+
+		List<File> files = new ArrayList<File>();
+
+		try {
+
+			buffer.readLine(); // skips the first line, it is useless
+
+			while((str = buffer.readLine()) != null){
+
+				String parts[] = str.split("\t"); //parts[0] - lines added, parts[1] - lines removed, parts[2] - file path
+				
+				int linesAdded = -1;
+				int linesRemoved = -1;
+				
+				if(!parts[0].equals("-"))
+					linesAdded = Integer.parseInt(parts[0]);
+				if(!parts[1].equals("-"))
+					linesRemoved = Integer.parseInt(parts[1]);
+				
+				FileState fs = new FileState(linesAdded, linesRemoved, false);
+				if(getData(commitName, str) == null){
+					fs.setRemoved(true);
+				}
+
+				File f = new File(0, parts[2], StringUtils.sha1(parts[2]));
+				f.setFileState(fs);
+				files.add(f);
+
+			}
+
+			buffer.close();
+
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
+		return files;		
+
 	}
-	
+
 	@Override
 	public void close() {
+
 		this.repository.close();
-		this.git.close();		
+		this.git.close();
+
 	}
-	
-	
-	
-	
-	// Helpers	
+
+	// Helpers
 	private List<Commit> createListCommit(CommitListFilter revCommits){
 		List<Commit> commits = new ArrayList<Commit>();
 		for(RevCommit revCommit : revCommits.getCommits()){
@@ -239,5 +316,6 @@ public class GitRepositorySystem implements IRepositorySystem{
 		}
 		return commits;
 	}
-	
+
+
 }

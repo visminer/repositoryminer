@@ -1,7 +1,11 @@
-package br.edu.ufba.softvis.visminer.model;
+package br.edu.ufba.softvis.visminer.model.database;
 
 import java.io.Serializable;
+
 import javax.persistence.*;
+
+import br.edu.ufba.softvis.visminer.constant.TreeType;
+
 import java.util.Date;
 import java.util.List;
 
@@ -56,6 +60,13 @@ public class TreeDB implements Serializable {
 	public TreeDB() {
 	}
 
+	public TreeDB(br.edu.ufba.softvis.visminer.model.bean.Tree tree){
+		this.lastUpdate = tree.getLastUpdate();
+		this.name = tree.getName();
+		this.fullName = tree.getFullName();
+		this.type = tree.getType().getId();
+	}
+	
 	public int getId() {
 		return this.id;
 	}
@@ -88,12 +99,12 @@ public class TreeDB implements Serializable {
 		this.name = name;
 	}
 
-	public int getType() {
-		return this.type;
+	public TreeType getType() {
+		return TreeType.parse(this.type);
 	}
 
-	public void setType(int type) {
-		this.type = type;
+	public void setType(TreeType type) {
+		this.type = type.getId();
 	}
 
 	public List<CommitDB> getCommits() {

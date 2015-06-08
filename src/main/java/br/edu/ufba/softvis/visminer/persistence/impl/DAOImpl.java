@@ -101,7 +101,7 @@ public class DAOImpl<E, K> implements DAO<E, K>{
 	@SuppressWarnings("unchecked")
 	@Override
 	public E find(K id) {
-		return (E)entityManager.find(entityClass, id);
+		return (E) entityManager.find(entityClass, id);
 	}
 
 	@SuppressWarnings("unchecked")

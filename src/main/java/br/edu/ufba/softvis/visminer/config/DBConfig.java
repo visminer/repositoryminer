@@ -12,13 +12,14 @@ public class DBConfig {
 	public static final String JDBC_USER = PersistenceUnitProperties.JDBC_USER;
 	public static final String JDBC_PASSWORD = PersistenceUnitProperties.JDBC_PASSWORD;
 	public static final String DDL_GENERATION = PersistenceUnitProperties.DDL_GENERATION;
+	public static final String LOGGING_LEVEL = PersistenceUnitProperties.LOGGING_LEVEL;
 
-	private String driver = null;
-	private String url = null;
-	private String user = null;
-	private String pass = null;
-	private String generation = null;
-	private String name = null;
+	private String driver;
+	private String url;
+	private String user;
+	private String pass;
+	private String generation;
+	private String logging;
 
 	public String getDriver() {
 		return driver;
@@ -60,23 +61,24 @@ public class DBConfig {
 		this.generation = generation;
 	}
 
-	public String getName() {
-		return name;
+	public String getLogging() {
+		return logging;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setLogging(String logging) {
+		this.logging = logging;
 	}
 
 	public Map<String, String> toMap() {
 		
-		Map<String, String> map = new HashMap<String, String>(5);
+		Map<String, String> map = new HashMap<String, String>(6);
 		
-		map.put(JDBC_DRIVER, getDriver());
-		map.put(JDBC_URL, getUrl());
-		map.put(JDBC_USER, getUser());
-		map.put(JDBC_PASSWORD, getPass());
-		map.put(DDL_GENERATION, getGeneration());
+		map.put(JDBC_DRIVER, this.driver);
+		map.put(JDBC_URL, this.url);
+		map.put(JDBC_USER, this.user);
+		map.put(JDBC_PASSWORD, this.pass);
+		map.put(DDL_GENERATION, this.generation);
+		map.put(LOGGING_LEVEL, this.logging);
 
 		return map;
 		

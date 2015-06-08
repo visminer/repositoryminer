@@ -1,4 +1,4 @@
-package br.edu.ufba.softvis.visminer.model;
+package br.edu.ufba.softvis.visminer.model.database;
 
 import java.io.Serializable;
 import javax.persistence.*;
@@ -12,14 +12,21 @@ public class FileXCommitPK implements Serializable {
 	//default serial version id, required for serializable classes.
 	private static final long serialVersionUID = 1L;
 
-	@Column(name="file_id", insertable=false, updatable=false, unique=true, nullable=false)
+	@Column(name="file_id", insertable=true, updatable=false, nullable=false)
 	private int fileId;
 
-	@Column(name="commit_id", insertable=false, updatable=false, unique=true, nullable=false)
+	@Column(name="commit_id", insertable=true, updatable=false, nullable=false)
 	private int commitId;
 
 	public FileXCommitPK() {
 	}
+	
+	public FileXCommitPK(int fileId, int commitId) {
+		super();
+		this.fileId = fileId;
+		this.commitId = commitId;
+	}
+
 	public int getFileId() {
 		return this.fileId;
 	}

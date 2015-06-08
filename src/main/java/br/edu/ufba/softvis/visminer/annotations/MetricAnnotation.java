@@ -7,18 +7,12 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface VisMinerMetric {
-
-	public enum Target {
-		FILE, CLASS, METHOD
-	}
+public @interface MetricAnnotation {
 
 	public String name();
 
 	public String description();
 
-	public boolean on();
-
-	public Target target();
+	public String acronym();
 
 }

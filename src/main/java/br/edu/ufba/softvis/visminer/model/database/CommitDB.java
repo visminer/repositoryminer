@@ -1,7 +1,9 @@
-package br.edu.ufba.softvis.visminer.model;
+package br.edu.ufba.softvis.visminer.model.database;
 
 import java.io.Serializable;
+
 import javax.persistence.*;
+
 import java.util.Date;
 import java.util.List;
 
@@ -65,6 +67,12 @@ public class CommitDB implements Serializable {
 	public CommitDB() {
 	}
 
+	public CommitDB(br.edu.ufba.softvis.visminer.model.bean.Commit commit){
+		this.date = commit.getDate();
+		this.message = commit.getMessage();
+		this.name = commit.getName();
+	}
+	
 	public int getId() {
 		return this.id;
 	}
@@ -149,6 +157,31 @@ public class CommitDB implements Serializable {
 
 	public void setSoftwareUnits(List<SoftwareUnitDB> softwareUnits) {
 		this.softwareUnits = softwareUnits;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		CommitDB other = (CommitDB) obj;
+		if (name == null) {
+			if (other.name != null)
+				return false;
+		} else if (!name.equals(other.name))
+			return false;
+		return true;
 	}
 
 }

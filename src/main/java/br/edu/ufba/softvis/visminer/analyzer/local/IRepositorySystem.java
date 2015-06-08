@@ -3,9 +3,10 @@ package br.edu.ufba.softvis.visminer.analyzer.local;
 import java.util.Date;
 import java.util.List;
 
-import br.edu.ufba.softvis.visminer.model.CommitDB;
-import br.edu.ufba.softvis.visminer.model.CommitterDB;
-import br.edu.ufba.softvis.visminer.model.TreeDB;
+import br.edu.ufba.softvis.visminer.model.bean.Commit;
+import br.edu.ufba.softvis.visminer.model.bean.Committer;
+import br.edu.ufba.softvis.visminer.model.bean.File;
+import br.edu.ufba.softvis.visminer.model.bean.Tree;
 
 public interface IRepositorySystem {
 
@@ -13,23 +14,23 @@ public interface IRepositorySystem {
 
 	public String getAbsolutePath();
 
-	public List<CommitterDB> getCommitters();
+	public List<Committer> getCommitters();
 
-	public List<TreeDB> getTrees();
+	public List<Tree> getTrees();
 
 	public List<String> getCommitsNames(String treeName);
 
 	public Date getLastCommitDate(String treeName);
 
-	public List<CommitDB> getCommits();
+	public List<Commit> getCommits();
 
-	public List<CommitDB> getCommits(CommitterDB committer);
+	public List<Commit> getCommitsByCommitter(String committerEmail);
 	
-	public List<CommitDB> getCommits(String treeName);
+	public List<Commit> getCommitsByTree(String treeName);
 
-	//public AST getAST(String commitName, String filePath);
+	public byte[] getData(String commitName, String filePath);
 
-	//public Map<File, FileState> getCommitedFiles(String commitName);
+	public List<File> getCommitedFiles(String commitName);
 
 	public void close();
 	

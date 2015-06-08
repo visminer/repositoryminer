@@ -1,7 +1,9 @@
-package br.edu.ufba.softvis.visminer.model;
+package br.edu.ufba.softvis.visminer.model.database;
 
 import java.io.Serializable;
+
 import javax.persistence.*;
+
 import java.util.List;
 
 
@@ -36,6 +38,12 @@ public class CommitterDB implements Serializable {
 	private List<CommitterRoleDB> committerRoles;
 
 	public CommitterDB() {
+	}
+
+	public CommitterDB(String email, String name) {
+		super();
+		this.email = email;
+		this.name = name;
 	}
 
 	public int getId() {

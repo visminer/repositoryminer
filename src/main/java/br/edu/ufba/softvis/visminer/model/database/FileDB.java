@@ -1,7 +1,9 @@
-package br.edu.ufba.softvis.visminer.model;
+package br.edu.ufba.softvis.visminer.model.database;
 
 import java.io.Serializable;
+
 import javax.persistence.*;
+
 import java.util.List;
 
 
@@ -21,9 +23,6 @@ public class FileDB implements Serializable {
 	@Column(unique=true, nullable=false)
 	private int id;
 
-	@Column(nullable=false, length=256)
-	private String name;
-
 	@Column(nullable=false, length=1024)
 	private String path;
 
@@ -41,20 +40,17 @@ public class FileDB implements Serializable {
 	public FileDB() {
 	}
 
+	public FileDB(br.edu.ufba.softvis.visminer.model.bean.File file){
+		this.path = file.getPath();
+		this.uid = file.getUid();
+	}
+	
 	public int getId() {
 		return this.id;
 	}
 
 	public void setId(int id) {
 		this.id = id;
-	}
-
-	public String getName() {
-		return this.name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
 	}
 
 	public String getPath() {
@@ -115,6 +111,31 @@ public class FileDB implements Serializable {
 		softwareUnit.setFile(null);
 
 		return softwareUnit;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((uid == null) ? 0 : uid.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		FileDB other = (FileDB) obj;
+		if (uid == null) {
+			if (other.uid != null)
+				return false;
+		} else if (!uid.equals(other.uid))
+			return false;
+		return true;
 	}
 
 }

@@ -2,6 +2,28 @@ package br.edu.ufba.softvis.visminer.constant;
 
 public enum TreeType {
 
-	BRANCH, TAG;
+	BRANCH(1), TAG(2);
 
+	private int id;
+	
+	private TreeType(int id){
+		this.id = id;
+	}
+	
+	public int getId(){
+		return this.id;
+	}
+	
+	public static TreeType parse(int id){
+
+		for(TreeType treeType : TreeType.values()){
+			if(treeType.getId() == id){
+				return treeType;
+			}
+		}
+		
+		throw new IllegalArgumentException("No tree type found for id"+id);
+		
+	}
+	
 }

@@ -1,4 +1,4 @@
-package br.edu.ufba.softvis.visminer.model;
+package br.edu.ufba.softvis.visminer.model.database;
 
 import java.io.Serializable;
 import javax.persistence.*;
@@ -12,14 +12,21 @@ public class CommitterRolePK implements Serializable {
 	//default serial version id, required for serializable classes.
 	private static final long serialVersionUID = 1L;
 
-	@Column(name="committer_id", insertable=false, updatable=false, unique=true, nullable=false)
+	@Column(name="committer_id", insertable=true, updatable=false, nullable=false)
 	private int committerId;
 
-	@Column(name="repository_id", insertable=false, updatable=false, unique=true, nullable=false)
+	@Column(name="repository_id", insertable=true, updatable=false, nullable=false)
 	private int repositoryId;
 
 	public CommitterRolePK() {
 	}
+	
+	public CommitterRolePK(int committerId, int repositoryId) {
+		super();
+		this.committerId = committerId;
+		this.repositoryId = repositoryId;
+	}
+
 	public int getCommitterId() {
 		return this.committerId;
 	}
