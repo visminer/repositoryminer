@@ -10,6 +10,8 @@ import br.edu.ufba.softvis.visminer.model.bean.File;
 import br.edu.ufba.softvis.visminer.model.database.CommitDB;
 import br.edu.ufba.softvis.visminer.model.database.FileDB;
 import br.edu.ufba.softvis.visminer.model.database.FileXCommitDB;
+import br.edu.ufba.softvis.visminer.persistence.dao.FileDAO;
+import br.edu.ufba.softvis.visminer.persistence.dao.FileXCommitDAO;
 import br.edu.ufba.softvis.visminer.persistence.impl.FileDAOImpl;
 import br.edu.ufba.softvis.visminer.persistence.impl.FileXCommitDAOImpl;
 
@@ -26,8 +28,8 @@ public class FileAnalyzer implements IAnalyzer<Void>{
 		List<FileDB> filesDb = new ArrayList<FileDB>();
 		List<FileXCommitDB> filesXCommitsDb = new ArrayList<FileXCommitDB>();
 		
-		FileXCommitDAOImpl fileXCommitDao = new FileXCommitDAOImpl();
-		FileDAOImpl fileDao = new FileDAOImpl();
+		FileXCommitDAO fileXCommitDao = new FileXCommitDAOImpl();
+		FileDAO fileDao = new FileDAOImpl();
 		
 		fileDao.setEntityManager(entityManager);
 		fileXCommitDao.setEntityManager(entityManager);

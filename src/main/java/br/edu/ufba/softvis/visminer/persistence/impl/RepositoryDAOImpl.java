@@ -9,10 +9,10 @@ import br.edu.ufba.softvis.visminer.persistence.dao.RepositoryDAO;
 public class RepositoryDAOImpl extends DAOImpl<RepositoryDB, Integer> implements RepositoryDAO{
 
 	@Override
-	public RepositoryDB getByUid(String uid) {
+	public RepositoryDB findByUid(String uid) {
 		
 		EntityManager em = getEntityManager();
-		TypedQuery<RepositoryDB> query = em.createQuery("select r from RepositoryDB r where r.uid = :uid", RepositoryDB.class);
+		TypedQuery<RepositoryDB> query = em.createNamedQuery("RepositoryDB.findByUid", RepositoryDB.class);
 		query.setParameter("uid", uid);
 		try{
 			return query.getSingleResult();

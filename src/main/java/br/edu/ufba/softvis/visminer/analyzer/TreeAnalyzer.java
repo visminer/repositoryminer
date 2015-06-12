@@ -11,6 +11,7 @@ import br.edu.ufba.softvis.visminer.model.bean.Tree;
 import br.edu.ufba.softvis.visminer.model.database.CommitDB;
 import br.edu.ufba.softvis.visminer.model.database.RepositoryDB;
 import br.edu.ufba.softvis.visminer.model.database.TreeDB;
+import br.edu.ufba.softvis.visminer.persistence.dao.TreeDAO;
 import br.edu.ufba.softvis.visminer.persistence.impl.TreeDAOImpl;
 
 public class TreeAnalyzer implements IAnalyzer<Void>{
@@ -24,7 +25,7 @@ public class TreeAnalyzer implements IAnalyzer<Void>{
 		IRepositorySystem repoSys = (IRepositorySystem) objects[2];
 		EntityManager entityManager = (EntityManager) objects[3];
 		
-		TreeDAOImpl treeDao = new TreeDAOImpl();
+		TreeDAO treeDao = new TreeDAOImpl();
 		treeDao.setEntityManager(entityManager);
 		
 		List<TreeDB> treesDb = new ArrayList<TreeDB>();

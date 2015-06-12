@@ -13,7 +13,8 @@ import java.util.List;
  */
 @Entity
 @Table(name="committer")
-@NamedQuery(name="CommitterDB.findAll", query="SELECT c FROM CommitterDB c")
+@NamedQuery(name="CommitterDB.findByEmail", query="select c from CommitterDB c where c.email = :email")
+
 public class CommitterDB implements Serializable {
 	private static final long serialVersionUID = 1L;
 

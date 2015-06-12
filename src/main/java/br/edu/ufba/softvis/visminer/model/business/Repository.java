@@ -1,5 +1,7 @@
 package br.edu.ufba.softvis.visminer.model.business;
 
+import java.util.List;
+
 import br.edu.ufba.softvis.visminer.constant.RepositoryServiceType;
 import br.edu.ufba.softvis.visminer.constant.RepositoryType;
 
@@ -14,10 +16,15 @@ public class Repository {
 	private RepositoryServiceType serviceType;
 	private String uid;
 	
+	List<Committer> committers;
+	List<Tree> trees;
+	Project project;
+	
 	public Repository(){}
 	
 	public Repository(int id, String description, String name, String path,
 			String remoteUrl, RepositoryType type, RepositoryServiceType serviceType, String uid) {
+		
 		super();
 		this.id = id;
 		this.description = description;
@@ -27,6 +34,7 @@ public class Repository {
 		this.type = type;
 		this.serviceType = serviceType;
 		this.uid = uid;
+		
 	}
 
 	public int getId() {

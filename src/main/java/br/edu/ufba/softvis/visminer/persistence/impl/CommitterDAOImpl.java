@@ -12,7 +12,7 @@ public class CommitterDAOImpl extends DAOImpl<CommitterDB, Integer> implements C
 	public CommitterDB findByEmail(String email) {
 		
 		EntityManager em = getEntityManager();
-		TypedQuery<CommitterDB> query = em.createQuery("select c from CommitterDB c where c.email = :email", CommitterDB.class);
+		TypedQuery<CommitterDB> query = em.createNamedQuery("CommitterDB.findByEmail", CommitterDB.class);
 		query.setParameter("email", email);
 		
 		try{

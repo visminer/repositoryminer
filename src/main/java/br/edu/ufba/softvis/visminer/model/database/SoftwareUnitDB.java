@@ -5,6 +5,7 @@ import java.io.Serializable;
 import javax.persistence.*;
 
 import br.edu.ufba.softvis.visminer.constant.SoftwareUnitType;
+import br.edu.ufba.softvis.visminer.model.bean.SoftwareUnit;
 
 import java.util.List;
 
@@ -15,7 +16,8 @@ import java.util.List;
  */
 @Entity
 @Table(name="software_unit")
-@NamedQuery(name="SoftwareUnitDB.findAll", query="SELECT s FROM SoftwareUnitDB s")
+@NamedQuery(name="SoftwareUnitDB.findByUid", query="select sw from SoftwareUnitDB sw where sw.uid = :uid")
+
 public class SoftwareUnitDB implements Serializable {
 	private static final long serialVersionUID = 1L;
 
@@ -49,7 +51,7 @@ public class SoftwareUnitDB implements Serializable {
 
 	//bi-directional many-to-one association to SoftwareUnitDB
 	@ManyToOne
-	@JoinColumn(name="parent_id")
+	@JoinColumn(name="parent_id", nullable=true)
 	private SoftwareUnitDB softwareUnit;
 
 	//bi-directional many-to-one association to SoftwareUnitDB
@@ -61,6 +63,14 @@ public class SoftwareUnitDB implements Serializable {
 	private List<CommitDB> commits;
 
 	public SoftwareUnitDB() {
+	}
+
+	public SoftwareUnitDB(SoftwareUnit softwareUnit) {
+		this.id = softwareUnit.getId();
+		this.fullName = softwareUnit.getFullName();
+		this.name = softwareUnit.getName();
+		this.uid = softwareUnit.getUid();
+		this.type = softwareUnit.getType().getId();
 	}
 
 	public int getId() {

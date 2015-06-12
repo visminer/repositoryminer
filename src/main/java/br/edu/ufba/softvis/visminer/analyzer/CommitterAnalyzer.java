@@ -10,6 +10,8 @@ import br.edu.ufba.softvis.visminer.model.bean.Committer;
 import br.edu.ufba.softvis.visminer.model.database.CommitterDB;
 import br.edu.ufba.softvis.visminer.model.database.CommitterRoleDB;
 import br.edu.ufba.softvis.visminer.model.database.RepositoryDB;
+import br.edu.ufba.softvis.visminer.persistence.dao.CommitterDAO;
+import br.edu.ufba.softvis.visminer.persistence.dao.CommitterRoleDAO;
 import br.edu.ufba.softvis.visminer.persistence.impl.CommitterDAOImpl;
 import br.edu.ufba.softvis.visminer.persistence.impl.CommitterRoleDAOImpl;
 
@@ -22,8 +24,8 @@ public class CommitterAnalyzer implements IAnalyzer<List<CommitterDB>> {
 		IRepositorySystem repoSys = (IRepositorySystem) objects[1];
 		EntityManager entityManager = (EntityManager) objects[2];
 		
-		CommitterDAOImpl committerDao = new CommitterDAOImpl();
-		CommitterRoleDAOImpl committerRoleDao = new CommitterRoleDAOImpl();
+		CommitterDAO committerDao = new CommitterDAOImpl();
+		CommitterRoleDAO committerRoleDao = new CommitterRoleDAOImpl();
 		
 		committerDao.setEntityManager(entityManager);
 		committerRoleDao.setEntityManager(entityManager);

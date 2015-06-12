@@ -4,6 +4,7 @@ import java.lang.reflect.ParameterizedType;
 import java.util.Collection;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -40,7 +41,7 @@ public class DAOImpl<E, K> implements DAO<E, K>{
 	}
 
 	@Override
-	public void batchUpdate(Collection<E> objects) {
+	public void batchMerge(Collection<E> objects) {
 
 		entityManager.getTransaction().begin();
 		int i = 0;
@@ -85,10 +86,11 @@ public class DAOImpl<E, K> implements DAO<E, K>{
 	}
 
 	@Override
-	public void update(E object) {
+	public E merge(E object) {
 		entityManager.getTransaction().begin();
-		entityManager.merge(object);
-		entityManager.getTransaction().commit();		
+		E o = entityManager.merge(object);
+		entityManager.getTransaction().commit();
+		return o;
 	}
 
 	@Override
@@ -101,7 +103,11 @@ public class DAOImpl<E, K> implements DAO<E, K>{
 	@SuppressWarnings("unchecked")
 	@Override
 	public E find(K id) {
-		return (E) entityManager.find(entityClass, id);
+		try{
+			return (E) entityManager.find(entityClass, id);
+		}catch(NoResultException e){
+			return null;
+		}
 	}
 
 	@SuppressWarnings("unchecked")

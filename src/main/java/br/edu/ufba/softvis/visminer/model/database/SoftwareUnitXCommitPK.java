@@ -20,6 +20,10 @@ public class SoftwareUnitXCommitPK implements Serializable {
 
 	public SoftwareUnitXCommitPK() {
 	}
+	public SoftwareUnitXCommitPK(int commitId, int softwareUnitId) {
+		this.commitId = commitId;
+		this.softwareUnitId = softwareUnitId;
+	}
 	public int getSoftwareUnitId() {
 		return this.softwareUnitId;
 	}

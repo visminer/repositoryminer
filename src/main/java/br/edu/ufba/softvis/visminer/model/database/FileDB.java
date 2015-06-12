@@ -13,7 +13,13 @@ import java.util.List;
  */
 @Entity
 @Table(name="file")
-@NamedQuery(name="FileDB.findAll", query="SELECT f FROM FileDB f")
+@NamedQueries({
+	@NamedQuery(name="File.findAll", query="SELECT f FROM FileDB f"),
+	@NamedQuery(name="FileDB.findByCode", query="select f.id from FileDB f where f.uid = :uid"),
+	@NamedQuery(name="FileDB.findCommitedFiles", query="select f from FileDB f join fetch f.fileXCommits"
+			+ " fxc where fxc.id.commitId = :id")
+})
+
 public class FileDB implements Serializable {
 	private static final long serialVersionUID = 1L;
 
@@ -41,6 +47,7 @@ public class FileDB implements Serializable {
 	}
 
 	public FileDB(br.edu.ufba.softvis.visminer.model.bean.File file){
+		this.id = file.getId();
 		this.path = file.getPath();
 		this.uid = file.getUid();
 	}

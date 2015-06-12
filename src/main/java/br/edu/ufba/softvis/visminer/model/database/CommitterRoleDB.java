@@ -11,6 +11,7 @@ import javax.persistence.*;
 @Entity
 @Table(name="committer_role")
 @NamedQuery(name="CommitterRoleDB.findAll", query="SELECT c FROM CommitterRoleDB c")
+
 public class CommitterRoleDB implements Serializable {
 	private static final long serialVersionUID = 1L;
 

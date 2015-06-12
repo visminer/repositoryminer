@@ -1,4 +1,4 @@
-package br.edu.ufba.softvis.visminer.model.bean;
+package br.edu.ufba.softvis.visminer.model.business;
 
 import br.edu.ufba.softvis.visminer.model.database.FileXCommitDB;
 
@@ -11,10 +11,12 @@ public class FileState {
 	public FileState(){}
 	
 	public FileState(int linesAdded, int linesRemoved, boolean deleted) {
+		
 		super();
 		this.linesAdded = linesAdded;
 		this.linesRemoved = linesRemoved;
 		this.deleted = deleted;
+	
 	}
 	
 	public FileState(FileXCommitDB fileXCommitDb){

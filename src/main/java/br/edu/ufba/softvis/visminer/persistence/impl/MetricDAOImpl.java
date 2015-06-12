@@ -10,10 +10,10 @@ import br.edu.ufba.softvis.visminer.persistence.dao.MetricDAO;
 public class MetricDAOImpl extends DAOImpl<MetricDB, Integer> implements MetricDAO{
 
 	@Override
-	public MetricDB getByAcronym(String acronym) {
+	public MetricDB findByAcronym(String acronym) {
 		
 		EntityManager em = getEntityManager();
-		TypedQuery<MetricDB> query = em.createQuery("select m from MetricDB m where m.acronym = :acronym", MetricDB.class);
+		TypedQuery<MetricDB> query = em.createNamedQuery("MetricDB.findByAcronym", MetricDB.class);
 		query.setParameter("acronym", acronym);
 		
 		try{

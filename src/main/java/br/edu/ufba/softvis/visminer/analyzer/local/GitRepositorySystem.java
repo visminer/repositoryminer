@@ -41,7 +41,8 @@ public class GitRepositorySystem implements IRepositorySystem{
 
 	private Repository repository;
 	private Git git;
-
+	String repositoryPath;
+	
 	@Override
 	public void open(String repositoryPath) {
 
@@ -51,12 +52,13 @@ public class GitRepositorySystem implements IRepositorySystem{
 			e.printStackTrace();
 		}
 		this.git = new Git(this.repository);
-
+		this.repositoryPath = this.repository.getWorkTree().getAbsolutePath().replace("\\", "/");
+		
 	}
 
 	@Override
 	public String getAbsolutePath() {
-		return this.repository.getWorkTree().getAbsolutePath().replace("\\", "/");	
+		return 	this.repositoryPath;
 	}
 
 	@Override
@@ -271,6 +273,7 @@ public class GitRepositorySystem implements IRepositorySystem{
 				
 				int linesAdded = -1;
 				int linesRemoved = -1;
+				String path = this.repositoryPath+"/"+parts[2];
 				
 				if(!parts[0].equals("-"))
 					linesAdded = Integer.parseInt(parts[0]);
@@ -278,11 +281,11 @@ public class GitRepositorySystem implements IRepositorySystem{
 					linesRemoved = Integer.parseInt(parts[1]);
 				
 				FileState fs = new FileState(linesAdded, linesRemoved, false);
-				if(getData(commitName, str) == null){
+				if(getData(commitName, parts[2]) == null){
 					fs.setRemoved(true);
 				}
 
-				File f = new File(0, parts[2], StringUtils.sha1(parts[2]));
+				File f = new File(0, path, StringUtils.sha1(path));
 				f.setFileState(fs);
 				files.add(f);
 
@@ -311,7 +314,6 @@ public class GitRepositorySystem implements IRepositorySystem{
 		List<Commit> commits = new ArrayList<Commit>();
 		for(RevCommit revCommit : revCommits.getCommits()){
 			Commit commit = new Commit(revCommit.getAuthorIdent().getWhen(), revCommit.getFullMessage(), revCommit.getName());
-			commit.setCommitter(new Committer(revCommit.getAuthorIdent().getEmailAddress(),revCommit.getAuthorIdent().getName()));
 			commits.add(commit);
 		}
 		return commits;

@@ -11,6 +11,7 @@ import javax.persistence.*;
 @Entity
 @Table(name="metric_value")
 @NamedQuery(name="MetricValueDB.findAll", query="SELECT m FROM MetricValueDB m")
+
 public class MetricValueDB implements Serializable {
 	private static final long serialVersionUID = 1L;
 
@@ -26,7 +27,7 @@ public class MetricValueDB implements Serializable {
 	@JoinColumns({
 		@JoinColumn(name="commit_id", referencedColumnName="commit_id", nullable=false, insertable=false, updatable=false),
 		@JoinColumn(name="software_unit_id", referencedColumnName="software_unit_id", nullable=false, insertable=false, updatable=false)
-		})
+	})
 	private SoftwareUnitXCommitDB softwareUnitXCommit;
 
 	//bi-directional many-to-one association to MetricDB
@@ -35,6 +36,10 @@ public class MetricValueDB implements Serializable {
 	private MetricDB metric;
 
 	public MetricValueDB() {
+	}
+
+	public MetricValueDB(MetricValuePK id) {
+		this.id = id;
 	}
 
 	public MetricValuePK getId() {

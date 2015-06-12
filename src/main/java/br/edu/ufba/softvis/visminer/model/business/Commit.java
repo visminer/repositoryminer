@@ -1,6 +1,7 @@
-package br.edu.ufba.softvis.visminer.model.bean;
+package br.edu.ufba.softvis.visminer.model.business;
 
 import java.util.Date;
+import java.util.List;
 
 public class Commit {
 
@@ -8,6 +9,7 @@ public class Commit {
 	private Date date;
 	private String message;
 	private String name;
+	private List<File> commitedFiles;
 	
 	public Commit(){}
 	
@@ -56,6 +58,14 @@ public class Commit {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public List<File> getCommitedFiles() {
+		return commitedFiles;
+	}
+
+	public void setCommitedFiles(List<File> commitedFiles) {
+		this.commitedFiles = commitedFiles;
 	}
 
 }

@@ -4,6 +4,6 @@ import br.edu.ufba.softvis.visminer.model.database.RepositoryDB;
 
 public interface RepositoryDAO extends DAO<RepositoryDB, Integer> {
 
-	public RepositoryDB getByUid(String uid);
+	public RepositoryDB findByUid(String uid);
 	
 }

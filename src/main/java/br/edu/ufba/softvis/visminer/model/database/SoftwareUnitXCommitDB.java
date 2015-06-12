@@ -12,6 +12,7 @@ import java.util.List;
 @Entity
 @Table(name="software_unit_x_commit")
 @NamedQuery(name="SoftwareUnitXCommitDB.findAll", query="SELECT s FROM SoftwareUnitXCommitDB s")
+
 public class SoftwareUnitXCommitDB implements Serializable {
 	private static final long serialVersionUID = 1L;
 
@@ -23,6 +24,10 @@ public class SoftwareUnitXCommitDB implements Serializable {
 	private List<MetricValueDB> metricValues;
 
 	public SoftwareUnitXCommitDB() {
+	}
+
+	public SoftwareUnitXCommitDB(SoftwareUnitXCommitPK id) {
+		this.id = id;
 	}
 
 	public SoftwareUnitXCommitPK getId() {

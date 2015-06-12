@@ -5,6 +5,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import br.edu.ufba.softvis.visminer.constant.MetricId;
+
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface MetricAnnotation {
@@ -14,5 +16,7 @@ public @interface MetricAnnotation {
 	public String description();
 
 	public String acronym();
-
+	
+	public MetricId id();
+	
 }

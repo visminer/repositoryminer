@@ -5,4 +5,5 @@ import br.edu.ufba.softvis.visminer.model.database.MetricValuePK;
 
 public interface MetricValueDAO extends DAO<MetricValueDB, MetricValuePK> {
 
+
 }

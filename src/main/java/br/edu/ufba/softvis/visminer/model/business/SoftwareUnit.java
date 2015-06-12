@@ -1,5 +1,8 @@
-package br.edu.ufba.softvis.visminer.model.bean;
+package br.edu.ufba.softvis.visminer.model.business;
 
+import java.util.Map;
+
+import br.edu.ufba.softvis.visminer.constant.MetricId;
 import br.edu.ufba.softvis.visminer.constant.SoftwareUnitType;
 import br.edu.ufba.softvis.visminer.model.database.SoftwareUnitDB;
 
@@ -11,6 +14,8 @@ public class SoftwareUnit {
 	private String uid;
 	private SoftwareUnitType type;
 	private SoftwareUnit parentUnit;
+	private Map<MetricId, String> metricValues;
+	
 	
 	public SoftwareUnit(){}
 
@@ -68,6 +73,14 @@ public class SoftwareUnit {
 
 	public void setParentUnit(SoftwareUnit parentUnit) {
 		this.parentUnit = parentUnit;
+	}
+
+	public Map<MetricId, String> getMetricValues() {
+		return metricValues;
+	}
+
+	public void setMetricValues(Map<MetricId, String> metricValues) {
+		this.metricValues = metricValues;
 	}
 	
 }

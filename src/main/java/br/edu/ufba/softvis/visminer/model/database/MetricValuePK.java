@@ -1,7 +1,10 @@
 package br.edu.ufba.softvis.visminer.model.database;
 
 import java.io.Serializable;
+
 import javax.persistence.*;
+
+import br.edu.ufba.softvis.visminer.constant.MetricId;
 
 /**
  * The primary key class for the metric_value database table.
@@ -22,6 +25,11 @@ public class MetricValuePK implements Serializable {
 	private int metricId;
 
 	public MetricValuePK() {
+	}
+	public MetricValuePK(int softwareUnitId, int commitId, int metricId) {
+		this.softwareUnitId = softwareUnitId;
+		this.commitId = commitId;
+		this.metricId = metricId;
 	}
 	public int getSoftwareUnitId() {
 		return this.softwareUnitId;
@@ -51,9 +59,9 @@ public class MetricValuePK implements Serializable {
 		}
 		MetricValuePK castOther = (MetricValuePK)other;
 		return 
-			(this.softwareUnitId == castOther.softwareUnitId)
-			&& (this.commitId == castOther.commitId)
-			&& (this.metricId == castOther.metricId);
+				(this.softwareUnitId == castOther.softwareUnitId)
+				&& (this.commitId == castOther.commitId)
+				&& (this.metricId == castOther.metricId);
 	}
 
 	public int hashCode() {
@@ -62,7 +70,7 @@ public class MetricValuePK implements Serializable {
 		hash = hash * prime + this.softwareUnitId;
 		hash = hash * prime + this.commitId;
 		hash = hash * prime + this.metricId;
-		
+
 		return hash;
 	}
 }

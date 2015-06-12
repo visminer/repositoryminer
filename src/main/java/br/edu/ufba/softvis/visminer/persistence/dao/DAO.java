@@ -7,10 +7,10 @@ import javax.persistence.EntityManager;
 public interface DAO<E, K> {
 
 	public void batchSave(Collection<E> objects);
-	public void batchUpdate(Collection<E> objects);
+	public void batchMerge(Collection<E> objects);
 	public void batchDelete(Collection<E> objects);
 	public void save(E object);
-	public void update(E object);
+	public E merge(E object);
 	public void delete(E object);
 	public E find(K id);
 	public Collection<E> findAll();

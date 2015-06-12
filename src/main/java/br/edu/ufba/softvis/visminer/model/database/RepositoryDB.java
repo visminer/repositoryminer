@@ -16,7 +16,8 @@ import java.util.List;
  */
 @Entity
 @Table(name="repository")
-@NamedQuery(name="RepositoryDB.findAll", query="SELECT r FROM RepositoryDB r")
+@NamedQuery(name="RepositoryDB.findByUid", query="select r from RepositoryDB r where r.uid = :uid")
+
 public class RepositoryDB implements Serializable {
 	private static final long serialVersionUID = 1L;
 

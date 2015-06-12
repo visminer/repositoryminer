@@ -1,4 +1,6 @@
-package br.edu.ufba.softvis.visminer.model.bean;
+package br.edu.ufba.softvis.visminer.model.business;
+
+import java.util.List;
 
 import br.edu.ufba.softvis.visminer.model.database.FileDB;
 
@@ -8,6 +10,7 @@ public class File {
 	private String path;
 	private String uid;
 	private FileState fileState;
+	private List<SoftwareUnit> softwareUnits;
 	
 	public File(){}
 	
@@ -54,6 +57,14 @@ public class File {
 
 	public void setFileState(FileState fileState) {
 		this.fileState = fileState;
+	}
+
+	public List<SoftwareUnit> getSoftwareUnits() {
+		return softwareUnits;
+	}
+
+	public void setSoftwareUnits(List<SoftwareUnit> softwareUnits) {
+		this.softwareUnits = softwareUnits;
 	}
 	
 }

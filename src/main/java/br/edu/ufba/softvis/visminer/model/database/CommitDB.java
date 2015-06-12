@@ -4,6 +4,8 @@ import java.io.Serializable;
 
 import javax.persistence.*;
 
+import br.edu.ufba.softvis.visminer.model.bean.Commit;
+
 import java.util.Date;
 import java.util.List;
 
@@ -182,6 +184,18 @@ public class CommitDB implements Serializable {
 		} else if (!name.equals(other.name))
 			return false;
 		return true;
+	}
+
+	public void clean() {
+		this.date = null;
+		this.committer = null;
+		this.message = null;
+	}
+
+	public Commit retrieveBean() {
+		
+		return new Commit(id, date, message, name);
+		
 	}
 
 }

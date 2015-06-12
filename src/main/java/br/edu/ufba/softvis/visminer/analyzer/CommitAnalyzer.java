@@ -9,6 +9,7 @@ import br.edu.ufba.softvis.visminer.analyzer.local.IRepositorySystem;
 import br.edu.ufba.softvis.visminer.model.bean.Commit;
 import br.edu.ufba.softvis.visminer.model.database.CommitDB;
 import br.edu.ufba.softvis.visminer.model.database.CommitterDB;
+import br.edu.ufba.softvis.visminer.persistence.dao.CommitDAO;
 import br.edu.ufba.softvis.visminer.persistence.impl.CommitDAOImpl;
 
 public class CommitAnalyzer implements IAnalyzer<List<CommitDB>>{
@@ -32,7 +33,7 @@ public class CommitAnalyzer implements IAnalyzer<List<CommitDB>>{
 			}
 		}
 		
-		CommitDAOImpl commitDao = new CommitDAOImpl();
+		CommitDAO commitDao = new CommitDAOImpl();
 		commitDao.setEntityManager(entityManager);
 		commitDao.batchSave(commitsDb);
 		return commitsDb;

@@ -1,7 +1,11 @@
 package br.edu.ufba.softvis.visminer.model.database;
 
 import java.io.Serializable;
+
 import javax.persistence.*;
+
+import br.edu.ufba.softvis.visminer.constant.MetricId;
+
 import java.util.List;
 
 
@@ -11,13 +15,12 @@ import java.util.List;
  */
 @Entity
 @Table(name="metric")
-@NamedQuery(name="MetricDB.findAll", query="SELECT m FROM MetricDB m")
+@NamedQuery(name="MetricDB.findByAcronym", query="select m from MetricDB m where m.acronym = :acronym")
+
 public class MetricDB implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@SequenceGenerator(name="METRIC_ID_GENERATOR", sequenceName="METRIC_SEQ")
-	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="METRIC_ID_GENERATOR")
 	@Column(unique=true, nullable=false)
 	private int id;
 
@@ -37,12 +40,12 @@ public class MetricDB implements Serializable {
 	public MetricDB() {
 	}
 
-	public int getId() {
-		return this.id;
+	public MetricId getId() {
+		return MetricId.parse(this.id);
 	}
 
-	public void setId(int id) {
-		this.id = id;
+	public void setId(MetricId id) {
+		this.id = id.getId();
 	}
 
 	public String getAcronym() {

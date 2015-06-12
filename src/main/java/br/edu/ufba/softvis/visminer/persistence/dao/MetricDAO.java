@@ -4,6 +4,6 @@ import br.edu.ufba.softvis.visminer.model.database.MetricDB;
 
 public interface MetricDAO extends DAO<MetricDB, Integer>{
 
-	public MetricDB getByAcronym(String acronym);
+	public MetricDB findByAcronym(String acronym);
 	
 }
