@@ -10,7 +10,7 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name="file_x_commit")
-@NamedQuery(name="FileXCommitDB.findAll", query="SELECT f FROM FileXCommitDB f")
+@NamedQuery(name="FileXCommitDB.findByCommit", query="SELECT fxc FROM FileXCommitDB fxc where fxc.id.commitId = :commitId")
 public class FileXCommitDB implements Serializable {
 	private static final long serialVersionUID = 1L;
 

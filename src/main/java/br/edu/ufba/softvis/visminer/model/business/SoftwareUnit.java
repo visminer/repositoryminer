@@ -1,10 +1,10 @@
 package br.edu.ufba.softvis.visminer.model.business;
 
+import java.util.List;
 import java.util.Map;
 
 import br.edu.ufba.softvis.visminer.constant.MetricId;
 import br.edu.ufba.softvis.visminer.constant.SoftwareUnitType;
-import br.edu.ufba.softvis.visminer.model.database.SoftwareUnitDB;
 
 public class SoftwareUnit {
 
@@ -14,17 +14,20 @@ public class SoftwareUnit {
 	private String uid;
 	private SoftwareUnitType type;
 	private SoftwareUnit parentUnit;
+	private List<SoftwareUnit> children;
 	private Map<MetricId, String> metricValues;
-	
+	private File file;
 	
 	public SoftwareUnit(){}
 
-	public SoftwareUnit(SoftwareUnitDB softUnitDb) {
-		this.id = softUnitDb.getId();
-		this.name = softUnitDb.getName();
-		this.fullName = softUnitDb.getFullName();
-		this.uid = softUnitDb.getUid();
-		this.type = softUnitDb.getType();
+	public SoftwareUnit(int id, String name, String fullName, String uid,
+			SoftwareUnitType type) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.fullName = fullName;
+		this.uid = uid;
+		this.type = type;
 	}
 
 	public int getId() {
@@ -81,6 +84,44 @@ public class SoftwareUnit {
 
 	public void setMetricValues(Map<MetricId, String> metricValues) {
 		this.metricValues = metricValues;
+	}
+
+	public List<SoftwareUnit> getChildren() {
+		return children;
+	}
+
+	public void setChildren(List<SoftwareUnit> children) {
+		this.children = children;
+	}
+
+	public File getFile() {
+		return file;
+	}
+
+	public void setFile(File file) {
+		this.file = file;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + id;
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		SoftwareUnit other = (SoftwareUnit) obj;
+		if (id != other.id)
+			return false;
+		return true;
 	}
 	
 }

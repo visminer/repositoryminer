@@ -16,9 +16,9 @@ public class Repository {
 	private RepositoryServiceType serviceType;
 	private String uid;
 	
-	List<Committer> committers;
-	List<Tree> trees;
-	Project project;
+	private List<Committer> committers;
+	private List<Tree> trees;
+	private Project project;
 	
 	public Repository(){}
 	
@@ -99,6 +99,52 @@ public class Repository {
 
 	public void setUid(String uid) {
 		this.uid = uid;
+	}
+
+	public List<Committer> getCommitters() {
+		return committers;
+	}
+
+	public void setCommitters(List<Committer> committers) {
+		this.committers = committers;
+	}
+
+	public List<Tree> getTrees() {
+		return trees;
+	}
+
+	public void setTrees(List<Tree> trees) {
+		this.trees = trees;
+	}
+
+	public Project getProject() {
+		return project;
+	}
+
+	public void setProject(Project project) {
+		this.project = project;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + id;
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Repository other = (Repository) obj;
+		if (id != other.id)
+			return false;
+		return true;
 	}	
 	
 }

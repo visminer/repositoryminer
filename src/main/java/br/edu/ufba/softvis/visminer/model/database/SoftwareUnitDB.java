@@ -16,8 +16,10 @@ import java.util.List;
  */
 @Entity
 @Table(name="software_unit")
-@NamedQuery(name="SoftwareUnitDB.findByUid", query="select sw from SoftwareUnitDB sw where sw.uid = :uid")
-
+@NamedQueries({
+	@NamedQuery(name="SoftwareUnitDB.findByUid", query="select sw from SoftwareUnitDB sw where sw.uid = :uid"),
+	@NamedQuery(name="SoftwareUnitDB.findByRepository", query="select sw from SoftwareUnitDB sw where sw.repository.id = :id")
+})
 public class SoftwareUnitDB implements Serializable {
 	private static final long serialVersionUID = 1L;
 

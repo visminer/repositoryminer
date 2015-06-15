@@ -32,12 +32,17 @@ public class VisMiner {
 	}
 	
 	public void refreshRepository(String repositoryPath, List<MetricId> metrics){
+		/**TODO
+		 * finalizar os  analyzers restantes
+		 */
 		RepositoryAnalyzer analyzer = new RepositoryAnalyzer();
 		analyzer.update(repositoryPath);
 	}	
 	
 	public void calculateMetrics(List<MetricId> metrics){
-		//
+		/**TODO
+		 * fazer essa parte usando uma variação do codigo de persistencia do repositorio
+		 */
 	}
 	
 }

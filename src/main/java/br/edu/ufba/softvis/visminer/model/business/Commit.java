@@ -10,6 +10,7 @@ public class Commit {
 	private String message;
 	private String name;
 	private List<File> commitedFiles;
+	private Committer committer;
 	
 	public Commit(){}
 	
@@ -66,6 +67,36 @@ public class Commit {
 
 	public void setCommitedFiles(List<File> commitedFiles) {
 		this.commitedFiles = commitedFiles;
+	}
+
+	public Committer getCommitter() {
+		return committer;
+	}
+
+	public void setCommitter(Committer committer) {
+		this.committer = committer;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + id;
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Commit other = (Commit) obj;
+		if (id != other.id)
+			return false;
+		return true;
 	}
 
 }

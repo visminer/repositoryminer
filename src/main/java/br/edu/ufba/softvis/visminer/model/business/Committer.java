@@ -20,19 +20,6 @@ public class Committer {
 		this.contribuitor = contribuitor;
 	}
 
-	public Committer(String email, String name, boolean contribuitor) {
-		super();
-		this.email = email;
-		this.name = name;
-		this.contribuitor = contribuitor;
-	}	
-	
-	public Committer(String email, String name) {
-		super();
-		this.email = email;
-		this.name = name;
-	}
-
 	public int getId() {
 		return id;
 	}
@@ -77,7 +64,7 @@ public class Committer {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((email == null) ? 0 : email.hashCode());
+		result = prime * result + id;
 		return result;
 	}
 
@@ -90,12 +77,10 @@ public class Committer {
 		if (getClass() != obj.getClass())
 			return false;
 		Committer other = (Committer) obj;
-		if (email == null) {
-			if (other.email != null)
-				return false;
-		} else if (!email.equals(other.email))
+		if (id != other.id)
 			return false;
 		return true;
 	}
+
 
 }

@@ -16,7 +16,10 @@ import java.util.List;
  */
 @Entity
 @Table(name="commit")
-@NamedQuery(name="CommitDB.findAll", query="SELECT c FROM CommitDB c")
+@NamedQueries({
+	@NamedQuery(name="CommitDB.findByTree", query="select c from TreeDB t join t.commits c where t.id = :id")
+})
+
 public class CommitDB implements Serializable {
 	private static final long serialVersionUID = 1L;
 	

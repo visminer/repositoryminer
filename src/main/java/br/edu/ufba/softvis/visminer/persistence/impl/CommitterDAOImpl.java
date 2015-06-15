@@ -1,5 +1,7 @@
 package br.edu.ufba.softvis.visminer.persistence.impl;
 
+import java.util.List;
+
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
@@ -20,6 +22,16 @@ public class CommitterDAOImpl extends DAOImpl<CommitterDB, Integer> implements C
 		}catch(Exception e){
 			return null;
 		}
+		
+	}
+
+	@Override
+	public List<CommitterDB> findByRepository(int repositoryId) {
+	
+		EntityManager em = getEntityManager();
+		TypedQuery<CommitterDB> query = em.createNamedQuery("CommitterDB.findByRepository", CommitterDB.class);
+		query.setParameter("id", repositoryId);
+		return query.getResultList();
 		
 	}
 

@@ -12,14 +12,14 @@ public class Metric {
 	
 	public Metric(){}
 	
-	public Metric(int id, String acronym, String description, String name) {
-		
+	public Metric(int id, String acronym, String description, String name,
+			MetricId uid) {
 		super();
 		this.id = id;
 		this.acronym = acronym;
 		this.description = description;
 		this.name = name;
-		
+		this.uid = uid;
 	}
 
 	public int getId() {
@@ -62,4 +62,28 @@ public class Metric {
 		this.uid = uid;
 	}
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + id;
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Metric other = (Metric) obj;
+		if (id != other.id)
+			return false;
+		return true;
+	}
+
+	
+	
 }

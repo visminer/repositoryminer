@@ -4,6 +4,10 @@ import java.io.Serializable;
 
 import javax.persistence.*;
 
+import org.eclipse.persistence.annotations.BatchFetch;
+import org.eclipse.persistence.annotations.JoinFetch;
+import org.eclipse.persistence.annotations.JoinFetchType;
+
 import java.util.List;
 
 
@@ -14,10 +18,9 @@ import java.util.List;
 @Entity
 @Table(name="file")
 @NamedQueries({
-	@NamedQuery(name="File.findAll", query="SELECT f FROM FileDB f"),
 	@NamedQuery(name="FileDB.findByCode", query="select f.id from FileDB f where f.uid = :uid"),
-	@NamedQuery(name="FileDB.findCommitedFiles", query="select f from FileDB f join fetch f.fileXCommits"
-			+ " fxc where fxc.id.commitId = :id")
+	@NamedQuery(name="FileDB.findCommitedFiles", query="select f from FileDB f join f.fileXCommits "
+			+ "fxc where fxc.id.commitId = :id")
 })
 
 public class FileDB implements Serializable {

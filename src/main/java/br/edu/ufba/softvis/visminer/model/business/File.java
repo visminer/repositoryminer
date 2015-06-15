@@ -2,8 +2,6 @@ package br.edu.ufba.softvis.visminer.model.business;
 
 import java.util.List;
 
-import br.edu.ufba.softvis.visminer.model.database.FileDB;
-
 public class File {
 	
 	private int id;
@@ -21,12 +19,6 @@ public class File {
 		this.uid = uid;
 	}
 
-	public File(FileDB fileDb){
-		this.id = fileDb.getId();
-		this.path = fileDb.getPath();
-		this.uid = fileDb.getUid();
-	}
-	
 	public int getId() {
 		return id;
 	}
@@ -66,5 +58,28 @@ public class File {
 	public void setSoftwareUnits(List<SoftwareUnit> softwareUnits) {
 		this.softwareUnits = softwareUnits;
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + id;
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		File other = (File) obj;
+		if (id != other.id)
+			return false;
+		return true;
+	}
+
 	
 }

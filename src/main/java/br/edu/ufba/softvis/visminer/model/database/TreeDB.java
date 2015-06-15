@@ -16,7 +16,7 @@ import java.util.List;
  */
 @Entity
 @Table(name="tree")
-@NamedQuery(name="TreeDB.findAll", query="SELECT t FROM TreeDB t")
+@NamedQuery(name="TreeDB.findByRepository", query="select t from TreeDB t where t.repository.id = :repositoryId")
 public class TreeDB implements Serializable {
 	private static final long serialVersionUID = 1L;
 
