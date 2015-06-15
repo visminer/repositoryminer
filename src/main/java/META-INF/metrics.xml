@@ -1,0 +1,3 @@
+<metrics>
+	<metric id="1">br.edu.ufba.softvis.visminer.metric.LOCMetric</metric>
+</metrics>
