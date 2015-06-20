@@ -1,12 +1,14 @@
 package br.edu.ufba.softvis.visminer.model.database;
 
 import java.io.Serializable;
+
 import javax.persistence.*;
 
 
 /**
+ * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
+ * @version 0.9
  * The persistent class for the metric_value database table.
- * 
  */
 @Entity
 @Table(name="metric_value")
@@ -39,38 +41,68 @@ public class MetricValueDB implements Serializable {
 	public MetricValueDB() {
 	}
 
-	public MetricValueDB(MetricValuePK id) {
+	/**
+	 * @param id
+	 * @param value
+	 */
+	public MetricValueDB(MetricValuePK id, String value) {
+		super();
 		this.id = id;
+		this.value = value;
 	}
 
+	/**
+	 * @return the id
+	 */
 	public MetricValuePK getId() {
-		return this.id;
+		return id;
 	}
 
+	/**
+	 * @param id the id to set
+	 */
 	public void setId(MetricValuePK id) {
 		this.id = id;
 	}
 
+	/**
+	 * @return the value
+	 */
 	public String getValue() {
-		return this.value;
+		return value;
 	}
 
+	/**
+	 * @param value the value to set
+	 */
 	public void setValue(String value) {
 		this.value = value;
 	}
 
+	/**
+	 * @return the softwareUnitXCommit
+	 */
 	public SoftwareUnitXCommitDB getSoftwareUnitXCommit() {
-		return this.softwareUnitXCommit;
+		return softwareUnitXCommit;
 	}
 
+	/**
+	 * @param softwareUnitXCommit the softwareUnitXCommit to set
+	 */
 	public void setSoftwareUnitXCommit(SoftwareUnitXCommitDB softwareUnitXCommit) {
 		this.softwareUnitXCommit = softwareUnitXCommit;
 	}
 
+	/**
+	 * @return the metric
+	 */
 	public MetricDB getMetric() {
-		return this.metric;
+		return metric;
 	}
 
+	/**
+	 * @param metric the metric to set
+	 */
 	public void setMetric(MetricDB metric) {
 		this.metric = metric;
 	}

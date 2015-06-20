@@ -4,8 +4,9 @@ import java.io.Serializable;
 import javax.persistence.*;
 
 /**
+ * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
+ * @version 0.9
  * The primary key class for the committer_role database table.
- * 
  */
 @Embeddable
 public class CommitterRolePK implements Serializable {
@@ -20,22 +21,41 @@ public class CommitterRolePK implements Serializable {
 
 	public CommitterRolePK() {
 	}
-	
+
+	/**
+	 * @param committerId
+	 * @param repositoryId
+	 */
 	public CommitterRolePK(int committerId, int repositoryId) {
 		super();
 		this.committerId = committerId;
 		this.repositoryId = repositoryId;
 	}
 
+	/**
+	 * @return the committerId
+	 */
 	public int getCommitterId() {
-		return this.committerId;
+		return committerId;
 	}
+
+	/**
+	 * @param committerId the committerId to set
+	 */
 	public void setCommitterId(int committerId) {
 		this.committerId = committerId;
 	}
+
+	/**
+	 * @return the repositoryId
+	 */
 	public int getRepositoryId() {
-		return this.repositoryId;
+		return repositoryId;
 	}
+
+	/**
+	 * @param repositoryId the repositoryId to set
+	 */
 	public void setRepositoryId(int repositoryId) {
 		this.repositoryId = repositoryId;
 	}

@@ -8,6 +8,13 @@ import javax.persistence.TypedQuery;
 import br.edu.ufba.softvis.visminer.model.database.CommitterDB;
 import br.edu.ufba.softvis.visminer.persistence.dao.CommitterDAO;
 
+/**
+ * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
+ * @version 0.9
+ * 
+ * Implementation of interface {@link CommitterDAO}
+ */
+
 public class CommitterDAOImpl extends DAOImpl<CommitterDB, Integer> implements CommitterDAO {
 
 	@Override

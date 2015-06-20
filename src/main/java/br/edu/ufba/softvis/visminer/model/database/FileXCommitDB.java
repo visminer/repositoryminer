@@ -5,8 +5,9 @@ import javax.persistence.*;
 
 
 /**
+ * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
+ * @version 0.9
  * The persistent class for the file_x_commit database table.
- * 
  */
 @Entity
 @Table(name="file_x_commit")
@@ -39,57 +40,101 @@ public class FileXCommitDB implements Serializable {
 	public FileXCommitDB() {
 	}
 
-	public FileXCommitDB(int fileId, int commitId, br.edu.ufba.softvis.visminer.model.bean.FileState fileState){
-		this.id = new FileXCommitPK(fileId, commitId);
-		this.linesAdded = fileState.getLinesAdded();
-		this.linesRemoved = fileState.getLinesRemoved();
-		this.removed = fileState.isRemoved();
-	}
-	
-	public FileXCommitPK getId() {
-		return this.id;
+	/**
+	 * @param id
+	 * @param linesAdded
+	 * @param linesRemoved
+	 * @param removed
+	 */
+	public FileXCommitDB(FileXCommitPK id, int linesAdded, int linesRemoved,
+			boolean removed) {
+		super();
+		this.id = id;
+		this.linesAdded = linesAdded;
+		this.linesRemoved = linesRemoved;
+		this.removed = removed;
 	}
 
+	/**
+	 * @return the id
+	 */
+	public FileXCommitPK getId() {
+		return id;
+	}
+
+	/**
+	 * @param id the id to set
+	 */
 	public void setId(FileXCommitPK id) {
 		this.id = id;
 	}
 
+	/**
+	 * @return the linesAdded
+	 */
 	public int getLinesAdded() {
-		return this.linesAdded;
+		return linesAdded;
 	}
 
+	/**
+	 * @param linesAdded the linesAdded to set
+	 */
 	public void setLinesAdded(int linesAdded) {
 		this.linesAdded = linesAdded;
 	}
 
+	/**
+	 * @return the linesRemoved
+	 */
 	public int getLinesRemoved() {
-		return this.linesRemoved;
+		return linesRemoved;
 	}
 
+	/**
+	 * @param linesRemoved the linesRemoved to set
+	 */
 	public void setLinesRemoved(int linesRemoved) {
 		this.linesRemoved = linesRemoved;
 	}
 
-	public boolean getRemoved() {
-		return this.removed;
+	/**
+	 * @return the removed
+	 */
+	public boolean isRemoved() {
+		return removed;
 	}
 
+	/**
+	 * @param removed the removed to set
+	 */
 	public void setRemoved(boolean removed) {
 		this.removed = removed;
 	}
 
+	/**
+	 * @return the commit
+	 */
 	public CommitDB getCommit() {
-		return this.commit;
+		return commit;
 	}
 
+	/**
+	 * @param commit the commit to set
+	 */
 	public void setCommit(CommitDB commit) {
 		this.commit = commit;
 	}
 
+	/**
+	 * @return the file
+	 */
 	public FileDB getFile() {
-		return this.file;
+		return file;
 	}
 
+	/**
+	 * @param file the file to set
+	 */
 	public void setFile(FileDB file) {
 		this.file = file;
 	}

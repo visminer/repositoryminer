@@ -4,14 +4,16 @@ import java.io.Serializable;
 
 import javax.persistence.*;
 
-import br.edu.ufba.softvis.visminer.constant.MetricId;
+import br.edu.ufba.softvis.visminer.constant.MetricType;
+import br.edu.ufba.softvis.visminer.constant.MetricUid;
 
 import java.util.List;
 
 
 /**
+ * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
+ * @version 0.9
  * The persistent class for the metric database table.
- * 
  */
 @Entity
 @Table(name="metric")
@@ -32,6 +34,9 @@ public class MetricDB implements Serializable {
 
 	@Column(nullable=false, length=100)
 	private String name;
+	
+	@Column(name="type", nullable=false)
+	private int type;
 
 	//bi-directional many-to-one association to MetricValueDB
 	@OneToMany(mappedBy="metric")
@@ -40,58 +45,106 @@ public class MetricDB implements Serializable {
 	public MetricDB() {
 	}
 
-	public MetricId getId() {
-		return MetricId.parse(this.id);
+	/**
+	 * @param id
+	 * @param acronym
+	 * @param description
+	 * @param name
+	 * @param type
+	 */
+	public MetricDB(MetricUid id, String acronym, String description, String name,
+			MetricType type) {
+		super();
+		this.id = id.getId();
+		this.acronym = acronym;
+		this.description = description;
+		this.name = name;
+		this.type = type.getId();
 	}
 
-	public void setId(MetricId id) {
+	/**
+	 * @return the id
+	 */
+	public MetricUid getId() {
+		return MetricUid.parse(id);
+	}
+
+	/**
+	 * @param id the id to set
+	 */
+	public void setId(MetricUid id) {
 		this.id = id.getId();
 	}
 
+	/**
+	 * @return the acronym
+	 */
 	public String getAcronym() {
-		return this.acronym;
+		return acronym;
 	}
 
+	/**
+	 * @param acronym the acronym to set
+	 */
 	public void setAcronym(String acronym) {
 		this.acronym = acronym;
 	}
 
+	/**
+	 * @return the description
+	 */
 	public String getDescription() {
-		return this.description;
+		return description;
 	}
 
+	/**
+	 * @param description the description to set
+	 */
 	public void setDescription(String description) {
 		this.description = description;
 	}
 
+	/**
+	 * @return the name
+	 */
 	public String getName() {
-		return this.name;
+		return name;
 	}
 
+	/**
+	 * @param name the name to set
+	 */
 	public void setName(String name) {
 		this.name = name;
 	}
 
-	public List<MetricValueDB> getMetricValues() {
-		return this.metricValues;
+	/**
+	 * @return the type
+	 */
+	public MetricType getType() {
+		return MetricType.parse(type);
 	}
 
+	/**
+	 * @param type the type to set
+	 */
+	public void setType(MetricType type) {
+		this.type = type.getId();
+	}
+
+	/**
+	 * @return the metricValues
+	 */
+	public List<MetricValueDB> getMetricValues() {
+		return metricValues;
+	}
+
+	/**
+	 * @param metricValues the metricValues to set
+	 */
 	public void setMetricValues(List<MetricValueDB> metricValues) {
 		this.metricValues = metricValues;
 	}
 
-	public MetricValueDB addMetricValue(MetricValueDB metricValue) {
-		getMetricValues().add(metricValue);
-		metricValue.setMetric(this);
-
-		return metricValue;
-	}
-
-	public MetricValueDB removeMetricValue(MetricValueDB metricValue) {
-		getMetricValues().remove(metricValue);
-		metricValue.setMetric(null);
-
-		return metricValue;
-	}
 
 }

@@ -4,20 +4,19 @@ import java.io.Serializable;
 
 import javax.persistence.*;
 
-import br.edu.ufba.softvis.visminer.model.bean.Commit;
-
 import java.util.Date;
 import java.util.List;
 
 
 /**
+ * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
+ * @version 0.9
  * The persistent class for the commit database table.
- * 
  */
 @Entity
 @Table(name="commit")
 @NamedQueries({
-	@NamedQuery(name="CommitDB.findByTree", query="select c from TreeDB t join t.commits c where t.id = :id")
+	@NamedQuery(name="CommitDB.findByTree", query="select c from TreeDB t join t.commits c where t.id = :id order by c.date")
 })
 
 public class CommitDB implements Serializable {
@@ -72,94 +71,142 @@ public class CommitDB implements Serializable {
 	public CommitDB() {
 	}
 
-	public CommitDB(br.edu.ufba.softvis.visminer.model.bean.Commit commit){
-		this.date = commit.getDate();
-		this.message = commit.getMessage();
-		this.name = commit.getName();
-	}
-	
-	public int getId() {
-		return this.id;
+	/**
+	 * @param id
+	 * @param date
+	 * @param message
+	 * @param name
+	 */
+	public CommitDB(int id, Date date, String message, String name) {
+		super();
+		this.id = id;
+		this.date = date;
+		this.message = message;
+		this.name = name;
 	}
 
+	/**
+	 * @return the id
+	 */
+	public int getId() {
+		return id;
+	}
+
+	/**
+	 * @param id the id to set
+	 */
 	public void setId(int id) {
 		this.id = id;
 	}
 
+	/**
+	 * @return the date
+	 */
 	public Date getDate() {
-		return this.date;
+		return date;
 	}
 
+	/**
+	 * @param date the date to set
+	 */
 	public void setDate(Date date) {
 		this.date = date;
 	}
 
+	/**
+	 * @return the message
+	 */
 	public String getMessage() {
-		return this.message;
+		return message;
 	}
 
+	/**
+	 * @param message the message to set
+	 */
 	public void setMessage(String message) {
 		this.message = message;
 	}
 
+	/**
+	 * @return the name
+	 */
 	public String getName() {
-		return this.name;
+		return name;
 	}
 
+	/**
+	 * @param name the name to set
+	 */
 	public void setName(String name) {
 		this.name = name;
 	}
 
+	/**
+	 * @return the committer
+	 */
 	public CommitterDB getCommitter() {
-		return this.committer;
+		return committer;
 	}
 
+	/**
+	 * @param committer the committer to set
+	 */
 	public void setCommitter(CommitterDB committer) {
 		this.committer = committer;
 	}
 
+	/**
+	 * @return the trees
+	 */
 	public List<TreeDB> getTrees() {
-		return this.trees;
+		return trees;
 	}
 
+	/**
+	 * @param trees the trees to set
+	 */
 	public void setTrees(List<TreeDB> trees) {
 		this.trees = trees;
 	}
 
+	/**
+	 * @return the fileXCommits
+	 */
 	public List<FileXCommitDB> getFileXCommits() {
-		return this.fileXCommits;
+		return fileXCommits;
 	}
 
+	/**
+	 * @param fileXCommits the fileXCommits to set
+	 */
 	public void setFileXCommits(List<FileXCommitDB> fileXCommits) {
 		this.fileXCommits = fileXCommits;
 	}
 
-	public FileXCommitDB addFileXCommit(FileXCommitDB fileXCommit) {
-		getFileXCommits().add(fileXCommit);
-		fileXCommit.setCommit(this);
-
-		return fileXCommit;
-	}
-
-	public FileXCommitDB removeFileXCommit(FileXCommitDB fileXCommit) {
-		getFileXCommits().remove(fileXCommit);
-		fileXCommit.setCommit(null);
-
-		return fileXCommit;
-	}
-
+	/**
+	 * @return the issues
+	 */
 	public List<IssueDB> getIssues() {
-		return this.issues;
+		return issues;
 	}
 
+	/**
+	 * @param issues the issues to set
+	 */
 	public void setIssues(List<IssueDB> issues) {
 		this.issues = issues;
 	}
 
+	/**
+	 * @return the softwareUnits
+	 */
 	public List<SoftwareUnitDB> getSoftwareUnits() {
-		return this.softwareUnits;
+		return softwareUnits;
 	}
 
+	/**
+	 * @param softwareUnits the softwareUnits to set
+	 */
 	public void setSoftwareUnits(List<SoftwareUnitDB> softwareUnits) {
 		this.softwareUnits = softwareUnits;
 	}
@@ -187,18 +234,6 @@ public class CommitDB implements Serializable {
 		} else if (!name.equals(other.name))
 			return false;
 		return true;
-	}
-
-	public void clean() {
-		this.date = null;
-		this.committer = null;
-		this.message = null;
-	}
-
-	public Commit retrieveBean() {
-		
-		return new Commit(id, date, message, name);
-		
 	}
 
 }

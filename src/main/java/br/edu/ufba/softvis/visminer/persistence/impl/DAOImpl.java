@@ -12,6 +12,13 @@ import javax.persistence.criteria.Root;
 
 import br.edu.ufba.softvis.visminer.persistence.dao.DAO;
 
+/**
+ * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
+ * @version 0.9
+ * 
+ * Implementation of interface {@link DAO}
+ */
+
 public class DAOImpl<E, K> implements DAO<E, K>{
 
 	private EntityManager entityManager;

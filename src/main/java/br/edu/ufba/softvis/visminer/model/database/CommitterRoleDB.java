@@ -5,8 +5,9 @@ import javax.persistence.*;
 
 
 /**
+ * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
+ * @version 0.9
  * The persistent class for the committer_role database table.
- * 
  */
 @Entity
 @Table(name="committer_role")
@@ -34,40 +35,68 @@ public class CommitterRoleDB implements Serializable {
 	public CommitterRoleDB() {
 	}
 
-	public CommitterRoleDB(int repositoryId, int committerId, boolean contributor) {
+	/**
+	 * @param id
+	 * @param contributor
+	 */
+	public CommitterRoleDB(CommitterRolePK id, boolean contributor) {
 		super();
-		this.id = new CommitterRolePK(committerId, repositoryId);
+		this.id = id;
 		this.contributor = contributor;
 	}
 
+	/**
+	 * @return the id
+	 */
 	public CommitterRolePK getId() {
-		return this.id;
+		return id;
 	}
 
+	/**
+	 * @param id the id to set
+	 */
 	public void setId(CommitterRolePK id) {
 		this.id = id;
 	}
 
-	public boolean getContributor() {
-		return this.contributor;
+	/**
+	 * @return the contributor
+	 */
+	public boolean isContributor() {
+		return contributor;
 	}
 
-	public void setContribuitor(boolean contributor) {
+	/**
+	 * @param contributor the contributor to set
+	 */
+	public void setContributor(boolean contributor) {
 		this.contributor = contributor;
 	}
 
+	/**
+	 * @return the committer
+	 */
 	public CommitterDB getCommitter() {
-		return this.committer;
+		return committer;
 	}
 
+	/**
+	 * @param committer the committer to set
+	 */
 	public void setCommitter(CommitterDB committer) {
 		this.committer = committer;
 	}
 
+	/**
+	 * @return the repository
+	 */
 	public RepositoryDB getRepository() {
-		return this.repository;
+		return repository;
 	}
 
+	/**
+	 * @param repository the repository to set
+	 */
 	public void setRepository(RepositoryDB repository) {
 		this.repository = repository;
 	}

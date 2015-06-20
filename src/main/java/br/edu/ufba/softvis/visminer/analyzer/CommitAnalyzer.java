@@ -12,6 +12,19 @@ import br.edu.ufba.softvis.visminer.model.database.CommitterDB;
 import br.edu.ufba.softvis.visminer.persistence.dao.CommitDAO;
 import br.edu.ufba.softvis.visminer.persistence.impl.CommitDAOImpl;
 
+/**
+ * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
+ * @version 0.9
+ * @see CommitterAnalyzer
+ * @see FileAnalyzer
+ * @see IssueAnalyzer
+ * @see MilestoneAnalyzer
+ * @see RepositoryAnalyzer
+ * @see TreeAnalyzer
+ * @see IAnalyzer
+ * 
+ * Defines how to save or to increment informations about commits in database.
+ */
 public class CommitAnalyzer implements IAnalyzer<List<CommitDB>>{
 
 	@SuppressWarnings("unchecked")
@@ -27,7 +40,7 @@ public class CommitAnalyzer implements IAnalyzer<List<CommitDB>>{
 		for(CommitterDB committerDb : committersDb){
 			List<Commit> commits = repoSys.getCommitsByCommitter(committerDb.getEmail());
 			for(Commit commit : commits){
-				CommitDB commitDb = new CommitDB(commit);
+				CommitDB commitDb = new CommitDB(0, commit.getDate(), commit.getMessage(), commit.getName());
 				commitDb.setCommitter(committerDb);
 				commitsDb.add(commitDb);
 			}
@@ -41,7 +54,7 @@ public class CommitAnalyzer implements IAnalyzer<List<CommitDB>>{
 	}
 
 	@Override
-	public List<CommitDB> update(Object... objects) {
+	public List<CommitDB> increment(Object... objects) {
 		return null;
 	}
 

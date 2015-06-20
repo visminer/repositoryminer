@@ -37,7 +37,13 @@ import br.edu.ufba.softvis.visminer.model.bean.Tree;
 import br.edu.ufba.softvis.visminer.utility.AuthorEmailFilter;
 import br.edu.ufba.softvis.visminer.utility.StringUtils;
 
-public class GitRepositorySystem implements IRepositorySystem{
+/**
+ * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
+ * @version 0.9
+ * @see IRepositorySystem
+ * Implementation for GIT repositories.
+ */
+public class GitRepository implements IRepositorySystem{
 
 	private Repository repository;
 	private Git git;
@@ -72,7 +78,7 @@ public class GitRepositorySystem implements IRepositorySystem{
 		Set<Committer> committers = new HashSet<Committer>();
 
 		for(PersonIdent person : authorFilter.getPersons()){
-			Committer committer = new Committer(person.getEmailAddress(), person.getName(), true);
+			Committer committer = new Committer(0, person.getEmailAddress(), person.getName(), true);
 			committers.add(committer);
 		}
 
@@ -80,7 +86,7 @@ public class GitRepositorySystem implements IRepositorySystem{
 
 			Iterable<RevCommit> revCommits = git.log().all().call();
 			for(RevCommit revCommit : revCommits){
-				Committer committer = new Committer(revCommit.getAuthorIdent().getEmailAddress(), revCommit.getAuthorIdent().getName(), false);
+				Committer committer = new Committer(0, revCommit.getAuthorIdent().getEmailAddress(), revCommit.getAuthorIdent().getName(), false);
 				committers.add(committer);
 			}
 
@@ -104,13 +110,13 @@ public class GitRepositorySystem implements IRepositorySystem{
 
 			Iterable<Ref> refs = git.branchList().call();
 			for(Ref ref : refs){
-				Tree tree = new Tree(getLastCommitDate(ref.getName()), ref.getName().split("/")[2], ref.getName(), TreeType.BRANCH);
+				Tree tree = new Tree(0, getLastCommitDate(ref.getName()), ref.getName().split("/")[2], ref.getName(), TreeType.BRANCH);
 				trees.add(tree);
 			}
 
 			refs = git.tagList().call();
 			for(Ref ref : refs){
-				Tree tree = new Tree(getLastCommitDate(ref.getName()), ref.getName().split("/")[2], ref.getName(), TreeType.TAG);
+				Tree tree = new Tree(0, getLastCommitDate(ref.getName()), ref.getName().split("/")[2], ref.getName(), TreeType.TAG);
 				trees.add(tree);
 			}
 
@@ -120,27 +126,6 @@ public class GitRepositorySystem implements IRepositorySystem{
 			e.printStackTrace();
 			return null;
 		}
-
-	}
-
-	@Override
-	public List<String> getCommitsNames(String treeName){
-
-		AndCommitFilter filters = new AndCommitFilter();
-		CommitListFilter revCommits = new CommitListFilter();
-		filters.add(revCommits);
-
-		CommitFinder finder = new CommitFinder(repository);
-		finder.setFilter(filters);
-		finder.findFrom(treeName);
-
-		List<String> names = new ArrayList<String>();
-
-		for(RevCommit revCommit : revCommits.getCommits()){
-			names.add(revCommit.getName());
-		}
-
-		return names;
 
 	}
 
@@ -172,7 +157,7 @@ public class GitRepositorySystem implements IRepositorySystem{
 			List<Commit> commits = new ArrayList<Commit>();
 
 			for(RevCommit revCommit : revCommits){
-				Commit commit = new Commit(revCommit.getAuthorIdent().getWhen(), revCommit.getFullMessage(), revCommit.getName());
+				Commit commit = new Commit(0, revCommit.getAuthorIdent().getWhen(), revCommit.getFullMessage(), revCommit.getName());
 				commits.add(commit);
 			}
 
@@ -282,7 +267,7 @@ public class GitRepositorySystem implements IRepositorySystem{
 				
 				FileState fs = new FileState(linesAdded, linesRemoved, false);
 				if(getData(commitName, parts[2]) == null){
-					fs.setRemoved(true);
+					fs.setDeleted(true);
 				}
 
 				File f = new File(0, path, StringUtils.sha1(path));
@@ -309,15 +294,16 @@ public class GitRepositorySystem implements IRepositorySystem{
 
 	}
 
-	// Helpers
+	/*
+	 * Avoids repeat code in the process to create a commit list.
+	 */
 	private List<Commit> createListCommit(CommitListFilter revCommits){
 		List<Commit> commits = new ArrayList<Commit>();
 		for(RevCommit revCommit : revCommits.getCommits()){
-			Commit commit = new Commit(revCommit.getAuthorIdent().getWhen(), revCommit.getFullMessage(), revCommit.getName());
+			Commit commit = new Commit(0, revCommit.getAuthorIdent().getWhen(), revCommit.getFullMessage(), revCommit.getName());
 			commits.add(commit);
 		}
 		return commits;
 	}
-
 
 }

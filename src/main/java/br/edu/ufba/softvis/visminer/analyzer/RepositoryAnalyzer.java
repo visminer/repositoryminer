@@ -7,7 +7,7 @@ import javax.persistence.EntityManager;
 
 import br.edu.ufba.softvis.visminer.analyzer.local.IRepositorySystem;
 import br.edu.ufba.softvis.visminer.analyzer.local.SupportedRepository;
-import br.edu.ufba.softvis.visminer.constant.MetricId;
+import br.edu.ufba.softvis.visminer.constant.MetricUid;
 import br.edu.ufba.softvis.visminer.model.business.Repository;
 import br.edu.ufba.softvis.visminer.model.database.CommitDB;
 import br.edu.ufba.softvis.visminer.model.database.CommitterDB;
@@ -17,14 +17,32 @@ import br.edu.ufba.softvis.visminer.persistence.dao.RepositoryDAO;
 import br.edu.ufba.softvis.visminer.persistence.impl.RepositoryDAOImpl;
 import br.edu.ufba.softvis.visminer.utility.StringUtils;
 
+/**
+ * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
+ * @version 0.9
+ * @see CommitAnalyzer
+ * @see CommitterAnalyzer
+ * @see FileAnalyzer
+ * @see IssueAnalyzer
+ * @see MilestoneAnalyzer
+ * @see TreeAnalyzer
+ * @see IAnalyzer
+ * 
+ * Defines how to save or to increment informations about the repository in database.
+ */
 public class RepositoryAnalyzer implements IAnalyzer<Void>{
 
+	/*
+	 * This class is responsible for join all the analyzers and make the
+	 * repository analyzis.
+	*/
+	
 	@SuppressWarnings("unchecked")
 	@Override
 	public Void persist(Object... objects) {
 		
 		Repository repoBusi = (Repository) objects[0];
-		List<MetricId> metrics = (List<MetricId>) objects[1];
+		List<MetricUid> metrics = (List<MetricUid>) objects[1];
 		
 		IRepositorySystem repoSys = SupportedRepository.getRepository(repoBusi.getType());
 		repoSys.open(repoBusi.getPath());
@@ -40,7 +58,8 @@ public class RepositoryAnalyzer implements IAnalyzer<Void>{
 			throw new KeyAlreadyExistsException("Repository already exists in database");
 		}
 		
-		RepositoryDB repositoryDb = new RepositoryDB(repoBusi);
+		RepositoryDB repositoryDb = new RepositoryDB(0, repoBusi.getDescription(), repoBusi.getName(),
+				repoBusi.getPath(), repoBusi.getRemoteUrl(), repoBusi.getType(), repoBusi.getServiceType(), repoBusi.getUid());
 		repositoryDb.setPath(path);
 		repositoryDb.setUid(uid);
 		
@@ -53,12 +72,10 @@ public class RepositoryAnalyzer implements IAnalyzer<Void>{
 
 		// set null in the things that will have no more use for save memory
 		committersDb = null;
-		for(CommitDB commitDb : commitsDB){
-			commitDb.clean();
-		}
+		commitsDB = null;
 		
 		if(metrics != null && metrics.size() > 0){
-			MetricCalculator.calculate(commitsDB, metrics, repoSys, repositoryDb, entityManager);
+			MetricCalculator.calculate(metrics, repoSys, repositoryDb.getPath(), repositoryDb.getId(), entityManager);
 		}
 		
 		entityManager.close();
@@ -68,9 +85,8 @@ public class RepositoryAnalyzer implements IAnalyzer<Void>{
 	}
 
 	@Override
-	public Void update(Object... objects) {
+	public Void increment(Object... objects) {
 		return null;
 	}
 
-	
 }

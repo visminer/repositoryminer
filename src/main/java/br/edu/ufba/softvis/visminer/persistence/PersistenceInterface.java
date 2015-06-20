@@ -8,7 +8,7 @@ import java.util.Map;
 
 import javax.persistence.EntityManager;
 
-import br.edu.ufba.softvis.visminer.constant.MetricId;
+import br.edu.ufba.softvis.visminer.constant.MetricUid;
 import br.edu.ufba.softvis.visminer.model.business.Commit;
 import br.edu.ufba.softvis.visminer.model.business.Committer;
 import br.edu.ufba.softvis.visminer.model.business.File;
@@ -44,18 +44,33 @@ import br.edu.ufba.softvis.visminer.persistence.impl.SoftwareUnitDAOImpl;
 import br.edu.ufba.softvis.visminer.persistence.impl.TreeDAOImpl;
 import br.edu.ufba.softvis.visminer.utility.StringUtils;
 
+/**
+ * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
+ * @version 0.9
+ * 
+ * Persistence interface for user access.
+ */
 public class PersistenceInterface {
 
 	private EntityManager entityManager;
 	
 	public PersistenceInterface(){
+		// Opens database connection.
 		this.entityManager = Database.getInstance().getEntityManager();
 	}
 	
+	/**
+	 * Closes database connection.
+	 */
 	public void close(){
 		this.entityManager.close();
 	}
 	
+	/**
+	 * 
+	 * @param repositoryPath
+	 * @return Repository with given path
+	 */
 	public Repository findRepository(String repositoryPath) {
 		
 		RepositoryDAO repositoryDao = new RepositoryDAOImpl();
@@ -71,6 +86,11 @@ public class PersistenceInterface {
 		
 	}
 
+	/**
+	 * 
+	 * @param repositoryId
+	 * @return All repository committers (contributors and not contributors).
+	 */
 	public List<Committer> findCommitters(int repositoryId){
 		
 		CommitterDAO committerDao = new CommitterDAOImpl();
@@ -80,8 +100,9 @@ public class PersistenceInterface {
 		List<Committer> committers = new ArrayList<Committer>();
 		
 		for(CommitterDB committerDb : committersDb){
+			
 			Committer committer = new Committer(committerDb.getId(), committerDb.getEmail(), committerDb.getName(),
-					committerDb.getCommitterRoles().get(0).getContributor());
+					committerDb.getCommitterRoles().get(0).isContributor());
 			committers.add(committer);
 		}
 
@@ -89,6 +110,11 @@ public class PersistenceInterface {
 		
 	}
 	
+	/**
+	 * 
+	 * @param repositoryId
+	 * @return All repository trees.
+	 */
 	public List<Tree> findTrees(int repositoryId){
 		
 		TreeDAO treeDao = new TreeDAOImpl();
@@ -106,6 +132,10 @@ public class PersistenceInterface {
 		
 	}
 	
+	/**
+	 * @param treeId
+	 * @return All commits related with given tree.
+	 */
 	public List<Commit> findCommitsByTree(int treeId) {
 		
 		CommitDAO commitDao = new CommitDAOImpl();
@@ -128,7 +158,7 @@ public class PersistenceInterface {
 			List<File> files = new ArrayList<File>();
 			
 			for(FileXCommitDB fxc : fxcDao.findByCommit(commitDb.getId())){
-				FileState fileState = new FileState(fxc.getLinesAdded(), fxc.getLinesRemoved(), fxc.getRemoved());
+				FileState fileState = new FileState(fxc.getLinesAdded(), fxc.getLinesRemoved(), fxc.isRemoved());
 				FileDB fileDb = fxc.getFile();
 				File file = new File(fileDb.getId(), fileDb.getPath(), fileDb.getUid());
 				file.setFileState(fileState);
@@ -145,6 +175,11 @@ public class PersistenceInterface {
 		
 	}
 
+	/**
+	 * @param repositoryId
+	 * @param commitId
+	 * @return All software units related with given repository in certain commit.
+	 */
 	public List<SoftwareUnit> findSoftwareUnitByRepository(int repositoryId, int commitId) {
 		
 		SoftwareUnitDAO softDao = new SoftwareUnitDAOImpl();
@@ -170,7 +205,7 @@ public class PersistenceInterface {
 				softUnitTemp.setFile(file);
 			}
 			
-			Map<MetricId, String> metricsVal = findMetricValue(softUnitTemp.getId(), commitId);
+			Map<MetricUid, String> metricsVal = findMetricValue(softUnitTemp.getId(), commitId);
 			softUnitTemp.setMetricValues(metricsVal);
 			
 			softwareUnits.add(softUnitTemp);
@@ -181,14 +216,19 @@ public class PersistenceInterface {
 		return softwareUnits;
 		
 	}
-	
-	public Map<MetricId, String> findMetricValue(int softwareUnitId, int commitId){
+
+	/**
+	 * @param softwareUnitId
+	 * @param commitId
+	 * @return A map with values of all metrics calculated over given software unit in certain commit.
+	 */
+	public Map<MetricUid, String> findMetricValue(int softwareUnitId, int commitId){
 		
 		MetricValueDAO metricValDao = new MetricValueDAOImpl();
 		metricValDao.setEntityManager(entityManager);
 		
 		List<MetricValueDB> metricValsDb = metricValDao.findBySoftwareUnitAndCommit(softwareUnitId, commitId);
-		Map<MetricId, String> metricVal = new HashMap<MetricId, String>();
+		Map<MetricUid, String> metricVal = new HashMap<MetricUid, String>();
 		
 		for(MetricValueDB elem : metricValsDb){
 			metricVal.put(elem.getMetric().getId(), elem.getValue());
@@ -197,7 +237,9 @@ public class PersistenceInterface {
 		return metricVal;
 		
 	}
-	
+	/**
+	 * @return All metrics that VisMiner gives support.
+	 */
 	public List<Metric> findAllMetrics(){
 		
 		MetricDAO metricDao = new MetricDAOImpl();
@@ -207,7 +249,7 @@ public class PersistenceInterface {
 		List<Metric> metrics = new ArrayList<Metric>(metricsDb.size());
 		for(MetricDB metricDb : metricsDb){
 			Metric m = new Metric(metricDb.getId().getId(), metricDb.getAcronym(),
-					metricDb.getDescription(), metricDb.getName(), metricDb.getId());
+					metricDb.getDescription(), metricDb.getName(), metricDb.getId(), metricDb.getType());
 			metrics.add(m);
 		}
 		return metrics;
@@ -216,6 +258,9 @@ public class PersistenceInterface {
 	
 	// helpers
 	
+	/*
+	 * Process flat softwareUnits list and transforms into a graph.
+	 */
 	private void processListToTree(List<SoftwareUnit> softwareUnits){
 		
 		int i = 0;
@@ -231,6 +276,11 @@ public class PersistenceInterface {
 		
 	}
 	
+	/**
+	 * @param list
+	 * @param elem
+	 * Puts the element in right place in the graph respecting the software unit hierarchy.
+	 */
 	private void setElementInTree(List<SoftwareUnit> list, SoftwareUnit elem){
 		
 		if(list == null){

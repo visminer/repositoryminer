@@ -5,28 +5,29 @@ import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 
 /**
- * The utility class to create AST from source code
+ * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
+ * @version 0.1
  * 
- * @author felipe
+ * The utility class to create AST from source code.
  */
-public class DetailAST {
+public class JavaAST {
 
     private CompilationUnit root = null;
-    
     private String source = null;
     
-    private byte[] data = null;
-    
     /**
-     * Create a AST from a String
-     * 
-     * @param source the source
+     * @param source
+     * Creates a AST from a String.
      */
     public void parserFromString(String source){
         this.source = source;
         setRoot(source);
     }
     
+    /**
+     * @param source
+     * Creates a AST from a bytes.
+     */
     public void partserFromBytes(byte[] bytes){
     	if(bytes != null){
     		String str = new String(bytes);
@@ -34,9 +35,6 @@ public class DetailAST {
     	}
     }
     
-    /**
-     * @param source the new root
-     */
     private void setRoot(String source){
         
         ASTParser parser = ASTParser.newParser(AST.JLS3);
@@ -52,26 +50,14 @@ public class DetailAST {
      * @return source code used to generate the AST
      */
     public String getSource(){
-        
         return this.source;
-        
     }
     
     /**
-     * @return the AST parent's node
+     * @return the AST root node
      */
     public CompilationUnit getRoot(){
-
     	return this.root;
-        
     }
 
-	public byte[] getData() {
-		return data;
-	}
-
-	public void setData(byte[] data) {
-		this.data = data;
-	}
-    
 }

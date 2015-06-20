@@ -9,6 +9,13 @@ import br.edu.ufba.softvis.visminer.model.database.FileXCommitDB;
 import br.edu.ufba.softvis.visminer.model.database.FileXCommitPK;
 import br.edu.ufba.softvis.visminer.persistence.dao.FileXCommitDAO;
 
+/**
+ * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
+ * @version 0.9
+ * 
+ * Implementation of interface {@link FileXCommitDAO}
+ */
+
 public class FileXCommitDAOImpl extends DAOImpl<FileXCommitDB, FileXCommitPK> implements FileXCommitDAO {
 
 	@Override

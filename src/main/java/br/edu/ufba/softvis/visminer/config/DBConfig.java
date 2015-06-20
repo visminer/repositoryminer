@@ -7,6 +7,12 @@ import org.eclipse.persistence.config.PersistenceUnitProperties;
 
 import br.edu.ufba.softvis.visminer.utility.PropertyReader;
 
+/**
+ * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
+ * @version 0.9
+ * 
+ * Database configuration bean.
+ */
 public class DBConfig {
 
 	public static final String JDBC_DRIVER = PersistenceUnitProperties.JDBC_DRIVER;

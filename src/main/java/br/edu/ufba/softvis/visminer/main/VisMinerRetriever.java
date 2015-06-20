@@ -10,8 +10,19 @@ import br.edu.ufba.softvis.visminer.model.business.Repository;
 import br.edu.ufba.softvis.visminer.model.business.Tree;
 import br.edu.ufba.softvis.visminer.persistence.PersistenceInterface;
 
+/**
+ * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
+ * @version 0.9
+ * 
+ * Provides informations queries in database.
+ */
 public class VisMinerRetriever {
 
+	/**
+	 * 
+	 * @param repositoryPath
+	 * @return Repository ready for access all its data.
+	 */
 	public Repository findRepository(String repositoryPath){
 	
 		File file = new File(repositoryPath);
@@ -28,7 +39,8 @@ public class VisMinerRetriever {
 		
 		Project project = new Project(repository);
 		for(Tree t : trees){
-			if(t.getName().equals("master") || t.getName().equals("head")){
+			String s = t.getName().toLowerCase();
+			if(s.equals("master") || s.equals("head")){
 				project.setCurrentTree(t);
 			}
 		}
@@ -43,6 +55,10 @@ public class VisMinerRetriever {
 		
 	}
 	
+	/**
+	 * 
+	 * @return List of supported metrics.
+	 */
 	public List<Metric> findMetrics(){
 		PersistenceInterface persistence = new PersistenceInterface();
 		List<Metric> metrics = persistence.findAllMetrics();

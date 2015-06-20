@@ -9,6 +9,13 @@ import javax.persistence.TypedQuery;
 import br.edu.ufba.softvis.visminer.model.database.SoftwareUnitDB;
 import br.edu.ufba.softvis.visminer.persistence.dao.SoftwareUnitDAO;
 
+/**
+ * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
+ * @version 0.9
+ * 
+ * Implementation of interface {@link SoftwareUnitDAO}
+ */
+
 public class SoftwareUnitDAOImpl extends DAOImpl<SoftwareUnitDB, Integer> implements SoftwareUnitDAO{
 
 	public SoftwareUnitDB findByUid(String uid) {

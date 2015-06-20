@@ -1,5 +1,10 @@
 package br.edu.ufba.softvis.visminer.constant;
 
+/**
+ * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
+ * @version 0.9
+ * Software units types.
+ */
 public enum SoftwareUnitType {
 
 	PROJECT(1),
@@ -14,10 +19,17 @@ public enum SoftwareUnitType {
 		this.id = id;
 	}
 	
+	/**
+	 * @return Software unit type id.
+	 */
 	public int getId(){
 		return this.id;
 	}
 	
+	/**
+	 * @param id
+	 * @return Software unit type with given id.
+	 */
 	public static SoftwareUnitType parse(int id){
 		
 		for(SoftwareUnitType softwareUnitType : SoftwareUnitType.values()){
@@ -25,8 +37,8 @@ public enum SoftwareUnitType {
 				return softwareUnitType;
 			}
 		}
-		
-		throw new IllegalArgumentException("No software unit type found for id "+id);
+
+		throw new IllegalArgumentException("Does not exists SoftwareUnitType with id "+id);
 		
 	}
 	

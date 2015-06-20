@@ -11,6 +11,13 @@ import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.revwalk.filter.RevFilter;
 import org.gitective.core.filter.commit.PersonFilter;
 
+/**
+ * 
+ * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
+ * @version 0.9
+ * 
+ * Custom filter implementation of Gitctive API.
+ */
 public class AuthorEmailFilter extends PersonFilter{
 
 	private String email;

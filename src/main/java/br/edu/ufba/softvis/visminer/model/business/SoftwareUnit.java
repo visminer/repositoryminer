@@ -3,8 +3,15 @@ package br.edu.ufba.softvis.visminer.model.business;
 import java.util.List;
 import java.util.Map;
 
-import br.edu.ufba.softvis.visminer.constant.MetricId;
+import br.edu.ufba.softvis.visminer.constant.MetricUid;
 import br.edu.ufba.softvis.visminer.constant.SoftwareUnitType;
+
+/**
+ * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
+ * @version 0.9
+ * User friendly software unit bean class.
+ * This class will be used for user interface.
+ */
 
 public class SoftwareUnit {
 
@@ -15,11 +22,18 @@ public class SoftwareUnit {
 	private SoftwareUnitType type;
 	private SoftwareUnit parentUnit;
 	private List<SoftwareUnit> children;
-	private Map<MetricId, String> metricValues;
+	private Map<MetricUid, String> metricValues;
 	private File file;
 	
 	public SoftwareUnit(){}
 
+	/**
+	 * @param id
+	 * @param name
+	 * @param fullName
+	 * @param uid
+	 * @param type
+	 */
 	public SoftwareUnit(int id, String name, String fullName, String uid,
 			SoftwareUnitType type) {
 		super();
@@ -30,74 +44,128 @@ public class SoftwareUnit {
 		this.type = type;
 	}
 
+	/**
+	 * @return the id
+	 */
 	public int getId() {
 		return id;
 	}
 
+	/**
+	 * @param id the id to set
+	 */
 	public void setId(int id) {
 		this.id = id;
 	}
 
+	/**
+	 * @return the name
+	 */
 	public String getName() {
 		return name;
 	}
 
+	/**
+	 * @param name the name to set
+	 */
 	public void setName(String name) {
 		this.name = name;
 	}
 
+	/**
+	 * @return the fullName
+	 */
 	public String getFullName() {
 		return fullName;
 	}
 
+	/**
+	 * @param fullName the fullName to set
+	 */
 	public void setFullName(String fullName) {
 		this.fullName = fullName;
 	}
 
+	/**
+	 * @return the uid
+	 */
 	public String getUid() {
 		return uid;
 	}
 
+	/**
+	 * @param uid the uid to set
+	 */
 	public void setUid(String uid) {
 		this.uid = uid;
 	}
 
+	/**
+	 * @return the type
+	 */
 	public SoftwareUnitType getType() {
 		return type;
 	}
 
+	/**
+	 * @param type the type to set
+	 */
 	public void setType(SoftwareUnitType type) {
 		this.type = type;
 	}
 
+	/**
+	 * @return the parentUnit
+	 */
 	public SoftwareUnit getParentUnit() {
 		return parentUnit;
 	}
 
+	/**
+	 * @param parentUnit the parentUnit to set
+	 */
 	public void setParentUnit(SoftwareUnit parentUnit) {
 		this.parentUnit = parentUnit;
 	}
 
-	public Map<MetricId, String> getMetricValues() {
-		return metricValues;
-	}
-
-	public void setMetricValues(Map<MetricId, String> metricValues) {
-		this.metricValues = metricValues;
-	}
-
+	/**
+	 * @return the children
+	 */
 	public List<SoftwareUnit> getChildren() {
 		return children;
 	}
 
+	/**
+	 * @param children the children to set
+	 */
 	public void setChildren(List<SoftwareUnit> children) {
 		this.children = children;
 	}
 
+	/**
+	 * @return the metricValues
+	 */
+	public Map<MetricUid, String> getMetricValues() {
+		return metricValues;
+	}
+
+	/**
+	 * @param metricValues the metricValues to set
+	 */
+	public void setMetricValues(Map<MetricUid, String> metricValues) {
+		this.metricValues = metricValues;
+	}
+
+	/**
+	 * @return the file
+	 */
 	public File getFile() {
 		return file;
 	}
 
+	/**
+	 * @param file the file to set
+	 */
 	public void setFile(File file) {
 		this.file = file;
 	}
@@ -112,15 +180,19 @@ public class SoftwareUnit {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (!(obj instanceof SoftwareUnit)) {
 			return false;
+		}
 		SoftwareUnit other = (SoftwareUnit) obj;
-		if (id != other.id)
+		if (id != other.id) {
 			return false;
+		}
 		return true;
 	}
 	
