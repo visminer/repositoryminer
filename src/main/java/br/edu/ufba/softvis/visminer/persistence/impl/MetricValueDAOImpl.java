@@ -9,6 +9,13 @@ import br.edu.ufba.softvis.visminer.model.database.MetricValueDB;
 import br.edu.ufba.softvis.visminer.model.database.MetricValuePK;
 import br.edu.ufba.softvis.visminer.persistence.dao.MetricValueDAO;
 
+/**
+ * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
+ * @version 0.9
+ * 
+ * Implementation of interface {@link MetricValueDAO}
+ */
+
 public class MetricValueDAOImpl extends DAOImpl<MetricValueDB, MetricValuePK> implements MetricValueDAO{
 
 	@Override

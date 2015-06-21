@@ -3,28 +3,19 @@ package br.edu.ufba.softvis.visminer.persistence.impl;
 import java.util.List;
 
 import javax.persistence.EntityManager;
-import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
 import br.edu.ufba.softvis.visminer.model.database.FileDB;
 import br.edu.ufba.softvis.visminer.persistence.dao.FileDAO;
 
-public class FileDAOImpl extends DAOImpl<FileDB, Integer> implements FileDAO {
+/**
+ * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
+ * @version 0.9
+ * 
+ * Implementation of interface {@link FileDAO}
+ */
 
-	@Override
-	public Integer findIdByCode(String uid) {
-		
-		EntityManager em = getEntityManager();
-		Query query = em.createNamedQuery("FileDB.findByCode", FileDB.class);
-		query.setParameter("uid", uid);
-		
-		try{
-			return (Integer) query.getSingleResult();
-		}catch(Exception e){
-			return 0;
-		}
-		
-	}
+public class FileDAOImpl extends DAOImpl<FileDB, Integer> implements FileDAO {
 
 	@Override
 	public List<FileDB> findCommitedFiles(int commitId) {

@@ -4,16 +4,13 @@ import java.io.Serializable;
 
 import javax.persistence.*;
 
-import org.eclipse.persistence.annotations.BatchFetch;
-import org.eclipse.persistence.annotations.JoinFetch;
-import org.eclipse.persistence.annotations.JoinFetchType;
-
 import java.util.List;
 
 
 /**
+ * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
+ * @version 0.9
  * The persistent class for the file database table.
- * 
  */
 @Entity
 @Table(name="file")
@@ -49,78 +46,87 @@ public class FileDB implements Serializable {
 	public FileDB() {
 	}
 
-	public FileDB(br.edu.ufba.softvis.visminer.model.bean.File file){
-		this.id = file.getId();
-		this.path = file.getPath();
-		this.uid = file.getUid();
-	}
-	
-	public int getId() {
-		return this.id;
+	/**
+	 * @param id
+	 * @param path
+	 * @param uid
+	 */
+	public FileDB(int id, String path, String uid) {
+		super();
+		this.id = id;
+		this.path = path;
+		this.uid = uid;
 	}
 
+
+	/**
+	 * @return the id
+	 */
+	public int getId() {
+		return id;
+	}
+
+	/**
+	 * @param id the id to set
+	 */
 	public void setId(int id) {
 		this.id = id;
 	}
 
+	/**
+	 * @return the path
+	 */
 	public String getPath() {
-		return this.path;
+		return path;
 	}
 
+	/**
+	 * @param path the path to set
+	 */
 	public void setPath(String path) {
 		this.path = path;
 	}
 
+	/**
+	 * @return the uid
+	 */
 	public String getUid() {
-		return this.uid;
+		return uid;
 	}
 
+	/**
+	 * @param uid the uid to set
+	 */
 	public void setUid(String uid) {
 		this.uid = uid;
 	}
 
+	/**
+	 * @return the fileXCommits
+	 */
 	public List<FileXCommitDB> getFileXCommits() {
-		return this.fileXCommits;
+		return fileXCommits;
 	}
 
+	/**
+	 * @param fileXCommits the fileXCommits to set
+	 */
 	public void setFileXCommits(List<FileXCommitDB> fileXCommits) {
 		this.fileXCommits = fileXCommits;
 	}
 
-	public FileXCommitDB addFileXCommit(FileXCommitDB fileXCommit) {
-		getFileXCommits().add(fileXCommit);
-		fileXCommit.setFile(this);
-
-		return fileXCommit;
-	}
-
-	public FileXCommitDB removeFileXCommit(FileXCommitDB fileXCommit) {
-		getFileXCommits().remove(fileXCommit);
-		fileXCommit.setFile(null);
-
-		return fileXCommit;
-	}
-
+	/**
+	 * @return the softwareUnits
+	 */
 	public List<SoftwareUnitDB> getSoftwareUnits() {
-		return this.softwareUnits;
+		return softwareUnits;
 	}
 
+	/**
+	 * @param softwareUnits the softwareUnits to set
+	 */
 	public void setSoftwareUnits(List<SoftwareUnitDB> softwareUnits) {
 		this.softwareUnits = softwareUnits;
-	}
-
-	public SoftwareUnitDB addSoftwareUnit(SoftwareUnitDB softwareUnit) {
-		getSoftwareUnits().add(softwareUnit);
-		softwareUnit.setFile(this);
-
-		return softwareUnit;
-	}
-
-	public SoftwareUnitDB removeSoftwareUnit(SoftwareUnitDB softwareUnit) {
-		getSoftwareUnits().remove(softwareUnit);
-		softwareUnit.setFile(null);
-
-		return softwareUnit;
 	}
 
 	@Override

@@ -6,8 +6,9 @@ import java.util.List;
 
 
 /**
+ * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
+ * @version 0.9
  * The persistent class for the software_unit_x_commit database table.
- * 
  */
 @Entity
 @Table(name="software_unit_x_commit")
@@ -26,38 +27,40 @@ public class SoftwareUnitXCommitDB implements Serializable {
 	public SoftwareUnitXCommitDB() {
 	}
 
+	/**
+	 * @param id
+	 */
 	public SoftwareUnitXCommitDB(SoftwareUnitXCommitPK id) {
+		super();
 		this.id = id;
 	}
 
+	/**
+	 * @return the id
+	 */
 	public SoftwareUnitXCommitPK getId() {
-		return this.id;
+		return id;
 	}
 
+	/**
+	 * @param id the id to set
+	 */
 	public void setId(SoftwareUnitXCommitPK id) {
 		this.id = id;
 	}
 
+	/**
+	 * @return the metricValues
+	 */
 	public List<MetricValueDB> getMetricValues() {
-		return this.metricValues;
+		return metricValues;
 	}
 
+	/**
+	 * @param metricValues the metricValues to set
+	 */
 	public void setMetricValues(List<MetricValueDB> metricValues) {
 		this.metricValues = metricValues;
-	}
-
-	public MetricValueDB addMetricValue(MetricValueDB metricValue) {
-		getMetricValues().add(metricValue);
-		metricValue.setSoftwareUnitXCommit(this);
-
-		return metricValue;
-	}
-
-	public MetricValueDB removeMetricValue(MetricValueDB metricValue) {
-		getMetricValues().remove(metricValue);
-		metricValue.setSoftwareUnitXCommit(null);
-
-		return metricValue;
 	}
 
 }

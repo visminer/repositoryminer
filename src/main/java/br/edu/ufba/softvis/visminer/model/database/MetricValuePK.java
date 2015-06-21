@@ -4,11 +4,10 @@ import java.io.Serializable;
 
 import javax.persistence.*;
 
-import br.edu.ufba.softvis.visminer.constant.MetricId;
-
 /**
+ * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
+ * @version 0.9
  * The primary key class for the metric_value database table.
- * 
  */
 @Embeddable
 public class MetricValuePK implements Serializable {
@@ -26,26 +25,57 @@ public class MetricValuePK implements Serializable {
 
 	public MetricValuePK() {
 	}
+
+	/**
+	 * @param softwareUnitId
+	 * @param commitId
+	 * @param metricId
+	 */
 	public MetricValuePK(int softwareUnitId, int commitId, int metricId) {
+		super();
 		this.softwareUnitId = softwareUnitId;
 		this.commitId = commitId;
 		this.metricId = metricId;
 	}
+
+	/**
+	 * @return the softwareUnitId
+	 */
 	public int getSoftwareUnitId() {
-		return this.softwareUnitId;
+		return softwareUnitId;
 	}
+
+	/**
+	 * @param softwareUnitId the softwareUnitId to set
+	 */
 	public void setSoftwareUnitId(int softwareUnitId) {
 		this.softwareUnitId = softwareUnitId;
 	}
+
+	/**
+	 * @return the commitId
+	 */
 	public int getCommitId() {
-		return this.commitId;
+		return commitId;
 	}
+
+	/**
+	 * @param commitId the commitId to set
+	 */
 	public void setCommitId(int commitId) {
 		this.commitId = commitId;
 	}
+
+	/**
+	 * @return the metricId
+	 */
 	public int getMetricId() {
-		return this.metricId;
+		return metricId;
 	}
+
+	/**
+	 * @param metricId the metricId to set
+	 */
 	public void setMetricId(int metricId) {
 		this.metricId = metricId;
 	}

@@ -6,6 +6,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+/**
+ * 
+ * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
+ * @version 0.9
+ * 
+ * Utility class to retrieve data from a properties file.
+ */
 public class PropertyReader {
 
 	private Properties properties;
@@ -22,6 +29,11 @@ public class PropertyReader {
 		
 	}
 	
+	/**
+	 * 
+	 * @param property
+	 * @return The value of the property
+	 */
 	public String getProperty(String property){
 		return properties.getProperty(property);
 	}

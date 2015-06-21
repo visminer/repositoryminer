@@ -4,8 +4,9 @@ import java.io.Serializable;
 import javax.persistence.*;
 
 /**
+ * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
+ * @version 0.9
  * The primary key class for the software_unit_x_commit database table.
- * 
  */
 @Embeddable
 public class SoftwareUnitXCommitPK implements Serializable {
@@ -20,19 +21,41 @@ public class SoftwareUnitXCommitPK implements Serializable {
 
 	public SoftwareUnitXCommitPK() {
 	}
-	public SoftwareUnitXCommitPK(int commitId, int softwareUnitId) {
-		this.commitId = commitId;
+
+	/**
+	 * @param softwareUnitId
+	 * @param commitId
+	 */
+	public SoftwareUnitXCommitPK(int softwareUnitId, int commitId) {
+		super();
 		this.softwareUnitId = softwareUnitId;
+		this.commitId = commitId;
 	}
+
+	/**
+	 * @return the softwareUnitId
+	 */
 	public int getSoftwareUnitId() {
-		return this.softwareUnitId;
+		return softwareUnitId;
 	}
+
+	/**
+	 * @param softwareUnitId the softwareUnitId to set
+	 */
 	public void setSoftwareUnitId(int softwareUnitId) {
 		this.softwareUnitId = softwareUnitId;
 	}
+
+	/**
+	 * @return the commitId
+	 */
 	public int getCommitId() {
-		return this.commitId;
+		return commitId;
 	}
+
+	/**
+	 * @param commitId the commitId to set
+	 */
 	public void setCommitId(int commitId) {
 		this.commitId = commitId;
 	}

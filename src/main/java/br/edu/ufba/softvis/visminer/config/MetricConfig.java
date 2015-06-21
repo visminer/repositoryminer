@@ -14,17 +14,25 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import br.edu.ufba.softvis.visminer.annotations.MetricAnnotation;
-import br.edu.ufba.softvis.visminer.constant.MetricId;
+import br.edu.ufba.softvis.visminer.constant.MetricType;
+import br.edu.ufba.softvis.visminer.constant.MetricUid;
 import br.edu.ufba.softvis.visminer.metric.IMetric;
 import br.edu.ufba.softvis.visminer.model.database.MetricDB;
 import br.edu.ufba.softvis.visminer.persistence.Database;
 import br.edu.ufba.softvis.visminer.persistence.dao.MetricDAO;
 import br.edu.ufba.softvis.visminer.persistence.impl.MetricDAOImpl;
 
+/**
+ * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
+ * @version 0.9
+ * 
+ * Manages metrics.
+ */
 public class MetricConfig {
 
 	private static final String CONFIG_FILE = "/META-INF/metrics.xml";
 	
+	// Reads the configuration file e return its data.
 	private static Map<Integer, String> readConfig(){
 		
 		Map<Integer, String> map = new HashMap<Integer, String>();
@@ -42,7 +50,8 @@ public class MetricConfig {
 			for(int i = 0; i < nList.getLength(); i++){
 				
 				Element element = (Element) nList.item(i);
-				map.put(Integer.parseInt(element.getAttribute("id")), element.getTextContent());
+				String uid = element.getAttribute("id").toUpperCase();
+				map.put(MetricUid.valueOf(uid).getId(), element.getTextContent());
 				
 			}
 			
@@ -55,6 +64,10 @@ public class MetricConfig {
 		
 	}
 	
+	/**
+	 * Loads the classes marked in configuration file and use reflections to load the metrics class
+	 * Saves the informations about the metrics
+	 */
 	public static void setMetricsClassPath(){
 		
 		Map<Integer, String> map = readConfig();
@@ -78,35 +91,52 @@ public class MetricConfig {
 		
 	}
 	
+	// Save metric in database 
 	private static void saveMetric(IMetric metric, MetricDAO dao){
 		
 		MetricAnnotation annotations = metric.getClass().getAnnotation(MetricAnnotation.class);
 
-		MetricDB metricDB = dao.find(annotations.id().getId());
+		MetricDB metricDB = dao.find(annotations.uid().getId());
 		if(metricDB == null){
-			metricDB = new MetricDB();
-			metricDB.setId(annotations.id());
-			metricDB.setName(annotations.name());
-			metricDB.setAcronym(annotations.acronym());
-			metricDB.setDescription(annotations.description());
+			metricDB = new MetricDB(annotations.uid(), annotations.acronym(),
+					annotations.description(), annotations.name(), annotations.type());
 			dao.save(metricDB);
 		}
 		
 	}
 	
-	public static Map<MetricId, IMetric> getImplementations(List<MetricId> metricsId){
+	/**
+	 * @param metricsId
+	 * @return Returns a map containing the metric id and metric implementation
+	 * Finds the implementation for the metrics id passed as parameter and return a map, with the pair, metric id and its implementation.
+	 */
+	public static Map<MetricType, Map<MetricUid, IMetric>> getImplementations(List<MetricUid> metricsId){
 
+		Map<MetricType, Map<MetricUid, IMetric>> metricMap = new HashMap<MetricType, Map<MetricUid,IMetric>>();
+		
+		Map<Integer, String> map = readConfig();
+		
+		Map<MetricUid, IMetric> simpleMetrics = new HashMap<MetricUid, IMetric>();
+		Map<MetricUid, IMetric> complexMetrics = new HashMap<MetricUid, IMetric>();
+		
 		try{
 			
-			Map<Integer, String> map = readConfig();
-			Map<MetricId, IMetric> metrics = new HashMap<MetricId, IMetric>(metricsId.size());
-			
-			for(MetricId metricId : metricsId){
-				String classPath = map.get(metricId.getId());
+			for(MetricUid metricUid : metricsId){
+				String classPath = map.get(metricUid.getId());
 				IMetric metric = (IMetric) Class.forName(classPath).newInstance();
-				metrics.put(metricId, metric);
+				MetricAnnotation annotations = metric.getClass().getAnnotation(MetricAnnotation.class);
+				
+				if(annotations.type().equals(MetricType.SIMPLE)){
+					simpleMetrics.put(metricUid, metric);
+				}else if(annotations.type().equals(MetricType.COMPLEX)){
+					complexMetrics.put(metricUid, metric);
+				}
 			}
-			return metrics;
+			
+			metricMap.put(MetricType.SIMPLE, simpleMetrics);
+			metricMap.put(MetricType.COMPLEX, complexMetrics);
+			
+			return metricMap;
 			
 		}catch(InstantiationException | IllegalAccessException
 				| ClassNotFoundException e){

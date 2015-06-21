@@ -2,6 +2,19 @@ package br.edu.ufba.softvis.visminer.analyzer;
 
 import br.edu.ufba.softvis.visminer.model.database.MilestoneDB;
 
+/**
+ * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
+ * @version 0.9
+ * @see CommitAnalyzer
+ * @see CommitterAnalyzer
+ * @see FileAnalyzer
+ * @see IssueAnalyzer
+ * @see RepositoryAnalyzer
+ * @see TreeAnalyzer
+ * @see IAnalyzer
+ * 
+ * Defines how to save or to increment informations about milestones in database
+ */
 public class MilestoneAnalyzer implements IAnalyzer<MilestoneDB>{
 
 	@Override
@@ -11,7 +24,7 @@ public class MilestoneAnalyzer implements IAnalyzer<MilestoneDB>{
 	}
 
 	@Override
-	public MilestoneDB update(Object... objects) {
+	public MilestoneDB increment(Object... objects) {
 		// TODO Auto-generated method stub
 		return null;
 	}

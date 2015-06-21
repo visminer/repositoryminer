@@ -11,8 +11,9 @@ import java.util.List;
 
 
 /**
+ * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
+ * @version 0.9
  * The persistent class for the tree database table.
- * 
  */
 @Entity
 @Table(name="tree")
@@ -60,65 +61,117 @@ public class TreeDB implements Serializable {
 	public TreeDB() {
 	}
 
-	public TreeDB(br.edu.ufba.softvis.visminer.model.bean.Tree tree){
-		this.lastUpdate = tree.getLastUpdate();
-		this.name = tree.getName();
-		this.fullName = tree.getFullName();
-		this.type = tree.getType().getId();
-	}
-	
-	public int getId() {
-		return this.id;
+	/**
+	 * @param id
+	 * @param fullName
+	 * @param lastUpdate
+	 * @param name
+	 * @param type
+	 */
+	public TreeDB(int id, String fullName, Date lastUpdate, String name,
+			TreeType type) {
+		super();
+		this.id = id;
+		this.fullName = fullName;
+		this.lastUpdate = lastUpdate;
+		this.name = name;
+		this.type = type.getId();
 	}
 
+	/**
+	 * @return the id
+	 */
+	public int getId() {
+		return id;
+	}
+
+	/**
+	 * @param id the id to set
+	 */
 	public void setId(int id) {
 		this.id = id;
 	}
 
+	/**
+	 * @return the fullName
+	 */
 	public String getFullName() {
-		return this.fullName;
+		return fullName;
 	}
 
+	/**
+	 * @param fullName the fullName to set
+	 */
 	public void setFullName(String fullName) {
 		this.fullName = fullName;
 	}
 
+	/**
+	 * @return the lastUpdate
+	 */
 	public Date getLastUpdate() {
-		return this.lastUpdate;
+		return lastUpdate;
 	}
 
+	/**
+	 * @param lastUpdate the lastUpdate to set
+	 */
 	public void setLastUpdate(Date lastUpdate) {
 		this.lastUpdate = lastUpdate;
 	}
 
+	/**
+	 * @return the name
+	 */
 	public String getName() {
-		return this.name;
+		return name;
 	}
 
+	/**
+	 * @param name the name to set
+	 */
 	public void setName(String name) {
 		this.name = name;
 	}
 
+	/**
+	 * @return the type
+	 */
 	public TreeType getType() {
-		return TreeType.parse(this.type);
+		return TreeType.parse(type);
 	}
 
+	/**
+	 * @param type the type to set
+	 */
 	public void setType(TreeType type) {
 		this.type = type.getId();
 	}
 
+	/**
+	 * @return the commits
+	 */
 	public List<CommitDB> getCommits() {
-		return this.commits;
+		return commits;
 	}
 
+	/**
+	 * @param commits the commits to set
+	 */
 	public void setCommits(List<CommitDB> commits) {
 		this.commits = commits;
 	}
 
+	/**
+	 * @return the repository
+	 */
 	public RepositoryDB getRepository() {
-		return this.repository;
+		return repository;
 	}
 
+	/**
+	 * @param repository the repository to set
+	 */
 	public void setRepository(RepositoryDB repository) {
 		this.repository = repository;
 	}

@@ -4,8 +4,9 @@ import java.io.Serializable;
 import javax.persistence.*;
 
 /**
+ * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
+ * @version 0.9
  * The primary key class for the file_x_commit database table.
- * 
  */
 @Embeddable
 public class FileXCommitPK implements Serializable {
@@ -21,21 +22,41 @@ public class FileXCommitPK implements Serializable {
 	public FileXCommitPK() {
 	}
 	
+	/**
+	 * @param fileId
+	 * @param commitId
+	 */
 	public FileXCommitPK(int fileId, int commitId) {
 		super();
 		this.fileId = fileId;
 		this.commitId = commitId;
 	}
 
+
+	/**
+	 * @return the fileId
+	 */
 	public int getFileId() {
-		return this.fileId;
+		return fileId;
 	}
+
+	/**
+	 * @param fileId the fileId to set
+	 */
 	public void setFileId(int fileId) {
 		this.fileId = fileId;
 	}
+
+	/**
+	 * @return the commitId
+	 */
 	public int getCommitId() {
-		return this.commitId;
+		return commitId;
 	}
+
+	/**
+	 * @param commitId the commitId to set
+	 */
 	public void setCommitId(int commitId) {
 		this.commitId = commitId;
 	}

@@ -13,7 +13,19 @@ import br.edu.ufba.softvis.visminer.model.database.RepositoryDB;
 import br.edu.ufba.softvis.visminer.model.database.TreeDB;
 import br.edu.ufba.softvis.visminer.persistence.dao.TreeDAO;
 import br.edu.ufba.softvis.visminer.persistence.impl.TreeDAOImpl;
-
+/**
+ * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
+ * @version 0.9
+ * @see CommitAnalyzer
+ * @see CommitterAnalyzer
+ * @see FileAnalyzer
+ * @see IssueAnalyzer
+ * @see MilestoneAnalyzer
+ * @see RepositoryAnalyzer
+ * @see IAnalyzer
+ * 
+ * Defines how to save or to increment informations about trees in repository.
+ */
 public class TreeAnalyzer implements IAnalyzer<Void>{
 
 	@SuppressWarnings("unchecked")
@@ -34,7 +46,8 @@ public class TreeAnalyzer implements IAnalyzer<Void>{
 		
 		for(Tree tree : repoSys.getTrees()){
 			
-			TreeDB treeDb = new TreeDB(tree);
+			TreeDB treeDb = new TreeDB(0, tree.getFullName(), tree.getLastUpdate(),
+					tree.getName(), tree.getType());
 			treeDb.setRepository(repositoryDb);
 			treeDb.setCommits(new ArrayList<CommitDB>());
 			
@@ -53,7 +66,7 @@ public class TreeAnalyzer implements IAnalyzer<Void>{
 	}
 
 	@Override
-	public Void update(Object... objects) {
+	public Void increment(Object... objects) {
 		// TODO Auto-generated method stub
 		return null;
 	}

@@ -1,5 +1,13 @@
 package br.edu.ufba.softvis.visminer.model.bean;
 
+/**
+ * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
+ * @version 0.9
+ * 
+ * Simple committer bean.
+ * This bean is used to simplify interaction between some parts, avoiding coupling and doing smaller core codes.
+ */
+
 public class Committer {
 
 	private int id;
@@ -9,6 +17,12 @@ public class Committer {
 	
 	public Committer(){}
 	
+	/**
+	 * @param id
+	 * @param email
+	 * @param name
+	 * @param contribuitor
+	 */
 	public Committer(int id, String email, String name, boolean contribuitor) {
 		super();
 		this.id = id;
@@ -17,47 +31,58 @@ public class Committer {
 		this.contribuitor = contribuitor;
 	}
 
-	public Committer(String email, String name, boolean contribuitor) {
-		super();
-		this.email = email;
-		this.name = name;
-		this.contribuitor = contribuitor;
-	}	
-	
-	public Committer(String email, String name) {
-		super();
-		this.email = email;
-		this.name = name;
-	}
-
+	/**
+	 * @return the id
+	 */
 	public int getId() {
 		return id;
 	}
 
+	/**
+	 * @param id the id to set
+	 */
 	public void setId(int id) {
 		this.id = id;
 	}
 
+	/**
+	 * @return the email
+	 */
 	public String getEmail() {
 		return email;
 	}
 
+	/**
+	 * @param email the email to set
+	 */
 	public void setEmail(String email) {
 		this.email = email;
 	}
 
+	/**
+	 * @return the name
+	 */
 	public String getName() {
 		return name;
 	}
 
+	/**
+	 * @param name the name to set
+	 */
 	public void setName(String name) {
 		this.name = name;
 	}
 
+	/**
+	 * @return the contribuitor
+	 */
 	public boolean isContribuitor() {
 		return contribuitor;
 	}
 
+	/**
+	 * @param contribuitor the contribuitor to set
+	 */
 	public void setContribuitor(boolean contribuitor) {
 		this.contribuitor = contribuitor;
 	}
@@ -72,19 +97,25 @@ public class Committer {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (!(obj instanceof Committer)) {
 			return false;
+		}
 		Committer other = (Committer) obj;
 		if (email == null) {
-			if (other.email != null)
+			if (other.email != null) {
 				return false;
-		} else if (!email.equals(other.email))
+			}
+		} else if (!email.equals(other.email)) {
 			return false;
+		}
 		return true;
 	}
+
 
 }

@@ -4,15 +4,16 @@ import java.io.Serializable;
 
 import javax.persistence.*;
 
-import br.edu.ufba.softvis.visminer.constant.RepositoryServiceType;
 import br.edu.ufba.softvis.visminer.constant.RepositoryType;
+import br.edu.ufba.softvis.visminer.constant.WebRepositoryType;
 
 import java.util.List;
 
 
 /**
+ * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
+ * @version 0.9
  * The persistent class for the repository database table.
- * 
  */
 @Entity
 @Table(name="repository")
@@ -71,187 +72,209 @@ public class RepositoryDB implements Serializable {
 	public RepositoryDB() {
 	}
 
-	public RepositoryDB(br.edu.ufba.softvis.visminer.model.business.Repository repository){
-		this.description = repository.getDescription();
-		this.name = repository.getName();
-		this.path = repository.getPath();
-		this.remoteUrl = repository.getRemoteUrl();
-		this.type = repository.getType().getId();
-		this.serviceType = repository.getServiceType().getId();
-	}
-	
-	public int getId() {
-		return this.id;
+	/**
+	 * @param id
+	 * @param description
+	 * @param name
+	 * @param path
+	 * @param remoteUrl
+	 * @param type
+	 * @param serviceType
+	 * @param uid
+	 */
+	public RepositoryDB(int id, String description, String name, String path,
+			String remoteUrl, RepositoryType type, WebRepositoryType serviceType, String uid) {
+		super();
+		this.id = id;
+		this.description = description;
+		this.name = name;
+		this.path = path;
+		this.remoteUrl = remoteUrl;
+		this.type = type.getId();
+		this.serviceType = serviceType.getId();
+		this.uid = uid;
 	}
 
+	/**
+	 * @return the id
+	 */
+	public int getId() {
+		return id;
+	}
+
+	/**
+	 * @param id the id to set
+	 */
 	public void setId(int id) {
 		this.id = id;
 	}
 
+	/**
+	 * @return the description
+	 */
 	public String getDescription() {
-		return this.description;
+		return description;
 	}
 
+	/**
+	 * @param description the description to set
+	 */
 	public void setDescription(String description) {
 		this.description = description;
 	}
 
+	/**
+	 * @return the name
+	 */
 	public String getName() {
-		return this.name;
+		return name;
 	}
 
+	/**
+	 * @param name the name to set
+	 */
 	public void setName(String name) {
 		this.name = name;
 	}
 
+	/**
+	 * @return the path
+	 */
 	public String getPath() {
-		return this.path;
+		return path;
 	}
 
+	/**
+	 * @param path the path to set
+	 */
 	public void setPath(String path) {
 		this.path = path;
 	}
 
+	/**
+	 * @return the remoteUrl
+	 */
 	public String getRemoteUrl() {
-		return this.remoteUrl;
+		return remoteUrl;
 	}
 
+	/**
+	 * @param remoteUrl the remoteUrl to set
+	 */
 	public void setRemoteUrl(String remoteUrl) {
 		this.remoteUrl = remoteUrl;
 	}
 
+	/**
+	 * @return the type
+	 */
 	public RepositoryType getType() {
-		return RepositoryType.parse(this.type);
+		return RepositoryType.parse(type);
 	}
 
+	/**
+	 * @param type the type to set
+	 */
 	public void setType(RepositoryType type) {
 		this.type = type.getId();
 	}
 
-	public RepositoryServiceType getServiceType() {
-		return RepositoryServiceType.parse(this.serviceType);
+	/**
+	 * @return the serviceType
+	 */
+	public WebRepositoryType getServiceType() {
+		return WebRepositoryType.parse(serviceType);
 	}
 
-	public void setServiceType(RepositoryServiceType serviceType) {
+	/**
+	 * @param serviceType the serviceType to set
+	 */
+	public void setServiceType(WebRepositoryType serviceType) {
 		this.serviceType = serviceType.getId();
 	}
 
+	/**
+	 * @return the uid
+	 */
 	public String getUid() {
-		return this.uid;
+		return uid;
 	}
 
+	/**
+	 * @param uid the uid to set
+	 */
 	public void setUid(String uid) {
 		this.uid = uid;
 	}
 
+	/**
+	 * @return the committerRoles
+	 */
 	public List<CommitterRoleDB> getCommitterRoles() {
-		return this.committerRoles;
+		return committerRoles;
 	}
 
+	/**
+	 * @param committerRoles the committerRoles to set
+	 */
 	public void setCommitterRoles(List<CommitterRoleDB> committerRoles) {
 		this.committerRoles = committerRoles;
 	}
 
-	public CommitterRoleDB addCommitterRole(CommitterRoleDB committerRole) {
-		getCommitterRoles().add(committerRole);
-		committerRole.setRepository(this);
-
-		return committerRole;
-	}
-
-	public CommitterRoleDB removeCommitterRole(CommitterRoleDB committerRole) {
-		getCommitterRoles().remove(committerRole);
-		committerRole.setRepository(null);
-
-		return committerRole;
-	}
-
+	/**
+	 * @return the issues
+	 */
 	public List<IssueDB> getIssues() {
-		return this.issues;
+		return issues;
 	}
 
+	/**
+	 * @param issues the issues to set
+	 */
 	public void setIssues(List<IssueDB> issues) {
 		this.issues = issues;
 	}
 
-	public IssueDB addIssue(IssueDB issue) {
-		getIssues().add(issue);
-		issue.setRepository(this);
-
-		return issue;
-	}
-
-	public IssueDB removeIssue(IssueDB issue) {
-		getIssues().remove(issue);
-		issue.setRepository(null);
-
-		return issue;
-	}
-
+	/**
+	 * @return the milestones
+	 */
 	public List<MilestoneDB> getMilestones() {
-		return this.milestones;
+		return milestones;
 	}
 
+	/**
+	 * @param milestones the milestones to set
+	 */
 	public void setMilestones(List<MilestoneDB> milestones) {
 		this.milestones = milestones;
 	}
 
-	public MilestoneDB addMilestone(MilestoneDB milestone) {
-		getMilestones().add(milestone);
-		milestone.setRepository(this);
-
-		return milestone;
-	}
-
-	public MilestoneDB removeMilestone(MilestoneDB milestone) {
-		getMilestones().remove(milestone);
-		milestone.setRepository(null);
-
-		return milestone;
-	}
-
+	/**
+	 * @return the softwareUnits
+	 */
 	public List<SoftwareUnitDB> getSoftwareUnits() {
-		return this.softwareUnits;
+		return softwareUnits;
 	}
 
+	/**
+	 * @param softwareUnits the softwareUnits to set
+	 */
 	public void setSoftwareUnits(List<SoftwareUnitDB> softwareUnits) {
 		this.softwareUnits = softwareUnits;
 	}
 
-	public SoftwareUnitDB addSoftwareUnit(SoftwareUnitDB softwareUnit) {
-		getSoftwareUnits().add(softwareUnit);
-		softwareUnit.setRepository(this);
-
-		return softwareUnit;
-	}
-
-	public SoftwareUnitDB removeSoftwareUnit(SoftwareUnitDB softwareUnit) {
-		getSoftwareUnits().remove(softwareUnit);
-		softwareUnit.setRepository(null);
-
-		return softwareUnit;
-	}
-
+	/**
+	 * @return the trees
+	 */
 	public List<TreeDB> getTrees() {
-		return this.trees;
+		return trees;
 	}
 
+	/**
+	 * @param trees the trees to set
+	 */
 	public void setTrees(List<TreeDB> trees) {
 		this.trees = trees;
 	}
 
-	public TreeDB addTree(TreeDB tree) {
-		getTrees().add(tree);
-		tree.setRepository(this);
-
-		return tree;
-	}
-
-	public TreeDB removeTree(TreeDB tree) {
-		getTrees().remove(tree);
-		tree.setRepository(null);
-
-		return tree;
-	}
-	
 }

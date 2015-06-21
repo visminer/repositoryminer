@@ -5,14 +5,14 @@ import java.io.Serializable;
 import javax.persistence.*;
 
 import br.edu.ufba.softvis.visminer.constant.SoftwareUnitType;
-import br.edu.ufba.softvis.visminer.model.bean.SoftwareUnit;
 
 import java.util.List;
 
 
 /**
+ * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
+ * @version 0.9
  * The persistent class for the software_unit database table.
- * 
  */
 @Entity
 @Table(name="software_unit")
@@ -67,104 +67,159 @@ public class SoftwareUnitDB implements Serializable {
 	public SoftwareUnitDB() {
 	}
 
-	public SoftwareUnitDB(SoftwareUnit softwareUnit) {
-		this.id = softwareUnit.getId();
-		this.fullName = softwareUnit.getFullName();
-		this.name = softwareUnit.getName();
-		this.uid = softwareUnit.getUid();
-		this.type = softwareUnit.getType().getId();
+	/**
+	 * @param id
+	 * @param fullName
+	 * @param name
+	 * @param type
+	 * @param uid
+	 */
+	public SoftwareUnitDB(int id, String fullName, String name, SoftwareUnitType type,
+			String uid) {
+		super();
+		this.id = id;
+		this.fullName = fullName;
+		this.name = name;
+		this.type = type.getId();
+		this.uid = uid;
 	}
 
+	/**
+	 * @return the id
+	 */
 	public int getId() {
-		return this.id;
+		return id;
 	}
 
+	/**
+	 * @param id the id to set
+	 */
 	public void setId(int id) {
 		this.id = id;
 	}
 
+	/**
+	 * @return the fullName
+	 */
 	public String getFullName() {
-		return this.fullName;
+		return fullName;
 	}
 
+	/**
+	 * @param fullName the fullName to set
+	 */
 	public void setFullName(String fullName) {
 		this.fullName = fullName;
 	}
 
+	/**
+	 * @return the name
+	 */
 	public String getName() {
-		return this.name;
+		return name;
 	}
 
+	/**
+	 * @param name the name to set
+	 */
 	public void setName(String name) {
 		this.name = name;
 	}
 
+	/**
+	 * @return the type
+	 */
 	public SoftwareUnitType getType() {
-		return SoftwareUnitType.parse(this.type);
+		return SoftwareUnitType.parse(type);
 	}
 
+	/**
+	 * @param type the type to set
+	 */
 	public void setType(SoftwareUnitType type) {
 		this.type = type.getId();
 	}
 
+	/**
+	 * @return the uid
+	 */
 	public String getUid() {
-		return this.uid;
+		return uid;
 	}
 
+	/**
+	 * @param uid the uid to set
+	 */
 	public void setUid(String uid) {
 		this.uid = uid;
 	}
 
+	/**
+	 * @return the file
+	 */
 	public FileDB getFile() {
-		return this.file;
+		return file;
 	}
 
+	/**
+	 * @param file the file to set
+	 */
 	public void setFile(FileDB file) {
 		this.file = file;
 	}
 
+	/**
+	 * @return the repository
+	 */
 	public RepositoryDB getRepository() {
-		return this.repository;
+		return repository;
 	}
 
+	/**
+	 * @param repository the repository to set
+	 */
 	public void setRepository(RepositoryDB repository) {
 		this.repository = repository;
 	}
 
+	/**
+	 * @return the softwareUnit
+	 */
 	public SoftwareUnitDB getSoftwareUnit() {
-		return this.softwareUnit;
+		return softwareUnit;
 	}
 
+	/**
+	 * @param softwareUnit the softwareUnit to set
+	 */
 	public void setSoftwareUnit(SoftwareUnitDB softwareUnit) {
 		this.softwareUnit = softwareUnit;
 	}
 
+	/**
+	 * @return the softwareUnits
+	 */
 	public List<SoftwareUnitDB> getSoftwareUnits() {
-		return this.softwareUnits;
+		return softwareUnits;
 	}
 
+	/**
+	 * @param softwareUnits the softwareUnits to set
+	 */
 	public void setSoftwareUnits(List<SoftwareUnitDB> softwareUnits) {
 		this.softwareUnits = softwareUnits;
 	}
 
-	public SoftwareUnitDB addSoftwareUnit(SoftwareUnitDB softwareUnit) {
-		getSoftwareUnits().add(softwareUnit);
-		softwareUnit.setSoftwareUnit(this);
-
-		return softwareUnit;
-	}
-
-	public SoftwareUnitDB removeSoftwareUnit(SoftwareUnitDB softwareUnit) {
-		getSoftwareUnits().remove(softwareUnit);
-		softwareUnit.setSoftwareUnit(null);
-
-		return softwareUnit;
-	}
-
+	/**
+	 * @return the commits
+	 */
 	public List<CommitDB> getCommits() {
-		return this.commits;
+		return commits;
 	}
 
+	/**
+	 * @param commits the commits to set
+	 */
 	public void setCommits(List<CommitDB> commits) {
 		this.commits = commits;
 	}

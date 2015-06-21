@@ -1,5 +1,10 @@
 package br.edu.ufba.softvis.visminer.constant;
 
+/**
+ * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
+ * @version 0.9
+ * Repository types
+ */
 public enum RepositoryType {
 
 	GIT(1);
@@ -10,10 +15,19 @@ public enum RepositoryType {
 		this.id = id;
 	}
 	
+	/**
+	 * 
+	 * @return Repository type id.
+	 */
 	public int getId(){
 		return this.id;
 	}
 	
+	/**
+	 * 
+	 * @param id
+	 * @return Repository type with given id.
+	 */
 	public static RepositoryType parse(int id){
 		
 		for(RepositoryType repoType : RepositoryType.values()){
@@ -22,7 +36,7 @@ public enum RepositoryType {
 			}
 		}
 		
-		throw new IllegalArgumentException("No repository type found for id "+id);
+		throw new IllegalArgumentException("Does not exists RepositoryType with id "+id);
 		
 	}
 	

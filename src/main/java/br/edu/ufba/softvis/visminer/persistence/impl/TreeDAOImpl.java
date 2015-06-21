@@ -8,6 +8,13 @@ import javax.persistence.TypedQuery;
 import br.edu.ufba.softvis.visminer.model.database.TreeDB;
 import br.edu.ufba.softvis.visminer.persistence.dao.TreeDAO;
 
+/**
+ * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
+ * @version 0.9
+ * 
+ * Implementation of interface {@link TreeDAO}
+ */
+
 public class TreeDAOImpl extends DAOImpl<TreeDB, Integer> implements TreeDAO{
 
 	@Override

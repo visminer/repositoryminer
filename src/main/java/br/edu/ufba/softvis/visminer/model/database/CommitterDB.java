@@ -4,19 +4,22 @@ import java.io.Serializable;
 
 import javax.persistence.*;
 
+import org.eclipse.persistence.annotations.JoinFetch;
+
 import java.util.List;
 
 
 /**
+ * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
+ * @version 0.9
  * The persistent class for the committer database table.
- * 
  */
 @Entity
 @Table(name="committer")
 @NamedQueries({
 	@NamedQuery(name="CommitterDB.findByEmail", query="select c from CommitterDB c where c.email = :email"),
-	@NamedQuery(name="CommitterDB.findByRepository", query="select c from RepositoryDB r join r.committerRoles cr join cr.committer c "
-			+ "where r.id = :id")
+	@NamedQuery(name="CommitterDB.findByRepository", query="select c from CommitterDB c join c.committerRoles cr"
+			+ " where cr.id.repositoryId = :id")
 })
 public class CommitterDB implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -44,78 +47,86 @@ public class CommitterDB implements Serializable {
 	public CommitterDB() {
 	}
 
-	public CommitterDB(String email, String name) {
+	/**
+	 * @param id
+	 * @param email
+	 * @param name
+	 */
+	public CommitterDB(int id, String email, String name) {
 		super();
+		this.id = id;
 		this.email = email;
 		this.name = name;
 	}
 
+	/**
+	 * @return the id
+	 */
 	public int getId() {
-		return this.id;
+		return id;
 	}
 
+	/**
+	 * @param id the id to set
+	 */
 	public void setId(int id) {
 		this.id = id;
 	}
 
+	/**
+	 * @return the email
+	 */
 	public String getEmail() {
-		return this.email;
+		return email;
 	}
 
+	/**
+	 * @param email the email to set
+	 */
 	public void setEmail(String email) {
 		this.email = email;
 	}
 
+	/**
+	 * @return the name
+	 */
 	public String getName() {
-		return this.name;
+		return name;
 	}
 
+	/**
+	 * @param name the name to set
+	 */
 	public void setName(String name) {
 		this.name = name;
 	}
 
+	/**
+	 * @return the commits
+	 */
 	public List<CommitDB> getCommits() {
-		return this.commits;
+		return commits;
 	}
 
+	/**
+	 * @param commits the commits to set
+	 */
 	public void setCommits(List<CommitDB> commits) {
 		this.commits = commits;
 	}
 
-	public CommitDB addCommit(CommitDB commit) {
-		getCommits().add(commit);
-		commit.setCommitter(this);
-
-		return commit;
-	}
-
-	public CommitDB removeCommit(CommitDB commit) {
-		getCommits().remove(commit);
-		commit.setCommitter(null);
-
-		return commit;
-	}
-
+	/**
+	 * @return the committerRoles
+	 */
 	public List<CommitterRoleDB> getCommitterRoles() {
-		return this.committerRoles;
+		return committerRoles;
 	}
 
+	/**
+	 * @param committerRoles the committerRoles to set
+	 */
 	public void setCommitterRoles(List<CommitterRoleDB> committerRoles) {
 		this.committerRoles = committerRoles;
-	}
-
-	public CommitterRoleDB addCommitterRole(CommitterRoleDB committerRole) {
-		getCommitterRoles().add(committerRole);
-		committerRole.setCommitter(this);
-
-		return committerRole;
-	}
-
-	public CommitterRoleDB removeCommitterRole(CommitterRoleDB committerRole) {
-		getCommitterRoles().remove(committerRole);
-		committerRole.setCommitter(null);
-
-		return committerRole;
 	}
 
 }

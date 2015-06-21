@@ -1,14 +1,17 @@
 package br.edu.ufba.softvis.visminer.model.database;
 
 import java.io.Serializable;
+
 import javax.persistence.*;
+
 import java.util.Date;
 import java.util.List;
 
 
 /**
+ * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
+ * @version 0.9
  * The persistent class for the milestone database table.
- * 
  */
 @Entity
 @Table(name="milestone")
@@ -63,112 +66,198 @@ public class MilestoneDB implements Serializable {
 	public MilestoneDB() {
 	}
 
-	public int getId() {
-		return this.id;
+	/**
+	 * @param id
+	 * @param closedIssues
+	 * @param createDate
+	 * @param creator
+	 * @param description
+	 * @param dueDate
+	 * @param number
+	 * @param openedIssues
+	 * @param state
+	 * @param title
+	 */
+	public MilestoneDB(int id, int closedIssues, Date createDate,
+			String creator, String description, Date dueDate, int number,
+			int openedIssues, String state, String title) {
+		super();
+		this.id = id;
+		this.closedIssues = closedIssues;
+		this.createDate = createDate;
+		this.creator = creator;
+		this.description = description;
+		this.dueDate = dueDate;
+		this.number = number;
+		this.openedIssues = openedIssues;
+		this.state = state;
+		this.title = title;
 	}
 
+	/**
+	 * @return the id
+	 */
+	public int getId() {
+		return id;
+	}
+
+	/**
+	 * @param id the id to set
+	 */
 	public void setId(int id) {
 		this.id = id;
 	}
 
+	/**
+	 * @return the closedIssues
+	 */
 	public int getClosedIssues() {
-		return this.closedIssues;
+		return closedIssues;
 	}
 
+	/**
+	 * @param closedIssues the closedIssues to set
+	 */
 	public void setClosedIssues(int closedIssues) {
 		this.closedIssues = closedIssues;
 	}
 
+	/**
+	 * @return the createDate
+	 */
 	public Date getCreateDate() {
-		return this.createDate;
+		return createDate;
 	}
 
+	/**
+	 * @param createDate the createDate to set
+	 */
 	public void setCreateDate(Date createDate) {
 		this.createDate = createDate;
 	}
 
+	/**
+	 * @return the creator
+	 */
 	public String getCreator() {
-		return this.creator;
+		return creator;
 	}
 
+	/**
+	 * @param creator the creator to set
+	 */
 	public void setCreator(String creator) {
 		this.creator = creator;
 	}
 
+	/**
+	 * @return the description
+	 */
 	public String getDescription() {
-		return this.description;
+		return description;
 	}
 
+	/**
+	 * @param description the description to set
+	 */
 	public void setDescription(String description) {
 		this.description = description;
 	}
 
+	/**
+	 * @return the dueDate
+	 */
 	public Date getDueDate() {
-		return this.dueDate;
+		return dueDate;
 	}
 
+	/**
+	 * @param dueDate the dueDate to set
+	 */
 	public void setDueDate(Date dueDate) {
 		this.dueDate = dueDate;
 	}
 
+	/**
+	 * @return the number
+	 */
 	public int getNumber() {
-		return this.number;
+		return number;
 	}
 
+	/**
+	 * @param number the number to set
+	 */
 	public void setNumber(int number) {
 		this.number = number;
 	}
 
+	/**
+	 * @return the openedIssues
+	 */
 	public int getOpenedIssues() {
-		return this.openedIssues;
+		return openedIssues;
 	}
 
+	/**
+	 * @param openedIssues the openedIssues to set
+	 */
 	public void setOpenedIssues(int openedIssues) {
 		this.openedIssues = openedIssues;
 	}
 
+	/**
+	 * @return the state
+	 */
 	public String getState() {
-		return this.state;
+		return state;
 	}
 
+	/**
+	 * @param state the state to set
+	 */
 	public void setState(String state) {
 		this.state = state;
 	}
 
+	/**
+	 * @return the title
+	 */
 	public String getTitle() {
-		return this.title;
+		return title;
 	}
 
+	/**
+	 * @param title the title to set
+	 */
 	public void setTitle(String title) {
 		this.title = title;
 	}
 
+	/**
+	 * @return the issues
+	 */
 	public List<IssueDB> getIssues() {
-		return this.issues;
+		return issues;
 	}
 
+	/**
+	 * @param issues the issues to set
+	 */
 	public void setIssues(List<IssueDB> issues) {
 		this.issues = issues;
 	}
 
-	public IssueDB addIssue(IssueDB issue) {
-		getIssues().add(issue);
-		issue.setMilestone(this);
-
-		return issue;
-	}
-
-	public IssueDB removeIssue(IssueDB issue) {
-		getIssues().remove(issue);
-		issue.setMilestone(null);
-
-		return issue;
-	}
-
+	/**
+	 * @return the repository
+	 */
 	public RepositoryDB getRepository() {
-		return this.repository;
+		return repository;
 	}
 
+	/**
+	 * @param repository the repository to set
+	 */
 	public void setRepository(RepositoryDB repository) {
 		this.repository = repository;
 	}

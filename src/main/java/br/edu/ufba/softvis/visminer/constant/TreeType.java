@@ -1,5 +1,10 @@
 package br.edu.ufba.softvis.visminer.constant;
 
+/**
+ * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
+ * @version 0.9
+ * Trees types.
+ */
 public enum TreeType {
 
 	BRANCH(1), TAG(2);
@@ -10,10 +15,17 @@ public enum TreeType {
 		this.id = id;
 	}
 	
+	/**
+	 * @return Tree type id.
+	 */
 	public int getId(){
 		return this.id;
 	}
-	
+
+	/**
+	 * @param id
+	 * @return Tree type with given id.
+	 */
 	public static TreeType parse(int id){
 
 		for(TreeType treeType : TreeType.values()){
@@ -22,7 +34,7 @@ public enum TreeType {
 			}
 		}
 		
-		throw new IllegalArgumentException("No tree type found for id"+id);
+		throw new IllegalArgumentException("Does not exists TreeType with id "+id);
 		
 	}
 	

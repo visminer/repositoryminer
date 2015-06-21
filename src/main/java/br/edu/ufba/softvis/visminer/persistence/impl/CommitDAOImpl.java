@@ -8,6 +8,13 @@ import javax.persistence.TypedQuery;
 import br.edu.ufba.softvis.visminer.model.database.CommitDB;
 import br.edu.ufba.softvis.visminer.persistence.dao.CommitDAO;
 
+/**
+ * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
+ * @version 0.9
+ * 
+ * Implementation of interface {@link CommitDAO}
+ */
+
 public class CommitDAOImpl extends DAOImpl<CommitDB, Integer> implements CommitDAO{
 
 	@Override
