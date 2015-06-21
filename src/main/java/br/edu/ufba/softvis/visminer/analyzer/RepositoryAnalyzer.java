@@ -44,8 +44,7 @@ public class RepositoryAnalyzer implements IAnalyzer<Void>{
 		Repository repoBusi = (Repository) objects[0];
 		List<MetricUid> metrics = (List<MetricUid>) objects[1];
 		
-		IRepositorySystem repoSys = SupportedRepository.getRepository(repoBusi.getType());
-		repoSys.open(repoBusi.getPath());
+		IRepositorySystem repoSys = SupportedRepository.getRepository(repoBusi.getPath(), repoBusi.getType());
 		
 		EntityManager entityManager = Database.getInstance().getEntityManager();
 		RepositoryDAO repositoryDao = new RepositoryDAOImpl();
@@ -87,6 +86,31 @@ public class RepositoryAnalyzer implements IAnalyzer<Void>{
 	@Override
 	public Void increment(Object... objects) {
 		return null;
+	}
+
+	/**
+	 * @param repositoryPath
+	 * @param metrics
+	 * Does not analyze the repository, only calculates a list of metrics from beginning of the repository.
+	 */
+	public void recalculateMetrics(String repositoryPath, List<MetricUid> metrics) {
+		
+		EntityManager entityManager = Database.getInstance().getEntityManager();
+		RepositoryDAO repositoryDao = new RepositoryDAOImpl();
+		repositoryDao.setEntityManager(entityManager);
+		
+		RepositoryDB repoDb = repositoryDao.findByUid(StringUtils.sha1(repositoryPath));
+		if(repoDb == null || metrics == null || metrics.size() == 0){
+			return;
+		}
+		
+		IRepositorySystem repoSys = SupportedRepository.getRepository(repoDb.getPath(), repoDb.getType());
+		
+		MetricCalculator.calculate(metrics, repoSys, repoDb.getPath(), repoDb.getId(), entityManager);
+		
+		repoSys.close();
+		entityManager.close();
+		
 	}
 
 }

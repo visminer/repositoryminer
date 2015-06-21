@@ -120,13 +120,12 @@ public class MetricPersistance {
 			}
 
 			softUnitDao.save(softUnitDb);
-
-			SoftwareUnitXCommitPK softXCommitPk = new SoftwareUnitXCommitPK(commit.getId(), softUnitDb.getId());
+			SoftwareUnitXCommitPK softXCommitPk = new SoftwareUnitXCommitPK(softUnitDb.getId(), commit.getId());
 			softUnitXCommitDao.save(new SoftwareUnitXCommitDB(softXCommitPk));
 
 		}else{
 
-			SoftwareUnitXCommitPK softXCommitPk = new SoftwareUnitXCommitPK(commit.getId(), softUnitDb.getId());
+			SoftwareUnitXCommitPK softXCommitPk = new SoftwareUnitXCommitPK(softUnitDb.getId(), commit.getId());
 			SoftwareUnitXCommitDB softXCommitDb = softUnitXCommitDao.find(softXCommitPk);
 
 			if(softXCommitDb == null){
@@ -141,7 +140,6 @@ public class MetricPersistance {
 	}
 
 	/**
-	 * 
 	 * @param file
 	 * @param softwareUnit
 	 * @param value

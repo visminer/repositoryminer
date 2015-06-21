@@ -70,7 +70,8 @@ public class VisMiner {
 	 * Does not analyze the repository, only calculates a list of metrics from beginning of the repository.
 	 */
 	public void calculateMetrics(String repositoryPath, List<MetricUid> metrics){
-		
+		RepositoryAnalyzer repositoryAnalyzer = new RepositoryAnalyzer();
+		repositoryAnalyzer.recalculateMetrics(repositoryPath, metrics);
 	}
 	
 	/**

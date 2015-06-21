@@ -23,11 +23,6 @@ public interface IRepositorySystem {
 	 * getCommitedFiles(String commitUid) should return File with FileState.
 	 */
 	
-	/**
-	 * @param repositoryPath
-	 * Initializes the repository.
-	 */
-	public void open(String repositoryPath);
 
 	/**
 	 * @return Repository absolute path.

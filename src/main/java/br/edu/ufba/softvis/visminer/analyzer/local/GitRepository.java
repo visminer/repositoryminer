@@ -49,11 +49,29 @@ public class GitRepository implements IRepositorySystem{
 	private Git git;
 	String repositoryPath;
 	
-	@Override
-	public void open(String repositoryPath) {
+	// Process the repository path
+	private String processPath(String repositoryPath){
+		
+		String path = repositoryPath.replace("\\", "/").trim();
+		
+		if(path.endsWith("/.git")){
+			return path;
+		}else if(path.endsWith("/.git/")){
+			return path.substring(0, path.length()-1);
+		}else if(path.endsWith("/")){
+			return path.concat(".git");
+		}else{
+			return path.concat("/.git");
+		}
+		
+	}
+	
+	public GitRepository(String repositoryPath) {
 
+		String path = processPath(repositoryPath);
+		
 		try {
-			this.repository = new FileRepository(repositoryPath);
+			this.repository = new FileRepository(path);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

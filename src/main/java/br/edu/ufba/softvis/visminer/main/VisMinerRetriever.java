@@ -19,7 +19,6 @@ import br.edu.ufba.softvis.visminer.persistence.PersistenceInterface;
 public class VisMinerRetriever {
 
 	/**
-	 * 
 	 * @param repositoryPath
 	 * @return Repository ready for access all its data.
 	 */
@@ -30,6 +29,10 @@ public class VisMinerRetriever {
 		
 		PersistenceInterface persistence = new PersistenceInterface();
 		Repository repository = persistence.findRepository(absolutePath);
+		
+		if(repository == null){
+			return null;
+		}
 		
 		List<Tree> trees = persistence.findTrees(repository.getId());
 		List<Committer> committers = persistence.findCommitters(repository.getId());
@@ -56,7 +59,6 @@ public class VisMinerRetriever {
 	}
 	
 	/**
-	 * 
 	 * @return List of supported metrics.
 	 */
 	public List<Metric> findMetrics(){

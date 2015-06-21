@@ -1,0 +1,15 @@
+br.edu.ufba.softvis.visminer.analyzer
+br.edu.ufba.softvis.visminer.analyzer.local
+br.edu.ufba.softvis.visminer.analyzer.remote
+br.edu.ufba.softvis.visminer.annotations
+br.edu.ufba.softvis.visminer.config
+br.edu.ufba.softvis.visminer.constant
+br.edu.ufba.softvis.visminer.main
+br.edu.ufba.softvis.visminer.metric
+br.edu.ufba.softvis.visminer.model.bean
+br.edu.ufba.softvis.visminer.model.business
+br.edu.ufba.softvis.visminer.model.database
+br.edu.ufba.softvis.visminer.persistence
+br.edu.ufba.softvis.visminer.persistence.dao
+br.edu.ufba.softvis.visminer.persistence.impl
+br.edu.ufba.softvis.visminer.utility

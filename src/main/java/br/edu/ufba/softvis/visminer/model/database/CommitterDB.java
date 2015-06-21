@@ -4,6 +4,8 @@ import java.io.Serializable;
 
 import javax.persistence.*;
 
+import org.eclipse.persistence.annotations.JoinFetch;
+
 import java.util.List;
 
 
@@ -16,8 +18,8 @@ import java.util.List;
 @Table(name="committer")
 @NamedQueries({
 	@NamedQuery(name="CommitterDB.findByEmail", query="select c from CommitterDB c where c.email = :email"),
-	@NamedQuery(name="CommitterDB.findByRepository", query="select c from RepositoryDB r join r.committerRoles cr join cr.committer c "
-			+ "where r.id = :id")
+	@NamedQuery(name="CommitterDB.findByRepository", query="select c from CommitterDB c join c.committerRoles cr"
+			+ " where cr.id.repositoryId = :id")
 })
 public class CommitterDB implements Serializable {
 	private static final long serialVersionUID = 1L;

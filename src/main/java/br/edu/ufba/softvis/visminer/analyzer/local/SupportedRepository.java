@@ -11,13 +11,14 @@ import br.edu.ufba.softvis.visminer.constant.RepositoryType;
 public class SupportedRepository {
 
 	/**
+	 * @param repositoryPath
 	 * @param repositoryType
 	 * @return Instance of the class that manage the repository. 
 	 */
-	public static IRepositorySystem getRepository(RepositoryType repositoryType){
+	public static IRepositorySystem getRepository(String repositoryPath, RepositoryType repositoryType){
 
 		switch(repositoryType){
-			case GIT : return new GitRepository();
+			case GIT : return new GitRepository(repositoryPath);
 			default : return null;
 		}
 		

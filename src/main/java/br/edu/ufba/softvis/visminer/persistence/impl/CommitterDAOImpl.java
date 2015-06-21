@@ -37,6 +37,8 @@ public class CommitterDAOImpl extends DAOImpl<CommitterDB, Integer> implements C
 	
 		EntityManager em = getEntityManager();
 		TypedQuery<CommitterDB> query = em.createNamedQuery("CommitterDB.findByRepository", CommitterDB.class);
+		query.setHint("javax.persistence.cache.storeMode", "BYPASS");
+		query.setHint("javax.persistence.cache.retrieveMode", "BYPASS");
 		query.setParameter("id", repositoryId);
 		return query.getResultList();
 		
