@@ -78,13 +78,14 @@ public class MetricConfig {
 		
 		
 		for (String classPath : map.values()) {
-			try {
-				IMetric metric = (IMetric) Class.forName(classPath).newInstance();
-				saveMetric(metric, dao);
-			} catch (InstantiationException | IllegalAccessException
-					| ClassNotFoundException e) {
-				e.printStackTrace();
-			}
+				IMetric metric;
+				try {
+					metric = (IMetric) Class.forName(classPath).newInstance();
+					saveMetric(metric, dao);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				
 		}
 		
 		em.close();
@@ -138,8 +139,7 @@ public class MetricConfig {
 			
 			return metricMap;
 			
-		}catch(InstantiationException | IllegalAccessException
-				| ClassNotFoundException e){
+		}catch(Exception e){
 			e.printStackTrace();
 			return null;
 		}

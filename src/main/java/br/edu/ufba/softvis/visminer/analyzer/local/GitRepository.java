@@ -108,7 +108,7 @@ public class GitRepository implements IRepositorySystem{
 				committers.add(committer);
 			}
 
-		} catch (GitAPIException | IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -158,7 +158,7 @@ public class GitRepository implements IRepositorySystem{
 			lastCommit = revWalk.parseCommit(repository.resolve(treeName));
 			return lastCommit.getAuthorIdent().getWhen();
 
-		} catch (RevisionSyntaxException | IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
 		}
@@ -181,7 +181,7 @@ public class GitRepository implements IRepositorySystem{
 
 			return commits;
 
-		} catch (GitAPIException | IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
 		}
