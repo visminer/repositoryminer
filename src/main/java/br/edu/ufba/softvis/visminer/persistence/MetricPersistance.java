@@ -3,7 +3,6 @@ package br.edu.ufba.softvis.visminer.persistence;
 import javax.persistence.EntityManager;
 
 import br.edu.ufba.softvis.visminer.constant.MetricUid;
-import br.edu.ufba.softvis.visminer.constant.SoftwareUnitType;
 import br.edu.ufba.softvis.visminer.model.bean.Commit;
 import br.edu.ufba.softvis.visminer.model.bean.File;
 import br.edu.ufba.softvis.visminer.model.bean.SoftwareUnit;
@@ -23,18 +22,14 @@ import br.edu.ufba.softvis.visminer.persistence.impl.SoftwareUnitXCommitImpl;
 import br.edu.ufba.softvis.visminer.utility.StringUtils;
 
 /**
- * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
  * @version 0.9
- * 
  * Persistence interface for metrics calculation.
  */
 public class MetricPersistance {
 
-	private String repositoryPath;
-	private int repositoryId;
-	
 	private EntityManager entityManager;
 
+	private RepositoryDB repositoryDb;
 	private SoftwareUnitDAO softUnitDao;
 	private SoftwareUnitXCommitDAO softUnitXCommitDao;
 	private MetricValueDAO metricValueDao;
@@ -42,12 +37,11 @@ public class MetricPersistance {
 	private Commit commit;
 	private MetricUid metric;
 	
-	public MetricPersistance(String repositoryPath, int repositoryId, EntityManager entityManager) {
+	public MetricPersistance(RepositoryDB repositoryDb, EntityManager entityManager) {
 
-		this.repositoryId = repositoryId;
-		this.repositoryPath = repositoryPath;
 		this.entityManager = entityManager;
-
+		this.repositoryDb = repositoryDb;
+		
 		this.softUnitDao = new SoftwareUnitDAOImpl();
 		this.softUnitDao.setEntityManager(entityManager);
 
@@ -91,21 +85,19 @@ public class MetricPersistance {
 	 * Use this method if you only want to save the software unit and not save its metric value.
 	 * 
 	 */
-	public SoftwareUnit saveSoftwareUnit(File file, SoftwareUnit softwareUnit){
+	public void saveSoftwareUnit(File file, SoftwareUnit softwareUnit){
 
-		String uid = generateUid(file, softwareUnit.getParentUnit(), softwareUnit.getFullName(), softwareUnit.getType());
+		String uid = generateUid(file, softwareUnit.getParentUnit(), softwareUnit.getName());
 		SoftwareUnitDB softUnitDb = softUnitDao.findByUid(uid);
 
 		// insert in database
 		if(softUnitDb == null){
 
 			softwareUnit.setUid(uid);;
-			softUnitDb = new SoftwareUnitDB(0, softwareUnit.getFullName(), softwareUnit.getName(), 
+			softUnitDb = new SoftwareUnitDB(0, softwareUnit.getName(), 
 					softwareUnit.getType(), softwareUnit.getUid());
 			
-			RepositoryDB repoDb = new RepositoryDB();
-			repoDb.setId(repositoryId);
-			softUnitDb.setRepository(repoDb);
+			softUnitDb.setRepository(repositoryDb);
 
 			if(file != null){
 				FileDB fileDb = new FileDB();
@@ -135,8 +127,8 @@ public class MetricPersistance {
 
 		}
 
-		return new SoftwareUnit(softUnitDb.getId(), softUnitDb.getName(),
-				softUnitDb.getFullName(), softUnitDb.getUid(), softUnitDb.getType());
+		softwareUnit.setId(softUnitDb.getId());
+		softwareUnit.setUid(softUnitDb.getUid());
 	}
 
 	/**
@@ -149,15 +141,13 @@ public class MetricPersistance {
 	 * If the software unit is not trailer with a file, as package, for example, pass file as null.
 	 * Use this method if you want save the software unit with its metric value.
 	 */
-	public SoftwareUnit saveMetricValue(File file, SoftwareUnit softwareUnit, String value){
+	public void saveMetricValue(File file, SoftwareUnit softwareUnit, String value){
 
-		SoftwareUnit softUnit = saveSoftwareUnit(file, softwareUnit);
-		MetricValuePK metricValPk = new MetricValuePK(softUnit.getId(), commit.getId(), metric.getId());
+		saveSoftwareUnit(file, softwareUnit);
+		MetricValuePK metricValPk = new MetricValuePK(softwareUnit.getId(), commit.getId(), metric.getId());
 		MetricValueDB metricValDb =  new MetricValueDB(metricValPk, value);
 
 		metricValueDao.merge(metricValDb);
-
-		return softUnit;
 
 	}
 
@@ -170,9 +160,9 @@ public class MetricPersistance {
 	 * Finds some software unit by its unique id.
 	 * If the software unit is not trailer with a file, as package, for example, pass file as null.
 	 */
-	public SoftwareUnit getSoftwareUnit(File file, SoftwareUnit parent, String fullName, SoftwareUnitType type){
+	public SoftwareUnit getSoftwareUnit(File file, SoftwareUnit parent, String fullName){
 
-		String uid = generateUid(file, parent, fullName, type);
+		String uid = generateUid(file, parent, fullName);
 		SoftwareUnitDB softUnitDb = softUnitDao.findByUid(uid);
 
 		if(softUnitDb == null){
@@ -180,7 +170,7 @@ public class MetricPersistance {
 		}
 
 		return new SoftwareUnit(softUnitDb.getId(), softUnitDb.getName(),
-				softUnitDb.getFullName(), softUnitDb.getUid(), softUnitDb.getType());
+				softUnitDb.getUid(), softUnitDb.getType());
 
 	}
 
@@ -205,31 +195,25 @@ public class MetricPersistance {
 
 	}
 
-
 	// helpers
 
 	// generates unique id for software units
-	private String generateUid(File file, SoftwareUnit parent, String fullName, SoftwareUnitType type){
+	private String generateUid(File file, SoftwareUnit parent, String fullName){
 
-		String filePath = null;
+		StringBuilder uid = new StringBuilder();
+		uid.append(repositoryDb.getUid());
+		
 		if(file != null){
-			filePath = file.getPath();
+			uid.append(file.getUid());
 		}
-
-		String parentPath = null;
+		
 		if(parent != null){
-			parentPath = parent.getUid();
+			uid.append(parent.getUid());
 		}
-
-		String uid = null;
-		if(type == SoftwareUnitType.PROJECT || type == SoftwareUnitType.PACKAGE
-				|| type == SoftwareUnitType.FILE){
-			uid = repositoryPath+"/"+parentPath+"/"+filePath+"/"+type.toString()+"/"+fullName;
-		}else{
-			uid = repositoryPath+"/"+filePath+"/"+parentPath+"/"+type.toString()+"/"+fullName;
-		}
-
-		return StringUtils.sha1(uid);
+		
+		uid.append(fullName);
+		
+		return StringUtils.sha1(uid.toString());
 
 	}
 

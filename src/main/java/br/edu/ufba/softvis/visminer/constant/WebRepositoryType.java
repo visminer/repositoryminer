@@ -27,14 +27,17 @@ public enum WebRepositoryType {
 	 * @return Web repository type with given id.
 	 */
 	public static WebRepositoryType parse(int id){
+
+		if(id == 0){
+			return null;
+		}
 		
 		for(WebRepositoryType repoServType : WebRepositoryType.values()){
 			if(repoServType.getId() == id){
 				return repoServType;
 			}
 		}
-
-		throw new IllegalArgumentException("Does not exists WebRepositoryType with id "+id);
+		return null;
 		
 	}
 	

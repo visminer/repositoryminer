@@ -65,7 +65,7 @@ public class RepositoryAnalyzer implements IAnalyzer<Void>{
 		repositoryDao.save(repositoryDb);
 		List<CommitterDB> committersDb = new CommitterAnalyzer().persist(repositoryDb, repoSys, entityManager);
 		List<CommitDB> commitsDB = new CommitAnalyzer().persist(committersDb, repoSys, entityManager);
-		
+
 		new TreeAnalyzer().persist(commitsDB, repositoryDb, repoSys, entityManager);
 		new FileAnalyzer().persist(commitsDB, repoSys, entityManager);
 
@@ -74,7 +74,7 @@ public class RepositoryAnalyzer implements IAnalyzer<Void>{
 		commitsDB = null;
 		
 		if(metrics != null && metrics.size() > 0){
-			MetricCalculator.calculate(metrics, repoSys, repositoryDb.getPath(), repositoryDb.getId(), entityManager);
+			MetricCalculator.calculate(metrics, repoSys, repositoryDb, entityManager);
 		}
 		
 		entityManager.close();
@@ -106,7 +106,7 @@ public class RepositoryAnalyzer implements IAnalyzer<Void>{
 		
 		IRepositorySystem repoSys = SupportedRepository.getRepository(repoDb.getPath(), repoDb.getType());
 		
-		MetricCalculator.calculate(metrics, repoSys, repoDb.getPath(), repoDb.getId(), entityManager);
+		MetricCalculator.calculate(metrics, repoSys, repoDb, entityManager);
 		
 		repoSys.close();
 		entityManager.close();

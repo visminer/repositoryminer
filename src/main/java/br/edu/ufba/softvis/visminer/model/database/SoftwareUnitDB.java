@@ -29,9 +29,6 @@ public class SoftwareUnitDB implements Serializable {
 	@Column(unique=true, nullable=false)
 	private int id;
 
-	@Column(name="full_name", nullable=false, length=256)
-	private String fullName;
-
 	@Column(nullable=false, length=256)
 	private String name;
 
@@ -69,16 +66,14 @@ public class SoftwareUnitDB implements Serializable {
 
 	/**
 	 * @param id
-	 * @param fullName
 	 * @param name
 	 * @param type
 	 * @param uid
 	 */
-	public SoftwareUnitDB(int id, String fullName, String name, SoftwareUnitType type,
+	public SoftwareUnitDB(int id, String name, SoftwareUnitType type,
 			String uid) {
 		super();
 		this.id = id;
-		this.fullName = fullName;
 		this.name = name;
 		this.type = type.getId();
 		this.uid = uid;
@@ -96,20 +91,6 @@ public class SoftwareUnitDB implements Serializable {
 	 */
 	public void setId(int id) {
 		this.id = id;
-	}
-
-	/**
-	 * @return the fullName
-	 */
-	public String getFullName() {
-		return fullName;
-	}
-
-	/**
-	 * @param fullName the fullName to set
-	 */
-	public void setFullName(String fullName) {
-		this.fullName = fullName;
 	}
 
 	/**

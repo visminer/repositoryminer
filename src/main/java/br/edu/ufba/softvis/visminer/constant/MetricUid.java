@@ -7,7 +7,9 @@ package br.edu.ufba.softvis.visminer.constant;
  */
 public enum MetricUid {
 
-	LOC(1);
+	SLOC(1),
+	CC(2),
+	NOC(3);
 	
 	private int id;
 	

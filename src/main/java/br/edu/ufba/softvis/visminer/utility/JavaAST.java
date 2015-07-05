@@ -37,6 +37,8 @@ public class JavaAST {
     
     private void setRoot(String source){
         
+    	this.source = source;
+    	
         ASTParser parser = ASTParser.newParser(AST.JLS3);
         parser.setSource(source.toCharArray());
         parser.setKind(ASTParser.K_COMPILATION_UNIT);

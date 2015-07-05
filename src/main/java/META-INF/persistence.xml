@@ -4,19 +4,19 @@
 		<class>br.edu.ufba.softvis.visminer.model.database.CommitDB</class>
 		<class>br.edu.ufba.softvis.visminer.model.database.CommitterDB</class>
 		<class>br.edu.ufba.softvis.visminer.model.database.CommitterRoleDB</class>
-		<class>br.edu.ufba.softvis.visminer.model.database.CommitterRoleDBPK</class>
+		<class>br.edu.ufba.softvis.visminer.model.database.CommitterRolePK</class>
 		<class>br.edu.ufba.softvis.visminer.model.database.FileDB</class>
 		<class>br.edu.ufba.softvis.visminer.model.database.FileXCommitDB</class>
-		<class>br.edu.ufba.softvis.visminer.model.database.FileXCommitDBPK</class>
+		<class>br.edu.ufba.softvis.visminer.model.database.FileXCommitPK</class>
 		<class>br.edu.ufba.softvis.visminer.model.database.IssueDB</class>
 		<class>br.edu.ufba.softvis.visminer.model.database.MetricDB</class>
 		<class>br.edu.ufba.softvis.visminer.model.database.MetricValueDB</class>
-		<class>br.edu.ufba.softvis.visminer.model.database.MetricValueDBPK</class>
+		<class>br.edu.ufba.softvis.visminer.model.database.MetricValuePK</class>
 		<class>br.edu.ufba.softvis.visminer.model.database.MilestoneDB</class>
 		<class>br.edu.ufba.softvis.visminer.model.database.RepositoryDB</class>
 		<class>br.edu.ufba.softvis.visminer.model.database.SoftwareUnitDB</class>
 		<class>br.edu.ufba.softvis.visminer.model.database.SoftwareUnitXCommitDB</class>
-		<class>br.edu.ufba.softvis.visminer.model.database.SoftwareUnitXCommitDBPK</class>
+		<class>br.edu.ufba.softvis.visminer.model.database.SoftwareUnitXCommitPK</class>
 		<class>br.edu.ufba.softvis.visminer.model.database.TreeDB</class>
 	</persistence-unit>
 </persistence>

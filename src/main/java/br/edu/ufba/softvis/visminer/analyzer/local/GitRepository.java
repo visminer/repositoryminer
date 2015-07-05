@@ -199,7 +199,7 @@ public class GitRepository implements IRepositorySystem{
 
 		CommitFinder finder = new CommitFinder(repository);
 		finder.setFilter(filters);
-		finder.find();
+		finder.findInBranches();
 
 		return createListCommit(revCommits);
 

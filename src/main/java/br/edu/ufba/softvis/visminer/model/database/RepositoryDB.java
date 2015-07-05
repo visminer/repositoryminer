@@ -91,8 +91,12 @@ public class RepositoryDB implements Serializable {
 		this.path = path;
 		this.remoteUrl = remoteUrl;
 		this.type = type.getId();
-		this.serviceType = serviceType.getId();
 		this.uid = uid;
+		
+		if(serviceType != null){
+			this.serviceType = serviceType.getId();
+		}
+		
 	}
 
 	/**

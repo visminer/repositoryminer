@@ -17,7 +17,6 @@ public class SoftwareUnit {
 
 	private int id;
 	private String name;
-	private String fullName;
 	private String uid;
 	private SoftwareUnitType type;
 	private SoftwareUnit parentUnit;
@@ -30,16 +29,14 @@ public class SoftwareUnit {
 	/**
 	 * @param id
 	 * @param name
-	 * @param fullName
 	 * @param uid
 	 * @param type
 	 */
-	public SoftwareUnit(int id, String name, String fullName, String uid,
+	public SoftwareUnit(int id, String name, String uid,
 			SoftwareUnitType type) {
 		super();
 		this.id = id;
 		this.name = name;
-		this.fullName = fullName;
 		this.uid = uid;
 		this.type = type;
 	}
@@ -70,20 +67,6 @@ public class SoftwareUnit {
 	 */
 	public void setName(String name) {
 		this.name = name;
-	}
-
-	/**
-	 * @return the fullName
-	 */
-	public String getFullName() {
-		return fullName;
-	}
-
-	/**
-	 * @param fullName the fullName to set
-	 */
-	public void setFullName(String fullName) {
-		this.fullName = fullName;
 	}
 
 	/**

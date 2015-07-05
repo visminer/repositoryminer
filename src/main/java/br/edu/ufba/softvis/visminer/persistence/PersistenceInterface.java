@@ -191,7 +191,7 @@ public class PersistenceInterface {
 		for(SoftwareUnitDB softUnitDb : softUnitsDb){
 			
 			SoftwareUnit softUnitTemp = new SoftwareUnit(softUnitDb.getId(), softUnitDb.getName(),
-					softUnitDb.getFullName(), softUnitDb.getUid(), softUnitDb.getType());
+					softUnitDb.getUid(), softUnitDb.getType());
 			
 			if(softUnitDb.getSoftwareUnit() != null){
 				SoftwareUnit parentTemp = new SoftwareUnit();
