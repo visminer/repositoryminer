@@ -28,17 +28,30 @@ public class NOPMetric implements IMetric{
 	public void calculate(Map<File, AST> filesMap, List<Commit> commits,
 			MetricPersistance persistence) {
 
+		if(filesMap.size() == 0){
+			return;
+		}
+		
 		Set<Integer> packages = new HashSet<Integer>();
 		int project = 0;
 		
 		for(Entry<File, AST> entry : filesMap.entrySet()){
+			
 			AST ast = entry.getValue();
+			
+			if(ast == null){
+				continue;
+			}
+			
 			project = ast.getProject().getId();
 			if(ast.getDocument().getPackageDeclaration() != null){
 				int id = ast.getDocument().getPackageDeclaration().getId();
 				packages.add(id);
 			}
 		}
+		
+		
+		
 		int val = packages.size() + 1;
 		persistence.saveMetricValue(project, String.valueOf(val));
 		

@@ -102,7 +102,7 @@ public class JavaASTGenerator {
 			
 			
 			MethodDeclaration methodDecl = new MethodDeclaration();
-			methodDecl.setName(method.toString());
+			methodDecl.setName(method.getName().getFullyQualifiedName());
 			Block body = method.getBody();
 			methodDecl.setStatements(processBlock(body));
 			methodsDecl.add(methodDecl);

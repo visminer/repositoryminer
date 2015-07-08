@@ -32,9 +32,9 @@ public class CCMetric implements IMetric{
 
 		for(Entry<File, AST> entry : filesMap.entrySet()){
 
-			AST ast = (AST) entry.getValue();
-
-			if(ast.getDocument().getTypesDeclarations() == null){
+			AST ast = entry.getValue();
+			
+			if(ast == null || ast.getDocument().getTypesDeclarations() == null){
 				continue;
 			}
 

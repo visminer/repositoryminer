@@ -25,6 +25,7 @@ public class SaveAST {
 	private Map<String, Integer> uidMap;
 	private SoftwareUnitDAO softUnitDao;
 	private Project project;
+	private SoftwareUnitDB projectUnit;
 	private RepositoryDB repositoryDb;
 	
 	public SaveAST(RepositoryDB repositoryDb, EntityManager entityManager){
@@ -35,19 +36,17 @@ public class SaveAST {
 		softUnitDao.setEntityManager(entityManager);
 		
 		this.repositoryDb = repositoryDb;
-		SoftwareUnitDB projectUnit = softUnitDao.findByUid(repositoryDb.getUid());
+		projectUnit = softUnitDao.findByUid(repositoryDb.getUid());
 		
 		project = new Project();
 		project.setId(projectUnit.getId());
 		project.setName(projectUnit.getName());
-		
+
 	}
 	
 	public void save(FileDB fileDb, AST ast){
 
 		SoftwareUnitDB parent = null;
-		SoftwareUnitDB projectUnit = softUnitDao.findByUid(repositoryDb.getUid());
-		
 		ast.setProject(project);
 		
 		if(ast.getDocument().getPackageDeclaration() != null){

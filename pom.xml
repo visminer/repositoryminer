@@ -101,11 +101,11 @@
 			<version>${jdt.ui.version}</version>
 		</dependency>
 		
-	<dependency>
-		<groupId>org.eclipse</groupId>
-		<artifactId>jface</artifactId>
-		<version>${jface.version}</version>
-	</dependency>
+		<dependency>
+			<groupId>org.eclipse</groupId>
+			<artifactId>jface</artifactId>
+			<version>${jface.version}</version>
+		</dependency>
 		
 		
 	</dependencies>

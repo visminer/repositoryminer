@@ -102,7 +102,7 @@ public class MetricCalculator{
 	// True if the file should be processed or false otherwise.
 	private static boolean isAcceptable(String filePath){
 		int index = filePath.lastIndexOf(".") + 1;
-		return !acceptedExtensions.contains(filePath.substring(index));
+		return acceptedExtensions.contains(filePath.substring(index));
 	}	
 	
 	/**
@@ -163,7 +163,7 @@ public class MetricCalculator{
 			List<FileDB> filesDbAux = fileDao.findCommitedFiles(commitDb.getId());
 
 			for(FileDB fileDb : filesDbAux){
-
+					
 				File fileAux = new File(fileDb.getId(), fileDb.getPath(), fileDb.getUid());
 				FileXCommitDB fxcDb = fileDb.getFileXCommits().get(0);
 				FileState fs = new FileState(fxcDb.getLinesAdded(), fxcDb.getLinesRemoved(),
@@ -174,9 +174,7 @@ public class MetricCalculator{
 					repositoryFiles.remove(fileAux);
 					commitFiles.put(fileAux, null);
 				}else{
-					
 					if(isProcessable(fileAux.getPath())){
-						
 						/*
 						 *  Absolute path doesn't work correctly, with absolute path JGIT doesn't find the file.
 						 *  I save the absolute path, so I need to remove the repository absolute path part.
@@ -197,7 +195,13 @@ public class MetricCalculator{
 							Document doc = new Document();
 							doc.setName(fileAux.getPath());
 							AST ast = new AST();
-							ast.setSourceCode(new String(data));
+							
+							if(data == null){
+								ast.setSourceCode(null);
+							}else{
+								ast.setSourceCode(new String(data));
+							}
+							
 							ast.setDocument(doc);
 							saveAst.save(fileDb, ast);
 							commitFiles.put(fileAux, ast);

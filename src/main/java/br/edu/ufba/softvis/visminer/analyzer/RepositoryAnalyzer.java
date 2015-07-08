@@ -78,12 +78,14 @@ public class RepositoryAnalyzer implements IAnalyzer<Void>{
 		committersDb = null;
 		commitsDB = null;
 		
+		
+		SoftwareUnitDB softUnitDb = new SoftwareUnitDB(0, repositoryDb.getName(), SoftwareUnitType.PROJECT, repositoryDb.getUid());
+		softUnitDb.setRepository(repositoryDb);
+		softwareUnitDao.save(softUnitDb);
+		
 		if(metrics != null && metrics.size() > 0){
 			MetricCalculator.calculate(metrics, repoSys, repositoryDb, entityManager);
 		}
-		
-		SoftwareUnitDB softUnitDb = new SoftwareUnitDB(0, repositoryDb.getName(), SoftwareUnitType.PROJECT, repositoryDb.getUid());
-		softwareUnitDao.save(softUnitDb);
 		
 		entityManager.close();
 		repoSys.close();

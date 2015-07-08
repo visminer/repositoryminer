@@ -33,6 +33,11 @@ public class NOCMetric implements IMetric{
 		for(Entry<File, AST> entry : filesMap.entrySet()){
 			
 			AST ast = entry.getValue();
+			
+			if(ast == null){
+				continue;
+			}
+			
 			Document doc = ast.getDocument();
 			int id, num = 0;
 
