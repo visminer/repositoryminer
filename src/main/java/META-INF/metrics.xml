@@ -1,5 +1,3 @@
 <metrics>
-	<metric id="SLOC">br.edu.ufba.softvis.visminer.metric.SLOCMetric</metric>
 	<metric id="CC">br.edu.ufba.softvis.visminer.metric.CCMetric</metric>
-	<metric id="NOC">br.edu.ufba.softvis.visminer.metric.NOCMetric</metric>
 </metrics>

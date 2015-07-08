@@ -29,8 +29,7 @@ public class MetricDB implements Serializable {
 	@Column(nullable=false, length=20)
 	private String acronym;
 
-	@Column(nullable=false)
-	@Lob
+	@Column(nullable=false, length=256)
 	private String description;
 
 	@Column(nullable=false, length=100)

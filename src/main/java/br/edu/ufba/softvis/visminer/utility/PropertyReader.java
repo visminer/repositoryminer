@@ -7,10 +7,7 @@ import java.io.InputStream;
 import java.util.Properties;
 
 /**
- * 
- * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
  * @version 0.9
- * 
  * Utility class to retrieve data from a properties file.
  */
 public class PropertyReader {

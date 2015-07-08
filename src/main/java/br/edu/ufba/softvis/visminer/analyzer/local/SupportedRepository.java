@@ -3,7 +3,6 @@ package br.edu.ufba.softvis.visminer.analyzer.local;
 import br.edu.ufba.softvis.visminer.constant.RepositoryType;
 
 /**
- * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
  * @version 0.9
  * Manage all the repositories and web repositories supported by VisMiner.
  */

@@ -9,7 +9,6 @@ import br.edu.ufba.softvis.visminer.model.bean.File;
 import br.edu.ufba.softvis.visminer.model.bean.Tree;
 
 /**
- * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
  * @version 0.9
  * @see GitRepository
  * Interface that define what is needed to support a repository.

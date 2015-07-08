@@ -1,7 +1,6 @@
 package br.edu.ufba.softvis.visminer.constant;
 
 /**
- * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
  * @version 0.9
  * Metric type.
  */

@@ -29,6 +29,7 @@ public class SoftwareUnit {
 	/**
 	 * @param id
 	 * @param name
+	 * @param fullName
 	 * @param uid
 	 * @param type
 	 */

@@ -1,10 +1,10 @@
 package br.edu.ufba.softvis.visminer.metric;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import org.eclipse.jface.text.Document;
+import java.util.Set;
 
 import br.edu.ufba.softvis.visminer.annotations.MetricAnnotation;
 import br.edu.ufba.softvis.visminer.ast.AST;
@@ -15,30 +15,33 @@ import br.edu.ufba.softvis.visminer.model.bean.File;
 import br.edu.ufba.softvis.visminer.persistence.MetricPersistance;
 
 @MetricAnnotation(
-		name = "Source Lines of Code",
-		description = "Source lines of code (SLOC), also known as lines of code (LOC), is a software metric"
-				+ " used to measure the size of a computer program by counting the number of lines in the text of"
-				+ " the program's source code.",
-		acronym = "SLOC",
-		type = MetricType.SIMPLE,
-		uid = MetricUid.SLOC
+	name = "Number of Packages",
+	description = "Number of Packages is a software metric used to measure the size of a computer program"+
+				" by counting the number of packages.",
+	acronym = "NOP",
+	type = MetricType.COMPLEX,
+	uid = MetricUid.NOP
 	)
-public class SLOCMetric implements IMetric{
+public class NOPMetric implements IMetric{
 
 	@Override
 	public void calculate(Map<File, AST> filesMap, List<Commit> commits,
 			MetricPersistance persistence) {
 
+		Set<Integer> packages = new HashSet<Integer>();
+		int project = 0;
+		
 		for(Entry<File, AST> entry : filesMap.entrySet()){
-
-			if(entry.getValue() == null){
-				continue;
-			}
-			
 			AST ast = entry.getValue();
-			Document doc = new Document(ast.getSourceCode());
-			persistence.saveMetricValue(ast.getDocument().getId(), String.valueOf(doc.getNumberOfLines()));
+			project = ast.getProject().getId();
+			if(ast.getDocument().getPackageDeclaration() != null){
+				int id = ast.getDocument().getPackageDeclaration().getId();
+				packages.add(id);
+			}
 		}
+		int val = packages.size() + 1;
+		persistence.saveMetricValue(project, String.valueOf(val));
+		
 	}
 
 }

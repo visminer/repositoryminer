@@ -8,17 +8,20 @@ import javax.persistence.EntityManager;
 import br.edu.ufba.softvis.visminer.analyzer.local.IRepositorySystem;
 import br.edu.ufba.softvis.visminer.analyzer.local.SupportedRepository;
 import br.edu.ufba.softvis.visminer.constant.MetricUid;
+import br.edu.ufba.softvis.visminer.constant.SoftwareUnitType;
 import br.edu.ufba.softvis.visminer.model.business.Repository;
 import br.edu.ufba.softvis.visminer.model.database.CommitDB;
 import br.edu.ufba.softvis.visminer.model.database.CommitterDB;
 import br.edu.ufba.softvis.visminer.model.database.RepositoryDB;
+import br.edu.ufba.softvis.visminer.model.database.SoftwareUnitDB;
 import br.edu.ufba.softvis.visminer.persistence.Database;
 import br.edu.ufba.softvis.visminer.persistence.dao.RepositoryDAO;
+import br.edu.ufba.softvis.visminer.persistence.dao.SoftwareUnitDAO;
 import br.edu.ufba.softvis.visminer.persistence.impl.RepositoryDAOImpl;
+import br.edu.ufba.softvis.visminer.persistence.impl.SoftwareUnitDAOImpl;
 import br.edu.ufba.softvis.visminer.utility.StringUtils;
 
 /**
- * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
  * @version 0.9
  * @see CommitAnalyzer
  * @see CommitterAnalyzer
@@ -47,8 +50,12 @@ public class RepositoryAnalyzer implements IAnalyzer<Void>{
 		IRepositorySystem repoSys = SupportedRepository.getRepository(repoBusi.getPath(), repoBusi.getType());
 		
 		EntityManager entityManager = Database.getInstance().getEntityManager();
+		
 		RepositoryDAO repositoryDao = new RepositoryDAOImpl();
 		repositoryDao.setEntityManager(entityManager);
+		
+		SoftwareUnitDAO softwareUnitDao = new SoftwareUnitDAOImpl();
+		softwareUnitDao.setEntityManager(entityManager);
 		
 		String path = repoSys.getAbsolutePath();
 		String uid = StringUtils.sha1(path);
@@ -58,14 +65,12 @@ public class RepositoryAnalyzer implements IAnalyzer<Void>{
 		}
 		
 		RepositoryDB repositoryDb = new RepositoryDB(0, repoBusi.getDescription(), repoBusi.getName(),
-				repoBusi.getPath(), repoBusi.getRemoteUrl(), repoBusi.getType(), repoBusi.getServiceType(), repoBusi.getUid());
-		repositoryDb.setPath(path);
-		repositoryDb.setUid(uid);
+				path, repoBusi.getRemoteUrl(), repoBusi.getType(), repoBusi.getServiceType(), uid);
 		
 		repositoryDao.save(repositoryDb);
 		List<CommitterDB> committersDb = new CommitterAnalyzer().persist(repositoryDb, repoSys, entityManager);
 		List<CommitDB> commitsDB = new CommitAnalyzer().persist(committersDb, repoSys, entityManager);
-
+		
 		new TreeAnalyzer().persist(commitsDB, repositoryDb, repoSys, entityManager);
 		new FileAnalyzer().persist(commitsDB, repoSys, entityManager);
 
@@ -76,6 +81,9 @@ public class RepositoryAnalyzer implements IAnalyzer<Void>{
 		if(metrics != null && metrics.size() > 0){
 			MetricCalculator.calculate(metrics, repoSys, repositoryDb, entityManager);
 		}
+		
+		SoftwareUnitDB softUnitDb = new SoftwareUnitDB(0, repositoryDb.getName(), SoftwareUnitType.PROJECT, repositoryDb.getUid());
+		softwareUnitDao.save(softUnitDb);
 		
 		entityManager.close();
 		repoSys.close();
