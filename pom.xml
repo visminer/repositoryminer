@@ -25,12 +25,10 @@
 		<jdt.version>3.3.0-v_771</jdt.version>
 		<eclipse.resources.version>3.7.100</eclipse.resources.version>
 		<eclipse.runtime.version>3.10.0-v20140318-2214</eclipse.runtime.version>
-		<jdt.ui.version>3.3.0-v20070607-0010</jdt.ui.version>
 		<github-api.version>1.62</github-api.version>
 		<slf4j.version>1.6.2</slf4j.version>
 		<maven-eclipse-plugin.version>2.9</maven-eclipse-plugin.version>
 		<maven-compiler-plugin.version>2.3.2</maven-compiler-plugin.version>
-		<jface.version>3.3.0-I20070606-0010</jface.version>
 
 	</properties>
 
@@ -95,19 +93,6 @@
 			<version>${eclipse.runtime.version}</version>
 		</dependency>
 	
-		<dependency>
-			<groupId>org.eclipse.jdt</groupId>
-			<artifactId>ui</artifactId>
-			<version>${jdt.ui.version}</version>
-		</dependency>
-		
-	<dependency>
-		<groupId>org.eclipse</groupId>
-		<artifactId>jface</artifactId>
-		<version>${jface.version}</version>
-	</dependency>
-		
-		
 	</dependencies>
 
 	<build>

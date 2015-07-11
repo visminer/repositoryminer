@@ -14,7 +14,6 @@ import br.edu.ufba.softvis.visminer.model.database.TreeDB;
 import br.edu.ufba.softvis.visminer.persistence.dao.TreeDAO;
 import br.edu.ufba.softvis.visminer.persistence.impl.TreeDAOImpl;
 /**
- * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
  * @version 0.9
  * @see CommitAnalyzer
  * @see CommitterAnalyzer

@@ -18,7 +18,6 @@ import br.edu.ufba.softvis.visminer.persistence.impl.CommitterRoleDAOImpl;
 
 
 /**
- * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
  * @version 0.9
  * @see CommitAnalyzer
  * @see FileAnalyzer

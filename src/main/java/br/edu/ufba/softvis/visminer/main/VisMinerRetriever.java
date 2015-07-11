@@ -11,7 +11,6 @@ import br.edu.ufba.softvis.visminer.model.business.Tree;
 import br.edu.ufba.softvis.visminer.persistence.PersistenceInterface;
 
 /**
- * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
  * @version 0.9
  * 
  * Provides informations queries in database.

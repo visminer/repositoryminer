@@ -1,7 +1,6 @@
 package br.edu.ufba.softvis.visminer.analyzer;
 
 /**
- * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
  * @param <T> Type of that will be returned by interface methods. 
  * @version 0.9
  * @see CommitAnalyzer

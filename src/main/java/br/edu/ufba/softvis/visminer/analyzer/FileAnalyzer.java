@@ -18,7 +18,6 @@ import br.edu.ufba.softvis.visminer.persistence.impl.FileDAOImpl;
 import br.edu.ufba.softvis.visminer.persistence.impl.FileXCommitDAOImpl;
 
 /**
- * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
  * @version 0.9
  * @see CommitAnalyzer
  * @see CommitterAnalyzer

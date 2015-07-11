@@ -3,7 +3,6 @@ package br.edu.ufba.softvis.visminer.analyzer;
 import br.edu.ufba.softvis.visminer.model.database.IssueDB;
 
 /**
- * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
  * @version 0.9
  * @see CommitAnalyzer
  * @see CommitterAnalyzer

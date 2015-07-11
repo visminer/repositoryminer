@@ -1,7 +1,6 @@
 package br.edu.ufba.softvis.visminer.constant;
 
 /**
- * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
  * @version 0.9
  * Software units types.
  */
@@ -11,7 +10,9 @@ public enum SoftwareUnitType {
 	PACKAGE(2),
 	FILE(3),
 	CLASS(4),
-	METHOD(5);
+	METHOD(5),
+	ENUM(6),
+	ENUM_CONST(7);
 	
 	private int id;
 	

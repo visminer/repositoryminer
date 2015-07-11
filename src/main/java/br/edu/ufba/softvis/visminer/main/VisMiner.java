@@ -11,7 +11,6 @@ import br.edu.ufba.softvis.visminer.persistence.Database;
 import br.edu.ufba.softvis.visminer.utility.PropertyReader;
 
 /**
- * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
  * @version 0.9
  * Provides core operations.
  */

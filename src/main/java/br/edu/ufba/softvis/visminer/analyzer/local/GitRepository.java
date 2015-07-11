@@ -38,7 +38,6 @@ import br.edu.ufba.softvis.visminer.utility.AuthorEmailFilter;
 import br.edu.ufba.softvis.visminer.utility.StringUtils;
 
 /**
- * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
  * @version 0.9
  * @see IRepositorySystem
  * Implementation for GIT repositories.
@@ -199,7 +198,7 @@ public class GitRepository implements IRepositorySystem{
 
 		CommitFinder finder = new CommitFinder(repository);
 		finder.setFilter(filters);
-		finder.findInBranches();
+		finder.find();
 
 		return createListCommit(revCommits);
 

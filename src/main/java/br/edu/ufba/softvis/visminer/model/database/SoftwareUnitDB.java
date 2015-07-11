@@ -66,6 +66,7 @@ public class SoftwareUnitDB implements Serializable {
 
 	/**
 	 * @param id
+	 * @param fullName
 	 * @param name
 	 * @param type
 	 * @param uid

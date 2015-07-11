@@ -1,15 +1,17 @@
 package br.edu.ufba.softvis.visminer.constant;
 
 /**
- * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
  * @version 0.9
  * Metrics unique id.
  */
 public enum MetricUid {
 
-	SLOC(1),
-	CC(2),
-	NOC(3);
+	CC(1),
+	SLOC(2),
+	NOC(3),
+	NOP(4),
+	NOM(5),
+	NOE(6);
 	
 	private int id;
 	

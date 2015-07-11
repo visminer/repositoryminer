@@ -10,6 +10,9 @@ import java.util.Set;
 import javax.persistence.EntityManager;
 
 import br.edu.ufba.softvis.visminer.analyzer.local.IRepositorySystem;
+import br.edu.ufba.softvis.visminer.ast.AST;
+import br.edu.ufba.softvis.visminer.ast.Document;
+import br.edu.ufba.softvis.visminer.ast.generator.JavaASTGenerator;
 import br.edu.ufba.softvis.visminer.config.MetricConfig;
 import br.edu.ufba.softvis.visminer.constant.MetricType;
 import br.edu.ufba.softvis.visminer.constant.MetricUid;
@@ -18,29 +21,28 @@ import br.edu.ufba.softvis.visminer.metric.IMetric;
 import br.edu.ufba.softvis.visminer.model.bean.Commit;
 import br.edu.ufba.softvis.visminer.model.bean.File;
 import br.edu.ufba.softvis.visminer.model.bean.FileState;
-import br.edu.ufba.softvis.visminer.model.bean.Repository;
 import br.edu.ufba.softvis.visminer.model.database.CommitDB;
 import br.edu.ufba.softvis.visminer.model.database.FileDB;
 import br.edu.ufba.softvis.visminer.model.database.FileXCommitDB;
 import br.edu.ufba.softvis.visminer.model.database.RepositoryDB;
 import br.edu.ufba.softvis.visminer.model.database.TreeDB;
 import br.edu.ufba.softvis.visminer.persistence.MetricPersistance;
+import br.edu.ufba.softvis.visminer.persistence.SaveAST;
 import br.edu.ufba.softvis.visminer.persistence.dao.CommitDAO;
 import br.edu.ufba.softvis.visminer.persistence.dao.FileDAO;
 import br.edu.ufba.softvis.visminer.persistence.dao.TreeDAO;
 import br.edu.ufba.softvis.visminer.persistence.impl.CommitDAOImpl;
 import br.edu.ufba.softvis.visminer.persistence.impl.FileDAOImpl;
 import br.edu.ufba.softvis.visminer.persistence.impl.TreeDAOImpl;
-import br.edu.ufba.softvis.visminer.utility.JavaAST;
 
 /**
- * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
  * @version 0.9
  * Manages all the process to calculate the metrics.
  */
 public class MetricCalculator{
 
 	private static final Set<String> sourceExtensions = initSourceExtensions();
+	private static final Set<String> acceptedExtensions = initAcceptedExtensions();
 	private static final Set<String> avoidedExtensions = initAvoidedExtensions();
 
 	//List of file files extension that should have their AST calculated.
@@ -54,6 +56,19 @@ public class MetricCalculator{
 		return set;
 	}
 
+	// List of files extensions that will have their content accessed, but they won't have any AST calculated.
+	private static Set<String> initAcceptedExtensions(){
+		
+		Set<String> set = new HashSet<String>();
+		set.add("txt");
+		set.add("md");
+		set.add("xml");
+		set.add("json");
+		set.add("html");
+		set.add("css");
+		
+		return set;
+	}
 	
 	//List of files extensions that should be avoided.
 	private static Set<String> initAvoidedExtensions(){
@@ -84,6 +99,12 @@ public class MetricCalculator{
 		return !avoidedExtensions.contains(filePath.substring(index));
 	}
 	
+	// True if the file should be processed or false otherwise.
+	private static boolean isAcceptable(String filePath){
+		int index = filePath.lastIndexOf(".") + 1;
+		return acceptedExtensions.contains(filePath.substring(index));
+	}	
+	
 	/**
 	 * 
 	 * @param metricsId
@@ -102,16 +123,13 @@ public class MetricCalculator{
 		CommitDAO commitDao = new CommitDAOImpl();
 		commitDao.setEntityManager(entityManager);
 		
-		Repository repository = new Repository(repositoryDb.getId(), repositoryDb.getDescription(), repositoryDb.getName(),
-				repositoryDb.getPath(), repositoryDb.getRemoteUrl(), repositoryDb.getType(), repositoryDb.getServiceType(), repositoryDb.getUid());
-		
 		Map<MetricType, Map<MetricUid, IMetric>> metricsMap = MetricConfig.getImplementations(metricsId);
 		
 		List<TreeDB> treesDb = treeDao.findByRepository(repositoryDb.getId());
 		for(TreeDB treeDb : treesDb){
 			if(treeDb.getType() == TreeType.BRANCH){
 				List<CommitDB> commitsDb = commitDao.findByTree(treeDb.getId());
-				calculateMetrics(commitsDb, metricsMap, repoSys, repository, entityManager);
+				calculateMetrics(commitsDb, metricsMap, repoSys, repositoryDb, entityManager);
 			}
 		}
 		
@@ -123,20 +141,17 @@ public class MetricCalculator{
 	 * Calculates the metrics and save their values in database.
 	 */
 	private static void calculateMetrics(List<CommitDB> commitsDb, Map<MetricType, Map<MetricUid, IMetric>> metricsMap,
-			IRepositorySystem repoSys, Repository repository, EntityManager entityManager) {
+			IRepositorySystem repoSys, RepositoryDB repositoryDb, EntityManager entityManager) {
 
 		FileDAO fileDao = new FileDAOImpl();
 		fileDao.setEntityManager(entityManager);
+
+		MetricPersistance persistence = new MetricPersistance(entityManager);
 		
-		RepositoryDB repositoryDb = new RepositoryDB();
-		repositoryDb.setId(repository.getId());
-		repositoryDb.setUid(repository.getUid());
-		
-		MetricPersistance persistence = new MetricPersistance(repositoryDb, entityManager);
-		
-		Map<File, Object> repositoryFiles = new HashMap<File, Object>();
-		Map<File, Object> commitFiles = new HashMap<File, Object>();
+		Map<File, AST> repositoryFiles = new HashMap<File, AST>();
+		Map<File, AST> commitFiles = new HashMap<File, AST>();
 		List<Commit> commitsBean = new ArrayList<Commit>(commitsDb.size());
+		SaveAST saveAst = new SaveAST(repositoryDb, entityManager);
 
 		for(int i = 0; i < commitsDb.size(); i++){
 
@@ -148,19 +163,18 @@ public class MetricCalculator{
 			List<FileDB> filesDbAux = fileDao.findCommitedFiles(commitDb.getId());
 
 			for(FileDB fileDb : filesDbAux){
-
-				File fileAux = new File(fileDb.getId(), fileDb.getPath(), fileDb.getUid());
-				if(fileDb.getFileXCommits().get(0).isRemoved()){
-					repositoryFiles.remove(fileAux);
-				}else{
-
-					FileXCommitDB fxcDb = fileDb.getFileXCommits().get(0);
-					FileState fs = new FileState(fxcDb.getLinesAdded(), fxcDb.getLinesRemoved(),
-							fxcDb.isRemoved());
-					fileAux.setFileState(fs);
 					
+				File fileAux = new File(fileDb.getId(), fileDb.getPath(), fileDb.getUid());
+				FileXCommitDB fxcDb = fileDb.getFileXCommits().get(0);
+				FileState fs = new FileState(fxcDb.getLinesAdded(), fxcDb.getLinesRemoved(),
+						fxcDb.isRemoved());
+				fileAux.setFileState(fs);
+				
+				if(fs.isDeleted()){
+					repositoryFiles.remove(fileAux);
+					commitFiles.put(fileAux, null);
+				}else{
 					if(isProcessable(fileAux.getPath())){
-						
 						/*
 						 *  Absolute path doesn't work correctly, with absolute path JGIT doesn't find the file.
 						 *  I save the absolute path, so I need to remove the repository absolute path part.
@@ -170,25 +184,40 @@ public class MetricCalculator{
 						byte[] data = repoSys.getData(commitDb.getName(), fileAux.getPath().substring(index));
 						
 						if(isASTCalculable(fileAux.getPath())){
-							JavaAST javaAST = new JavaAST();
-							javaAST.partserFromBytes(data);
-							commitFiles.put(fileAux, javaAST);
-						}else{
-							commitFiles.put(fileAux, data);
+							
+							AST ast = JavaASTGenerator.generate(fileAux.getPath(), data);
+							saveAst.save(fileDb, ast);
+							commitFiles.put(fileAux, ast);
+							repositoryFiles.put(fileAux, ast);
+							
+						}else if(isAcceptable(fileAux.getPath())){
+							
+							Document doc = new Document();
+							doc.setName(fileAux.getPath());
+							AST ast = new AST();
+							
+							if(data == null){
+								ast.setSourceCode(null);
+							}else{
+								ast.setSourceCode(new String(data));
+							}
+							
+							ast.setDocument(doc);
+							saveAst.save(fileDb, ast);
+							commitFiles.put(fileAux, ast);
+							repositoryFiles.put(fileAux, ast);
+							
 						}
 						
 					}else{
-						
 						commitFiles.put(fileAux, null);
-						
+						repositoryFiles.put(fileAux, null);
 					}
-
 
 				}// end else
 			}// end for(FileDB fileDb : filesDbAux)
 
-			repositoryFiles.putAll(commitFiles);
-			calculationMetricsHelper(metricsMap, commitsBean, commitFiles, repositoryFiles, repository, persistence);
+			calculationMetricsHelper(metricsMap, commitsBean, commitFiles, repositoryFiles, persistence);
 			
 		}// end for(CommitDB commitDb : commitsDb)
 
@@ -196,7 +225,7 @@ public class MetricCalculator{
 	
 	// Calculates all the selected metrics for a given commit.
 	private static void calculationMetricsHelper(Map<MetricType, Map<MetricUid, IMetric>> metricsMap, List<Commit> commits, 
-			Map<File, Object> committedFiles, Map<File, Object> repositoryFiles, Repository repository, MetricPersistance persistence){
+			Map<File, AST> committedFiles, Map<File, AST> repositoryFiles, MetricPersistance persistence){
 		
 		Commit c = commits.get(commits.size() - 1);
 		persistence.setCommit(c);
@@ -204,13 +233,13 @@ public class MetricCalculator{
 		Map<MetricUid, IMetric> metricMapAux = metricsMap.get(MetricType.SIMPLE);
 		for(java.util.Map.Entry<MetricUid, IMetric> entry : metricMapAux.entrySet()){
 			persistence.setMetric(entry.getKey());
-			entry.getValue().calculate(committedFiles, commits, repository, persistence);
+			entry.getValue().calculate(committedFiles, commits, persistence);
 		}
 		
 		metricMapAux = metricsMap.get(MetricType.COMPLEX);
 		for(java.util.Map.Entry<MetricUid, IMetric> entry : metricMapAux.entrySet()){
 			persistence.setMetric(entry.getKey());
-			entry.getValue().calculate(repositoryFiles, commits, repository, persistence);
+			entry.getValue().calculate(repositoryFiles, commits, persistence);
 		}
 		
 	}

@@ -15,19 +15,18 @@ import br.edu.ufba.softvis.visminer.model.bean.File;
 import br.edu.ufba.softvis.visminer.persistence.MetricPersistance;
 
 @MetricAnnotation(
-		name = "Number of Classes",
-		description = "Number of Classes is a software metric used to measure the size of a computer program"+
-				" by counting the number of classes and interfaces",
-		acronym = "NOC",
+		name = "Number of Enums",
+		description = "Number of Enums is a software metric used to measure the size of a computer program"+
+				" by counting the number of enums",
+		acronym = "NOE",
 		type = MetricType.COMPLEX,
-		uid = MetricUid.NOC
+		uid = MetricUid.NOE
 	)
-public class NOCMetric implements IMetric{
+public class NOEMetric implements IMetric{
 
 	@Override
-	public void calculate(Map<File, AST> filesMap, List<Commit> commits,
-			MetricPersistance persistence) {
-
+	public void calculate(Map<File, AST> filesMap, List<Commit> commits, MetricPersistance persistence) {
+		
 		Map<Integer, Integer> packageCls = new HashMap<Integer, Integer>();
 		
 		for(Entry<File, AST> entry : filesMap.entrySet()){
@@ -42,11 +41,7 @@ public class NOCMetric implements IMetric{
 			int id, num = 0;
 
 			if(doc.getEnumsDeclarations() != null){
-				num += doc.getEnumsDeclarations().size();
-			}
-			
-			if(doc.getTypesDeclarations() != null){
-				num += doc.getTypesDeclarations().size();
+				num = doc.getEnumsDeclarations().size();
 			}
 			
 			if(doc.getPackageDeclaration() != null){
@@ -56,8 +51,7 @@ public class NOCMetric implements IMetric{
 			}
 			
 			if(packageCls.containsKey(id)){
-				int aux = packageCls.get(id);
-				packageCls.put(id, aux + num);
+				packageCls.put(id, packageCls.get(id) + num);
 			}else{
 				packageCls.put(id, num);
 			}
