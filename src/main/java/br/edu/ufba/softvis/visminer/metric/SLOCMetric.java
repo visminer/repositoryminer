@@ -37,7 +37,7 @@ public class SLOCMetric implements IMetric{
 			
 			AST ast = entry.getValue();
 			Document doc = new Document(ast.getSourceCode());
-			persistence.saveMetricValue(ast.getDocument().getId(), String.valueOf(doc.getNumberOfLines()));
+			persistence.postMetricValue(ast.getDocument().getId(), String.valueOf(doc.getNumberOfLines()));
 		}
 	}
 

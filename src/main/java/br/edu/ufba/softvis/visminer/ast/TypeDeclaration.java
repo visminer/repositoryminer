@@ -1,6 +1,5 @@
 package br.edu.ufba.softvis.visminer.ast;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class TypeDeclaration {
@@ -8,7 +7,7 @@ public class TypeDeclaration {
 	private int id;
 	private String name;
 	private boolean interfaceClass;
-	private List<MethodDeclaration> methods = new ArrayList<MethodDeclaration>();
+	private List<MethodDeclaration> methods;
 
 	/**
 	 * @return the id

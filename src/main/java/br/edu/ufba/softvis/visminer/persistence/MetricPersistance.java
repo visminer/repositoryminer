@@ -1,7 +1,7 @@
 package br.edu.ufba.softvis.visminer.persistence;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.EntityManager;
 
@@ -21,10 +21,7 @@ import br.edu.ufba.softvis.visminer.persistence.impl.SoftwareUnitXCommitImpl;
  * Persistence interface for metrics calculation.
  */
 public class MetricPersistance {
-	
-	private EntityManager entityManager;
 
-	Set<SoftwareUnitXCommitDB> unitsXCommits;
 	
 	private SoftwareUnitXCommitDAO softUnitXCommitDao;
 	private MetricValueDAO metricValueDao;
@@ -32,10 +29,13 @@ public class MetricPersistance {
 	private Commit commit;
 	private MetricUid metric;
 	
+	private List<SoftwareUnitXCommitDB> unitsXCommits;
+	private List<MetricValueDB> metricValues;
+	
 	public MetricPersistance(EntityManager entityManager) {
 
-		this.unitsXCommits = new HashSet<SoftwareUnitXCommitDB>();
-		this.entityManager = entityManager;
+		this.unitsXCommits = new ArrayList<SoftwareUnitXCommitDB>();
+		this.metricValues  = new ArrayList<MetricValueDB>();
 
 		this.softUnitXCommitDao = new SoftwareUnitXCommitImpl();
 		this.softUnitXCommitDao.setEntityManager(entityManager);
@@ -61,22 +61,30 @@ public class MetricPersistance {
 		this.commit = commit;
 	}
 	
-	public void saveMetricValue(int id, String value){
+	public void initBatchPersistence() {
+		unitsXCommits.clear();
+		metricValues.clear();
+	}
+	
+	public void postMetricValue(int id, String value){
 		
 		SoftwareUnitXCommitPK unitXCommitPk = new SoftwareUnitXCommitPK(id, commit.getId());
 		SoftwareUnitXCommitDB unitXCommit = new SoftwareUnitXCommitDB(unitXCommitPk);
 		
 		if(!unitsXCommits.contains(unitXCommit)){
-			if(softUnitXCommitDao.find(unitXCommitPk) == null){
-				softUnitXCommitDao.save(unitXCommit);
-			}
 			unitsXCommits.add(unitXCommit);
 		}
 		
 		MetricValuePK metricValPk = new MetricValuePK(id, commit.getId(), metric.getId());
 		MetricValueDB metricValDb =  new MetricValueDB(metricValPk, value);
-		metricValueDao.merge(metricValDb);
 		
+		metricValues.add(metricValDb);
+		
+	}
+	
+	public void flushAllMetricValues() {
+		softUnitXCommitDao.batchMerge(unitsXCommits);
+		metricValueDao.batchMerge(metricValues);
 	}
 
 	/**

@@ -147,6 +147,7 @@ public class MetricCalculator{
 		fileDao.setEntityManager(entityManager);
 
 		MetricPersistance persistence = new MetricPersistance(entityManager);
+		persistence.initBatchPersistence();
 		
 		Map<File, AST> repositoryFiles = new HashMap<File, AST>();
 		Map<File, AST> commitFiles = new HashMap<File, AST>();
@@ -221,6 +222,8 @@ public class MetricCalculator{
 			
 		}// end for(CommitDB commitDb : commitsDb)
 
+		
+		persistence.flushAllMetricValues();
 	}
 	
 	// Calculates all the selected metrics for a given commit.
