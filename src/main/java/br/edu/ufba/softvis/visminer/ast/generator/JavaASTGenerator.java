@@ -76,12 +76,14 @@ public class JavaASTGenerator {
 			
 		}
 		
-		if(typesDecl.size() > 0){
-			document.setTypesDeclarations(typesDecl);
-		}
-		
-		if(enumsDecl.size() > 0){
-			document.setEnumsDeclarations(enumsDecl);
+		if(root.types().size() > 0){
+			if(typesDecl.size() > 0){
+				document.setTypesDeclarations(typesDecl);
+			}
+			
+			if(enumsDecl.size() > 0){
+				document.setEnumsDeclarations(enumsDecl);
+			}
 		}
 		
 		AST ast = new AST();
@@ -97,15 +99,19 @@ public class JavaASTGenerator {
 		typeDecl.setInterfaceClass(type.isInterface());
 		typeDecl.setName(type.getName().getFullyQualifiedName());
 		
+		if(type.getMethods().length == 0){
+			return typeDecl;
+		}
+		
 		List<MethodDeclaration> methodsDecl = new ArrayList<MethodDeclaration>();
 		for(org.eclipse.jdt.core.dom.MethodDeclaration method : type.getMethods()){
-			
 			
 			MethodDeclaration methodDecl = new MethodDeclaration();
 			methodDecl.setName(method.getName().getFullyQualifiedName());
 			Block body = method.getBody();
 			methodDecl.setStatements(processBlock(body));
 			methodsDecl.add(methodDecl);
+			
 		}
 		
 		typeDecl.setMethods(methodsDecl);
@@ -117,6 +123,10 @@ public class JavaASTGenerator {
 		
 		br.edu.ufba.softvis.visminer.ast.EnumDeclaration enumDecl = new br.edu.ufba.softvis.visminer.ast.EnumDeclaration();
 		enumDecl.setName(enumType.getName().getFullyQualifiedName());
+		
+		if(enumType.enumConstants() == null){
+			return enumDecl;
+		}
 		
 		List<EnumConstantDeclaration> constsDecls = new ArrayList<EnumConstantDeclaration>();
 		for(Object elem : enumType.enumConstants()){

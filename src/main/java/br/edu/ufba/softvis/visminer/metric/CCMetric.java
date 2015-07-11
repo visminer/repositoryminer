@@ -39,9 +39,23 @@ public class CCMetric implements IMetric{
 			}
 
 			for(TypeDeclaration type : ast.getDocument().getTypesDeclarations()){
-				for(MethodDeclaration method : type.getMethods()){
-					persistence.saveMetricValue(method.getId(), calculate(method));
+				
+				if(type.getMethods() == null){
+					break;
 				}
+				
+				int sumCC = 0;
+				int numMethods = type.getMethods().size();
+				
+				for(MethodDeclaration method : type.getMethods()){
+					int cc = calculate(method);
+					sumCC += cc;
+					persistence.saveMetricValue(method.getId(), String.valueOf(cc));
+				}
+				System.out.println("Commit: "+commits.get(commits.size()-1).getName()+" file "+entry.getKey().getPath()+" vals "+sumCC+" "+numMethods);
+				float averageCC = sumCC / numMethods;
+				persistence.saveMetricValue(type.getId(), String.valueOf(averageCC));
+				
 			}
 
 		}
@@ -49,10 +63,10 @@ public class CCMetric implements IMetric{
 	}
 
 
-	private String calculate(MethodDeclaration method) {
+	private int calculate(MethodDeclaration method) {
 
 		if(method.getStatements() == null){
-			return "1";
+			return 1;
 		}
 
 		int cc = 1;
@@ -66,7 +80,7 @@ public class CCMetric implements IMetric{
 			}
 		}
 
-		return String.valueOf(cc);
+		return cc;
 	}
 
 }

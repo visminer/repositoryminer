@@ -76,6 +76,10 @@ public class SaveAST {
 						fileDb, repositoryDb, docUnit);
 				type.setId(typeUnit.getId());
 				
+				if(type.getMethods() == null){
+					continue;
+				}
+				
 				for(MethodDeclaration method : type.getMethods()){
 					String methodUid = generateUid(repositoryDb.getUid(), typeUid, method.getName());
 					SoftwareUnitDB methodUnit = getSofwareUnitDB(methodUid, method.getName(), SoftwareUnitType.METHOD,
@@ -93,6 +97,10 @@ public class SaveAST {
 				SoftwareUnitDB enumUnit = getSofwareUnitDB(enumUid, enumDecl.getName(), SoftwareUnitType.ENUM, fileDb,
 						repositoryDb, docUnit);
 				enumDecl.setId(enumUnit.getId());
+				
+				if(enumDecl.getDeclarations() == null){
+					continue;
+				}
 				
 				for(EnumConstantDeclaration constDecl : enumDecl.getDeclarations()){
 					String constUid = generateUid(repositoryDb.getUid(), enumUid, constDecl.getName());
