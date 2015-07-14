@@ -59,7 +59,7 @@ public class NOEMetric implements IMetric{
 		}
 		
 		for(Entry<Integer, Integer> entry : packageCls.entrySet()){
-			persistence.saveMetricValue(entry.getKey(), String.valueOf(entry.getValue()));
+			persistence.postMetricValue(entry.getKey(), String.valueOf(entry.getValue()));
 		}
 		
 	}

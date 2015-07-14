@@ -41,7 +41,7 @@ public class NOMMetric implements IMetric {
 				if(type.getMethods() != null){
 					m = type.getMethods().size();
 				}
-				persistence.saveMetricValue(type.getId(), String.valueOf(m));
+				persistence.postMetricValue(type.getId(), String.valueOf(m));
 			}
 			
 		}

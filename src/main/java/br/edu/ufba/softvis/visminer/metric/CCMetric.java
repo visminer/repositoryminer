@@ -44,17 +44,10 @@ public class CCMetric implements IMetric{
 					break;
 				}
 				
-				int sumCC = 0;
-				int numMethods = type.getMethods().size();
-				
 				for(MethodDeclaration method : type.getMethods()){
 					int cc = calculate(method);
-					sumCC += cc;
-					persistence.saveMetricValue(method.getId(), String.valueOf(cc));
+					persistence.postMetricValue(method.getId(), String.valueOf(cc));
 				}
-				System.out.println("Commit: "+commits.get(commits.size()-1).getName()+" file "+entry.getKey().getPath()+" vals "+sumCC+" "+numMethods);
-				float averageCC = sumCC / numMethods;
-				persistence.saveMetricValue(type.getId(), String.valueOf(averageCC));
 				
 			}
 

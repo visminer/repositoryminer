@@ -53,7 +53,7 @@ public class NOPMetric implements IMetric{
 		
 		
 		int val = packages.size() + 1;
-		persistence.saveMetricValue(project, String.valueOf(val));
+		persistence.postMetricValue(project, String.valueOf(val));
 		
 	}
 
