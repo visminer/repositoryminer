@@ -120,6 +120,12 @@ public class MetricConfig {
 		
 		try{
 			
+			if(metricsId.contains(MetricUid.WMC)){
+				if(metricsId.contains(MetricUid.CC))					
+					metricsId.remove(MetricUid.CC);
+				metricsId.add(metricsId.indexOf(MetricUid.WMC),MetricUid.CC);
+			}
+			
 			for(MetricUid metricUid : metricsId){
 				String classPath = map.get(metricUid.getId());
 				IMetric metric = (IMetric) Class.forName(classPath).newInstance();
