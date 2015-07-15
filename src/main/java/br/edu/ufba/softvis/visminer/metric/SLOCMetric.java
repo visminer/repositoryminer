@@ -10,8 +10,8 @@ import br.edu.ufba.softvis.visminer.annotations.MetricAnnotation;
 import br.edu.ufba.softvis.visminer.ast.AST;
 import br.edu.ufba.softvis.visminer.constant.MetricType;
 import br.edu.ufba.softvis.visminer.constant.MetricUid;
-import br.edu.ufba.softvis.visminer.model.bean.Commit;
-import br.edu.ufba.softvis.visminer.model.bean.File;
+import br.edu.ufba.softvis.visminer.model.database.CommitDB;
+import br.edu.ufba.softvis.visminer.model.database.FileDB;
 import br.edu.ufba.softvis.visminer.persistence.MetricPersistance;
 
 @MetricAnnotation(
@@ -26,10 +26,10 @@ import br.edu.ufba.softvis.visminer.persistence.MetricPersistance;
 public class SLOCMetric implements IMetric{
 
 	@Override
-	public void calculate(Map<File, AST> filesMap, List<Commit> commits,
+	public void calculate(Map<FileDB, AST> filesMap, List<CommitDB> commits,
 			MetricPersistance persistence) {
 
-		for(Entry<File, AST> entry : filesMap.entrySet()){
+		for(Entry<FileDB, AST> entry : filesMap.entrySet()){
 
 			if(entry.getValue() == null){
 				continue;

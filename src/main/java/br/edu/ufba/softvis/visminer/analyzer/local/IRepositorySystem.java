@@ -3,10 +3,10 @@ package br.edu.ufba.softvis.visminer.analyzer.local;
 import java.util.Date;
 import java.util.List;
 
-import br.edu.ufba.softvis.visminer.model.bean.Commit;
-import br.edu.ufba.softvis.visminer.model.bean.Committer;
-import br.edu.ufba.softvis.visminer.model.bean.File;
-import br.edu.ufba.softvis.visminer.model.bean.Tree;
+import br.edu.ufba.softvis.visminer.model.database.CommitDB;
+import br.edu.ufba.softvis.visminer.model.database.FileDB;
+import br.edu.ufba.softvis.visminer.model.database.TreeDB;
+
 
 /**
  * @version 0.9
@@ -29,15 +29,9 @@ public interface IRepositorySystem {
 	public String getAbsolutePath();
 
 	/**
-	 * @return List of committers (contributors and not contributors).
-	 */
-	public List<Committer> getCommitters();
-
-	
-	/**
 	 * @return List of trees (tags and branchs).
 	 */
-	public List<Tree> getTrees();
+	public List<TreeDB> getTrees();
 
 
 	/**
@@ -50,19 +44,13 @@ public interface IRepositorySystem {
 	/**
 	 * @return List of all commits made.
 	 */
-	public List<Commit> getCommits();
+	public List<CommitDB> getCommits();
 	
-	/**
-	 * @param committerEmail
-	 * @return List of commits made by a committer.
-	 */
-	public List<Commit> getCommitsByCommitter(String committerEmail);
-
 	/**
 	 * @param treeFullName
 	 * @return List of commits made in a tree.
 	 */
-	public List<Commit> getCommitsByTree(String treeFullName);
+	public List<CommitDB> getCommitsByTree(String treeFullName);
 
 	/**
 	 * @param commitUid
@@ -75,7 +63,7 @@ public interface IRepositorySystem {
 	 * @param commitUid
 	 * @return List of modified files (with modifications) in a commit.
 	 */
-	public List<File> getCommitedFiles(String commitUid);
+	public List<FileDB> getCommitedFiles(CommitDB commitDb);
 
 	/**
 	 * Closes the repository and frees memory and resources.

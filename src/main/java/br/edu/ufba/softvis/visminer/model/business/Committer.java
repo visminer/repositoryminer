@@ -14,7 +14,6 @@ public class Committer {
 	private int id;
 	private String email;
 	private String name;
-	private boolean contribuitor;
 	private List<Commit> commits;
 	
 	public Committer(){}
@@ -23,14 +22,12 @@ public class Committer {
 	 * @param id
 	 * @param email
 	 * @param name
-	 * @param contribuitor
 	 */
-	public Committer(int id, String email, String name, boolean contribuitor) {
+	public Committer(int id, String email, String name) {
 		super();
 		this.id = id;
 		this.email = email;
 		this.name = name;
-		this.contribuitor = contribuitor;
 	}
 
 	/**
@@ -73,20 +70,6 @@ public class Committer {
 	 */
 	public void setName(String name) {
 		this.name = name;
-	}
-
-	/**
-	 * @return the contribuitor
-	 */
-	public boolean isContribuitor() {
-		return contribuitor;
-	}
-
-	/**
-	 * @param contribuitor the contribuitor to set
-	 */
-	public void setContribuitor(boolean contribuitor) {
-		this.contribuitor = contribuitor;
 	}
 
 	/**

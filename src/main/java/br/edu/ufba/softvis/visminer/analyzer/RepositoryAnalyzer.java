@@ -11,7 +11,6 @@ import br.edu.ufba.softvis.visminer.constant.MetricUid;
 import br.edu.ufba.softvis.visminer.constant.SoftwareUnitType;
 import br.edu.ufba.softvis.visminer.model.business.Repository;
 import br.edu.ufba.softvis.visminer.model.database.CommitDB;
-import br.edu.ufba.softvis.visminer.model.database.CommitterDB;
 import br.edu.ufba.softvis.visminer.model.database.RepositoryDB;
 import br.edu.ufba.softvis.visminer.model.database.SoftwareUnitDB;
 import br.edu.ufba.softvis.visminer.persistence.Database;
@@ -23,29 +22,15 @@ import br.edu.ufba.softvis.visminer.utility.StringUtils;
 
 /**
  * @version 0.9
- * @see CommitAnalyzer
- * @see CommitterAnalyzer
- * @see FileAnalyzer
- * @see IssueAnalyzer
- * @see MilestoneAnalyzer
- * @see TreeAnalyzer
- * @see IAnalyzer
- * 
  * Defines how to save or to increment informations about the repository in database.
  */
-public class RepositoryAnalyzer implements IAnalyzer<Void>{
+public class RepositoryAnalyzer{
 
 	/*
 	 * This class is responsible for join all the analyzers and make the
 	 * repository analyzis.
 	*/
-	
-	@SuppressWarnings("unchecked")
-	@Override
-	public Void persist(Object... objects) {
-		
-		Repository repoBusi = (Repository) objects[0];
-		List<MetricUid> metrics = (List<MetricUid>) objects[1];
+	public void persist(Repository repoBusi, List<MetricUid> metrics) {
 		
 		IRepositorySystem repoSys = SupportedRepository.getRepository(repoBusi.getPath(), repoBusi.getType());
 		
@@ -65,19 +50,15 @@ public class RepositoryAnalyzer implements IAnalyzer<Void>{
 		}
 		
 		RepositoryDB repositoryDb = new RepositoryDB(0, repoBusi.getDescription(), repoBusi.getName(),
-				path, repoBusi.getRemoteUrl(), repoBusi.getType(), repoBusi.getServiceType(), uid);
+				path, repoBusi.getType(), uid);
 		
 		repositoryDao.save(repositoryDb);
-		List<CommitterDB> committersDb = new CommitterAnalyzer().persist(repositoryDb, repoSys, entityManager);
-		List<CommitDB> commitsDB = new CommitAnalyzer().persist(committersDb, repoSys, entityManager);
+		List<CommitDB> commitsDB = new CommitAndCommitterAnalyzer().persist(repositoryDb, repoSys, entityManager);
 		
 		new TreeAnalyzer().persist(commitsDB, repositoryDb, repoSys, entityManager);
 		new FileAnalyzer().persist(commitsDB, repoSys, entityManager);
 
-		// set null in the things that will have no more use for save memory
-		committersDb = null;
 		commitsDB = null;
-		
 		
 		SoftwareUnitDB softUnitDb = new SoftwareUnitDB(0, repositoryDb.getName(), SoftwareUnitType.PROJECT, repositoryDb.getUid());
 		softUnitDb.setRepository(repositoryDb);
@@ -89,13 +70,7 @@ public class RepositoryAnalyzer implements IAnalyzer<Void>{
 		
 		entityManager.close();
 		repoSys.close();
-		return null;
 		
-	}
-
-	@Override
-	public Void increment(Object... objects) {
-		return null;
 	}
 
 	/**
@@ -116,7 +91,7 @@ public class RepositoryAnalyzer implements IAnalyzer<Void>{
 		
 		IRepositorySystem repoSys = SupportedRepository.getRepository(repoDb.getPath(), repoDb.getType());
 		
-		MetricCalculator.calculate(metrics, repoSys, repoDb, entityManager);
+		//MetricCalculator.calculate(metrics, repoSys, repoDb, entityManager);
 		
 		repoSys.close();
 		entityManager.close();

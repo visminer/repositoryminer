@@ -78,7 +78,7 @@ public class PersistenceInterface {
 		
 		String uid = StringUtils.sha1(repositoryPath);
 		RepositoryDB repoDb = repositoryDao.findByUid(uid);
-		
+	
 		Repository repository = new Repository(repoDb.getId(), repoDb.getDescription(), repoDb.getName(),
 				repoDb.getPath(), repoDb.getRemoteUrl(), repoDb.getType(),repoDb.getServiceType(), repoDb.getUid());
 		
@@ -101,8 +101,7 @@ public class PersistenceInterface {
 		
 		for(CommitterDB committerDb : committersDb){
 			
-			Committer committer = new Committer(committerDb.getId(), committerDb.getEmail(), committerDb.getName(),
-					committerDb.getCommitterRoles().get(0).isContributor());
+			Committer committer = new Committer(committerDb.getId(), committerDb.getEmail(), committerDb.getName());
 			committers.add(committer);
 		}
 
@@ -153,7 +152,7 @@ public class PersistenceInterface {
 					commitDb.getName());
 			
 			CommitterDB c = commitDb.getCommitter();
-			Committer committer = new Committer(c.getId(), c.getEmail(), c.getName(), false);
+			Committer committer = new Committer(c.getId(), c.getEmail(), c.getName());
 			
 			List<File> files = new ArrayList<File>();
 			

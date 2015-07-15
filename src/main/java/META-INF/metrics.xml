@@ -5,4 +5,5 @@
 	<metric id="SLOC">br.edu.ufba.softvis.visminer.metric.SLOCMetric</metric>
 	<metric id="NOM">br.edu.ufba.softvis.visminer.metric.NOMMetric</metric>
 	<metric id="NOE">br.edu.ufba.softvis.visminer.metric.NOEMetric</metric>
+	<metric id="WMC">br.edu.ufba.softvis.visminer.metric.WMCMetric</metric>
 </metrics>

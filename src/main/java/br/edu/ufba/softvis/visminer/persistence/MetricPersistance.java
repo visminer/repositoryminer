@@ -6,7 +6,7 @@ import java.util.List;
 import javax.persistence.EntityManager;
 
 import br.edu.ufba.softvis.visminer.constant.MetricUid;
-import br.edu.ufba.softvis.visminer.model.bean.Commit;
+import br.edu.ufba.softvis.visminer.model.database.CommitDB;
 import br.edu.ufba.softvis.visminer.model.database.MetricValueDB;
 import br.edu.ufba.softvis.visminer.model.database.MetricValuePK;
 import br.edu.ufba.softvis.visminer.model.database.SoftwareUnitXCommitDB;
@@ -26,7 +26,7 @@ public class MetricPersistance {
 	private SoftwareUnitXCommitDAO softUnitXCommitDao;
 	private MetricValueDAO metricValueDao;
 
-	private Commit commit;
+	private int commitId;
 	private MetricUid metric;
 	
 	private List<SoftwareUnitXCommitDB> unitsXCommits;
@@ -46,19 +46,19 @@ public class MetricPersistance {
 	}
 
 	/**
-	 * @param metric
-	 * Sets the metric that is being calculated at time.
-	 */
-	public void setMetric(MetricUid metric) {
-		this.metric = metric;
-	}
-
-	/**
 	 * @param commit
 	 * Sets the current commit of metric calculation.
 	 */
-	public void setCommit(Commit commit){
-		this.commit = commit;
+	public void setCommitId(int commitId){
+		this.commitId = commitId;
+	}
+	
+	/**
+	 * @param metricUid
+	 * Sets the current metric.
+	 */
+	public void setMetric(MetricUid metric){
+		this.metric = metric;
 	}
 	
 	public void initBatchPersistence() {
@@ -66,16 +66,16 @@ public class MetricPersistance {
 		metricValues.clear();
 	}
 	
-	public void postMetricValue(int id, String value){
+	public void postMetricValue(int softwareUnitId, String value){
 		
-		SoftwareUnitXCommitPK unitXCommitPk = new SoftwareUnitXCommitPK(id, commit.getId());
+		SoftwareUnitXCommitPK unitXCommitPk = new SoftwareUnitXCommitPK(softwareUnitId, commitId);
 		SoftwareUnitXCommitDB unitXCommit = new SoftwareUnitXCommitDB(unitXCommitPk);
 		
 		if(!unitsXCommits.contains(unitXCommit)){
 			unitsXCommits.add(unitXCommit);
 		}
 		
-		MetricValuePK metricValPk = new MetricValuePK(id, commit.getId(), metric.getId());
+		MetricValuePK metricValPk = new MetricValuePK(softwareUnitId, commitId, metric.getId());
 		MetricValueDB metricValDb =  new MetricValueDB(metricValPk, value);
 		
 		metricValues.add(metricValDb);
@@ -95,10 +95,17 @@ public class MetricPersistance {
 	 * Pass commitPrev as parameter if you want get the value of the metric for the software unit in the previous commit.
 	 * If you want the value of the metric calculated for the software unit in the current commit pass null as parameter.
 	 */
-	public String getMetricValue(MetricUid metricUid, int id, Commit commit){
+	public String getMetricValue(MetricUid metricUid, int id, CommitDB commitDb){
 
-		MetricValuePK pk = new MetricValuePK(id, commit.getId(), metricUid.getId());
-		MetricValueDB metricValDb = metricValueDao.find(pk);
+		MetricValuePK pk = new MetricValuePK(id, commitDb.getId(), metricUid.getId());
+		MetricValueDB metricValDb = new MetricValueDB(pk, null);
+		
+		int index = metricValues.indexOf(metricValDb);
+		if(index > -1){
+			metricValDb = metricValues.get(index);
+		}else{
+			metricValDb = metricValueDao.find(pk);
+		}
 
 		if(metricValDb == null){
 			return null;

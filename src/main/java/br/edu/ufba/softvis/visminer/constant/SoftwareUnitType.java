@@ -39,7 +39,7 @@ public enum SoftwareUnitType {
 			}
 		}
 
-		throw new IllegalArgumentException("Does not exists SoftwareUnitType with id "+id);
+		return null;
 		
 	}
 	

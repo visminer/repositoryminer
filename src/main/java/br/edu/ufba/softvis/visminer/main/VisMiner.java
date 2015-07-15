@@ -59,8 +59,6 @@ public class VisMiner {
 		/**TODO
 		 * finalizar os  analyzers restantes
 		 */
-		RepositoryAnalyzer analyzer = new RepositoryAnalyzer();
-		analyzer.increment(repositoryPath);
 	}	
 	
 	/**
