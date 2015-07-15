@@ -33,7 +33,7 @@ public enum TreeType {
 			}
 		}
 		
-		throw new IllegalArgumentException("Does not exists TreeType with id "+id);
+		return null;
 		
 	}
 	

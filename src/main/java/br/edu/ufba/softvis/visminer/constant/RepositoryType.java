@@ -34,8 +34,8 @@ public enum RepositoryType {
 				return repoType;
 			}
 		}
-		
-		throw new IllegalArgumentException("Does not exists RepositoryType with id "+id);
+
+		return null;
 		
 	}
 	

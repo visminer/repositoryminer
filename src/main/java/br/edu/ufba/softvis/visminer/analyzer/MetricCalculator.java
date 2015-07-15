@@ -18,9 +18,6 @@ import br.edu.ufba.softvis.visminer.constant.MetricType;
 import br.edu.ufba.softvis.visminer.constant.MetricUid;
 import br.edu.ufba.softvis.visminer.constant.TreeType;
 import br.edu.ufba.softvis.visminer.metric.IMetric;
-import br.edu.ufba.softvis.visminer.model.bean.Commit;
-import br.edu.ufba.softvis.visminer.model.bean.File;
-import br.edu.ufba.softvis.visminer.model.bean.FileState;
 import br.edu.ufba.softvis.visminer.model.database.CommitDB;
 import br.edu.ufba.softvis.visminer.model.database.FileDB;
 import br.edu.ufba.softvis.visminer.model.database.FileXCommitDB;
@@ -147,53 +144,49 @@ public class MetricCalculator{
 		fileDao.setEntityManager(entityManager);
 
 		MetricPersistance persistence = new MetricPersistance(entityManager);
+		persistence.initBatchPersistence();
 		
-		Map<File, AST> repositoryFiles = new HashMap<File, AST>();
-		Map<File, AST> commitFiles = new HashMap<File, AST>();
-		List<Commit> commitsBean = new ArrayList<Commit>(commitsDb.size());
+		Map<FileDB, AST> repositoryFiles = new HashMap<FileDB, AST>();
+		Map<FileDB, AST> commitFiles = new HashMap<FileDB, AST>();
+		List<CommitDB> commitsDbAux = new ArrayList<CommitDB>(commitsDb.size());
 		SaveAST saveAst = new SaveAST(repositoryDb, entityManager);
 
 		for(int i = 0; i < commitsDb.size(); i++){
 
 			commitFiles.clear();
-			CommitDB commitDb = commitsDb.get(i);
-			Commit commitBean = new Commit(commitDb.getId(), commitDb.getDate(), commitDb.getMessage(), commitDb.getName());
-			commitsBean.add(commitBean);
+			commitsDbAux.add(commitsDb.get(i));
 
+			CommitDB commitDb = commitsDb.get(i);
 			List<FileDB> filesDbAux = fileDao.findCommitedFiles(commitDb.getId());
 
 			for(FileDB fileDb : filesDbAux){
 					
-				File fileAux = new File(fileDb.getId(), fileDb.getPath(), fileDb.getUid());
 				FileXCommitDB fxcDb = fileDb.getFileXCommits().get(0);
-				FileState fs = new FileState(fxcDb.getLinesAdded(), fxcDb.getLinesRemoved(),
-						fxcDb.isRemoved());
-				fileAux.setFileState(fs);
 				
-				if(fs.isDeleted()){
-					repositoryFiles.remove(fileAux);
-					commitFiles.put(fileAux, null);
+				if(fxcDb.isRemoved()){
+					repositoryFiles.remove(fileDb);
+					commitFiles.put(fileDb, null);
 				}else{
-					if(isProcessable(fileAux.getPath())){
+					if(isProcessable(fileDb.getPath())){
 						/*
 						 *  Absolute path doesn't work correctly, with absolute path JGIT doesn't find the file.
 						 *  I save the absolute path, so I need to remove the repository absolute path part.
 						 *  index is the start of relative path, transforming "repository_path/file_path" into "file_path".
 						 */
 						int index = repoSys.getAbsolutePath().length()+1;
-						byte[] data = repoSys.getData(commitDb.getName(), fileAux.getPath().substring(index));
+						byte[] data = repoSys.getData(commitDb.getName(), fileDb.getPath().substring(index));
 						
-						if(isASTCalculable(fileAux.getPath())){
+						if(isASTCalculable(fileDb.getPath())){
 							
-							AST ast = JavaASTGenerator.generate(fileAux.getPath(), data);
+							AST ast = JavaASTGenerator.generate(fileDb.getPath(), data);
 							saveAst.save(fileDb, ast);
-							commitFiles.put(fileAux, ast);
-							repositoryFiles.put(fileAux, ast);
+							commitFiles.put(fileDb, ast);
+							repositoryFiles.put(fileDb, ast);
 							
-						}else if(isAcceptable(fileAux.getPath())){
+						}else if(isAcceptable(fileDb.getPath())){
 							
 							Document doc = new Document();
-							doc.setName(fileAux.getPath());
+							doc.setName(fileDb.getPath());
 							AST ast = new AST();
 							
 							if(data == null){
@@ -204,31 +197,33 @@ public class MetricCalculator{
 							
 							ast.setDocument(doc);
 							saveAst.save(fileDb, ast);
-							commitFiles.put(fileAux, ast);
-							repositoryFiles.put(fileAux, ast);
+							commitFiles.put(fileDb, ast);
+							repositoryFiles.put(fileDb, ast);
 							
 						}
 						
 					}else{
-						commitFiles.put(fileAux, null);
-						repositoryFiles.put(fileAux, null);
+						commitFiles.put(fileDb, null);
+						repositoryFiles.put(fileDb, null);
 					}
 
 				}// end else
 			}// end for(FileDB fileDb : filesDbAux)
 
-			calculationMetricsHelper(metricsMap, commitsBean, commitFiles, repositoryFiles, persistence);
+			calculationMetricsHelper(metricsMap, commitsDbAux, commitFiles, repositoryFiles, persistence);
 			
 		}// end for(CommitDB commitDb : commitsDb)
 
+		
+		persistence.flushAllMetricValues();
 	}
 	
 	// Calculates all the selected metrics for a given commit.
-	private static void calculationMetricsHelper(Map<MetricType, Map<MetricUid, IMetric>> metricsMap, List<Commit> commits, 
-			Map<File, AST> committedFiles, Map<File, AST> repositoryFiles, MetricPersistance persistence){
+	private static void calculationMetricsHelper(Map<MetricType, Map<MetricUid, IMetric>> metricsMap, List<CommitDB> commits, 
+			Map<FileDB, AST> committedFiles, Map<FileDB, AST> repositoryFiles, MetricPersistance persistence){
 		
-		Commit c = commits.get(commits.size() - 1);
-		persistence.setCommit(c);
+		CommitDB c = commits.get(commits.size() - 1);
+		persistence.setCommitId(c.getId());
 		
 		Map<MetricUid, IMetric> metricMapAux = metricsMap.get(MetricType.SIMPLE);
 		for(java.util.Map.Entry<MetricUid, IMetric> entry : metricMapAux.entrySet()){

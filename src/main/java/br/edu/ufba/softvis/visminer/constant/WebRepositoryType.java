@@ -33,7 +33,7 @@ public enum WebRepositoryType {
 			}
 		}
 
-		throw new IllegalArgumentException("Does not exists WebRepositoryType with id "+id);
+		return null;
 		
 	}
 	

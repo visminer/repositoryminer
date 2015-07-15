@@ -11,7 +11,6 @@ import java.util.List;
 
 
 /**
- * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
  * @version 0.9
  * The persistent class for the repository database table.
  */
@@ -49,9 +48,8 @@ public class RepositoryDB implements Serializable {
 	@Column(nullable=false, length=40)
 	private String uid;
 
-	//bi-directional many-to-one association to CommitterRoleDB
-	@OneToMany(mappedBy="repository")
-	private List<CommitterRoleDB> committerRoles;
+	@ManyToMany(mappedBy="repositories")
+	private List<CommitterDB> committers;
 
 	//bi-directional many-to-one association to IssueDB
 	@OneToMany(mappedBy="repository")
@@ -77,21 +75,17 @@ public class RepositoryDB implements Serializable {
 	 * @param description
 	 * @param name
 	 * @param path
-	 * @param remoteUrl
 	 * @param type
-	 * @param serviceType
 	 * @param uid
 	 */
 	public RepositoryDB(int id, String description, String name, String path,
-			String remoteUrl, RepositoryType type, WebRepositoryType serviceType, String uid) {
+			RepositoryType type, String uid) {
 		super();
 		this.id = id;
 		this.description = description;
 		this.name = name;
 		this.path = path;
-		this.remoteUrl = remoteUrl;
 		this.type = type.getId();
-		//this.serviceType = serviceType.getId();
 		this.uid = uid;
 	}
 
@@ -208,17 +202,17 @@ public class RepositoryDB implements Serializable {
 	}
 
 	/**
-	 * @return the committerRoles
+	 * @return the committers
 	 */
-	public List<CommitterRoleDB> getCommitterRoles() {
-		return committerRoles;
+	public List<CommitterDB> getCommitters() {
+		return committers;
 	}
 
 	/**
-	 * @param committerRoles the committerRoles to set
+	 * @param committers the committers to set
 	 */
-	public void setCommitterRoles(List<CommitterRoleDB> committerRoles) {
-		this.committerRoles = committerRoles;
+	public void setCommitters(List<CommitterDB> committers) {
+		this.committers = committers;
 	}
 
 	/**

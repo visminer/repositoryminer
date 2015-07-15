@@ -11,7 +11,8 @@ public enum MetricUid {
 	NOC(3),
 	NOP(4),
 	NOM(5),
-	NOE(6);
+	NOE(6),
+	WMC(7);
 	
 	private int id;
 	
@@ -40,7 +41,7 @@ public enum MetricUid {
 			}
 		}
 		
-		throw new IllegalArgumentException("Does not exists MetricUid with id "+id);
+		return null;
 		
 	}
 	

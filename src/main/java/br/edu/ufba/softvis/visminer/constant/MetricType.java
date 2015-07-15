@@ -35,7 +35,7 @@ public enum MetricType {
 			}
 		}
 		
-		throw new IllegalArgumentException("Does not exists MetricType with id "+id);
+		return null;
 		
 	}
 	

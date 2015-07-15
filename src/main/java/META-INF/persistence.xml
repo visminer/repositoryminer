@@ -3,8 +3,6 @@
 	<persistence-unit name="VisminerDatabase">
 		<class>br.edu.ufba.softvis.visminer.model.database.CommitDB</class>
 		<class>br.edu.ufba.softvis.visminer.model.database.CommitterDB</class>
-		<class>br.edu.ufba.softvis.visminer.model.database.CommitterRoleDB</class>
-		<class>br.edu.ufba.softvis.visminer.model.database.CommitterRolePK</class>
 		<class>br.edu.ufba.softvis.visminer.model.database.FileDB</class>
 		<class>br.edu.ufba.softvis.visminer.model.database.FileXCommitDB</class>
 		<class>br.edu.ufba.softvis.visminer.model.database.FileXCommitPK</class>

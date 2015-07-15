@@ -150,7 +150,7 @@ public class JavaASTGenerator {
 		List<org.eclipse.jdt.core.dom.Statement> statements = body.statements();
 		List<Statement> statementsDecl = new ArrayList<Statement>(statements.size());
 		for(org.eclipse.jdt.core.dom.Statement statement : statements){
-			
+
 			Statement statementDecl = new Statement();
 			switch(statement.getNodeType()){
 				case ASTNode.IF_STATEMENT: statementDecl.setNodeType(NodeType.IF); break;
@@ -160,6 +160,7 @@ public class JavaASTGenerator {
 				case ASTNode.WHILE_STATEMENT: statementDecl.setNodeType(NodeType.WHILE); break;
 				default : statementDecl.setNodeType(NodeType.NONE); break;
 			}
+			
 			statementsDecl.add(statementDecl);
 		}
 		

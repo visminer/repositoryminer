@@ -4,8 +4,6 @@ import java.io.Serializable;
 
 import javax.persistence.*;
 
-import org.eclipse.persistence.annotations.JoinFetch;
-
 import java.util.List;
 
 
@@ -18,8 +16,7 @@ import java.util.List;
 @Table(name="committer")
 @NamedQueries({
 	@NamedQuery(name="CommitterDB.findByEmail", query="select c from CommitterDB c where c.email = :email"),
-	@NamedQuery(name="CommitterDB.findByRepository", query="select c from CommitterDB c join c.committerRoles cr"
-			+ " where cr.id.repositoryId = :id")
+	@NamedQuery(name="CommitterDB.findByRepository", query="select c from CommitterDB c join c.repositories r where r.id = :id")
 })
 public class CommitterDB implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -40,10 +37,18 @@ public class CommitterDB implements Serializable {
 	@OneToMany(mappedBy="committer")
 	private List<CommitDB> commits;
 
-	//bi-directional many-to-one association to CommitterRoleDB
-	@OneToMany(mappedBy="committer")
-	private List<CommitterRoleDB> committerRoles;
-
+	@ManyToMany
+	@JoinTable(
+		name="committer_contribute_repository",
+		joinColumns={
+			@JoinColumn(name="committer_id", nullable=false)
+		},
+		inverseJoinColumns={
+			@JoinColumn(name="repository_id", nullable=false)
+		}
+	)
+	private List<RepositoryDB> repositories;
+	
 	public CommitterDB() {
 	}
 
@@ -116,17 +121,17 @@ public class CommitterDB implements Serializable {
 	}
 
 	/**
-	 * @return the committerRoles
+	 * @return the repositories
 	 */
-	public List<CommitterRoleDB> getCommitterRoles() {
-		return committerRoles;
+	public List<RepositoryDB> getRepositories() {
+		return repositories;
 	}
 
 	/**
-	 * @param committerRoles the committerRoles to set
+	 * @param repositories the repositories to set
 	 */
-	public void setCommitterRoles(List<CommitterRoleDB> committerRoles) {
-		this.committerRoles = committerRoles;
+	public void setRepositories(List<RepositoryDB> repositories) {
+		this.repositories = repositories;
 	}
 
 }

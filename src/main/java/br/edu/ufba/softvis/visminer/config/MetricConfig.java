@@ -2,6 +2,7 @@ package br.edu.ufba.softvis.visminer.config;
 
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -111,12 +112,12 @@ public class MetricConfig {
 	 */
 	public static Map<MetricType, Map<MetricUid, IMetric>> getImplementations(List<MetricUid> metricsId){
 
-		Map<MetricType, Map<MetricUid, IMetric>> metricMap = new HashMap<MetricType, Map<MetricUid,IMetric>>();
+		Map<MetricType, Map<MetricUid, IMetric>> metricMap = new LinkedHashMap<MetricType, Map<MetricUid,IMetric>>();
 		
 		Map<Integer, String> map = readConfig();
 		
-		Map<MetricUid, IMetric> simpleMetrics = new HashMap<MetricUid, IMetric>();
-		Map<MetricUid, IMetric> complexMetrics = new HashMap<MetricUid, IMetric>();
+		Map<MetricUid, IMetric> simpleMetrics = new LinkedHashMap<MetricUid, IMetric>();
+		Map<MetricUid, IMetric> complexMetrics = new LinkedHashMap<MetricUid, IMetric>();
 		
 		try{
 			

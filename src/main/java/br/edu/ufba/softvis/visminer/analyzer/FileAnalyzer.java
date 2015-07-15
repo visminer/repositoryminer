@@ -6,12 +6,9 @@ import java.util.List;
 import javax.persistence.EntityManager;
 
 import br.edu.ufba.softvis.visminer.analyzer.local.IRepositorySystem;
-import br.edu.ufba.softvis.visminer.model.bean.File;
-import br.edu.ufba.softvis.visminer.model.bean.FileState;
 import br.edu.ufba.softvis.visminer.model.database.CommitDB;
 import br.edu.ufba.softvis.visminer.model.database.FileDB;
 import br.edu.ufba.softvis.visminer.model.database.FileXCommitDB;
-import br.edu.ufba.softvis.visminer.model.database.FileXCommitPK;
 import br.edu.ufba.softvis.visminer.persistence.dao.FileDAO;
 import br.edu.ufba.softvis.visminer.persistence.dao.FileXCommitDAO;
 import br.edu.ufba.softvis.visminer.persistence.impl.FileDAOImpl;
@@ -19,27 +16,13 @@ import br.edu.ufba.softvis.visminer.persistence.impl.FileXCommitDAOImpl;
 
 /**
  * @version 0.9
- * @see CommitAnalyzer
- * @see CommitterAnalyzer
- * @see IssueAnalyzer
- * @see MilestoneAnalyzer
- * @see RepositoryAnalyzer
- * @see TreeAnalyzer
- * @see IAnalyzer
- * 
  * Defines how to save or to increment informations about files in database.
  */
 
-public class FileAnalyzer implements IAnalyzer<Void>{
+public class FileAnalyzer{
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public Void persist(Object... objects) {
+	public void persist(List<CommitDB> commitsDb, IRepositorySystem repoSys, EntityManager entityManager) {
 
-		List<CommitDB> commitsDb = (List<CommitDB>) objects[0];
-		IRepositorySystem repoSys = (IRepositorySystem) objects[1];
-		EntityManager entityManager = (EntityManager) objects[2];
-		
 		List<FileDB> filesDb = new ArrayList<FileDB>();
 		List<FileXCommitDB> filesXCommitsDb = new ArrayList<FileXCommitDB>();
 		
@@ -51,23 +34,22 @@ public class FileAnalyzer implements IAnalyzer<Void>{
 		
 		for(CommitDB commitDb : commitsDb){
 			
-			List<File> files = repoSys.getCommitedFiles(commitDb.getName());
-			for(File file : files){
+			List<FileDB> files = repoSys.getCommitedFiles(commitDb);
+			for(FileDB file : files){
 				
-				FileDB fileDb = new FileDB(0, file.getPath(), file.getUid());
-				int index = filesDb.indexOf(fileDb);
+				int index = filesDb.indexOf(file);
+				FileXCommitDB fxcDb = file.getFileXCommits().get(0);
+				
 				if(index == -1){
-					filesDb.add(fileDb);
+					filesDb.add(file);
+					file.setFileXCommits(null);
+					fxcDb.setFile(file);
 				}else{
-					fileDb = filesDb.get(index);
+					FileDB fileDb = filesDb.get(index);
+					fxcDb.setFile(fileDb);
 				}
 
-				FileXCommitPK fxcPk = new FileXCommitPK(0, commitDb.getId());
-				FileState fileState = file.getFileState();
-				FileXCommitDB fileXCommitDb = new FileXCommitDB(fxcPk, fileState.getLinesAdded(),
-						fileState.getLinesRemoved(), fileState.isDeleted());
-				fileXCommitDb.setFile(fileDb);
-				filesXCommitsDb.add(fileXCommitDb);
+				filesXCommitsDb.add(fxcDb);
 				
 			}
 			
@@ -75,19 +57,12 @@ public class FileAnalyzer implements IAnalyzer<Void>{
 		
 		fileDao.batchSave(filesDb);
 		
-		for(FileXCommitDB fileXCommitDb : filesXCommitsDb){
-			fileXCommitDb.getId().setFileId(fileXCommitDb.getFile().getId());
+		for(FileXCommitDB fxc : filesXCommitsDb){
+			fxc.getId().setFileId(fxc.getFile().getId());
+			fxc.setFile(null);
 		}
-		
 		fileXCommitDao.batchSave(filesXCommitsDb);
-		return null;
 		
-	}
-
-	@Override
-	public Void increment(Object... objects) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 }
