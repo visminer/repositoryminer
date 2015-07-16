@@ -166,35 +166,35 @@ public class JavaASTGenerator {
 			switch (statement.getNodeType()) {
 			case ASTNode.IF_STATEMENT:
 				IfStatement ifstmt = (IfStatement) statement;
-				statementDecl.setExpression(inspectExpression(sourceCode, ifstmt
+				statementDecl.setExpression(extractExpression(sourceCode, ifstmt
 						.getExpression()));
 				statementDecl.setNodeType(NodeType.IF);
 
 				break;
 			case ASTNode.SWITCH_CASE:
 				SwitchStatement switchstmt = (SwitchStatement) statement;
-				statementDecl.setExpression(inspectExpression(sourceCode, switchstmt
+				statementDecl.setExpression(extractExpression(sourceCode, switchstmt
 						.getExpression()));
 				statementDecl.setNodeType(NodeType.SWITCH_CASE);
 
 				break;
 			case ASTNode.FOR_STATEMENT:
 				ForStatement forstmt = (ForStatement) statement;
-				statementDecl.setExpression(inspectExpression(sourceCode, forstmt
+				statementDecl.setExpression(extractExpression(sourceCode, forstmt
 						.getExpression()));
 				statementDecl.setNodeType(NodeType.FOR);
 				
 				break;
 			case ASTNode.DO_STATEMENT:
 				DoStatement dostmt = (DoStatement) statement;
-				statementDecl.setExpression(inspectExpression(sourceCode, dostmt
+				statementDecl.setExpression(extractExpression(sourceCode, dostmt
 						.getExpression()));
 				statementDecl.setNodeType(NodeType.DO);
 
 				break;
 			case ASTNode.WHILE_STATEMENT:
 				WhileStatement whilestmt = (WhileStatement) statement;
-				statementDecl.setExpression(inspectExpression(sourceCode, whilestmt
+				statementDecl.setExpression(extractExpression(sourceCode, whilestmt
 						.getExpression()));
 				statementDecl.setNodeType(NodeType.WHILE);
 
@@ -211,7 +211,7 @@ public class JavaASTGenerator {
 
 	}
 
-	private static String inspectExpression(String sourceCode, Expression expression) {
+	private static String extractExpression(String sourceCode, Expression expression) {
 		String exp = "";
 
 		if (expression != null) {
