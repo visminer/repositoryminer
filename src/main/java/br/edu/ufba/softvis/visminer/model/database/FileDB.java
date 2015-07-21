@@ -32,7 +32,7 @@ public class FileDB implements Serializable {
 	@Column(nullable=false, length=1024)
 	private String path;
 
-	@Column(nullable=false, length=40)
+	@Column(unique=true, nullable=false, length=40)
 	private String uid;
 
 	//bi-directional many-to-one association to FileXCommitDB

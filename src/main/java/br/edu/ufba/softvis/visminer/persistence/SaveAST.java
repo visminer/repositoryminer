@@ -134,7 +134,6 @@ public class SaveAST {
 			softwareUnitDB.setFile(fileDb);
 			softwareUnitDB.setRepository(repoDb);
 			softwareUnitDB.setSoftwareUnit(parent);
-			
 			softUnitDao.save(softwareUnitDB);
 			uidMap.put(uid, softwareUnitDB.getId());
 		}

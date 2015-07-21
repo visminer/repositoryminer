@@ -121,12 +121,13 @@ public class MetricCalculator{
 		commitDao.setEntityManager(entityManager);
 		
 		Map<MetricType, Map<MetricUid, IMetric>> metricsMap = MetricConfig.getImplementations(metricsId);
+		SaveAST saveAst = new SaveAST(repositoryDb, entityManager);
 		
 		List<TreeDB> treesDb = treeDao.findByRepository(repositoryDb.getId());
 		for(TreeDB treeDb : treesDb){
 			if(treeDb.getType() == TreeType.BRANCH){
 				List<CommitDB> commitsDb = commitDao.findByTree(treeDb.getId());
-				calculateMetrics(commitsDb, metricsMap, repoSys, repositoryDb, entityManager);
+				calculateMetrics(commitsDb, metricsMap, saveAst, repoSys, repositoryDb, entityManager);
 			}
 		}
 		
@@ -138,7 +139,7 @@ public class MetricCalculator{
 	 * Calculates the metrics and save their values in database.
 	 */
 	private static void calculateMetrics(List<CommitDB> commitsDb, Map<MetricType, Map<MetricUid, IMetric>> metricsMap,
-			IRepositorySystem repoSys, RepositoryDB repositoryDb, EntityManager entityManager) {
+			SaveAST saveAst, IRepositorySystem repoSys, RepositoryDB repositoryDb, EntityManager entityManager) {
 
 		FileDAO fileDao = new FileDAOImpl();
 		fileDao.setEntityManager(entityManager);
@@ -149,7 +150,6 @@ public class MetricCalculator{
 		Map<FileDB, AST> repositoryFiles = new HashMap<FileDB, AST>();
 		Map<FileDB, AST> commitFiles = new HashMap<FileDB, AST>();
 		List<CommitDB> commitsDbAux = new ArrayList<CommitDB>(commitsDb.size());
-		SaveAST saveAst = new SaveAST(repositoryDb, entityManager);
 
 		for(int i = 0; i < commitsDb.size(); i++){
 

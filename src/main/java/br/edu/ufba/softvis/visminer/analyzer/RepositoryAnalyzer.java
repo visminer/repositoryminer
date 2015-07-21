@@ -94,6 +94,7 @@ public class RepositoryAnalyzer{
 		//MetricCalculator.calculate(metrics, repoSys, repoDb, entityManager);
 		
 		repoSys.close();
+		entityManager.flush();
 		entityManager.close();
 		
 	}

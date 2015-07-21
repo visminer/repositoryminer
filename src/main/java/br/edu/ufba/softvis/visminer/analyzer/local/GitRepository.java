@@ -254,7 +254,7 @@ public class GitRepository implements IRepositorySystem{
 					fileXCommit.setRemoved(true);
 				}
 				
-				List<FileXCommitDB> filesXCommits = new ArrayList<FileXCommitDB>();
+				List<FileXCommitDB> filesXCommits = new ArrayList<FileXCommitDB>(1);
 				filesXCommits.add(fileXCommit);
 				fileDb.setFileXCommits(filesXCommits);
 				files.add(fileDb);

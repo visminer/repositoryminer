@@ -35,7 +35,7 @@ public class SoftwareUnitDB implements Serializable {
 	@Column(nullable=false)
 	private int type;
 
-	@Column(nullable=false, length=40)
+	@Column(unique=true, nullable=false, length=40)
 	private String uid;
 
 	//bi-directional many-to-one association to FileDB
@@ -204,6 +204,31 @@ public class SoftwareUnitDB implements Serializable {
 	 */
 	public void setCommits(List<CommitDB> commits) {
 		this.commits = commits;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((uid == null) ? 0 : uid.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		SoftwareUnitDB other = (SoftwareUnitDB) obj;
+		if (uid == null) {
+			if (other.uid != null)
+				return false;
+		} else if (!uid.equals(other.uid))
+			return false;
+		return true;
 	}
 
 }

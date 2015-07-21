@@ -22,8 +22,11 @@ import br.edu.ufba.softvis.visminer.persistence.dao.DAO;
 public class DAOImpl<E, K> implements DAO<E, K>{
 
 	private EntityManager entityManager;
+	
+	@SuppressWarnings("rawtypes")
 	Class entityClass;
 	
+	@SuppressWarnings("rawtypes")
 	public DAOImpl(){
 		ParameterizedType genericClass = (ParameterizedType) getClass().getGenericSuperclass();
 		entityClass = (Class) genericClass.getActualTypeArguments()[0];
@@ -44,6 +47,7 @@ public class DAOImpl<E, K> implements DAO<E, K>{
 			i++;
 		}
 		entityManager.getTransaction().commit();
+		entityManager.clear();
 		
 	}
 
@@ -63,6 +67,7 @@ public class DAOImpl<E, K> implements DAO<E, K>{
 		}
 		
 		entityManager.getTransaction().commit();
+		entityManager.clear();
 		
 	}
 
@@ -82,6 +87,7 @@ public class DAOImpl<E, K> implements DAO<E, K>{
 		}
 		
 		entityManager.getTransaction().commit();
+		entityManager.clear();
 		
 	}
 
@@ -89,7 +95,8 @@ public class DAOImpl<E, K> implements DAO<E, K>{
 	public void save(E object) {
 		entityManager.getTransaction().begin();
 		entityManager.persist(object);
-		entityManager.getTransaction().commit();		
+		entityManager.getTransaction().commit();
+		entityManager.clear();
 	}
 
 	@Override
@@ -97,6 +104,7 @@ public class DAOImpl<E, K> implements DAO<E, K>{
 		entityManager.getTransaction().begin();
 		E o = entityManager.merge(object);
 		entityManager.getTransaction().commit();
+		entityManager.clear();
 		return o;
 	}
 
@@ -105,6 +113,7 @@ public class DAOImpl<E, K> implements DAO<E, K>{
 		entityManager.getTransaction().begin();
 		entityManager.remove(object);
 		entityManager.getTransaction().commit();
+		entityManager.clear();
 	}
 
 	@SuppressWarnings("unchecked")

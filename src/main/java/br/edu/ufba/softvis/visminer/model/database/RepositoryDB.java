@@ -45,7 +45,7 @@ public class RepositoryDB implements Serializable {
 	@Column(name="service_type", nullable=false)
 	private int serviceType;
 	
-	@Column(nullable=false, length=40)
+	@Column(unique=true, nullable=false, length=40)
 	private String uid;
 
 	@ManyToMany(mappedBy="repositories")
