@@ -47,6 +47,9 @@ public class RepositoryDB implements Serializable {
 	
 	@Column(unique=true, nullable=false, length=40)
 	private String uid;
+	
+	@Column(nullable=false, length=20)
+	private String charset;
 
 	@ManyToMany(mappedBy="repositories")
 	private List<CommitterDB> committers;
@@ -77,9 +80,10 @@ public class RepositoryDB implements Serializable {
 	 * @param path
 	 * @param type
 	 * @param uid
+	 * @param charset
 	 */
 	public RepositoryDB(int id, String description, String name, String path,
-			RepositoryType type, String uid) {
+			RepositoryType type, String uid, String charset) {
 		super();
 		this.id = id;
 		this.description = description;
@@ -87,6 +91,7 @@ public class RepositoryDB implements Serializable {
 		this.path = path;
 		this.type = type.getId();
 		this.uid = uid;
+		this.charset = charset;
 	}
 
 	/**
@@ -199,6 +204,20 @@ public class RepositoryDB implements Serializable {
 	 */
 	public void setUid(String uid) {
 		this.uid = uid;
+	}
+
+	/**
+	 * @return the charset
+	 */
+	public String getCharset() {
+		return charset;
+	}
+
+	/**
+	 * @param charset the charset to set
+	 */
+	public void setCharset(String charset) {
+		this.charset = charset;
 	}
 
 	/**

@@ -80,7 +80,8 @@ public class PersistenceInterface {
 		RepositoryDB repoDb = repositoryDao.findByUid(uid);
 	
 		Repository repository = new Repository(repoDb.getId(), repoDb.getDescription(), repoDb.getName(),
-				repoDb.getPath(), repoDb.getRemoteUrl(), repoDb.getType(),repoDb.getServiceType(), repoDb.getUid());
+				repoDb.getPath(), repoDb.getRemoteUrl(), repoDb.getType(),repoDb.getServiceType(),
+				repoDb.getUid(), repoDb.getCharset());
 		
 		return repository;
 		

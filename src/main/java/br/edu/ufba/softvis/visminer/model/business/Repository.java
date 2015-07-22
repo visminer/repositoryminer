@@ -22,6 +22,7 @@ public class Repository {
 	private RepositoryType type;
 	private WebRepositoryType serviceType;
 	private String uid;
+	private String charset;
 	
 	private List<Committer> committers;
 	private List<Tree> trees;
@@ -38,10 +39,11 @@ public class Repository {
 	 * @param type
 	 * @param serviceType
 	 * @param uid
+	 * @param charset
 	 */
 	public Repository(int id, String description, String name, String path,
 			String remoteUrl, RepositoryType type,
-			WebRepositoryType serviceType, String uid) {
+			WebRepositoryType serviceType, String uid, String charset) {
 		super();
 		this.id = id;
 		this.description = description;
@@ -51,6 +53,7 @@ public class Repository {
 		this.type = type;
 		this.serviceType = serviceType;
 		this.uid = uid;
+		this.charset = charset;
 	}
 
 	/**
@@ -163,6 +166,20 @@ public class Repository {
 	 */
 	public void setUid(String uid) {
 		this.uid = uid;
+	}
+
+	/**
+	 * @return the charset
+	 */
+	public String getCharset() {
+		return charset;
+	}
+
+	/**
+	 * @param charset the charset to set
+	 */
+	public void setCharset(String charset) {
+		this.charset = charset;
 	}
 
 	/**

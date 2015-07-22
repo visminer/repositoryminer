@@ -50,7 +50,7 @@ public class RepositoryAnalyzer{
 		}
 		
 		RepositoryDB repositoryDb = new RepositoryDB(0, repoBusi.getDescription(), repoBusi.getName(),
-				path, repoBusi.getType(), uid);
+				path, repoBusi.getType(), uid, repoBusi.getCharset());
 		
 		repositoryDao.save(repositoryDb);
 		List<CommitDB> commitsDB = new CommitAndCommitterAnalyzer().persist(repositoryDb, repoSys, entityManager);

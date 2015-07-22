@@ -1,5 +1,6 @@
 package br.edu.ufba.softvis.visminer.analyzer;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -178,7 +179,7 @@ public class MetricCalculator{
 						
 						if(isASTCalculable(fileDb.getPath())){
 							
-							AST ast = JavaASTGenerator.generate(fileDb.getPath(), data);
+							AST ast = JavaASTGenerator.generate(fileDb.getPath(), data, repositoryDb.getCharset());
 							saveAst.save(fileDb, ast);
 							commitFiles.put(fileDb, ast);
 							repositoryFiles.put(fileDb, ast);
@@ -192,7 +193,12 @@ public class MetricCalculator{
 							if(data == null){
 								ast.setSourceCode(null);
 							}else{
-								ast.setSourceCode(new String(data));
+								try {
+									ast.setSourceCode(new String(data, repositoryDb.getCharset()));
+								} catch (UnsupportedEncodingException e) {
+									e.getMessage();
+									System.exit(1);
+								}
 							}
 							
 							ast.setDocument(doc);

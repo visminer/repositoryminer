@@ -21,7 +21,7 @@ import br.edu.ufba.softvis.visminer.constant.NodeType;
 
 public class JavaASTGenerator {
 
-	public static AST generate(String filePath, byte[] source){
+	public static AST generate(String filePath, byte[] source, String charset){
 		
 		Document document = new  Document();
 		document.setName(filePath);
@@ -36,9 +36,10 @@ public class JavaASTGenerator {
 		
 		String sourceCode;
 		try {
-			sourceCode = new String(source, "UTF-8");
+			sourceCode = new String(source, charset);
 		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
+			e.getMessage();
+			System.exit(1);
 			return null;
 		}
 		
