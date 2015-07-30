@@ -4,7 +4,6 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
-
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.Block;
@@ -22,6 +21,7 @@ import br.edu.ufba.softvis.visminer.ast.FieldDeclaration;
 import br.edu.ufba.softvis.visminer.ast.PackageDeclaration;
 import br.edu.ufba.softvis.visminer.ast.Statement;
 import br.edu.ufba.softvis.visminer.constant.NodeType;
+import br.edu.ufba.softvis.visminer.visitor.MethodVisitor;
 
 public class JavaASTGenerator {
 
@@ -119,20 +119,31 @@ public class JavaASTGenerator {
 		}
 		
 		List<MethodDeclaration> methodsDecl = new ArrayList<MethodDeclaration>();
-		for(org.eclipse.jdt.core.dom.MethodDeclaration method : type.getMethods()){
-			
-			MethodDeclaration methodDecl = new MethodDeclaration();
-			methodDecl.setName(method.getName().getFullyQualifiedName());
-			Block body = method.getBody();
-			methodDecl.setStatements(processBlock(body));
-			methodsDecl.add(methodDecl);
-			
-		}
+		for(org.eclipse.jdt.core.dom.MethodDeclaration method : type.getMethods())
+			methodsDecl.add(processMethod(method));		
 		
 		typeDecl.setMethods(methodsDecl);
 		return typeDecl;
 		
 	}
+	
+	private static MethodDeclaration processMethod(org.eclipse.jdt.core.dom.MethodDeclaration method){
+		
+		MethodVisitor mVisitor = new MethodVisitor();
+		method.accept(mVisitor);	
+		
+		MethodDeclaration methodDecl = new MethodDeclaration();
+		methodDecl.setName(method.getName().getFullyQualifiedName());
+		methodDecl.setConstructor(method.isConstructor());
+		ModifierKeyword modifier = ModifierKeyword.fromFlagValue(method.getModifiers());
+		if(modifier!=null)
+			methodDecl.setModifier(modifier.toString());			
+		
+		methodDecl.setStatements(mVisitor.getStatements());
+		
+		return methodDecl;
+	}
+	
 	
 	private static FieldDeclaration processField(org.eclipse.jdt.core.dom.FieldDeclaration field){
 				
@@ -168,34 +179,6 @@ public class JavaASTGenerator {
 		
 		enumDecl.setDeclarations(constsDecls);
 		return enumDecl;
-	}
-	
-	@SuppressWarnings("unchecked")
-	private static List<Statement> processBlock(Block body){
-		
-		if(body == null || body.statements() == null){
-			return null;
-		}
-
-		List<org.eclipse.jdt.core.dom.Statement> statements = body.statements();
-		List<Statement> statementsDecl = new ArrayList<Statement>(statements.size());
-		for(org.eclipse.jdt.core.dom.Statement statement : statements){
-
-			Statement statementDecl = new Statement();
-			switch(statement.getNodeType()){
-				case ASTNode.IF_STATEMENT: statementDecl.setNodeType(NodeType.IF); break;
-				case ASTNode.SWITCH_CASE: statementDecl.setNodeType(NodeType.SWITCH_CASE); break;
-				case ASTNode.FOR_STATEMENT:statementDecl.setNodeType(NodeType.FOR); break;
-				case ASTNode.DO_STATEMENT: statementDecl.setNodeType(NodeType.DO); break;
-				case ASTNode.WHILE_STATEMENT: statementDecl.setNodeType(NodeType.WHILE); break;
-				default : statementDecl.setNodeType(NodeType.NONE); break;
-			}
-			
-			statementsDecl.add(statementDecl);
-		}
-		
-		return statementsDecl;
-		
 	}
 	
 }

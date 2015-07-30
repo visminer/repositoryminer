@@ -6,6 +6,8 @@ public class MethodDeclaration {
 
 	private int id;
 	private String name;
+	private String modifier;
+	private boolean isConstructor;
 	private List<Statement> statements;
 
 	public int getId() {
@@ -30,6 +32,22 @@ public class MethodDeclaration {
 
 	public void setStatements(List<Statement> statements) {
 		this.statements = statements;
+	}
+
+	public String getModifier() {
+		return modifier;
+	}
+
+	public void setModifier(String modifier) {
+		this.modifier = modifier;
+	}
+
+	public boolean isConstructor() {
+		return isConstructor;
+	}
+
+	public void setConstructor(boolean isConstructor) {
+		this.isConstructor = isConstructor;
 	}
 	
 }
