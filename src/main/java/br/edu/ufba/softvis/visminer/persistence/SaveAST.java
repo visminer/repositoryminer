@@ -8,6 +8,7 @@ import javax.persistence.EntityManager;
 import br.edu.ufba.softvis.visminer.ast.AST;
 import br.edu.ufba.softvis.visminer.ast.EnumConstantDeclaration;
 import br.edu.ufba.softvis.visminer.ast.EnumDeclaration;
+import br.edu.ufba.softvis.visminer.ast.FieldDeclaration;
 import br.edu.ufba.softvis.visminer.ast.MethodDeclaration;
 import br.edu.ufba.softvis.visminer.ast.PackageDeclaration;
 import br.edu.ufba.softvis.visminer.ast.Project;
@@ -75,6 +76,15 @@ public class SaveAST {
 				SoftwareUnitDB typeUnit = getSofwareUnitDB(typeUid, type.getName(), SoftwareUnitType.CLASS,
 						fileDb, repositoryDb, docUnit);
 				type.setId(typeUnit.getId());
+				
+				if(type.getFields()!=null){
+					for(FieldDeclaration field : type.getFields()){
+						String fieldUid = generateUid(repositoryDb.getUid(), typeUid, field.getName());
+						SoftwareUnitDB fieldUnit = getSofwareUnitDB(fieldUid, field.getName(), SoftwareUnitType.FIELD,
+								fileDb, repositoryDb, typeUnit);
+						field.setId(fieldUnit.getId());
+					}
+				}
 				
 				if(type.getMethods() == null){
 					continue;

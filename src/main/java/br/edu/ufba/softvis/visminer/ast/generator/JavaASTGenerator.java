@@ -4,17 +4,24 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.EnumDeclaration;
+import org.eclipse.jdt.core.dom.ITypeBinding;
+import org.eclipse.jdt.core.dom.Modifier;
+import org.eclipse.jdt.core.dom.Modifier.ModifierKeyword;
+import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
+import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
 import br.edu.ufba.softvis.visminer.ast.AST;
 import br.edu.ufba.softvis.visminer.ast.Document;
 import br.edu.ufba.softvis.visminer.ast.EnumConstantDeclaration;
 import br.edu.ufba.softvis.visminer.ast.MethodDeclaration;
+import br.edu.ufba.softvis.visminer.ast.FieldDeclaration;
 import br.edu.ufba.softvis.visminer.ast.PackageDeclaration;
 import br.edu.ufba.softvis.visminer.ast.Statement;
 import br.edu.ufba.softvis.visminer.constant.NodeType;
@@ -100,6 +107,16 @@ public class JavaASTGenerator {
 		typeDecl.setInterfaceClass(type.isInterface());
 		typeDecl.setName(type.getName().getFullyQualifiedName());
 		
+		
+		if(type.getFields().length>0){
+			List<FieldDeclaration> fields = new ArrayList<FieldDeclaration>();
+			for(org.eclipse.jdt.core.dom.FieldDeclaration field : type.getFields()){
+				fields.add(processField(field));
+			}
+			typeDecl.setFields(fields);
+		}		
+		
+		
 		if(type.getMethods().length == 0){
 			return typeDecl;
 		}
@@ -118,6 +135,21 @@ public class JavaASTGenerator {
 		typeDecl.setMethods(methodsDecl);
 		return typeDecl;
 		
+	}
+	
+	private static FieldDeclaration processField(org.eclipse.jdt.core.dom.FieldDeclaration field){
+				
+		FieldDeclaration fieldDecl = new FieldDeclaration();		
+		fieldDecl.setType(field.getType().toString());
+		
+		for(VariableDeclarationFragment vdf : (List<VariableDeclarationFragment>)field.fragments())
+			fieldDecl.setName(vdf.getName().getIdentifier());
+		
+		ModifierKeyword modifier = ModifierKeyword.fromFlagValue(field.getModifiers());
+		if(modifier!=null)
+			fieldDecl.setModifier(modifier.toString());
+		
+		return fieldDecl;
 	}
 	
 	private static br.edu.ufba.softvis.visminer.ast.EnumDeclaration processEnum(EnumDeclaration enumType){

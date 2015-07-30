@@ -12,7 +12,8 @@ public enum SoftwareUnitType {
 	CLASS(4),
 	METHOD(5),
 	ENUM(6),
-	ENUM_CONST(7);
+	ENUM_CONST(7),
+	FIELD(8);
 	
 	private int id;
 	
