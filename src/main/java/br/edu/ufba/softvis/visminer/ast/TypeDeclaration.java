@@ -8,6 +8,7 @@ public class TypeDeclaration {
 	private String name;
 	private boolean interfaceClass;
 	private List<MethodDeclaration> methods;
+	private List<FieldDeclaration> fields;
 
 	/**
 	 * @return the id
@@ -56,6 +57,20 @@ public class TypeDeclaration {
 	 */
 	public void setMethods(List<MethodDeclaration> methods) {
 		this.methods = methods;
+	}
+	
+	/**
+	 * @return the Fields
+	 */
+	public List<FieldDeclaration> getFields() {
+		return fields;
+	}
+	
+	/**
+	 * @param fields the fields to set
+	 */
+	public void setFields(List<FieldDeclaration> fields) {
+		this.fields = fields;
 	}
 
 }
