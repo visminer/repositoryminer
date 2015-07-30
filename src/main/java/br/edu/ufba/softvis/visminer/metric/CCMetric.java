@@ -70,6 +70,9 @@ public class CCMetric implements IMetric{
 			case FOR: cc += 1; break;
 			case DO: cc += 1; break;
 			case WHILE: cc += 1; break;
+			case CATCH: cc += 1; break;
+			case CONDITIONAL_OR: cc += 1; break;
+			case CONDITIONAL_AND: cc += 1; break;
 			}
 		}
 

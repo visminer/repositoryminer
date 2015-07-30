@@ -6,6 +6,7 @@ import java.util.List;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.CatchClause;
 import org.eclipse.jdt.core.dom.DoStatement;
+import org.eclipse.jdt.core.dom.EnhancedForStatement;
 import org.eclipse.jdt.core.dom.ForStatement;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
@@ -22,6 +23,13 @@ public class MethodVisitor extends ASTVisitor {
 	private List<Statement> statements=new ArrayList<Statement>();	
 	
 	public boolean visit(ForStatement node){
+		Statement statement = new Statement();
+		statement.setNodeType(NodeType.FOR);
+		statements.add(statement);
+		return super.visit(node);
+	}
+	
+	public boolean visit(EnhancedForStatement node){
 		Statement statement = new Statement();
 		statement.setNodeType(NodeType.FOR);
 		statements.add(statement);
