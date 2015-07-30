@@ -119,20 +119,28 @@ public class JavaASTGenerator {
 		}
 		
 		List<MethodDeclaration> methodsDecl = new ArrayList<MethodDeclaration>();
-		for(org.eclipse.jdt.core.dom.MethodDeclaration method : type.getMethods()){
-			
-			MethodDeclaration methodDecl = new MethodDeclaration();
-			methodDecl.setName(method.getName().getFullyQualifiedName());
-			Block body = method.getBody();
-			methodDecl.setStatements(processBlock(body));
-			methodsDecl.add(methodDecl);
-			
-		}
+		for(org.eclipse.jdt.core.dom.MethodDeclaration method : type.getMethods())
+			methodsDecl.add(processMethod(method));		
 		
 		typeDecl.setMethods(methodsDecl);
 		return typeDecl;
 		
 	}
+	
+	private static MethodDeclaration processMethod(org.eclipse.jdt.core.dom.MethodDeclaration method){
+		
+		MethodDeclaration methodDecl = new MethodDeclaration();
+		methodDecl.setName(method.getName().getFullyQualifiedName());
+		methodDecl.setConstructor(method.isConstructor());
+		ModifierKeyword modifier = ModifierKeyword.fromFlagValue(method.getModifiers());
+		if(modifier!=null)
+			methodDecl.setModifier(modifier.toString());			
+		
+		Block body = method.getBody();
+		methodDecl.setStatements(processBlock(body));
+		return methodDecl;
+	}
+	
 	
 	private static FieldDeclaration processField(org.eclipse.jdt.core.dom.FieldDeclaration field){
 				
