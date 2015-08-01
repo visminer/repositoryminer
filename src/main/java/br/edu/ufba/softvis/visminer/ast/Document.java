@@ -6,8 +6,8 @@ public class Document {
 
 	private int id;
 	private String name;
-	private List<TypeDeclaration> typesDeclarations;
-	private List<EnumDeclaration> enumsDeclarations;
+	private List<TypeDeclaration> types;
+	private List<ImportDeclaration> imports;
 	private PackageDeclaration packageDeclaration;
 	
 	/**
@@ -35,28 +35,28 @@ public class Document {
 		this.name = name;
 	}
 	/**
-	 * @return the typesDeclarations
+	 * @return the types
 	 */
-	public List<TypeDeclaration> getTypesDeclarations() {
-		return typesDeclarations;
+	public List<TypeDeclaration> getTypes() {
+		return types;
 	}
 	/**
-	 * @param typesDeclarations the typesDeclarations to set
+	 * @param types the types to set
 	 */
-	public void setTypesDeclarations(List<TypeDeclaration> typesDeclarations) {
-		this.typesDeclarations = typesDeclarations;
+	public void setTypes(List<TypeDeclaration> types) {
+		this.types = types;
 	}
 	/**
-	 * @return the enumsDeclarations
+	 * @return the imports
 	 */
-	public List<EnumDeclaration> getEnumsDeclarations() {
-		return enumsDeclarations;
+	public List<ImportDeclaration> getImports() {
+		return imports;
 	}
 	/**
-	 * @param enumsDeclarations the enumsDeclarations to set
+	 * @param imports the imports to set
 	 */
-	public void setEnumsDeclarations(List<EnumDeclaration> enumsDeclarations) {
-		this.enumsDeclarations = enumsDeclarations;
+	public void setImports(List<ImportDeclaration> imports) {
+		this.imports = imports;
 	}
 	/**
 	 * @return the packageDeclaration

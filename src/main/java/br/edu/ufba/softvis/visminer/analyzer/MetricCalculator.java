@@ -13,7 +13,7 @@ import javax.persistence.EntityManager;
 import br.edu.ufba.softvis.visminer.analyzer.local.IRepositorySystem;
 import br.edu.ufba.softvis.visminer.ast.AST;
 import br.edu.ufba.softvis.visminer.ast.Document;
-import br.edu.ufba.softvis.visminer.ast.generator.JavaASTGenerator;
+import br.edu.ufba.softvis.visminer.ast.generator.java.JavaASTGenerator;
 import br.edu.ufba.softvis.visminer.config.MetricConfig;
 import br.edu.ufba.softvis.visminer.constant.MetricType;
 import br.edu.ufba.softvis.visminer.constant.MetricUid;

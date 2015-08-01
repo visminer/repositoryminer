@@ -7,7 +7,6 @@ public class FieldDeclaration {
 	private String type;
 	private String modifier;
 	
-	
 	public int getId() {
 		return id;
 	}

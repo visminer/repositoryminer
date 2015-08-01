@@ -52,6 +52,10 @@ public class RepositoryAnalyzer{
 		RepositoryDB repositoryDb = new RepositoryDB(0, repoBusi.getDescription(), repoBusi.getName(),
 				path, repoBusi.getType(), uid, repoBusi.getCharset());
 		
+		if(repoBusi.getCharset() == null){
+			repositoryDb.setCharset("UTF-8"); //UTF-8 is used as default charset
+		}
+		
 		repositoryDao.save(repositoryDb);
 		List<CommitDB> commitsDB = new CommitAndCommitterAnalyzer().persist(repositoryDb, repoSys, entityManager);
 		
@@ -63,7 +67,7 @@ public class RepositoryAnalyzer{
 		SoftwareUnitDB softUnitDb = new SoftwareUnitDB(0, repositoryDb.getName(), SoftwareUnitType.PROJECT, repositoryDb.getUid());
 		softUnitDb.setRepository(repositoryDb);
 		softwareUnitDao.save(softUnitDb);
-		
+
 		if(metrics != null && metrics.size() > 0){
 			MetricCalculator.calculate(metrics, repoSys, repositoryDb, entityManager);
 		}

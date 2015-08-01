@@ -39,10 +39,15 @@ public @interface MetricAnnotation {
 	public MetricUid uid();
 	
 	/**
-	 * 
 	 * @return Metric type
 	 * @see MetricType
 	 */
 	public MetricType type();
+
+	
+	/**
+	 * @return Requisited metrics
+	 */
+	public MetricUid[] requisites() default {};
 	
 }

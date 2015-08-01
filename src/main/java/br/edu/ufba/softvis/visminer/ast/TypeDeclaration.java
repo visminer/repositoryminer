@@ -1,14 +1,12 @@
 package br.edu.ufba.softvis.visminer.ast;
 
-import java.util.List;
+import br.edu.ufba.softvis.visminer.constant.SoftwareUnitType;
 
 public class TypeDeclaration {
 
 	private int id;
 	private String name;
-	private boolean interfaceClass;
-	private List<MethodDeclaration> methods;
-	private List<FieldDeclaration> fields;
+	private SoftwareUnitType type;
 
 	/**
 	 * @return the id
@@ -35,42 +33,16 @@ public class TypeDeclaration {
 		this.name = name;
 	}
 	/**
-	 * @return the interfaceClass
+	 * @return the type
 	 */
-	public boolean isInterfaceClass() {
-		return interfaceClass;
+	public SoftwareUnitType getType() {
+		return type;
 	}
 	/**
-	 * @param interfaceClass the interfaceClass to set
+	 * @param type the type to set
 	 */
-	public void setInterfaceClass(boolean interfaceClass) {
-		this.interfaceClass = interfaceClass;
-	}
-	/**
-	 * @return the methods
-	 */
-	public List<MethodDeclaration> getMethods() {
-		return methods;
-	}
-	/**
-	 * @param methods the methods to set
-	 */
-	public void setMethods(List<MethodDeclaration> methods) {
-		this.methods = methods;
-	}
-	
-	/**
-	 * @return the Fields
-	 */
-	public List<FieldDeclaration> getFields() {
-		return fields;
-	}
-	
-	/**
-	 * @param fields the fields to set
-	 */
-	public void setFields(List<FieldDeclaration> fields) {
-		this.fields = fields;
+	public void setType(SoftwareUnitType type) {
+		this.type = type;
 	}
 
 }

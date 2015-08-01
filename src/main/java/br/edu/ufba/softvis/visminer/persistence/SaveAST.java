@@ -6,6 +6,7 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 
 import br.edu.ufba.softvis.visminer.ast.AST;
+import br.edu.ufba.softvis.visminer.ast.ClassOrInterfaceDeclaration;
 import br.edu.ufba.softvis.visminer.ast.EnumConstantDeclaration;
 import br.edu.ufba.softvis.visminer.ast.EnumDeclaration;
 import br.edu.ufba.softvis.visminer.ast.FieldDeclaration;
@@ -69,64 +70,64 @@ public class SaveAST {
 				fileDb, repositoryDb, parent);
 		ast.getDocument().setId(docUnit.getId());
 		
-		if(ast.getDocument().getTypesDeclarations() != null){
-			for(TypeDeclaration type : ast.getDocument().getTypesDeclarations()){
+		if(ast.getDocument().getTypes() != null){
+			for(TypeDeclaration type : ast.getDocument().getTypes()){
 				
 				String typeUid = generateUid(repositoryDb.getUid(), docUid, type.getName());
-				SoftwareUnitDB typeUnit = getSofwareUnitDB(typeUid, type.getName(), SoftwareUnitType.CLASS,
+				
+				SoftwareUnitDB typeUnit = getSofwareUnitDB(typeUid, type.getName(), type.getType(),
 						fileDb, repositoryDb, docUnit);
 				type.setId(typeUnit.getId());
 				
-				if(type.getFields()!=null){
-					for(FieldDeclaration field : type.getFields()){
-						String fieldUid = generateUid(repositoryDb.getUid(), typeUid, field.getName());
-						SoftwareUnitDB fieldUnit = getSofwareUnitDB(fieldUid, field.getName(), SoftwareUnitType.FIELD,
-								fileDb, repositoryDb, typeUnit);
-						field.setId(fieldUnit.getId());
-					}
-				}
-				
-				if(type.getMethods() == null){
-					continue;
-				}
-				
-				for(MethodDeclaration method : type.getMethods()){
-					String methodUid = generateUid(repositoryDb.getUid(), typeUid, method.getName());
-					SoftwareUnitDB methodUnit = getSofwareUnitDB(methodUid, method.getName(), SoftwareUnitType.METHOD,
-							fileDb, repositoryDb, typeUnit);
-					method.setId(methodUnit.getId());
+				if(type.getType() == SoftwareUnitType.CLASS_OR_INTERFACE){
+					processClassOrInterface( (ClassOrInterfaceDeclaration) type, fileDb, typeUnit);
+				}else if(type.getType() == SoftwareUnitType.ENUM){
+					processEnum( (EnumDeclaration) type, typeUnit, fileDb);
 				}
 				
 			}
 		}
-		
-		if(ast.getDocument().getEnumsDeclarations() != null){
-			for(EnumDeclaration enumDecl : ast.getDocument().getEnumsDeclarations()){
-				
-				String enumUid = generateUid(repositoryDb.getUid(), docUid, enumDecl.getName());
-				SoftwareUnitDB enumUnit = getSofwareUnitDB(enumUid, enumDecl.getName(), SoftwareUnitType.ENUM, fileDb,
-						repositoryDb, docUnit);
-				enumDecl.setId(enumUnit.getId());
-				
-				if(enumDecl.getDeclarations() == null){
-					continue;
-				}
-				
-				for(EnumConstantDeclaration constDecl : enumDecl.getDeclarations()){
-					String constUid = generateUid(repositoryDb.getUid(), enumUid, constDecl.getName());
-					SoftwareUnitDB constUnit = getSofwareUnitDB(constUid, constDecl.getName(), SoftwareUnitType.ENUM_CONST, fileDb,
-							repositoryDb, enumUnit);
-					constDecl.setId(constUnit.getId());
-				}
-				
-			}
-		}
-		
+			
 	}
 	
 	private String generateUid(String repositoryUid, String parentUid, String softwareUnitName){
 		String uid = repositoryUid + parentUid + softwareUnitName;
 		return StringUtils.sha1(uid);
+	}
+	
+	private void processClassOrInterface(ClassOrInterfaceDeclaration type, FileDB fileDb, SoftwareUnitDB typeUnit){
+		
+		if(type.getFields() != null){
+			for(FieldDeclaration field : type.getFields()){
+				String fieldUid = generateUid(repositoryDb.getUid(), typeUnit.getUid(), type.getName()+"."+field.getName());
+				SoftwareUnitDB fieldUnit = getSofwareUnitDB(fieldUid, field.getName(), SoftwareUnitType.FIELD,
+						fileDb, repositoryDb, typeUnit);
+				field.setId(fieldUnit.getId());
+			}
+		}
+
+		if(type.getMethods() != null){
+			for(MethodDeclaration method : type.getMethods()){
+				String methodUid = generateUid(repositoryDb.getUid(), typeUnit.getUid(), type.getName()+"."+method.getName());
+				SoftwareUnitDB methodUnit = getSofwareUnitDB(methodUid, method.getName(), SoftwareUnitType.METHOD,
+						fileDb, repositoryDb, typeUnit);
+				method.setId(methodUnit.getId());
+			}
+		}
+		
+	}
+	
+	private void processEnum(EnumDeclaration type, SoftwareUnitDB enumUnit, FileDB fileDb){
+		
+		if(type.getenumConsts() != null){
+			for(EnumConstantDeclaration constDecl : type.getenumConsts()){
+				String constUid = generateUid(repositoryDb.getUid(), enumUnit.getUid(), constDecl.getName());
+				SoftwareUnitDB constUnit = getSofwareUnitDB(constUid, constDecl.getName(), SoftwareUnitType.ENUM_CONST, fileDb,
+						repositoryDb, enumUnit);
+				constDecl.setId(constUnit.getId());
+			}
+		}
+		
 	}
 	
 	private SoftwareUnitDB getSofwareUnitDB(String uid, String name, SoftwareUnitType type, FileDB fileDb,

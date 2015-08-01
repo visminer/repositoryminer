@@ -1,19 +1,12 @@
 package br.edu.ufba.softvis.visminer.metric;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import br.edu.ufba.softvis.visminer.annotations.MetricAnnotation;
-import br.edu.ufba.softvis.visminer.ast.AST;
 import br.edu.ufba.softvis.visminer.ast.MethodDeclaration;
 import br.edu.ufba.softvis.visminer.ast.Statement;
-import br.edu.ufba.softvis.visminer.ast.TypeDeclaration;
 import br.edu.ufba.softvis.visminer.constant.MetricType;
 import br.edu.ufba.softvis.visminer.constant.MetricUid;
-import br.edu.ufba.softvis.visminer.model.database.CommitDB;
-import br.edu.ufba.softvis.visminer.model.database.FileDB;
-import br.edu.ufba.softvis.visminer.persistence.MetricPersistance;
 
 @MetricAnnotation(
 		name = "Ciclomatic Complexity",
@@ -24,56 +17,73 @@ import br.edu.ufba.softvis.visminer.persistence.MetricPersistance;
 				type = MetricType.SIMPLE,
 				uid = MetricUid.CC
 		)
-public class CCMetric implements IMetric{
+public class CCMetric extends MethodBasedMetricTemplate{
 
 	@Override
-	public void calculate(Map<FileDB, AST> filesMap, List<CommitDB> commits,
-			MetricPersistance persistence) {
-
-		for(Entry<FileDB, AST> entry : filesMap.entrySet()){
-
-			AST ast = entry.getValue();
+	public void calculate(List<MethodDeclaration> methods) {
+		for (MethodDeclaration method : methods) {
 			
-			if(ast == null || ast.getDocument().getTypesDeclarations() == null){
-				continue;
-			}
-
-			for(TypeDeclaration type : ast.getDocument().getTypesDeclarations()){
-				
-				if(type.getMethods() == null){
-					break;
-				}
-				
-				for(MethodDeclaration method : type.getMethods()){
-					int cc = calculate(method);
-					persistence.postMetricValue(method.getId(), String.valueOf(cc));
-				}
-				
-			}
-
+			int cc = calculate(method);
+			if(method.getThrownsExceptions() != null)
+				cc += method.getThrownsExceptions().size();
+			persistence.postMetricValue(method.getId(), String.valueOf(cc));
+			
+			
 		}
-
-	}
-
-
+	}	
+	
 	private int calculate(MethodDeclaration method) {
-
-		if(method.getStatements() == null){
+		if (method.getStatements() == null) {
 			return 1;
 		}
 
 		int cc = 1;
-		for(Statement statement : method.getStatements()){
-			switch(statement.getNodeType()){
-			case IF: cc += 1; break;
-			case SWITCH_CASE: cc += 1; break;
-			case FOR: cc += 1; break;
-			case DO: cc += 1; break;
-			case WHILE: cc += 1; break;
+		for (Statement statement : method.getStatements()) {
+			switch (statement.getNodeType()) {
+			
+				case IF:
+				case SWITCH_CASE:
+				case FOR:
+				case DO_WHILE:
+				case WHILE:
+				case CATCH:
+				case CONDITIONAL_EXPRESSION:
+					cc += calculateExpression(statement.getExpression());
+				break;
+				case RETURN:
+				case ELSE:
+				case BREAK:
+				case CONTINUE:
+				case TRY:
+				case FINALLY:
+				case THROW:
+					cc += 1;
+				break;
+				
+				default:
+				break;
 			}
 		}
 
 		return cc;
 	}
-
+	
+	private int calculateExpression(String expression) {
+		int cc = 1;
+		
+		if(expression == null){
+			return cc;
+		}
+		
+		char[] chars = expression.toCharArray();
+		for (int i = 0; i < chars.length - 1; i++) {
+			char next = chars[i];
+			if ((next == '&' || next == '|') && (next == chars[i + 1])) {
+				cc++;
+			}
+		}
+		
+		return cc;
+	}	
+	
 }

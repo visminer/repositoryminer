@@ -9,7 +9,7 @@ public enum SoftwareUnitType {
 	PROJECT(1),
 	PACKAGE(2),
 	FILE(3),
-	CLASS(4),
+	CLASS_OR_INTERFACE(4),
 	METHOD(5),
 	ENUM(6),
 	ENUM_CONST(7),
