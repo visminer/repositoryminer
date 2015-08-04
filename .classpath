@@ -22,5 +22,6 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="org.eclipse.cdt.core_5.8.0.201409172108.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
