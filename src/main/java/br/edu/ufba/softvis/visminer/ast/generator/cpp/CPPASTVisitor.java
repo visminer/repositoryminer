@@ -272,30 +272,6 @@ public class CPPASTVisitor extends ASTVisitor {
 		return super.visit(declSpec);
 	}
 
-	/*
-	 * @Override public int visit(IASTDeclaration declaration) { if
-	 * (currClassOrInterface == null) { return PROCESS_CONTINUE; } if
-	 * (declaration instanceof ICPPASTFunctionDefinition) {
-	 * ICPPASTFunctionDefinition funcDef = (ICPPASTFunctionDefinition)
-	 * declaration; ICPPASTFunctionDeclarator funcDcl =
-	 * (ICPPASTFunctionDeclarator) funcDef .getDeclarator();
-	 * 
-	 * generator.addMethod(extractMethodDeclaration(funcDcl, null)); }
-	 * 
-	 * return super.visit(declaration); }
-	 * 
-	 * @Override public int visit(IASTDeclarator declarator) { if
-	 * (currClassOrInterface == null) { return PROCESS_CONTINUE; } if
-	 * ((declarator instanceof ICPPASTFunctionDeclarator) &&
-	 * !(declarator.getParent() instanceof ICPPASTFunctionDefinition)) {
-	 * ICPPASTFunctionDeclarator funcDcl = (ICPPASTFunctionDeclarator)
-	 * declarator;
-	 * 
-	 * generator.addMethod(extractMethodDeclaration(funcDcl, null)); }
-	 * 
-	 * return super.visit(declarator); }
-	 */
-
 	@Override
 	public int visit(IASTStatement statement) {
 		if (statement instanceof CPPASTCompoundStatement) {
