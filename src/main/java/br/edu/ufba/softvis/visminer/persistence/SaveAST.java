@@ -119,8 +119,8 @@ public class SaveAST {
 	
 	private void processEnum(EnumDeclaration type, SoftwareUnitDB enumUnit, FileDB fileDb){
 		
-		if(type.getenumConsts() != null){
-			for(EnumConstantDeclaration constDecl : type.getenumConsts()){
+		if(type.getEnumConsts() != null){
+			for(EnumConstantDeclaration constDecl : type.getEnumConsts()){
 				String constUid = generateUid(repositoryDb.getUid(), enumUnit.getUid(), constDecl.getName());
 				SoftwareUnitDB constUnit = getSofwareUnitDB(constUid, constDecl.getName(), SoftwareUnitType.ENUM_CONST, fileDb,
 						repositoryDb, enumUnit);
