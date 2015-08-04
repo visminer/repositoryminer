@@ -8,6 +8,7 @@ public class Document {
 	private String name;
 	private List<TypeDeclaration> types;
 	private List<ImportDeclaration> imports;
+	private List<MethodDeclaration> methods;
 	private PackageDeclaration packageDeclaration;
 	
 	/**
@@ -58,6 +59,18 @@ public class Document {
 	public void setImports(List<ImportDeclaration> imports) {
 		this.imports = imports;
 	}
+	/**
+	 * @return the methods
+	 */
+	public List<MethodDeclaration> getMethods() {
+		return methods;
+	}
+	/**
+	 * @param imports the methods to set
+	 */
+	public void setMethods(List<MethodDeclaration> methods) {
+		this.methods = methods;
+	}	
 	/**
 	 * @return the packageDeclaration
 	 */
