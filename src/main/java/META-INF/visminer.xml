@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+	<metrics>
+		<metric id="CC">br.edu.ufba.softvis.visminer.metric.CCMetric</metric>
+		<metric id="SLOC">br.edu.ufba.softvis.visminer.metric.SLOCMetric</metric>
+		<metric id="NOCAI">br.edu.ufba.softvis.visminer.metric.NOCAIMetric</metric>
+		<metric id="WMC">br.edu.ufba.softvis.visminer.metric.WMCMetric</metric>
+	</metrics>
+	
+	<file-extensions>
+	
+		<avoided-extensions>
+			<extension>mwb</extension>
+			<extension>jpg</extension>
+			<extension>jpeg</extension>
+			<extension>pdf</extension>
+			<extension>png</extension>
+			<extension>jar</extension>
+			<extension>war</extension>
+		</avoided-extensions>
+	
+		<source-extensions>
+			<extension>java</extension>
+		</source-extensions>
+		
+		<other-extensions>
+			<extension>xml</extension>
+			<extension>html</extension>
+			<extension>css</extension>
+			<extension>json</extension>
+		</other-extensions>
+	
+	</file-extensions>
+	
+</configuration>

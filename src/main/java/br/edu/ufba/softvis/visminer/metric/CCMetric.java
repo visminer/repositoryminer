@@ -7,6 +7,7 @@ import br.edu.ufba.softvis.visminer.ast.MethodDeclaration;
 import br.edu.ufba.softvis.visminer.ast.Statement;
 import br.edu.ufba.softvis.visminer.constant.MetricType;
 import br.edu.ufba.softvis.visminer.constant.MetricUid;
+import br.edu.ufba.softvis.visminer.constant.NodeType;
 
 @MetricAnnotation(
 		name = "Ciclomatic Complexity",
@@ -27,8 +28,6 @@ public class CCMetric extends MethodBasedMetricTemplate{
 			if(method.getThrownsExceptions() != null)
 				cc += method.getThrownsExceptions().size();
 			persistence.postMetricValue(method.getId(), String.valueOf(cc));
-			
-			
 		}
 	}	
 	
@@ -40,7 +39,6 @@ public class CCMetric extends MethodBasedMetricTemplate{
 		int cc = 1;
 		for (Statement statement : method.getStatements()) {
 			switch (statement.getNodeType()) {
-			
 				case IF:
 				case SWITCH_CASE:
 				case FOR:
@@ -48,19 +46,7 @@ public class CCMetric extends MethodBasedMetricTemplate{
 				case WHILE:
 				case CATCH:
 				case CONDITIONAL_EXPRESSION:
-					cc += calculateExpression(statement.getExpression());
-				break;
-				case RETURN:
-				case ELSE:
-				case BREAK:
-				case CONTINUE:
-				case TRY:
-				case FINALLY:
-				case THROW:
-					cc += 1;
-				break;
-				
-				default:
+					cc += calculateExpression(statement.getExpression(), statement.getNodeType());
 				break;
 			}
 		}
@@ -68,18 +54,23 @@ public class CCMetric extends MethodBasedMetricTemplate{
 		return cc;
 	}
 	
-	private int calculateExpression(String expression) {
+	private int calculateExpression(String expression, NodeType type) {
 		int cc = 1;
 		
-		if(expression == null){
-			return cc;
-		}
-		
 		char[] chars = expression.toCharArray();
-		for (int i = 0; i < chars.length - 1; i++) {
-			char next = chars[i];
-			if ((next == '&' || next == '|') && (next == chars[i + 1])) {
-				cc++;
+		
+		if(type != NodeType.CATCH){
+			for (int i = 0; i < chars.length - 1; i++) {
+				char next = chars[i];
+				if ((next == '&' || next == '|') && (next == chars[i + 1])) {
+					cc++;
+				}
+			}
+		}else{
+			for (int i = 0; i < chars.length - 1; i++) {
+				if (chars[i] == '|') {
+					cc++;
+				}
 			}
 		}
 		

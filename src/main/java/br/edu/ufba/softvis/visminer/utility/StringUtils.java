@@ -10,7 +10,6 @@ import java.security.NoSuchAlgorithmException;
 public class StringUtils {
 	
 	/**
-	 * 
 	 * @param input
 	 * @return SHA1 hash
 	 * Calculates SHA1 hash.

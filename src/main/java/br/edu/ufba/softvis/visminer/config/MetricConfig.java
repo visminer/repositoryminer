@@ -1,14 +1,10 @@
 package br.edu.ufba.softvis.visminer.config;
 
-import java.io.InputStream;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.persistence.EntityManager;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -22,6 +18,7 @@ import br.edu.ufba.softvis.visminer.model.database.MetricDB;
 import br.edu.ufba.softvis.visminer.persistence.Database;
 import br.edu.ufba.softvis.visminer.persistence.dao.MetricDAO;
 import br.edu.ufba.softvis.visminer.persistence.impl.MetricDAOImpl;
+import br.edu.ufba.softvis.visminer.utility.XMLUtil;
 
 /**
  * @version 0.9
@@ -29,38 +26,23 @@ import br.edu.ufba.softvis.visminer.persistence.impl.MetricDAOImpl;
  */
 public class MetricConfig {
 
-	private static final String CONFIG_FILE = "/META-INF/metrics.xml";
+	private static Map<Integer, String> configMap;
 	
-	// Reads the configuration file e return its data.
+	// Reads the metrics configuration and return metrics canonical names.
 	private static Map<Integer, String> readConfig(){
-		
+
 		Map<Integer, String> map = new HashMap<Integer, String>();
+		Document doc = XMLUtil.getXMLDoc("/META-INF/visminer.xml");
+		NodeList nList = doc.getElementsByTagName("metric");
 		
-		try{
-			
-			InputStream inputStream = MetricConfig.class.getResourceAsStream(CONFIG_FILE);
-			DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
-			DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
-			Document doc = docBuilder.parse(inputStream);
-			
-			doc.getDocumentElement().normalize();
-			
-			NodeList nList = doc.getElementsByTagName("metric");
-			for(int i = 0; i < nList.getLength(); i++){
-				
-				Element element = (Element) nList.item(i);
-				String uid = element.getAttribute("id").toUpperCase();
-				map.put(MetricUid.valueOf(uid).getId(), element.getTextContent());
-				
-			}
-			
-			return map;
-			
-		}catch(Exception e){
-			e.printStackTrace();
-			return null;
+		for(int i = 0; i < nList.getLength(); i++){
+			Element element = (Element) nList.item(i);
+			String uid = element.getAttribute("id").toUpperCase();
+			map.put(MetricUid.valueOf(uid).getId(), element.getTextContent());
 		}
-		
+
+		return map;
+
 	}
 	
 	/**
@@ -110,37 +92,52 @@ public class MetricConfig {
 	 * @return Returns a map containing the metric id and metric implementation
 	 * Finds the implementation for the metrics id passed as parameter and return a map, with the pair, metric id and its implementation.
 	 */
-	public static Map<MetricType, Map<MetricUid, IMetric>> getImplementations(List<MetricUid> metricsId){
+	public static void getImplementations(List<MetricUid> metricsId, Map<MetricUid, IMetric> simpleMetrics, Map<MetricUid, IMetric> complexMetrics){
 
-		Map<MetricType, Map<MetricUid, IMetric>> metricMap = new LinkedHashMap<MetricType, Map<MetricUid,IMetric>>();
+		configMap = readConfig();
+		for(MetricUid uid : metricsId){
+			String canonicalName = configMap.get(uid.getId());
+			IMetric metric = getIMetricInstance(canonicalName);
+			addMetric(metric, simpleMetrics, complexMetrics);
+		}
 		
-		Map<Integer, String> map = readConfig();
+	}
+	
+	// Get an IMetric instance from a class canonical name
+	private static IMetric getIMetricInstance(String canonicalName){
 		
-		Map<MetricUid, IMetric> simpleMetrics = new LinkedHashMap<MetricUid, IMetric>();
-		Map<MetricUid, IMetric> complexMetrics = new LinkedHashMap<MetricUid, IMetric>();
-		
-		try{
-			
-			for(MetricUid metricUid : metricsId){
-				String classPath = map.get(metricUid.getId());
-				IMetric metric = (IMetric) Class.forName(classPath).newInstance();
-				MetricAnnotation annotations = metric.getClass().getAnnotation(MetricAnnotation.class);
-				
-				if(annotations.type().equals(MetricType.SIMPLE)){
-					simpleMetrics.put(metricUid, metric);
-				}else if(annotations.type().equals(MetricType.COMPLEX)){
-					complexMetrics.put(metricUid, metric);
-				}
-			}
-			
-			metricMap.put(MetricType.SIMPLE, simpleMetrics);
-			metricMap.put(MetricType.COMPLEX, complexMetrics);
-			
-			return metricMap;
-			
-		}catch(Exception e){
+		try {
+			IMetric metric = (IMetric) Class.forName(canonicalName).newInstance();
+			return metric;
+		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
+		}
+		
+	}
+	
+	// Adds the metric in one of the lists based on metric type
+	private static void addMetric(IMetric metric, Map<MetricUid, IMetric> simpleMetrics,
+			Map<MetricUid, IMetric> complexMetrics){
+		
+		MetricAnnotation annotations = metric.getClass().getAnnotation(MetricAnnotation.class);
+		
+		for(MetricUid uid : annotations.requisites()){
+			String canonicalName = configMap.get(uid.getId());
+			IMetric metric2 = getIMetricInstance(canonicalName);
+			addMetric(metric2, simpleMetrics, complexMetrics);
+		}
+		
+		Map<MetricUid, IMetric> auxList = null;
+		
+		if(annotations.type().equals(MetricType.SIMPLE)){
+			auxList = simpleMetrics;
+		}else if(annotations.type().equals(MetricType.COMPLEX)){
+			auxList = complexMetrics;
+		}
+		
+		if(!auxList.containsKey(annotations.uid())){
+			auxList.put(annotations.uid(), metric);
 		}
 		
 	}

@@ -4,8 +4,10 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.persistence.EntityManager;
@@ -15,7 +17,6 @@ import br.edu.ufba.softvis.visminer.ast.AST;
 import br.edu.ufba.softvis.visminer.ast.Document;
 import br.edu.ufba.softvis.visminer.ast.generator.java.JavaASTGenerator;
 import br.edu.ufba.softvis.visminer.config.MetricConfig;
-import br.edu.ufba.softvis.visminer.constant.MetricType;
 import br.edu.ufba.softvis.visminer.constant.MetricUid;
 import br.edu.ufba.softvis.visminer.constant.TreeType;
 import br.edu.ufba.softvis.visminer.metric.IMetric;
@@ -121,14 +122,17 @@ public class MetricCalculator{
 		CommitDAO commitDao = new CommitDAOImpl();
 		commitDao.setEntityManager(entityManager);
 		
-		Map<MetricType, Map<MetricUid, IMetric>> metricsMap = MetricConfig.getImplementations(metricsId);
+		Map<MetricUid, IMetric> simpleMetrics = new LinkedHashMap<MetricUid, IMetric>();
+		Map<MetricUid, IMetric> complexMetrics = new LinkedHashMap<MetricUid, IMetric>();
+		MetricConfig.getImplementations(metricsId, simpleMetrics, complexMetrics);
+		
 		SaveAST saveAst = new SaveAST(repositoryDb, entityManager);
 		
 		List<TreeDB> treesDb = treeDao.findByRepository(repositoryDb.getId());
 		for(TreeDB treeDb : treesDb){
 			if(treeDb.getType() == TreeType.BRANCH){
 				List<CommitDB> commitsDb = commitDao.findByTree(treeDb.getId());
-				calculateMetrics(commitsDb, metricsMap, saveAst, repoSys, repositoryDb, entityManager);
+				calculateMetrics(commitsDb, simpleMetrics, complexMetrics, saveAst, repoSys, repositoryDb, entityManager);
 			}
 		}
 		
@@ -139,8 +143,9 @@ public class MetricCalculator{
 	 * Prepares AST for source code files.
 	 * Calculates the metrics and save their values in database.
 	 */
-	private static void calculateMetrics(List<CommitDB> commitsDb, Map<MetricType, Map<MetricUid, IMetric>> metricsMap,
-			SaveAST saveAst, IRepositorySystem repoSys, RepositoryDB repositoryDb, EntityManager entityManager) {
+	private static void calculateMetrics(List<CommitDB> commitsDb, Map<MetricUid, IMetric> simpleMetrics,
+			Map<MetricUid, IMetric> complexMetrics, SaveAST saveAst, IRepositorySystem repoSys,
+			RepositoryDB repositoryDb, EntityManager entityManager) {
 
 		FileDAO fileDao = new FileDAOImpl();
 		fileDao.setEntityManager(entityManager);
@@ -216,7 +221,7 @@ public class MetricCalculator{
 				}// end else
 			}// end for(FileDB fileDb : filesDbAux)
 
-			calculationMetricsHelper(metricsMap, commitsDbAux, commitFiles, repositoryFiles, persistence);
+			calculationMetricsHelper(simpleMetrics, complexMetrics, commitsDbAux, commitFiles, repositoryFiles, persistence);
 			
 		}// end for(CommitDB commitDb : commitsDb)
 
@@ -225,20 +230,18 @@ public class MetricCalculator{
 	}
 	
 	// Calculates all the selected metrics for a given commit.
-	private static void calculationMetricsHelper(Map<MetricType, Map<MetricUid, IMetric>> metricsMap, List<CommitDB> commits, 
-			Map<FileDB, AST> committedFiles, Map<FileDB, AST> repositoryFiles, MetricPersistance persistence){
+	private static void calculationMetricsHelper(Map<MetricUid, IMetric> simpleMetrics, Map<MetricUid, IMetric> complexMetrics,
+			List<CommitDB> commits, Map<FileDB, AST> committedFiles, Map<FileDB, AST> repositoryFiles, MetricPersistance persistence){
 		
 		CommitDB c = commits.get(commits.size() - 1);
 		persistence.setCommitId(c.getId());
 		
-		Map<MetricUid, IMetric> metricMapAux = metricsMap.get(MetricType.SIMPLE);
-		for(java.util.Map.Entry<MetricUid, IMetric> entry : metricMapAux.entrySet()){
+		for(Entry<MetricUid, IMetric> entry : simpleMetrics.entrySet()){
 			persistence.setMetric(entry.getKey());
 			entry.getValue().calculate(committedFiles, commits, persistence);
 		}
 		
-		metricMapAux = metricsMap.get(MetricType.COMPLEX);
-		for(java.util.Map.Entry<MetricUid, IMetric> entry : metricMapAux.entrySet()){
+		for(Entry<MetricUid, IMetric> entry : complexMetrics.entrySet()){
 			persistence.setMetric(entry.getKey());
 			entry.getValue().calculate(repositoryFiles, commits, persistence);
 		}

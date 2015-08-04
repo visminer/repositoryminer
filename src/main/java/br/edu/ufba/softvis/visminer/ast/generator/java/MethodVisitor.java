@@ -71,11 +71,11 @@ public class MethodVisitor extends ASTVisitor {
 
 	@Override
 	public boolean visit(SwitchCase node) {
-		if(node.getExpression() != null){
+		if(node.isDefault())
+			return addStatement(NodeType.SWITCH_DEFAULT, null);
+		else
 			return addStatement(NodeType.SWITCH_CASE, node.getExpression().toString());
-		}else{
-			return addStatement(NodeType.SWITCH_CASE, null);
-		}
+			
 	}
 
 	@Override

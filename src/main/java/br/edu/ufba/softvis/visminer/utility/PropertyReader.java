@@ -27,7 +27,6 @@ public class PropertyReader {
 	}
 	
 	/**
-	 * 
 	 * @param property
 	 * @return The value of the property
 	 */

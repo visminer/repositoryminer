@@ -7,6 +7,7 @@ public enum NodeType {
 	IF,
 	ELSE,
 	SWITCH_CASE,
+	SWITCH_DEFAULT,
 	FOR,
 	DO_WHILE,
 	WHILE,
