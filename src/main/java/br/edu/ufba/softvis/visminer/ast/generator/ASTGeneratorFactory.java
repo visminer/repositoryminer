@@ -3,7 +3,7 @@ package br.edu.ufba.softvis.visminer.ast.generator;
 import br.edu.ufba.softvis.visminer.ast.generator.cpp.CPPASTGenerator;
 import br.edu.ufba.softvis.visminer.ast.generator.java.JavaASTGenerator;
 
-public class ASTGeneratorFactory {
+public abstract class ASTGeneratorFactory {
 
 	public static IASTGenerator create(Language language) {
 		IASTGenerator generator = null;
