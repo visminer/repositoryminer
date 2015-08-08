@@ -1,73 +1,84 @@
 package br.edu.ufba.softvis.visminer.model.database;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Lob;
+import javax.persistence.ManyToMany;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
 
 import br.edu.ufba.softvis.visminer.constant.RepositoryType;
 import br.edu.ufba.softvis.visminer.constant.WebRepositoryType;
-
-import java.util.List;
-
+import br.edu.ufba.softvis.visminer.model.business.Repository;
 
 /**
- * @version 0.9
- * The persistent class for the repository database table.
+ * @version 0.9 The persistent class for the repository database table.
  */
 @Entity
-@Table(name="repository")
-@NamedQuery(name="RepositoryDB.findByUid", query="select r from RepositoryDB r where r.uid = :uid")
-
+@Table(name = "repository")
+@NamedQueries({
+		@NamedQuery(name = "RepositoryDB.findAll", query = "select r from RepositoryDB r"),
+		@NamedQuery(name = "RepositoryDB.findByUid", query = "select r from RepositoryDB r where r.uid = :uid") })
 public class RepositoryDB implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@SequenceGenerator(name="REPOSITORY_ID_GENERATOR", sequenceName="REPOSITORY_SEQ")
-	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="REPOSITORY_ID_GENERATOR")
-	@Column(unique=true, nullable=false)
+	@SequenceGenerator(name = "REPOSITORY_ID_GENERATOR", sequenceName = "REPOSITORY_SEQ")
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "REPOSITORY_ID_GENERATOR")
+	@Column(unique = true, nullable = false)
 	private int id;
 
 	@Lob
 	private String description;
 
-	@Column(nullable=false, length=100)
+	@Column(nullable = false, length = 100)
 	private String name;
 
-	@Column(nullable=false, length=1024)
+	@Column(nullable = false, length = 1024)
 	private String path;
 
-	@Column(name="remote_url", length=256)
+	@Column(name = "remote_url", length = 256)
 	private String remoteUrl;
 
-	@Column(nullable=false)
+	@Column(nullable = false)
 	private int type;
 
-	@Column(name="service_type", nullable=false)
+	@Column(name = "service_type", nullable = false)
 	private int serviceType;
-	
-	@Column(unique=true, nullable=false, length=40)
+
+	@Column(unique = true, nullable = false, length = 40)
 	private String uid;
-	
-	@Column(nullable=false, length=20)
+
+	@Column(nullable = false, length = 20)
 	private String charset;
 
-	@ManyToMany(mappedBy="repositories")
+	@ManyToMany(mappedBy = "repositories")
 	private List<CommitterDB> committers;
 
-	//bi-directional many-to-one association to IssueDB
-	@OneToMany(mappedBy="repository")
+	// bi-directional many-to-one association to IssueDB
+	@OneToMany(mappedBy = "repository")
 	private List<IssueDB> issues;
 
-	//bi-directional many-to-one association to MilestoneDB
-	@OneToMany(mappedBy="repository")
+	// bi-directional many-to-one association to MilestoneDB
+	@OneToMany(mappedBy = "repository")
 	private List<MilestoneDB> milestones;
 
-	//bi-directional many-to-one association to SoftwareUnitDB
-	@OneToMany(mappedBy="repository")
+	// bi-directional many-to-one association to SoftwareUnitDB
+	@OneToMany(mappedBy = "repository")
 	private List<SoftwareUnitDB> softwareUnits;
 
-	//bi-directional many-to-one association to TreeDB
-	@OneToMany(mappedBy="repository")
+	// bi-directional many-to-one association to TreeDB
+	@OneToMany(mappedBy = "repository")
 	private List<TreeDB> trees;
 
 	public RepositoryDB() {
@@ -102,7 +113,8 @@ public class RepositoryDB implements Serializable {
 	}
 
 	/**
-	 * @param id the id to set
+	 * @param id
+	 *            the id to set
 	 */
 	public void setId(int id) {
 		this.id = id;
@@ -116,7 +128,8 @@ public class RepositoryDB implements Serializable {
 	}
 
 	/**
-	 * @param description the description to set
+	 * @param description
+	 *            the description to set
 	 */
 	public void setDescription(String description) {
 		this.description = description;
@@ -130,7 +143,8 @@ public class RepositoryDB implements Serializable {
 	}
 
 	/**
-	 * @param name the name to set
+	 * @param name
+	 *            the name to set
 	 */
 	public void setName(String name) {
 		this.name = name;
@@ -144,7 +158,8 @@ public class RepositoryDB implements Serializable {
 	}
 
 	/**
-	 * @param path the path to set
+	 * @param path
+	 *            the path to set
 	 */
 	public void setPath(String path) {
 		this.path = path;
@@ -158,7 +173,8 @@ public class RepositoryDB implements Serializable {
 	}
 
 	/**
-	 * @param remoteUrl the remoteUrl to set
+	 * @param remoteUrl
+	 *            the remoteUrl to set
 	 */
 	public void setRemoteUrl(String remoteUrl) {
 		this.remoteUrl = remoteUrl;
@@ -172,7 +188,8 @@ public class RepositoryDB implements Serializable {
 	}
 
 	/**
-	 * @param type the type to set
+	 * @param type
+	 *            the type to set
 	 */
 	public void setType(RepositoryType type) {
 		this.type = type.getId();
@@ -186,7 +203,8 @@ public class RepositoryDB implements Serializable {
 	}
 
 	/**
-	 * @param serviceType the serviceType to set
+	 * @param serviceType
+	 *            the serviceType to set
 	 */
 	public void setServiceType(WebRepositoryType serviceType) {
 		this.serviceType = serviceType.getId();
@@ -200,7 +218,8 @@ public class RepositoryDB implements Serializable {
 	}
 
 	/**
-	 * @param uid the uid to set
+	 * @param uid
+	 *            the uid to set
 	 */
 	public void setUid(String uid) {
 		this.uid = uid;
@@ -214,7 +233,8 @@ public class RepositoryDB implements Serializable {
 	}
 
 	/**
-	 * @param charset the charset to set
+	 * @param charset
+	 *            the charset to set
 	 */
 	public void setCharset(String charset) {
 		this.charset = charset;
@@ -228,7 +248,8 @@ public class RepositoryDB implements Serializable {
 	}
 
 	/**
-	 * @param committers the committers to set
+	 * @param committers
+	 *            the committers to set
 	 */
 	public void setCommitters(List<CommitterDB> committers) {
 		this.committers = committers;
@@ -242,7 +263,8 @@ public class RepositoryDB implements Serializable {
 	}
 
 	/**
-	 * @param issues the issues to set
+	 * @param issues
+	 *            the issues to set
 	 */
 	public void setIssues(List<IssueDB> issues) {
 		this.issues = issues;
@@ -256,7 +278,8 @@ public class RepositoryDB implements Serializable {
 	}
 
 	/**
-	 * @param milestones the milestones to set
+	 * @param milestones
+	 *            the milestones to set
 	 */
 	public void setMilestones(List<MilestoneDB> milestones) {
 		this.milestones = milestones;
@@ -270,7 +293,8 @@ public class RepositoryDB implements Serializable {
 	}
 
 	/**
-	 * @param softwareUnits the softwareUnits to set
+	 * @param softwareUnits
+	 *            the softwareUnits to set
 	 */
 	public void setSoftwareUnits(List<SoftwareUnitDB> softwareUnits) {
 		this.softwareUnits = softwareUnits;
@@ -284,10 +308,45 @@ public class RepositoryDB implements Serializable {
 	}
 
 	/**
-	 * @param trees the trees to set
+	 * @param trees
+	 *            the trees to set
 	 */
 	public void setTrees(List<TreeDB> trees) {
 		this.trees = trees;
+	}
+
+	/**
+	 * @return the bizz representation of Repository
+	 */
+	public Repository toBusiness() {
+		Repository repository = new Repository(this.getId(),
+				this.getDescription(), this.getName(), this.getPath(),
+				this.getRemoteUrl(), this.getType(), this.getServiceType(),
+				this.getUid(), this.getCharset());
+
+		return repository;
+	}
+
+	/**
+	 * Converts from DB beans to Bizz beans
+	 * 
+	 * @param repositories
+	 *            collection of RepositoryDB instances
+	 * @return collection of "Business" repositories
+	 */
+	public static List<Repository> toBusiness(List<RepositoryDB> repositories) {
+		List<Repository> bizzRepos = new ArrayList<Repository>();
+
+		for (RepositoryDB repo : repositories) {
+			Repository repository = new Repository(repo.getId(),
+					repo.getDescription(), repo.getName(), repo.getPath(),
+					repo.getRemoteUrl(), repo.getType(), repo.getServiceType(),
+					repo.getUid(), repo.getCharset());
+
+			bizzRepos.add(repository);
+		}
+
+		return bizzRepos;
 	}
 
 }

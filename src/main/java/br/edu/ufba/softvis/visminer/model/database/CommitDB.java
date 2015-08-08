@@ -1,71 +1,76 @@
 package br.edu.ufba.softvis.visminer.model.database;
 
 import java.io.Serializable;
-
-import javax.persistence.*;
-
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.Lob;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
+import br.edu.ufba.softvis.visminer.model.business.Commit;
 
 /**
  * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
- * @version 0.9
- * The persistent class for the commit database table.
+ * @version 0.9 The persistent class for the commit database table.
  */
 @Entity
-@Table(name="commit")
-@NamedQueries({
-	@NamedQuery(name="CommitDB.findByTree", query="select c from TreeDB t join t.commits c where t.id = :id order by c.date")
-})
-
+@Table(name = "commit")
+@NamedQueries({ @NamedQuery(name = "CommitDB.findByTree", query = "select c from TreeDB t join t.commits c where t.id = :id order by c.date") })
 public class CommitDB implements Serializable {
 	private static final long serialVersionUID = 1L;
-	
+
 	@Id
-	@SequenceGenerator(name="COMMIT_ID_GENERATOR", sequenceName="COMMIT_SEQ")
-	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="COMMIT_ID_GENERATOR")
-	@Column(unique=true, nullable=false)
+	@SequenceGenerator(name = "COMMIT_ID_GENERATOR", sequenceName = "COMMIT_SEQ")
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "COMMIT_ID_GENERATOR")
+	@Column(unique = true, nullable = false)
 	private int id;
 
 	@Temporal(TemporalType.TIMESTAMP)
-	@Column(nullable=false)
+	@Column(nullable = false)
 	private Date date;
 
 	@Lob
 	private String message;
 
-	@Column(unique=true, nullable=false, length=40)
+	@Column(unique = true, nullable = false, length = 40)
 	private String name;
 
-	//bi-directional many-to-one association to CommitterDB
+	// bi-directional many-to-one association to CommitterDB
 	@ManyToOne
-	@JoinColumn(name="committer_id", nullable=false)
+	@JoinColumn(name = "committer_id", nullable = false)
 	private CommitterDB committer;
 
-	//bi-directional many-to-many association to TreeDB
-	@ManyToMany(mappedBy="commits")
+	// bi-directional many-to-many association to TreeDB
+	@ManyToMany(mappedBy = "commits")
 	private List<TreeDB> trees;
 
-	//bi-directional many-to-one association to FileXCommitDB
-	@OneToMany(mappedBy="commit")
+	// bi-directional many-to-one association to FileXCommitDB
+	@OneToMany(mappedBy = "commit")
 	private List<FileXCommitDB> fileXCommits;
 
-	//bi-directional many-to-many association to IssueDB
-	@ManyToMany(mappedBy="commits")
+	// bi-directional many-to-many association to IssueDB
+	@ManyToMany(mappedBy = "commits")
 	private List<IssueDB> issues;
 
-	//bi-directional many-to-many association to SoftwareUnitDB
+	// bi-directional many-to-many association to SoftwareUnitDB
 	@ManyToMany
-	@JoinTable(
-		name="software_unit_x_commit"
-		, joinColumns={
-			@JoinColumn(name="commit_id", nullable=false)
-			}
-		, inverseJoinColumns={
-			@JoinColumn(name="software_unit_id", nullable=false)
-			}
-		)
+	@JoinTable(name = "software_unit_x_commit", joinColumns = { @JoinColumn(name = "commit_id", nullable = false) }, inverseJoinColumns = { @JoinColumn(name = "software_unit_id", nullable = false) })
 	private List<SoftwareUnitDB> softwareUnits;
 
 	public CommitDB() {
@@ -93,7 +98,8 @@ public class CommitDB implements Serializable {
 	}
 
 	/**
-	 * @param id the id to set
+	 * @param id
+	 *            the id to set
 	 */
 	public void setId(int id) {
 		this.id = id;
@@ -107,7 +113,8 @@ public class CommitDB implements Serializable {
 	}
 
 	/**
-	 * @param date the date to set
+	 * @param date
+	 *            the date to set
 	 */
 	public void setDate(Date date) {
 		this.date = date;
@@ -121,7 +128,8 @@ public class CommitDB implements Serializable {
 	}
 
 	/**
-	 * @param message the message to set
+	 * @param message
+	 *            the message to set
 	 */
 	public void setMessage(String message) {
 		this.message = message;
@@ -135,7 +143,8 @@ public class CommitDB implements Serializable {
 	}
 
 	/**
-	 * @param name the name to set
+	 * @param name
+	 *            the name to set
 	 */
 	public void setName(String name) {
 		this.name = name;
@@ -149,7 +158,8 @@ public class CommitDB implements Serializable {
 	}
 
 	/**
-	 * @param committer the committer to set
+	 * @param committer
+	 *            the committer to set
 	 */
 	public void setCommitter(CommitterDB committer) {
 		this.committer = committer;
@@ -163,7 +173,8 @@ public class CommitDB implements Serializable {
 	}
 
 	/**
-	 * @param trees the trees to set
+	 * @param trees
+	 *            the trees to set
 	 */
 	public void setTrees(List<TreeDB> trees) {
 		this.trees = trees;
@@ -177,7 +188,8 @@ public class CommitDB implements Serializable {
 	}
 
 	/**
-	 * @param fileXCommits the fileXCommits to set
+	 * @param fileXCommits
+	 *            the fileXCommits to set
 	 */
 	public void setFileXCommits(List<FileXCommitDB> fileXCommits) {
 		this.fileXCommits = fileXCommits;
@@ -191,7 +203,8 @@ public class CommitDB implements Serializable {
 	}
 
 	/**
-	 * @param issues the issues to set
+	 * @param issues
+	 *            the issues to set
 	 */
 	public void setIssues(List<IssueDB> issues) {
 		this.issues = issues;
@@ -205,7 +218,8 @@ public class CommitDB implements Serializable {
 	}
 
 	/**
-	 * @param softwareUnits the softwareUnits to set
+	 * @param softwareUnits
+	 *            the softwareUnits to set
 	 */
 	public void setSoftwareUnits(List<SoftwareUnitDB> softwareUnits) {
 		this.softwareUnits = softwareUnits;
@@ -234,6 +248,37 @@ public class CommitDB implements Serializable {
 		} else if (!name.equals(other.name))
 			return false;
 		return true;
+	}
+
+	/**
+	 * @return the bizz representation of Commit
+	 */
+	public Commit toBusiness() {
+		Commit commit = new Commit(this.getId(), this.getDate(),
+				this.getMessage(), this.getName());
+
+		return commit;
+	}
+
+	/**
+	 * Converts from DB beans to Bizz beans
+	 * 
+	 * @param repositories
+	 *            collection of CommitDB instances
+	 * @return collection of "Business" commits
+	 */
+	public static List<Commit> toBusiness(List<CommitDB> commits) {
+		List<Commit> bizzCommits = new ArrayList<Commit>();
+
+		for (CommitDB comm : commits) {
+			Commit commit = new Commit(comm.getId(), comm.getDate(),
+					comm.getMessage(), comm.getName());
+			commit.setCommitter(comm.getCommitter().toBusiness());
+
+			bizzCommits.add(commit);
+		}
+
+		return bizzCommits;
 	}
 
 }
