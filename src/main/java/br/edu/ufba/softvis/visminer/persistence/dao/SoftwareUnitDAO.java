@@ -22,6 +22,13 @@ public interface SoftwareUnitDAO extends DAO<SoftwareUnitDB, Integer>{
 
 	/**
 	 * 
+	 * @param id
+	 * @return File by id.
+	 */
+	public List<SoftwareUnitDB> findByFile(int fileId);
+	
+	/**
+	 * 
 	 * @param repositoryId
 	 * @return List of software units by repository
 	 */

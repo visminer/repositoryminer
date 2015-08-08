@@ -1,5 +1,7 @@
 package br.edu.ufba.softvis.visminer.persistence.impl;
 
+import java.util.List;
+
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
@@ -15,6 +17,18 @@ import br.edu.ufba.softvis.visminer.persistence.dao.RepositoryDAO;
 
 public class RepositoryDAOImpl extends DAOImpl<RepositoryDB, Integer> implements RepositoryDAO{
 
+	@Override
+	public List<RepositoryDB> findAll() {
+		
+		EntityManager em = getEntityManager();
+		TypedQuery<RepositoryDB> query = em.createNamedQuery("RepositoryDB.findAll", RepositoryDB.class);
+		try{
+			return query.getResultList();
+		}catch(Exception e){
+			return null;
+		}
+	}
+	
 	@Override
 	public RepositoryDB findByUid(String uid) {
 		

@@ -33,6 +33,17 @@ public class SoftwareUnitDAOImpl extends DAOImpl<SoftwareUnitDB, Integer> implem
 	}
 
 	@Override
+	public List<SoftwareUnitDB> findByFile(int fileId) {
+		
+		EntityManager em = getEntityManager();
+		TypedQuery<SoftwareUnitDB> query = em.createNamedQuery("SoftwareUnitDB.findByFile", SoftwareUnitDB.class);
+		query.setParameter("id", fileId);
+		
+		return query.getResultList();
+
+	}
+
+	@Override
 	public List<SoftwareUnitDB> findByRepository(int repositoryId) {
 
 		EntityManager em = getEntityManager();
