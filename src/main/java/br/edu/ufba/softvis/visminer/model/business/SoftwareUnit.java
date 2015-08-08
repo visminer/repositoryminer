@@ -19,7 +19,7 @@ public class SoftwareUnit {
 	private String name;
 	private String uid;
 	private SoftwareUnitType type;
-	private SoftwareUnit parentUnit;
+	private SoftwareUnit softwareUnit;
 	private List<SoftwareUnit> children;
 	private Map<MetricUid, String> metricValues;
 	private File file;
@@ -101,15 +101,15 @@ public class SoftwareUnit {
 	/**
 	 * @return the parentUnit
 	 */
-	public SoftwareUnit getParentUnit() {
-		return parentUnit;
+	public SoftwareUnit getSoftwareUnit() {
+		return softwareUnit;
 	}
 
 	/**
 	 * @param parentUnit the parentUnit to set
 	 */
-	public void setParentUnit(SoftwareUnit parentUnit) {
-		this.parentUnit = parentUnit;
+	public void setSoftwareUnit(SoftwareUnit softwareUnit) {
+		this.softwareUnit = softwareUnit;
 	}
 
 	/**
