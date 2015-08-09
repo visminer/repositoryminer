@@ -46,18 +46,9 @@ public class JavaASTGenerator {
 		}
 		
 		ASTParser parser = ASTParser.newParser(org.eclipse.jdt.core.dom.AST.JLS8);
-		parser.setResolveBindings(true);
+		parser.setSource(sourceCode.toCharArray());
 		parser.setKind(ASTParser.K_COMPILATION_UNIT);
 		parser.setBindingsRecovery(true);
-		
-		int pos = filePath.lastIndexOf("/") + 1;
-		parser.setUnitName(filePath.substring(pos));
-		
-		String[] sources = {"C:\\Users\\felipe\\git\\Visminer\\src"}; 
-		String[] classpath = {System.getProperty("java.home").replace("\\", "/")+"/lib/rt.jar"};
-		
-		parser.setEnvironment(classpath, sources, new String[] {charset}, true);
-		parser.setSource(sourceCode.toCharArray());
 		
 		CompilationUnit root = (CompilationUnit) parser.createAST(null);
 		
