@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.eclipse.jface.text.Document;
-
 import br.edu.ufba.softvis.visminer.annotations.MetricAnnotation;
 import br.edu.ufba.softvis.visminer.ast.AST;
 import br.edu.ufba.softvis.visminer.constant.MetricType;
@@ -36,9 +34,32 @@ public class SLOCMetric implements IMetric{
 			}
 			
 			AST ast = entry.getValue();
-			Document doc = new Document(ast.getSourceCode());
-			persistence.postMetricValue(ast.getDocument().getId(), String.valueOf(doc.getNumberOfLines()));
+			
+			persistence.postMetricValue(ast.getDocument().getId(), String.valueOf(count(ast.getSourceCode())));
 		}
+	}
+	
+	private int count(String source){
+		
+		if(source == null || source.length() == 0)
+			return 0;
+		
+		int len = source.length();
+		int lines = 1;
+		
+		for(int i = 0; i < len; i++){
+			char c = source.charAt(i);
+			if(c == '\r'){
+				lines++;
+				if(i+1 < len && source.charAt(i+1) == '\n')
+					i++;
+			}else if(c == '\n'){
+				lines++;
+			}
+		}
+		
+		return lines;
+		
 	}
 
 }

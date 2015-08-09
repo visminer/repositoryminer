@@ -67,11 +67,12 @@ public class RepositoryAnalyzer{
 		SoftwareUnitDB softUnitDb = new SoftwareUnitDB(0, repositoryDb.getName(), SoftwareUnitType.PROJECT, repositoryDb.getUid());
 		softUnitDb.setRepository(repositoryDb);
 		softwareUnitDao.save(softUnitDb);
-
+		
 		if(metrics != null && metrics.size() > 0){
 			MetricCalculator.calculate(metrics, repoSys, repositoryDb, entityManager);
 		}
-		
+
+		entityManager.clear();
 		entityManager.close();
 		repoSys.close();
 		

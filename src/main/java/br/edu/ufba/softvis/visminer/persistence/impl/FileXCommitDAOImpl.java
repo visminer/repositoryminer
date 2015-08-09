@@ -22,6 +22,8 @@ public class FileXCommitDAOImpl extends DAOImpl<FileXCommitDB, FileXCommitPK> im
 	public List<FileXCommitDB> findByCommit(int commitId) {
 		EntityManager em = getEntityManager();
 		TypedQuery<FileXCommitDB> query = em.createNamedQuery("FileXCommitDB.findByCommit", FileXCommitDB.class);
+		query.setHint("javax.persistence.cache.storeMode", "BYPASS");
+		query.setHint("javax.persistence.cache.retrieveMode", "BYPASS");
 		query.setParameter("commitId", commitId);
 		return query.getResultList();
 	}

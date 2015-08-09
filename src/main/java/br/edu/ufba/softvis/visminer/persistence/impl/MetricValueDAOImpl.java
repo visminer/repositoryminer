@@ -24,6 +24,8 @@ public class MetricValueDAOImpl extends DAOImpl<MetricValueDB, MetricValuePK> im
 		EntityManager em = getEntityManager();
 		TypedQuery<MetricValueDB> query = em.createNamedQuery("MetricValueDB.findBySoftwareUnitAndCommit",
 				MetricValueDB.class);
+		query.setHint("javax.persistence.cache.storeMode", "BYPASS");
+		query.setHint("javax.persistence.cache.retrieveMode", "BYPASS");
 		query.setParameter("commitId", commitId);
 		query.setParameter("softwareUnitId", softwareUnitId);
 		return query.getResultList();

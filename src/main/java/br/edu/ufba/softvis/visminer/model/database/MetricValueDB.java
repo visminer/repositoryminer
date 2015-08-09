@@ -4,7 +4,6 @@ import java.io.Serializable;
 
 import javax.persistence.*;
 
-
 /**
  * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
  * @version 0.9
@@ -12,7 +11,7 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name="metric_value")
-@NamedQuery(name="MetricValueDB.findBySoftwareUnitAndCommit", query="SELECT m FROM MetricValueDB m "
+@NamedQuery(name="MetricValueDB.findBySoftwareUnitAndCommit", query="SELECT m FROM MetricValueDB m join m.metric m2 "
 		+ "where m.id.commitId = :commitId and m.id.softwareUnitId = :softwareUnitId")
 
 public class MetricValueDB implements Serializable {
@@ -34,7 +33,6 @@ public class MetricValueDB implements Serializable {
 	private SoftwareUnitXCommitDB softwareUnitXCommit;
 
 	//bi-directional many-to-one association to MetricDB
-	@ManyToOne
 	@JoinColumn(name="metric_id", nullable=false, insertable=false, updatable=false)
 	private MetricDB metric;
 

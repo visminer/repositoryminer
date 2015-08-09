@@ -76,9 +76,14 @@ public class PersistenceInterface {
 		RepositoryDAO repositoryDao = new RepositoryDAOImpl();
 		repositoryDao.setEntityManager(entityManager);
 		
-		String uid = StringUtils.sha1(repositoryPath);
+		String path = repositoryPath.replace("\\", "/");
+		
+		String uid = StringUtils.sha1(path);
 		RepositoryDB repoDb = repositoryDao.findByUid(uid);
 	
+		if(repoDb == null)
+			return null;
+		
 		Repository repository = new Repository(repoDb.getId(), repoDb.getDescription(), repoDb.getName(),
 				repoDb.getPath(), repoDb.getRemoteUrl(), repoDb.getType(),repoDb.getServiceType(),
 				repoDb.getUid(), repoDb.getCharset());

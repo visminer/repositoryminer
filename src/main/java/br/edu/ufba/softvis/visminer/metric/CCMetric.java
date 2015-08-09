@@ -25,8 +25,6 @@ public class CCMetric extends MethodBasedMetricTemplate{
 		for (MethodDeclaration method : methods) {
 			
 			int cc = calculate(method);
-			if(method.getThrownsExceptions() != null)
-				cc += method.getThrownsExceptions().size();
 			persistence.postMetricValue(method.getId(), String.valueOf(cc));
 		}
 	}	

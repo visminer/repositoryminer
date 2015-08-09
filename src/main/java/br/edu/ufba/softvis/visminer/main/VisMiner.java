@@ -8,6 +8,7 @@ import br.edu.ufba.softvis.visminer.config.MetricConfig;
 import br.edu.ufba.softvis.visminer.constant.MetricUid;
 import br.edu.ufba.softvis.visminer.model.business.Repository;
 import br.edu.ufba.softvis.visminer.persistence.Database;
+import br.edu.ufba.softvis.visminer.persistence.PersistenceInterface;
 import br.edu.ufba.softvis.visminer.utility.PropertyReader;
 
 /**
@@ -82,6 +83,17 @@ public class VisMiner {
 		/*
 		 * TODO: fazer integração com repositorio remoto
 		*/
+	}
+	
+	/**
+	 * @param repositoryPath
+	 * @return True repository was processed and false otherwise
+	 */
+	public boolean isRepositoryPersisted(String repositoryPath){
+		PersistenceInterface persistence = new PersistenceInterface();
+		boolean result = persistence.findRepository(repositoryPath) != null;
+		persistence.close();
+		return result;
 	}
 	
 }

@@ -32,7 +32,7 @@ public class MetricConfig {
 	private static Map<Integer, String> readConfig(){
 
 		Map<Integer, String> map = new HashMap<Integer, String>();
-		Document doc = XMLUtil.getXMLDoc("/META-INF/visminer.xml");
+		Document doc = XMLUtil.getXMLDoc("/META-INF/metrics.xml");
 		NodeList nList = doc.getElementsByTagName("metric");
 		
 		for(int i = 0; i < nList.getLength(); i++){

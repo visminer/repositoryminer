@@ -8,8 +8,8 @@ import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.EnumDeclaration;
 import org.eclipse.jdt.core.dom.Modifier.ModifierKeyword;
-import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
+import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
@@ -45,10 +45,19 @@ public class JavaASTGenerator {
 			return null;
 		}
 		
-		ASTParser parser = ASTParser.newParser(org.eclipse.jdt.core.dom.AST.JLS3);
-		parser.setSource(sourceCode.toCharArray());
+		ASTParser parser = ASTParser.newParser(org.eclipse.jdt.core.dom.AST.JLS8);
+		parser.setResolveBindings(true);
 		parser.setKind(ASTParser.K_COMPILATION_UNIT);
 		parser.setBindingsRecovery(true);
+		
+		int pos = filePath.lastIndexOf("/") + 1;
+		parser.setUnitName(filePath.substring(pos));
+		
+		String[] sources = {"C:\\Users\\felipe\\git\\Visminer\\src"}; 
+		String[] classpath = {System.getProperty("java.home").replace("\\", "/")+"/lib/rt.jar"};
+		
+		parser.setEnvironment(classpath, sources, new String[] {charset}, true);
+		parser.setSource(sourceCode.toCharArray());
 		
 		CompilationUnit root = (CompilationUnit) parser.createAST(null);
 		
@@ -157,10 +166,11 @@ public class JavaASTGenerator {
 			m.setParameters(params);
 		}
 
-		if(methodDecl.thrownExceptions().size() > 0){
+		if(methodDecl.thrownExceptionTypes().size() > 0){
 			List<String> throwsList = new ArrayList<String>();
-			for(Name name : (List<Name>) methodDecl.thrownExceptions()){
-				throwsList.add(name.getFullyQualifiedName());
+			List<Type> types = methodDecl.thrownExceptionTypes();
+			for(Type type : types){
+				throwsList.add(type.toString());
 			}
 			m.setThrownsExceptions(throwsList);
 		}
