@@ -4,7 +4,7 @@ import java.util.List;
 
 import br.edu.ufba.softvis.visminer.annotations.MetricAnnotation;
 import br.edu.ufba.softvis.visminer.ast.MethodDeclaration;
-import br.edu.ufba.softvis.visminer.constant.MetricInput;
+import br.edu.ufba.softvis.visminer.constant.MetricType;
 import br.edu.ufba.softvis.visminer.constant.MetricUid;
 
 @MetricAnnotation(
@@ -12,7 +12,7 @@ import br.edu.ufba.softvis.visminer.constant.MetricUid;
 		description = "Weighted Method Count is the sum of the statical complexity of all methods of a class." 
 				+ " The Cyclomatic complexity metric is used to quantify the method’s complexity.",
 				acronym = "WMC",
-				type = MetricInput.COMMIT,
+				type = MetricType.COMMIT,
 				uid = MetricUid.WMC,
 				requisites = {MetricUid.CC}
 		)

@@ -1,6 +1,6 @@
 package br.edu.ufba.softvis.visminer.model.business;
 
-import br.edu.ufba.softvis.visminer.constant.MetricInput;
+import br.edu.ufba.softvis.visminer.constant.MetricType;
 import br.edu.ufba.softvis.visminer.constant.MetricUid;
 
 /**
@@ -17,7 +17,7 @@ public class Metric {
 	private String description;
 	private String name;
 	private MetricUid uid;
-	private MetricInput type;
+	private MetricType type;
 	
 	public Metric(){}
 	
@@ -31,7 +31,7 @@ public class Metric {
 	 * @param type
 	 */
 	public Metric(int id, String acronym, String description, String name,
-			MetricUid uid, MetricInput type) {
+			MetricUid uid, MetricType type) {
 		super();
 		this.id = id;
 		this.acronym = acronym;
@@ -124,7 +124,7 @@ public class Metric {
 	/**
 	 * @return the type
 	 */
-	public MetricInput getType() {
+	public MetricType getType() {
 		return type;
 	}
 
@@ -132,7 +132,7 @@ public class Metric {
 	/**
 	 * @param type the type to set
 	 */
-	public void setType(MetricInput type) {
+	public void setType(MetricType type) {
 		this.type = type;
 	}
 

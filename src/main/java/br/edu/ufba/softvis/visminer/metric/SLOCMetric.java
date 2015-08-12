@@ -6,7 +6,7 @@ import java.util.Map.Entry;
 
 import br.edu.ufba.softvis.visminer.annotations.MetricAnnotation;
 import br.edu.ufba.softvis.visminer.ast.AST;
-import br.edu.ufba.softvis.visminer.constant.MetricInput;
+import br.edu.ufba.softvis.visminer.constant.MetricType;
 import br.edu.ufba.softvis.visminer.constant.MetricUid;
 import br.edu.ufba.softvis.visminer.model.database.CommitDB;
 import br.edu.ufba.softvis.visminer.model.database.FileDB;
@@ -18,7 +18,7 @@ import br.edu.ufba.softvis.visminer.persistence.MetricPersistance;
 				+ " used to measure the size of a computer program by counting the number of lines in the text of"
 				+ " the program's source code.",
 		acronym = "SLOC",
-		type = MetricInput.COMMIT,
+		type = MetricType.COMMIT,
 		uid = MetricUid.SLOC
 	)
 public class SLOCMetric implements IMetric{

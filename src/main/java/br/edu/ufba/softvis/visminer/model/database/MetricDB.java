@@ -4,9 +4,12 @@ import java.io.Serializable;
 
 import javax.persistence.*;
 
-import br.edu.ufba.softvis.visminer.constant.MetricInput;
+import br.edu.ufba.softvis.visminer.constant.MetricType;
 import br.edu.ufba.softvis.visminer.constant.MetricUid;
+import br.edu.ufba.softvis.visminer.model.business.Metric;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 
@@ -53,7 +56,7 @@ public class MetricDB implements Serializable {
 	 * @param type
 	 */
 	public MetricDB(MetricUid id, String acronym, String description, String name,
-			MetricInput type) {
+			MetricType type) {
 		super();
 		this.id = id.getId();
 		this.acronym = acronym;
@@ -121,14 +124,14 @@ public class MetricDB implements Serializable {
 	/**
 	 * @return the type
 	 */
-	public MetricInput getType() {
-		return MetricInput.parse(type);
+	public MetricType getType() {
+		return MetricType.parse(type);
 	}
 
 	/**
 	 * @param type the type to set
 	 */
-	public void setType(MetricInput type) {
+	public void setType(MetricType type) {
 		this.type = type.getId();
 	}
 
@@ -144,6 +147,18 @@ public class MetricDB implements Serializable {
 	 */
 	public void setMetricValues(List<MetricValueDB> metricValues) {
 		this.metricValues = metricValues;
+	}
+
+	public static List<Metric> toBusiness(List<MetricDB> metricsDB) {
+		
+		List<Metric> bizzMetrics = new ArrayList<Metric>();
+		for(MetricDB m : metricsDB){
+			Metric metric = new Metric(m.getId().getId(), m.getAcronym(), m.getDescription(),
+					m.getName(), m.getId(), m.getType());
+			bizzMetrics.add(metric);
+		}
+		return bizzMetrics;
+		
 	}
 
 

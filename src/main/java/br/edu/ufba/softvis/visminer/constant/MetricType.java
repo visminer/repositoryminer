@@ -4,13 +4,13 @@ package br.edu.ufba.softvis.visminer.constant;
  * @version 0.9
  * Metric type.
  */
-public enum MetricInput {
+public enum MetricType {
 
 	COMMIT(1), SNAPSHOT(2);
 	
 	private int id;
 	
-	private MetricInput(int id){
+	private MetricType(int id){
 		this.id = id;
 	}
 	
@@ -18,9 +18,9 @@ public enum MetricInput {
 		return this.id;
 	}
 	
-	public static MetricInput parse(int id){
+	public static MetricType parse(int id){
 		
-		for(MetricInput type : MetricInput.values()){
+		for(MetricType type : MetricType.values()){
 			if(type.getId() == id){
 				return type;
 			}

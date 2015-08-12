@@ -11,7 +11,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import br.edu.ufba.softvis.visminer.annotations.MetricAnnotation;
-import br.edu.ufba.softvis.visminer.constant.MetricInput;
+import br.edu.ufba.softvis.visminer.constant.MetricType;
 import br.edu.ufba.softvis.visminer.constant.MetricUid;
 import br.edu.ufba.softvis.visminer.metric.IMetric;
 import br.edu.ufba.softvis.visminer.model.database.MetricDB;
@@ -131,9 +131,9 @@ public class MetricConfig {
 		
 		Map<MetricUid, IMetric> auxList = null;
 		
-		if(annotations.type().equals(MetricInput.COMMIT)){
+		if(annotations.type().equals(MetricType.COMMIT)){
 			auxList = commitMetrics;
-		}else if(annotations.type().equals(MetricInput.SNAPSHOT)){
+		}else if(annotations.type().equals(MetricType.SNAPSHOT)){
 			auxList = snapshotMetrics;
 		}
 		

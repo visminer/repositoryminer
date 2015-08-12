@@ -22,6 +22,7 @@ import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.treewalk.TreeWalk;
 
 import br.edu.ufba.softvis.visminer.constant.TreeType;
+import br.edu.ufba.softvis.visminer.model.business.File;
 import br.edu.ufba.softvis.visminer.model.database.CommitDB;
 import br.edu.ufba.softvis.visminer.model.database.CommitterDB;
 import br.edu.ufba.softvis.visminer.model.database.FileDB;
@@ -275,7 +276,7 @@ public class GitRepository implements IRepositorySystem{
 
 	@SuppressWarnings("resource")
 	@Override
-	public List<String> getSnapshotFilesNames(String commitUid){
+	public List<File> getSnapshotFiles(String commitUid){
 
 		
 		try {
@@ -286,10 +287,11 @@ public class GitRepository implements IRepositorySystem{
 			treeWalk.addTree(lastCommit.getTree());
 			treeWalk.setRecursive(true);
 			
-			List<String> files = new ArrayList<String>();
+			List<File> files = new ArrayList<File>();
 			while(treeWalk.next()){
 				String path = this.repositoryPath+"/"+treeWalk.getPathString();
-				files.add(path);
+				File f = new File(0, path, StringUtils.sha1(path));
+				files.add(f);
 				
 			}
 			

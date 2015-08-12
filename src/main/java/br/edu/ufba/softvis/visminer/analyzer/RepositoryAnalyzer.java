@@ -69,7 +69,7 @@ public class RepositoryAnalyzer{
 		softwareUnitDao.save(softUnitDb);
 		
 		if(metrics != null && metrics.size() > 0){
-			//MetricCalculator.calculate(metrics, repoSys, repositoryDb);
+			MetricCalculator.calculate(metrics, repoSys, repositoryDb, entityManager);
 		}
 
 		entityManager.clear();

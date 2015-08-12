@@ -8,7 +8,7 @@ import java.util.Map.Entry;
 import br.edu.ufba.softvis.visminer.annotations.MetricAnnotation;
 import br.edu.ufba.softvis.visminer.ast.AST;
 import br.edu.ufba.softvis.visminer.ast.Document;
-import br.edu.ufba.softvis.visminer.constant.MetricInput;
+import br.edu.ufba.softvis.visminer.constant.MetricType;
 import br.edu.ufba.softvis.visminer.constant.MetricUid;
 import br.edu.ufba.softvis.visminer.model.database.CommitDB;
 import br.edu.ufba.softvis.visminer.model.database.FileDB;
@@ -19,7 +19,7 @@ import br.edu.ufba.softvis.visminer.persistence.MetricPersistance;
 		description = "Number of Classes and Interfaces is a software metric used to measure the size of a computer program"+
 				" by counting the concrete and abstract classes",
 		acronym = "NOCAI",
-		type = MetricInput.SNAPSHOT,
+		type = MetricType.SNAPSHOT,
 		uid = MetricUid.NOCAI
 	)
 public class NOCAIMetric implements IMetric{

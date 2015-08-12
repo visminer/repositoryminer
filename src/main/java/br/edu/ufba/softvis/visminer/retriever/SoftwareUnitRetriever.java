@@ -60,7 +60,6 @@ public class SoftwareUnitRetriever extends Retriever {
 		}
 
 		processListToTree(softwareUnits);
-		super.closeEntityManager();
 		return softwareUnits;
 		
 	}

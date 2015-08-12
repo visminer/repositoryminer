@@ -45,7 +45,8 @@ public class VisMiner {
 	 * Analyzes and persists repository information in database and defines what metrics will be calculated for each repository state.
 	 * Set "metrics" as null if you don't want to calculate any metric.
 	 */
-	public void persistRepository(Repository repository, List<MetricUid> metrics){
+	public void persistRepository(Repository repository, List<MetricUid> metrics, List<Language> languages){
+		//languages will be used
 		RepositoryAnalyzer analyzer = new RepositoryAnalyzer();
 		analyzer.persist(repository, metrics);
 	}

@@ -5,7 +5,7 @@ import java.util.List;
 import br.edu.ufba.softvis.visminer.annotations.MetricAnnotation;
 import br.edu.ufba.softvis.visminer.ast.MethodDeclaration;
 import br.edu.ufba.softvis.visminer.ast.Statement;
-import br.edu.ufba.softvis.visminer.constant.MetricInput;
+import br.edu.ufba.softvis.visminer.constant.MetricType;
 import br.edu.ufba.softvis.visminer.constant.MetricUid;
 import br.edu.ufba.softvis.visminer.constant.NodeType;
 
@@ -15,7 +15,7 @@ import br.edu.ufba.softvis.visminer.constant.NodeType;
 				+ " program. It is a quantitative measure of the number of linearly independent paths through a"
 				+ " program's source code.",
 				acronym = "CC",
-				type = MetricInput.COMMIT,
+				type = MetricType.COMMIT,
 				uid = MetricUid.CC
 		)
 public class CCMetric extends MethodBasedMetricTemplate{

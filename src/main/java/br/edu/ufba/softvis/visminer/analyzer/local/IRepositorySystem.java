@@ -3,6 +3,7 @@ package br.edu.ufba.softvis.visminer.analyzer.local;
 import java.util.Date;
 import java.util.List;
 
+import br.edu.ufba.softvis.visminer.model.business.File;
 import br.edu.ufba.softvis.visminer.model.database.CommitDB;
 import br.edu.ufba.softvis.visminer.model.database.FileDB;
 import br.edu.ufba.softvis.visminer.model.database.TreeDB;
@@ -68,7 +69,7 @@ public interface IRepositorySystem {
 	 * @param commitUid
 	 * @return List of files path in certain snapshot.
 	 */
-	public List<String> getSnapshotFilesNames(String commitUid);
+	public List<File> getSnapshotFiles(String commitUid);
 	
 	/**
 	 * Closes the repository and frees memory and resources.
