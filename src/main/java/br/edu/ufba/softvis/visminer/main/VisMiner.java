@@ -9,7 +9,10 @@ import br.edu.ufba.softvis.visminer.constant.Language;
 import br.edu.ufba.softvis.visminer.constant.MetricUid;
 import br.edu.ufba.softvis.visminer.model.business.Repository;
 import br.edu.ufba.softvis.visminer.persistence.Database;
+import br.edu.ufba.softvis.visminer.persistence.dao.RepositoryDAO;
+import br.edu.ufba.softvis.visminer.persistence.impl.RepositoryDAOImpl;
 import br.edu.ufba.softvis.visminer.utility.PropertyReader;
+import br.edu.ufba.softvis.visminer.utility.StringUtils;
 
 /**
  * @version 0.9
@@ -88,7 +91,12 @@ public class VisMiner {
 	 * @return True repository was processed and false otherwise
 	 */
 	public boolean isRepositoryPersisted(String repositoryPath){
-		return false;
+		RepositoryDAO dao = new RepositoryDAOImpl();
+		dao.setEntityManager(Database.getInstance().getEntityManager());
+		String uid = StringUtils.sha1(repositoryPath.replace("\\", "/"));
+		boolean result = (dao.findByUid(uid) != null);
+		dao.getEntityManager().close();
+		return result;
 	}
 	
 }
