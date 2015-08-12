@@ -10,9 +10,7 @@ import br.edu.ufba.softvis.visminer.model.database.SoftwareUnitDB;
 import br.edu.ufba.softvis.visminer.persistence.dao.SoftwareUnitDAO;
 
 /**
- * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
  * @version 0.9
- * 
  * Implementation of interface {@link SoftwareUnitDAO}
  */
 
@@ -30,6 +28,17 @@ public class SoftwareUnitDAOImpl extends DAOImpl<SoftwareUnitDB, Integer> implem
 			return null;
 		}
 		
+	}
+
+	@Override
+	public List<SoftwareUnitDB> findByFile(int fileId) {
+		
+		EntityManager em = getEntityManager();
+		TypedQuery<SoftwareUnitDB> query = em.createNamedQuery("SoftwareUnitDB.findByFile", SoftwareUnitDB.class);
+		query.setParameter("id", fileId);
+		
+		return query.getResultList();
+
 	}
 
 	@Override

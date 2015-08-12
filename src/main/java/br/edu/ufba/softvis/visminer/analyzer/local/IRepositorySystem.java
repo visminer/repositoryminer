@@ -17,7 +17,6 @@ import br.edu.ufba.softvis.visminer.model.database.TreeDB;
 public interface IRepositorySystem {
 
 	/* 
-	 * DevNotes:
 	 * All methods that return commits should return the committer inside of each commit.
 	 * getCommitedFiles(String commitUid) should return File with FileState.
 	 */
@@ -65,6 +64,12 @@ public interface IRepositorySystem {
 	 */
 	public List<FileDB> getCommitedFiles(CommitDB commitDb);
 
+	/**
+	 * @param commitUid
+	 * @return List of files path in certain snapshot.
+	 */
+	public List<String> getSnapshotFilesNames(String commitUid);
+	
 	/**
 	 * Closes the repository and frees memory and resources.
 	 */

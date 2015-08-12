@@ -5,10 +5,10 @@ import java.util.List;
 import br.edu.ufba.softvis.visminer.analyzer.RepositoryAnalyzer;
 import br.edu.ufba.softvis.visminer.config.DBConfig;
 import br.edu.ufba.softvis.visminer.config.MetricConfig;
+import br.edu.ufba.softvis.visminer.constant.Language;
 import br.edu.ufba.softvis.visminer.constant.MetricUid;
 import br.edu.ufba.softvis.visminer.model.business.Repository;
 import br.edu.ufba.softvis.visminer.persistence.Database;
-import br.edu.ufba.softvis.visminer.persistence.PersistenceInterface;
 import br.edu.ufba.softvis.visminer.utility.PropertyReader;
 
 /**
@@ -56,7 +56,7 @@ public class VisMiner {
 	 * Analyzes and persists new repository informations in database and defines what metrics will be calculated only for new repository states.
 	 * Set "metrics" as null if you don't want to calculate any metric.
 	 */
-	public void refreshRepository(String repositoryPath, List<MetricUid> metrics){
+	public void refreshRepository(String repositoryPath, List<MetricUid> metrics, List<Language> languages){
 		/**TODO
 		 * finalizar os  analyzers restantes
 		 */
@@ -80,9 +80,6 @@ public class VisMiner {
 	 * Synchronizes local repository with web-based repository service. 
 	 */
 	public void connectWithWebRepository(String login, String password, String repositoryPath){
-		/*
-		 * TODO: fazer integração com repositorio remoto
-		*/
 	}
 	
 	/**
@@ -90,10 +87,7 @@ public class VisMiner {
 	 * @return True repository was processed and false otherwise
 	 */
 	public boolean isRepositoryPersisted(String repositoryPath){
-		PersistenceInterface persistence = new PersistenceInterface();
-		boolean result = persistence.findRepository(repositoryPath) != null;
-		persistence.close();
-		return result;
+		return false;
 	}
 	
 }

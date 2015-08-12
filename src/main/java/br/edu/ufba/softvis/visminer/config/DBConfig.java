@@ -37,14 +37,12 @@ public class DBConfig {
 	public DBConfig(){}
 	
 	public DBConfig(PropertyReader properties){
-		
 		this.driver = properties.getProperty(PROP_JDBC_DRIVER);
 		this.url = properties.getProperty(PROP_JDBC_URL);
 		this.user = properties.getProperty(PROP_JDBC_USER);
 		this.password = properties.getProperty(PROP_JDBC_PASSWORD);
 		this.generation = properties.getProperty(PROP_JDBC_GENERATION);
 		this.logging = properties.getProperty(PROP_JDBC_LOGGING);
-		
 	}	
 	
 	public String getDriver() {

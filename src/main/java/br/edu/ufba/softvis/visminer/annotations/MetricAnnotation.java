@@ -5,7 +5,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import br.edu.ufba.softvis.visminer.constant.MetricType;
+import br.edu.ufba.softvis.visminer.constant.MetricInput;
 import br.edu.ufba.softvis.visminer.constant.MetricUid;
 
 /**
@@ -40,9 +40,9 @@ public @interface MetricAnnotation {
 	
 	/**
 	 * @return Metric type
-	 * @see MetricType
+	 * @see MetricInput
 	 */
-	public MetricType type();
+	public MetricInput type();
 
 	
 	/**

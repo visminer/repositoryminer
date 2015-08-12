@@ -1,10 +1,21 @@
 package br.edu.ufba.softvis.visminer.model.database;
 
 import java.io.Serializable;
-
-import javax.persistence.*;
-
+import java.util.ArrayList;
 import java.util.List;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+
+import br.edu.ufba.softvis.visminer.model.business.File;
 
 
 /**
@@ -153,5 +164,36 @@ public class FileDB implements Serializable {
 			return false;
 		return true;
 	}
+	
+	/**
+	 * @return the bizz representation of File
+	 */
+	public File toBusiness() {
+		File file = new File(this.getId(), this.getPath(),
+				this.getUid());
+		
+		return file;
+	}
+
+	/**
+	 * Converts from DB beans to Bizz beans
+	 * 
+	 * @param repositories
+	 *            collection of FileDB instances
+	 * @return collection of "Business" files
+	 */
+	public static List<File> toBusiness(List<FileDB> files) {
+		List<File> bizzFiles = new ArrayList<File>();
+
+		for (FileDB f : files) {
+			File file = new File(f.getId(), f.getPath(),
+					f.getUid());
+
+			bizzFiles.add(file);
+		}
+
+		return bizzFiles;
+	}
+
 
 }

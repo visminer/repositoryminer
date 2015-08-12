@@ -11,7 +11,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import br.edu.ufba.softvis.visminer.annotations.MetricAnnotation;
-import br.edu.ufba.softvis.visminer.constant.MetricType;
+import br.edu.ufba.softvis.visminer.constant.MetricInput;
 import br.edu.ufba.softvis.visminer.constant.MetricUid;
 import br.edu.ufba.softvis.visminer.metric.IMetric;
 import br.edu.ufba.softvis.visminer.model.database.MetricDB;
@@ -27,12 +27,13 @@ import br.edu.ufba.softvis.visminer.utility.XMLUtil;
 public class MetricConfig {
 
 	private static Map<Integer, String> configMap;
+	private static final String MAPPING_FILE = "/META-INF/metrics.xml";
 	
 	// Reads the metrics configuration and return metrics canonical names.
 	private static Map<Integer, String> readConfig(){
 
 		Map<Integer, String> map = new HashMap<Integer, String>();
-		Document doc = XMLUtil.getXMLDoc("/META-INF/metrics.xml");
+		Document doc = XMLUtil.getXMLDoc(MAPPING_FILE);
 		NodeList nList = doc.getElementsByTagName("metric");
 		
 		for(int i = 0; i < nList.getLength(); i++){
@@ -92,13 +93,13 @@ public class MetricConfig {
 	 * @return Returns a map containing the metric id and metric implementation
 	 * Finds the implementation for the metrics id passed as parameter and return a map, with the pair, metric id and its implementation.
 	 */
-	public static void getImplementations(List<MetricUid> metricsId, Map<MetricUid, IMetric> simpleMetrics, Map<MetricUid, IMetric> complexMetrics){
+	public static void getImplementations(List<MetricUid> metricsId, Map<MetricUid, IMetric> commitMetrics, Map<MetricUid, IMetric> snapshotMetrics){
 
 		configMap = readConfig();
 		for(MetricUid uid : metricsId){
 			String canonicalName = configMap.get(uid.getId());
 			IMetric metric = getIMetricInstance(canonicalName);
-			addMetric(metric, simpleMetrics, complexMetrics);
+			addMetric(metric, commitMetrics, snapshotMetrics);
 		}
 		
 	}
@@ -117,23 +118,23 @@ public class MetricConfig {
 	}
 	
 	// Adds the metric in one of the lists based on metric type
-	private static void addMetric(IMetric metric, Map<MetricUid, IMetric> simpleMetrics,
-			Map<MetricUid, IMetric> complexMetrics){
+	private static void addMetric(IMetric metric, Map<MetricUid, IMetric> commitMetrics,
+			Map<MetricUid, IMetric> snapshotMetrics){
 		
 		MetricAnnotation annotations = metric.getClass().getAnnotation(MetricAnnotation.class);
 		
 		for(MetricUid uid : annotations.requisites()){
 			String canonicalName = configMap.get(uid.getId());
 			IMetric metric2 = getIMetricInstance(canonicalName);
-			addMetric(metric2, simpleMetrics, complexMetrics);
+			addMetric(metric2, commitMetrics, snapshotMetrics);
 		}
 		
 		Map<MetricUid, IMetric> auxList = null;
 		
-		if(annotations.type().equals(MetricType.SIMPLE)){
-			auxList = simpleMetrics;
-		}else if(annotations.type().equals(MetricType.COMPLEX)){
-			auxList = complexMetrics;
+		if(annotations.type().equals(MetricInput.COMMIT)){
+			auxList = commitMetrics;
+		}else if(annotations.type().equals(MetricInput.SNAPSHOT)){
+			auxList = snapshotMetrics;
 		}
 		
 		if(!auxList.containsKey(annotations.uid())){

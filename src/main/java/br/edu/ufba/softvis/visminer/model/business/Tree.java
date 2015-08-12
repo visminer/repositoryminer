@@ -128,6 +128,11 @@ public class Tree {
 		if (id != other.id)
 			return false;
 		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "Tree [name=" + name + "]";
 	}	
 	
 }

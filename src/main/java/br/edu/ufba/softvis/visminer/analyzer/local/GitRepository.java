@@ -107,6 +107,7 @@ public class GitRepository implements IRepositorySystem{
 
 	}
 
+	@SuppressWarnings("resource")
 	@Override
 	public Date getLastCommitDate(String treeName) {
 
@@ -180,6 +181,7 @@ public class GitRepository implements IRepositorySystem{
 
 	}
 
+	@SuppressWarnings("resource")
 	@Override
 	public byte[] getData(String commitName, String filePath) {
 
@@ -271,6 +273,35 @@ public class GitRepository implements IRepositorySystem{
 
 	}
 
+	@SuppressWarnings("resource")
+	@Override
+	public List<String> getSnapshotFilesNames(String commitUid){
+
+		
+		try {
+			
+			RevWalk revWalk = new RevWalk(repository);
+			RevCommit lastCommit = revWalk.parseCommit(repository.resolve(commitUid));
+			TreeWalk treeWalk = new TreeWalk(repository);
+			treeWalk.addTree(lastCommit.getTree());
+			treeWalk.setRecursive(true);
+			
+			List<String> files = new ArrayList<String>();
+			while(treeWalk.next()){
+				String path = this.repositoryPath+"/"+treeWalk.getPathString();
+				files.add(path);
+				
+			}
+			
+			return files;
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+		
+	}
+	
 	@Override
 	public void close() {
 		this.repository.close();

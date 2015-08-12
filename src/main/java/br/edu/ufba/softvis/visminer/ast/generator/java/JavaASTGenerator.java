@@ -13,6 +13,7 @@ import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
+import br.edu.ufba.softvis.visminer.annotations.ASTGeneratorAnnotation;
 import br.edu.ufba.softvis.visminer.ast.AST;
 import br.edu.ufba.softvis.visminer.ast.ClassOrInterfaceDeclaration;
 import br.edu.ufba.softvis.visminer.ast.Document;
@@ -22,10 +23,16 @@ import br.edu.ufba.softvis.visminer.ast.ImportDeclaration;
 import br.edu.ufba.softvis.visminer.ast.MethodDeclaration;
 import br.edu.ufba.softvis.visminer.ast.PackageDeclaration;
 import br.edu.ufba.softvis.visminer.ast.ParameterDeclaration;
+import br.edu.ufba.softvis.visminer.ast.generator.IASTGenerator;
+import br.edu.ufba.softvis.visminer.constant.Language;
 
-public class JavaASTGenerator {
+@ASTGeneratorAnnotation(
+		language = Language.JAVA,
+		extensions = {"java"}
+)
+public class JavaASTGenerator implements IASTGenerator{
 
-	public static AST generate(String filePath, byte[] source, String charset){
+	public AST generate(String filePath, byte[] source, String charset){
 		
 		Document document = new  Document();
 		document.setName(filePath);
@@ -215,7 +222,7 @@ public class JavaASTGenerator {
 				constDecl.setName(enumDecl.getName() + "." + constEnum.getName().getFullyQualifiedName());
 				constsDecls.add(constDecl);
 			}
-			enumDecl.setenumConsts(constsDecls);
+			enumDecl.setEnumConsts(constsDecls);
 		}
 		
 		return enumDecl;

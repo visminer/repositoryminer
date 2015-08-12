@@ -15,13 +15,13 @@ public class EnumDeclaration extends TypeDeclaration {
 	/**
 	 * @return the enumConsts
 	 */
-	public List<EnumConstantDeclaration> getenumConsts() {
+	public List<EnumConstantDeclaration> getEnumConsts() {
 		return enumConsts;
 	}
 	/**
 	 * @param enumConsts the enumConsts to set
 	 */
-	public void setenumConsts(List<EnumConstantDeclaration> enumConsts) {
+	public void setEnumConsts(List<EnumConstantDeclaration> enumConsts) {
 		this.enumConsts = enumConsts;
 	}
 

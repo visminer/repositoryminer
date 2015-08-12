@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 import javax.persistence.*;
 
-import br.edu.ufba.softvis.visminer.constant.MetricType;
+import br.edu.ufba.softvis.visminer.constant.MetricInput;
 import br.edu.ufba.softvis.visminer.constant.MetricUid;
 
 import java.util.List;
@@ -53,7 +53,7 @@ public class MetricDB implements Serializable {
 	 * @param type
 	 */
 	public MetricDB(MetricUid id, String acronym, String description, String name,
-			MetricType type) {
+			MetricInput type) {
 		super();
 		this.id = id.getId();
 		this.acronym = acronym;
@@ -121,14 +121,14 @@ public class MetricDB implements Serializable {
 	/**
 	 * @return the type
 	 */
-	public MetricType getType() {
-		return MetricType.parse(type);
+	public MetricInput getType() {
+		return MetricInput.parse(type);
 	}
 
 	/**
 	 * @param type the type to set
 	 */
-	public void setType(MetricType type) {
+	public void setType(MetricInput type) {
 		this.type = type.getId();
 	}
 
