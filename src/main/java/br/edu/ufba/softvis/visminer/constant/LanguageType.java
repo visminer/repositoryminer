@@ -1,6 +1,6 @@
 package br.edu.ufba.softvis.visminer.constant;
 
-public enum Language {
+public enum LanguageType {
 	
 	JAVA,
 	CPP,
