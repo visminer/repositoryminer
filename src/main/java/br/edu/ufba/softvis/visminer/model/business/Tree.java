@@ -132,7 +132,7 @@ public class Tree {
 
 	@Override
 	public String toString() {
-		return "Tree [name=" + name + "]";
+		return name;
 	}	
 	
 }
