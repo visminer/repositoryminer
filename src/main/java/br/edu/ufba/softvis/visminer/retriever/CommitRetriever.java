@@ -17,7 +17,7 @@ import br.edu.ufba.softvis.visminer.persistence.impl.FileXCommitDAOImpl;
 public class CommitRetriever extends Retriever {
 
 	private List<File> retrieveFiles(Commit commit) {
-		
+
 		List<File> files = new ArrayList<File>();
 
 		FileXCommitDAO fxcDao = new FileXCommitDAOImpl();
@@ -35,10 +35,10 @@ public class CommitRetriever extends Retriever {
 	}
 
 	public List<Commit> retrieveByTree(int treeId) {
-		
+
 		List<Commit> commits = new ArrayList<Commit>();
 		CommitDAO dao = new CommitDAOImpl();
-		
+
 		super.createEntityManager();
 		super.shareEntityManager(dao);
 
@@ -51,7 +51,12 @@ public class CommitRetriever extends Retriever {
 		}
 
 		super.closeEntityManager();
+		
 		return commits;
+	}
+
+	public List<Commit> retrieveByTree(Tree tree) {
+		return retrieveByTree(tree.getId());
 	}
 
 }
