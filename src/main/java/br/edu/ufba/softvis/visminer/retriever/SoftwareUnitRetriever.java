@@ -36,6 +36,7 @@ public class SoftwareUnitRetriever extends Retriever {
 		}
 
 		super.closeEntityManager();
+		
 		return softwareUnits;
 		
 	}
@@ -64,7 +65,7 @@ public class SoftwareUnitRetriever extends Retriever {
 		
 	}
 
-	public Map<MetricUid, String> findMetricValue(int softwareUnitId, int commitId) {
+	private Map<MetricUid, String> findMetricValue(int softwareUnitId, int commitId) {
 		
 		MetricValueDAO metricValDao = new MetricValueDAOImpl();
 		super.createEntityManager();
@@ -78,7 +79,6 @@ public class SoftwareUnitRetriever extends Retriever {
 			metricVal.put(elem.getMetric().getId(), elem.getValue());
 		}
 
-		super.closeEntityManager();
 		return metricVal;
 		
 	}
