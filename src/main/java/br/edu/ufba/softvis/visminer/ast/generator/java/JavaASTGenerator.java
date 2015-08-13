@@ -24,10 +24,10 @@ import br.edu.ufba.softvis.visminer.ast.MethodDeclaration;
 import br.edu.ufba.softvis.visminer.ast.PackageDeclaration;
 import br.edu.ufba.softvis.visminer.ast.ParameterDeclaration;
 import br.edu.ufba.softvis.visminer.ast.generator.IASTGenerator;
-import br.edu.ufba.softvis.visminer.constant.Language;
+import br.edu.ufba.softvis.visminer.constant.LanguageType;
 
 @ASTGeneratorAnnotation(
-		language = Language.JAVA,
+		language = LanguageType.JAVA,
 		extensions = {"java"}
 )
 public class JavaASTGenerator implements IASTGenerator{

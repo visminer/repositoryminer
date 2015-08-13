@@ -25,7 +25,7 @@ import br.edu.ufba.softvis.visminer.ast.EnumDeclaration;
 import br.edu.ufba.softvis.visminer.ast.ImportDeclaration;
 import br.edu.ufba.softvis.visminer.ast.MethodDeclaration;
 import br.edu.ufba.softvis.visminer.ast.generator.IASTGenerator;
-import br.edu.ufba.softvis.visminer.constant.Language;
+import br.edu.ufba.softvis.visminer.constant.LanguageType;
 
 /**
  * A CPP AST generator
@@ -43,7 +43,7 @@ import br.edu.ufba.softvis.visminer.constant.Language;
  */
 
 @ASTGeneratorAnnotation(
-		language = Language.CPP,
+		language = LanguageType.CPP,
 		extensions = {"h", "cpp", "hpp"}
 )
 public class CPPASTGenerator implements IASTGenerator {
