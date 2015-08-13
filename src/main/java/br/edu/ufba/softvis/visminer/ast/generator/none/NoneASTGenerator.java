@@ -6,10 +6,10 @@ import br.edu.ufba.softvis.visminer.annotations.ASTGeneratorAnnotation;
 import br.edu.ufba.softvis.visminer.ast.AST;
 import br.edu.ufba.softvis.visminer.ast.Document;
 import br.edu.ufba.softvis.visminer.ast.generator.IASTGenerator;
-import br.edu.ufba.softvis.visminer.constant.Language;
+import br.edu.ufba.softvis.visminer.constant.LanguageType;
 
 @ASTGeneratorAnnotation(
-		language = Language.NONE,
+		language = LanguageType.NONE,
 		extensions = {"xml", "html", "css", "txt", "md"}
 )
 public class NoneASTGenerator implements IASTGenerator{
