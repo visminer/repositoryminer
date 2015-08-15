@@ -29,11 +29,11 @@ public class TreeAnalyzer{
 		CommitDB commitDb = new CommitDB();
 		
 		for(TreeDB tree : repoSys.getTrees()){
-			
+			System.out.println(tree.getFullName()+" - "+tree.getName());
 			tree.setRepository(repositoryDb);
 			tree.setCommits(new ArrayList<CommitDB>());
 			
-			for(CommitDB commit : repoSys.getCommitsByTree(tree.getFullName())){
+			for(CommitDB commit : repoSys.getCommitsByTree(tree.getName())){
 				commitDb.setName(commit.getName());
 				int index = commitsDb.indexOf(commitDb);
 				tree.getCommits().add(commitsDb.get(index));
