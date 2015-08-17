@@ -31,7 +31,11 @@ import br.edu.ufba.softvis.visminer.model.business.Commit;
  */
 @Entity
 @Table(name = "commit")
-@NamedQueries({ @NamedQuery(name = "CommitDB.findByTree", query = "select c from TreeDB t join t.commits c where t.id = :id order by c.date asc") })
+@NamedQueries({ 
+	@NamedQuery(name = "CommitDB.findByTree", query = "select c from TreeDB t join t.commits c where t.id = :id order by c.date asc"),
+	@NamedQuery(name = "CommitDB.findByRepository", query = "select distinct(c) from TreeDB t join t.commits c where "
+			+ " t.repository.uid = :uid order by c.date asc")
+})
 public class CommitDB implements Serializable {
 	private static final long serialVersionUID = 1L;
 

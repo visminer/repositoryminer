@@ -161,6 +161,20 @@ public class Project {
 	}
 
 	/**
+	 * Sets the project states to the first commit state
+	 */
+	public void firstCommit(){
+		setCurrentCommit(commits.get(0));
+	}
+
+	/**
+	 * Sets the project states to the last commit state
+	 */
+	public void lastCommit(){
+		setCurrentCommit(commits.get(commits.size() - 1));
+	}	
+	
+	/**
 	 * @return The commit that define the current state of the repository.
 	 */
 	public Commit getCurrentCommit() {

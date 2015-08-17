@@ -7,6 +7,7 @@ import javax.persistence.TypedQuery;
 
 import br.edu.ufba.softvis.visminer.model.database.CommitDB;
 import br.edu.ufba.softvis.visminer.persistence.dao.CommitDAO;
+import br.edu.ufba.softvis.visminer.utility.StringUtils;
 
 /**
  * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
@@ -26,6 +27,20 @@ public class CommitDAOImpl extends DAOImpl<CommitDB, Integer> implements CommitD
 		return query.getResultList();
 		
 	}
+
+	@Override
+	public List<CommitDB> findByRepository(String repositoryPath) {
+		
+		String uid = StringUtils.sha1(repositoryPath.replace("\\", "/"));
+		
+		EntityManager em = getEntityManager();
+		TypedQuery<CommitDB> query = em.createNamedQuery("CommitDB.findByRepository", CommitDB.class);
+		query.setParameter("uid", uid);
+		return query.getResultList();
+		
+	}
+	
+	
 
 
 	

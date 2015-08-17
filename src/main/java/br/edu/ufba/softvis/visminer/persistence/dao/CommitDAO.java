@@ -19,6 +19,11 @@ public interface CommitDAO extends DAO<CommitDB, Integer> {
 	 * @return List of commits by tree.
 	 */
 	public List<CommitDB> findByTree(int treeId);
-
+	
+	/**
+	 * @param repositoryPath
+	 * @return All commits from a given repository.
+	 */
+	public List<CommitDB> findByRepository(String repositoryPath);
 	
 }

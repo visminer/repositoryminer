@@ -58,5 +58,27 @@ public class CommitRetriever extends Retriever {
 	public List<Commit> retrieveByTree(Tree tree) {
 		return retrieveByTree(tree.getId());
 	}
+	
+	public List<Commit> retrieveByRepository(String repositoryPath){
+		
+		List<Commit> commits = new ArrayList<Commit>();
+		CommitDAO dao = new CommitDAOImpl();
+
+		super.createEntityManager();
+		super.shareEntityManager(dao);
+
+		List<CommitDB> commitsDb = dao.findByRepository(repositoryPath);
+		if (commitsDb != null) {
+			commits.addAll(CommitDB.toBusiness(commitsDb));
+			for (Commit commit : commits) {
+				commit.setCommitedFiles(retrieveFiles(commit));
+			}
+		}
+
+		super.closeEntityManager();
+		
+		return commits;
+		
+	}
 
 }
