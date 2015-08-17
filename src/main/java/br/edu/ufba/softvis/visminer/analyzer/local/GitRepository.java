@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.LogCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.internal.storage.file.FileRepository;
 import org.eclipse.jgit.lib.ObjectId;
@@ -22,7 +23,6 @@ import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.treewalk.TreeWalk;
 
 import br.edu.ufba.softvis.visminer.constant.TreeType;
-import br.edu.ufba.softvis.visminer.model.business.File;
 import br.edu.ufba.softvis.visminer.model.database.CommitDB;
 import br.edu.ufba.softvis.visminer.model.database.CommitterDB;
 import br.edu.ufba.softvis.visminer.model.database.FileDB;
@@ -87,6 +87,10 @@ public class GitRepository implements IRepositorySystem{
 
 			Iterable<Ref> refs = git.branchList().call();
 			for(Ref ref : refs){
+				
+				if(ref.getName().equals("HEAD"))
+					continue;
+				
 				TreeDB tree = new TreeDB(0, ref.getName(), getLastCommitDate(ref.getName()), ref.getName().split("/")[2],
 						TreeType.BRANCH);
 				trees.add(tree);
@@ -155,33 +159,74 @@ public class GitRepository implements IRepositorySystem{
 
 	}
 
-	public List<CommitDB> getCommitsByTree(String treeName) {
+	public List<CommitDB> getCommitsByTree(String treeName, TreeType type) {
 
 		Iterable<RevCommit> revCommits = null;
+		if(type == TreeType.BRANCH){
+			revCommits = getCommitsFromBranch(treeName);
+		}else if(type == TreeType.TAG){
+			revCommits = getCommitsFromTag(treeName);
+		}
+		
+		List<CommitDB> commits = new ArrayList<CommitDB>();
+		for(RevCommit revCommit : revCommits){
+			CommitDB commit = new CommitDB(0, revCommit.getAuthorIdent().getWhen(), revCommit.getFullMessage(),
+					revCommit.getName());
+			commits.add(commit);
+		}
+
+		return commits;
+
+	}
+
+	private Iterable<RevCommit> getCommitsFromTag(String treeName) {
+
 		try {
+
+			List<Ref> call = git.tagList().call();
+			Iterable<RevCommit> logs = null;
 			
-			revCommits = git.log()
-					.add(repository.resolve(treeName))
-					.call();
-			
-			List<CommitDB> commits = new ArrayList<CommitDB>();
-			for(RevCommit revCommit : revCommits){
-				CommitDB commit = new CommitDB(0, revCommit.getAuthorIdent().getWhen(), revCommit.getFullMessage(),
-						revCommit.getName());
-				commits.add(commit);
+			for(Ref ref : call){
+
+				if(ref.getName().equals(treeName)){
+					LogCommand log = git.log();
+					Ref peeledRef = repository.peel(ref);
+					if(peeledRef.getPeeledObjectId() != null) {
+						log.add(peeledRef.getPeeledObjectId());
+					} else {
+						log.add(ref.getObjectId());
+					}
+					
+					logs = log.call();
+					return logs;
+				}
 			}
 			
-			return commits;
+			return null;
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+
+	}
+
+	private Iterable<RevCommit> getCommitsFromBranch(String treeName){
+
+		try {
+			
+			Iterable<RevCommit> revCommits = git.log()
+					.add(repository.resolve(treeName))
+					.call();
+			return revCommits;
 			
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
 		}
-		
-		
 
 	}
-
+	
 	@SuppressWarnings("resource")
 	@Override
 	public byte[] getData(String commitName, String filePath) {
@@ -276,7 +321,7 @@ public class GitRepository implements IRepositorySystem{
 
 	@SuppressWarnings("resource")
 	@Override
-	public List<File> getSnapshotFiles(String commitUid){
+	public List<String> getSnapshotFiles(String commitUid){
 
 		
 		try {
@@ -287,11 +332,10 @@ public class GitRepository implements IRepositorySystem{
 			treeWalk.addTree(lastCommit.getTree());
 			treeWalk.setRecursive(true);
 			
-			List<File> files = new ArrayList<File>();
+			List<String> files = new ArrayList<String>();
 			while(treeWalk.next()){
 				String path = this.repositoryPath+"/"+treeWalk.getPathString();
-				File f = new File(0, path, StringUtils.sha1(path));
-				files.add(f);
+				files.add(StringUtils.sha1(path));
 				
 			}
 			
@@ -300,6 +344,17 @@ public class GitRepository implements IRepositorySystem{
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
+		}
+		
+	}
+	
+	@Override
+	public void checkoutToTree(String treeName){
+		
+		try {
+			git.checkout().setName(treeName).call();
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		
 	}

@@ -1,38 +1,37 @@
 package br.edu.ufba.softvis.visminer.analyzer;
 
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import javax.persistence.EntityManager;
 
 import br.edu.ufba.softvis.visminer.analyzer.local.IRepositorySystem;
+import br.edu.ufba.softvis.visminer.annotations.ASTGeneratorAnnotation;
 import br.edu.ufba.softvis.visminer.ast.AST;
-import br.edu.ufba.softvis.visminer.ast.Document;
-import br.edu.ufba.softvis.visminer.ast.generator.java.JavaASTGenerator;
+import br.edu.ufba.softvis.visminer.ast.generator.ASTGeneratorFactory;
+import br.edu.ufba.softvis.visminer.ast.generator.IASTGenerator;
 import br.edu.ufba.softvis.visminer.config.MetricConfig;
+import br.edu.ufba.softvis.visminer.constant.LanguageType;
 import br.edu.ufba.softvis.visminer.constant.MetricUid;
 import br.edu.ufba.softvis.visminer.constant.TreeType;
 import br.edu.ufba.softvis.visminer.metric.IMetric;
-import br.edu.ufba.softvis.visminer.model.database.CommitDB;
+import br.edu.ufba.softvis.visminer.model.business.Commit;
+import br.edu.ufba.softvis.visminer.model.business.File;
 import br.edu.ufba.softvis.visminer.model.database.FileDB;
-import br.edu.ufba.softvis.visminer.model.database.FileXCommitDB;
 import br.edu.ufba.softvis.visminer.model.database.RepositoryDB;
 import br.edu.ufba.softvis.visminer.model.database.TreeDB;
+import br.edu.ufba.softvis.visminer.persistence.Database;
 import br.edu.ufba.softvis.visminer.persistence.MetricPersistance;
 import br.edu.ufba.softvis.visminer.persistence.SaveAST;
-import br.edu.ufba.softvis.visminer.persistence.dao.CommitDAO;
 import br.edu.ufba.softvis.visminer.persistence.dao.FileDAO;
 import br.edu.ufba.softvis.visminer.persistence.dao.TreeDAO;
-import br.edu.ufba.softvis.visminer.persistence.impl.CommitDAOImpl;
 import br.edu.ufba.softvis.visminer.persistence.impl.FileDAOImpl;
 import br.edu.ufba.softvis.visminer.persistence.impl.TreeDAOImpl;
+import br.edu.ufba.softvis.visminer.retriever.CommitRetriever;
 
 /**
  * @version 0.9
@@ -40,212 +39,200 @@ import br.edu.ufba.softvis.visminer.persistence.impl.TreeDAOImpl;
  */
 public class MetricCalculator{
 
-	private static final Set<String> sourceExtensions = initSourceExtensions();
-	private static final Set<String> acceptedExtensions = initAcceptedExtensions();
-	private static final Set<String> avoidedExtensions = initAvoidedExtensions();
+	private Map<MetricUid, IMetric> commitMetrics;
+	private Map<MetricUid, IMetric> snapshotMetrics;
+	private SaveAST saveAST;
+	private IRepositorySystem repoSys;
+	private Map<String, IASTGenerator> astGenerators;
+	private List<String> analyzedCommits;
+	private EntityManager entityManager;
 
-	//List of file files extension that should have their AST calculated.
-	private static Set<String> initSourceExtensions(){
-
-		Set<String> set = new HashSet<String>();
-
-		// set here the files that should have their ast calculated
-		set.add("java");
-
-		return set;
-	}
-
-	// List of files extensions that will have their content accessed, but they won't have any AST calculated.
-	private static Set<String> initAcceptedExtensions(){
-		
-		Set<String> set = new HashSet<String>();
-		set.add("txt");
-		set.add("md");
-		set.add("xml");
-		set.add("json");
-		set.add("html");
-		set.add("css");
-		
-		return set;
-	}
-	
-	//List of files extensions that should be avoided.
-	private static Set<String> initAvoidedExtensions(){
-		
-		Set<String> set = new HashSet<String>();
-
-		// set here the files that should have be avoided
-		set.add("jar");
-		set.add("mwb");
-		set.add("bak");
-		set.add("jpg");
-		set.add("jpeg");
-		set.add("png");
-		
-		return set;
-		
-	}
-	
-	// True if AST must be calculated or false otherwise.
-	private static boolean isASTCalculable(String filePath){
-		int index = filePath.lastIndexOf(".") + 1;
-		return sourceExtensions.contains(filePath.substring(index));
-	}
-
-	// True if the file should be processed or false otherwise.
-	private static boolean isProcessable(String filePath){
-		int index = filePath.lastIndexOf(".") + 1;
-		return !avoidedExtensions.contains(filePath.substring(index));
-	}
-	
-	// True if the file should be processed or false otherwise.
-	private static boolean isAcceptable(String filePath){
-		int index = filePath.lastIndexOf(".") + 1;
-		return acceptedExtensions.contains(filePath.substring(index));
-	}	
 	
 	/**
-	 * 
-	 * @param metricsId
+	 * @param metrics
 	 * @param repoSys
-	 * @param repositoryDb
-	 * @param entityManager
+	 * @param repoDb
+	 * @param languages
 	 * 
-	 * Calculates the metrics for all commits in all trees, except tags.
+	 * Calculates the metrics for the target languages.
 	 */
-	public static void calculate(List<MetricUid> metricsId, IRepositorySystem repoSys,
-			RepositoryDB repositoryDb, EntityManager entityManager){
+	public void calculate(List<MetricUid> metrics, IRepositorySystem repoSys, RepositoryDB repoDb, List<LanguageType> languages){
+		
+		entityManager = Database.getInstance().getEntityManager();
 		
 		TreeDAO treeDao = new TreeDAOImpl();
 		treeDao.setEntityManager(entityManager);
+		List<TreeDB> treesDb = treeDao.findByRepository(repoDb.getId());
 		
-		CommitDAO commitDao = new CommitDAOImpl();
-		commitDao.setEntityManager(entityManager);
+		if(treesDb == null){
+			entityManager.close();
+			return;
+		}
+	
+		createASTGenerators(languages);
+		this.repoSys = repoSys;
 		
-		Map<MetricUid, IMetric> simpleMetrics = new LinkedHashMap<MetricUid, IMetric>();
-		Map<MetricUid, IMetric> complexMetrics = new LinkedHashMap<MetricUid, IMetric>();
-		MetricConfig.getImplementations(metricsId, simpleMetrics, complexMetrics);
+		this.analyzedCommits = new ArrayList<String>();
+		this.saveAST = new SaveAST(repoDb, entityManager);
+		CommitRetriever commitRetriever = new CommitRetriever();
 		
-		SaveAST saveAst = new SaveAST(repositoryDb, entityManager);
+		this.commitMetrics = new LinkedHashMap<MetricUid, IMetric>();
+		this.snapshotMetrics = new LinkedHashMap<MetricUid, IMetric>();
+		MetricConfig.getImplementations(metrics, commitMetrics, snapshotMetrics);
 		
-		List<TreeDB> treesDb = treeDao.findByRepository(repositoryDb.getId());
 		for(TreeDB treeDb : treesDb){
 			if(treeDb.getType() == TreeType.BRANCH){
-				List<CommitDB> commitsDb = commitDao.findByTree(treeDb.getId());
-				calculateMetrics(commitsDb, simpleMetrics, complexMetrics, saveAst, repoSys, repositoryDb, entityManager);
+				List<Commit> commits = commitRetriever.retrieveByTree(treeDb.getId());
+				calculateMetrics(commits);
 			}
 		}
 		
+		entityManager.close();
 	}
-	
-	/*
-	 * Constructs the repository files state in certain commit.
-	 * Prepares AST for source code files.
-	 * Calculates the metrics and save their values in database.
-	 */
-	private static void calculateMetrics(List<CommitDB> commitsDb, Map<MetricUid, IMetric> simpleMetrics,
-			Map<MetricUid, IMetric> complexMetrics, SaveAST saveAst, IRepositorySystem repoSys,
-			RepositoryDB repositoryDb, EntityManager entityManager) {
 
-		FileDAO fileDao = new FileDAOImpl();
-		fileDao.setEntityManager(entityManager);
-
+	// This is the main method in metric calculation, it manages all other process.
+	private void calculateMetrics(List<Commit> commits) {
+		
 		MetricPersistance persistence = new MetricPersistance(entityManager);
 		persistence.initBatchPersistence();
 		
-		Map<FileDB, AST> repositoryFiles = new HashMap<FileDB, AST>();
-		Map<FileDB, AST> commitFiles = new HashMap<FileDB, AST>();
-		List<CommitDB> commitsDbAux = new ArrayList<CommitDB>(commitsDb.size());
+		List<String> snapshotFilesUids = null;
+		List<File> commitFiles = null;
+		
+		int nextCommit = getNextCommitToAnalysis(commits, commitFiles, snapshotFilesUids);
+		
+		FileDAO dao = new FileDAOImpl();
+		dao.setEntityManager(entityManager);
+		List<FileDB> snapshotFiles = dao.getFilesByUids(snapshotFilesUids);
 
-		for(int i = 0; i < commitsDb.size(); i++){
-
-			commitFiles.clear();
-			commitsDbAux.add(commitsDb.get(i));
-
-			CommitDB commitDb = commitsDb.get(i);
-			List<FileDB> filesDbAux = fileDao.findCommitedFiles(commitDb.getId());
-
-			for(FileDB fileDb : filesDbAux){
-					
-				FileXCommitDB fxcDb = fileDb.getFileXCommits().get(0);
-				
-				if(fxcDb.isRemoved()){
-					repositoryFiles.remove(fileDb);
-					commitFiles.put(fileDb, null);
-				}else{
-					if(isProcessable(fileDb.getPath())){
-						/*
-						 *  Absolute path doesn't work correctly, with absolute path JGIT doesn't find the file.
-						 *  I save the absolute path, so I need to remove the repository absolute path part.
-						 *  index is the start of relative path, transforming "repository_path/file_path" into "file_path".
-						 */
-						int index = repoSys.getAbsolutePath().length()+1;
-						byte[] data = repoSys.getData(commitDb.getName(), fileDb.getPath().substring(index));
-						
-						if(isASTCalculable(fileDb.getPath())){
-							
-							AST ast = new JavaASTGenerator().generate(fileDb.getPath(), data, repositoryDb.getCharset());
-							saveAst.save(fileDb, ast);
-							commitFiles.put(fileDb, ast);
-							repositoryFiles.put(fileDb, ast);
-							
-						}else if(isAcceptable(fileDb.getPath())){
-							
-							Document doc = new Document();
-							doc.setName(fileDb.getPath());
-							AST ast = new AST();
-							
-							if(data == null){
-								ast.setSourceCode(null);
-							}else{
-								try {
-									ast.setSourceCode(new String(data, repositoryDb.getCharset()));
-								} catch (UnsupportedEncodingException e) {
-									e.getMessage();
-									System.exit(1);
-								}
-							}
-							
-							ast.setDocument(doc);
-							saveAst.save(fileDb, ast);
-							commitFiles.put(fileDb, ast);
-							repositoryFiles.put(fileDb, ast);
-							
-						}
-						
-					}else{
-						commitFiles.put(fileDb, null);
-						repositoryFiles.put(fileDb, null);
-					}
-
-				}// end else
-			}// end for(FileDB fileDb : filesDbAux)
-
-			calculationMetricsHelper(simpleMetrics, complexMetrics, commitsDbAux, commitFiles, repositoryFiles, persistence);
+		Map<String, AST> commitASTs = new LinkedHashMap<String, AST>();
+		Map<String, AST> snapshotASTs = new LinkedHashMap<String, AST>();
+		
+		repoSys.checkoutToTree(commits.get(nextCommit).getName());
+		initASTs(commitASTs, snapshotASTs, commitFiles, snapshotFiles, commits.get(nextCommit).getName());
+		calculationMetricsHelper(commitMetrics, snapshotMetrics, commits.subList(0, nextCommit+1),
+				commitASTs, snapshotASTs, persistence);
+	
+		for(int i = nextCommit+1; i < commits.size(); i++){
 			
-		}// end for(CommitDB commitDb : commitsDb)
-
+			commitASTs.clear();
+			Commit commit = commits.get(i);
+			repoSys.checkoutToTree(commit.getName());
+			
+			for(File file : commit.getCommitedFiles()){
+				
+				if(file.getFileState().isDeleted()){
+					snapshotASTs.remove(file.getPath());
+				}else{
+					AST ast = processAST(file.getPath(), file.getId(), commit.getName());
+					if(ast != null){
+						snapshotASTs.put(file.getPath(), ast);
+						commitASTs.put(file.getPath(), ast);
+					}
+				}
+				
+			}
+			
+			calculationMetricsHelper(commitMetrics, snapshotMetrics, commits.subList(0, i+1), commitASTs, snapshotASTs, persistence);
+			
+		}
 		
 		persistence.flushAllMetricValues();
+		
+	}	
+	
+	// Initializes astGenerators, the map is filled with extensions and ast generators 
+	private void createASTGenerators(List<LanguageType> languages){
+		
+		astGenerators = new Hashtable<String, IASTGenerator>();
+		for(LanguageType lang : languages){
+			IASTGenerator astGen = ASTGeneratorFactory.create(lang);
+			ASTGeneratorAnnotation annotation = astGen.getClass().getAnnotation(ASTGeneratorAnnotation.class);
+			for(String str : annotation.extensions()){
+				astGenerators.put(str, astGen);
+			}
+		}
+		
+	}	
+	
+	/* Return the next commit that should be processed, commits already processed are stored
+	to avoid overhead */
+	private int getNextCommitToAnalysis(List<Commit> commits, List<File> commitFiles, List<String> snapshotFilesUids){
+		
+		int i = 0;
+		for(; i < commits.size(); i++){
+			Commit c = commits.get(i);
+			if( !analyzedCommits.contains(c.getName()) ){
+				analyzedCommits.add(c.getName());
+				break;
+			}
+		}
+		
+		commitFiles = commits.get(i).getCommitedFiles();
+		snapshotFilesUids = repoSys.getSnapshotFiles(commits.get(i).getName());
+		return i;
+		
 	}
 	
-	// Calculates all the selected metrics for a given commit.
-	private static void calculationMetricsHelper(Map<MetricUid, IMetric> simpleMetrics, Map<MetricUid, IMetric> complexMetrics,
-			List<CommitDB> commits, Map<FileDB, AST> committedFiles, Map<FileDB, AST> repositoryFiles, MetricPersistance persistence){
-		
-		CommitDB c = commits.get(commits.size() - 1);
-		persistence.setCommitId(c.getId());
-		
-		for(Entry<MetricUid, IMetric> entry : simpleMetrics.entrySet()){
-			persistence.setMetric(entry.getKey());
-			entry.getValue().calculate(committedFiles, commits, persistence);
-		}
-		
-		for(Entry<MetricUid, IMetric> entry : complexMetrics.entrySet()){
-			persistence.setMetric(entry.getKey());
-			entry.getValue().calculate(repositoryFiles, commits, persistence);
+	// Initializes the ASTs maps to next commit that should be processed
+	private void initASTs(Map<String, AST> commitASTs, Map<String, AST> snapshotASTs, List<File> commitFiles,
+			List<FileDB> snapshotFiles, String commitName){
+
+		for(FileDB fileDb : snapshotFiles){
+			File f = fileDb.toBusiness();
+			AST ast = processAST(f.getPath(), f.getId(), commitName);
+			snapshotASTs.put(f.getPath(), ast);
+			if(commitFiles.contains(f))
+				commitASTs.put(f.getPath(), ast);
 		}
 		
 	}
+
+	// Creates the AST for the given file and save their software units
+	private AST processAST(String filePath, int fileId, String commitName){
+		
+		int index = filePath.lastIndexOf(".") + 1;
+		String ext = filePath.substring(index);
+		IASTGenerator gen = astGenerators.get(ext);
+		
+		if(gen == null){
+			return null;
+		}
+		
+		/*
+		 *  Absolute path doesn't work correctly, with absolute path JGIT doesn't find the file.
+		 *  I save the absolute path, so I need to remove the repository absolute path part.
+		 *  index is the start of relative path, transforming "repository_path/file_path" into "file_path".
+		 */
+		index = repoSys.getAbsolutePath().length()+1;
+		byte[] data = repoSys.getData(commitName, filePath.substring(index));
+		AST ast = gen.generate(filePath, data, saveAST.getRepositoryDB().getCharset());
+		
+		saveAST.save(filePath, fileId, ast);
+		return ast;
+		
+	}
+	
+	// Simple helper to calculate the metrics
+	private void calculationMetricsHelper(Map<MetricUid, IMetric> commitMetrics, Map<MetricUid, IMetric> snapshotMetrics,
+			List<Commit> commits, Map<String, AST> commitASTs, Map<String, AST> snapshotASTs, MetricPersistance persistence){
+		
+		List<AST> commitsASTsList = new ArrayList<AST>(commitASTs.values());
+		List<AST> snapshotASTsList = new ArrayList<AST>(snapshotASTs.values());
+		
+		Commit c = commits.get(commits.size() - 1);
+		persistence.setCommitId(c.getId());
+		
+		for(Entry<MetricUid, IMetric> entry : commitMetrics.entrySet()){
+			persistence.setMetric(entry.getKey());
+			entry.getValue().calculate(commitsASTsList, commits, persistence);
+		}
+		
+		for(Entry<MetricUid, IMetric> entry : snapshotMetrics.entrySet()){
+			persistence.setMetric(entry.getKey());
+			entry.getValue().calculate(snapshotASTsList, commits, persistence);
+		}
+		
+	}	
 	
 }

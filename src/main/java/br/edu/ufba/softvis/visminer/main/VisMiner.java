@@ -51,7 +51,7 @@ public class VisMiner {
 	public void persistRepository(Repository repository, List<MetricUid> metrics, List<LanguageType> languages){
 		//languages will be used
 		RepositoryAnalyzer analyzer = new RepositoryAnalyzer();
-		analyzer.persist(repository, metrics);
+		analyzer.persist(repository, metrics, languages);
 	}
 	
 	/**

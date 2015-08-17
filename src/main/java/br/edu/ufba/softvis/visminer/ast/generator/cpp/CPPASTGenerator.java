@@ -39,6 +39,8 @@ import br.edu.ufba.softvis.visminer.constant.LanguageType;
  * instance of @link br.edu.ifba.softvis.visminer.generator.cpp.CPPASTVisitor
  * into the IASTTranslationUnit returned from the C++ parser.
  * 
+ * The extensions accepted for this generator are: h, cpp, hpp
+ * 
  * @author Luis Paulo
  */
 

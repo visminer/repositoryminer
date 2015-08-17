@@ -26,6 +26,16 @@ import br.edu.ufba.softvis.visminer.ast.ParameterDeclaration;
 import br.edu.ufba.softvis.visminer.ast.generator.IASTGenerator;
 import br.edu.ufba.softvis.visminer.constant.LanguageType;
 
+/**
+ * Java AST generator
+ * 
+ * This class have the job to create an abstract AST upon Java source code.
+ * The underlining API is the JDT, the same used by Eclipse IDE.
+ * 
+ * The extensions accepted for this generator are: java
+ * 
+ */
+
 @ASTGeneratorAnnotation(
 		language = LanguageType.JAVA,
 		extensions = {"java"}

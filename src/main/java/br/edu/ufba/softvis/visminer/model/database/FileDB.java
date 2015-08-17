@@ -17,10 +17,7 @@ import javax.persistence.Table;
 
 import br.edu.ufba.softvis.visminer.model.business.File;
 
-
 /**
- * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
- * @version 0.9
  * The persistent class for the file database table.
  */
 @Entity
@@ -28,7 +25,8 @@ import br.edu.ufba.softvis.visminer.model.business.File;
 @NamedQueries({
 	@NamedQuery(name="FileDB.findByCode", query="select f.id from FileDB f where f.uid = :uid"),
 	@NamedQuery(name="FileDB.findCommitedFiles", query="select f from FileDB f join f.fileXCommits "
-			+ "fxc where fxc.id.commitId = :id")
+			+ "fxc where fxc.id.commitId = :id"),
+	@NamedQuery(name="FileDB.findByUids", query="select f from FileDB f where f.uid in (:uids)")
 })
 
 public class FileDB implements Serializable {
@@ -68,7 +66,11 @@ public class FileDB implements Serializable {
 		this.path = path;
 		this.uid = uid;
 	}
-
+	
+	public FileDB(int id){
+		super();
+		this.id = id;
+	}
 
 	/**
 	 * @return the id

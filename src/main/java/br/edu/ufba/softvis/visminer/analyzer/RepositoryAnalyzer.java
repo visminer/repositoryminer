@@ -7,6 +7,7 @@ import javax.persistence.EntityManager;
 
 import br.edu.ufba.softvis.visminer.analyzer.local.IRepositorySystem;
 import br.edu.ufba.softvis.visminer.analyzer.local.SupportedRepository;
+import br.edu.ufba.softvis.visminer.constant.LanguageType;
 import br.edu.ufba.softvis.visminer.constant.MetricUid;
 import br.edu.ufba.softvis.visminer.constant.SoftwareUnitType;
 import br.edu.ufba.softvis.visminer.model.business.Repository;
@@ -30,7 +31,7 @@ public class RepositoryAnalyzer{
 	 * This class is responsible for join all the analyzers and make the
 	 * repository analyzis.
 	*/
-	public void persist(Repository repoBusi, List<MetricUid> metrics) {
+	public void persist(Repository repoBusi, List<MetricUid> metrics, List<LanguageType> languages) {
 		
 		IRepositorySystem repoSys = SupportedRepository.getRepository(repoBusi.getPath(), repoBusi.getType());
 		
@@ -69,7 +70,8 @@ public class RepositoryAnalyzer{
 		softwareUnitDao.save(softUnitDb);
 		
 		if(metrics != null && metrics.size() > 0){
-			MetricCalculator.calculate(metrics, repoSys, repositoryDb, entityManager);
+			MetricCalculator m = new MetricCalculator();
+			m.calculate(metrics, repoSys, repositoryDb, languages);
 		}
 
 		entityManager.clear();

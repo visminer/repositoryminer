@@ -83,6 +83,7 @@ public class Document {
 	public void setPackageDeclaration(PackageDeclaration packageDeclaration) {
 		this.packageDeclaration = packageDeclaration;
 	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -90,6 +91,7 @@ public class Document {
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		return result;
 	}
+	
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)

@@ -29,4 +29,14 @@ public class FileDAOImpl extends DAOImpl<FileDB, Integer> implements FileDAO {
 		
 	}
 
+	@Override
+	public List<FileDB> getFilesByUids(List<String> uids){
+		
+		EntityManager em = getEntityManager();
+		TypedQuery<FileDB> query = em.createNamedQuery("FileDB.findByUids", FileDB.class);
+		query.setParameter("uids", uids);
+		return query.getResultList();
+		
+	}
+	
 }

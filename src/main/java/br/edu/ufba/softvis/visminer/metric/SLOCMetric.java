@@ -1,15 +1,12 @@
 package br.edu.ufba.softvis.visminer.metric;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import br.edu.ufba.softvis.visminer.annotations.MetricAnnotation;
 import br.edu.ufba.softvis.visminer.ast.AST;
 import br.edu.ufba.softvis.visminer.constant.MetricType;
 import br.edu.ufba.softvis.visminer.constant.MetricUid;
-import br.edu.ufba.softvis.visminer.model.database.CommitDB;
-import br.edu.ufba.softvis.visminer.model.database.FileDB;
+import br.edu.ufba.softvis.visminer.model.business.Commit;
 import br.edu.ufba.softvis.visminer.persistence.MetricPersistance;
 
 @MetricAnnotation(
@@ -24,17 +21,9 @@ import br.edu.ufba.softvis.visminer.persistence.MetricPersistance;
 public class SLOCMetric implements IMetric{
 
 	@Override
-	public void calculate(Map<FileDB, AST> filesMap, List<CommitDB> commits,
-			MetricPersistance persistence) {
-
-		for(Entry<FileDB, AST> entry : filesMap.entrySet()){
-
-			if(entry.getValue() == null){
-				continue;
-			}
-			
-			AST ast = entry.getValue();
-			
+	public void calculate(List<AST> astList, List<Commit> commits, MetricPersistance persistence){
+		
+		for(AST ast : astList){
 			persistence.postMetricValue(ast.getDocument().getId(), String.valueOf(count(ast.getSourceCode())));
 		}
 	}

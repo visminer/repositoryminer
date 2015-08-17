@@ -6,6 +6,7 @@ import br.edu.ufba.softvis.visminer.annotations.MetricAnnotation;
 import br.edu.ufba.softvis.visminer.ast.MethodDeclaration;
 import br.edu.ufba.softvis.visminer.constant.MetricType;
 import br.edu.ufba.softvis.visminer.constant.MetricUid;
+import br.edu.ufba.softvis.visminer.model.business.Commit;
 
 @MetricAnnotation(
 		name = "Weighted Method Count",
@@ -25,7 +26,8 @@ public class WMCMetric extends MethodBasedMetricTemplate{
 		int wmc = 0;				
 
 		for(MethodDeclaration method : methods){
-			wmc += Integer.parseInt(persistence.getMetricValue(MetricUid.CC, method.getId(), commits.get(commits.size()-1)));	
+			Commit c = commits.get(commits.size() - 1);
+			wmc += Integer.parseInt(persistence.getMetricValue(MetricUid.CC, method.getId(), c));	
 		}
 
 		persistence.postMetricValue(currentType.getId(), String.valueOf(wmc));

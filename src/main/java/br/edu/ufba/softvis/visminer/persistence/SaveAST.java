@@ -22,6 +22,9 @@ import br.edu.ufba.softvis.visminer.persistence.dao.SoftwareUnitDAO;
 import br.edu.ufba.softvis.visminer.persistence.impl.SoftwareUnitDAOImpl;
 import br.edu.ufba.softvis.visminer.utility.StringUtils;
 
+/**
+ * This class is used to save in database the software units(methods, classes and others) found in one AST.
+ */
 public class SaveAST {
 
 	private Map<String, Integer> uidMap;
@@ -29,6 +32,10 @@ public class SaveAST {
 	private Project project;
 	private SoftwareUnitDB projectUnit;
 	private RepositoryDB repositoryDb;
+	
+	public RepositoryDB getRepositoryDB(){
+		return this.repositoryDb;
+	}
 	
 	public SaveAST(RepositoryDB repositoryDb, EntityManager entityManager){
 		
@@ -46,7 +53,13 @@ public class SaveAST {
 
 	}
 	
-	public void save(FileDB fileDb, AST ast){
+	/**
+	 * @param filePath
+	 * @param fileId
+	 * @param ast
+	 * Saves the software units found in the given AST in database.
+	 */
+	public void save(String filePath, int fileId, AST ast){
 
 		SoftwareUnitDB parent = null;
 		ast.setProject(project);
@@ -54,10 +67,10 @@ public class SaveAST {
 		if(ast.getDocument().getPackageDeclaration() != null){
 				
 			PackageDeclaration pkgDecl = ast.getDocument().getPackageDeclaration();
-			String uid = generateUid(repositoryDb.getUid(), null, pkgDecl.getName());
+			String uid = generateUid(repositoryDb.getPath(), null, pkgDecl.getName());
 				
 			SoftwareUnitDB pkgUnit = getSofwareUnitDB(uid, pkgDecl.getName(), SoftwareUnitType.PACKAGE,
-						null, repositoryDb, projectUnit);
+						0, repositoryDb, projectUnit);
 			pkgDecl.setId(pkgUnit.getId());
 			parent = pkgUnit;	
 			
@@ -65,24 +78,24 @@ public class SaveAST {
 			parent = projectUnit;
 		}
 		
-		String docUid = generateUid(repositoryDb.getUid(), parent.getUid(), fileDb.getUid());
+		String docUid = generateUid(repositoryDb.getPath(), parent.getName(), filePath);
 		SoftwareUnitDB docUnit = getSofwareUnitDB(docUid, ast.getDocument().getName(), SoftwareUnitType.FILE,
-				fileDb, repositoryDb, parent);
+				fileId, repositoryDb, parent);
 		ast.getDocument().setId(docUnit.getId());
 		
 		if(ast.getDocument().getTypes() != null){
 			for(TypeDeclaration type : ast.getDocument().getTypes()){
 				
-				String typeUid = generateUid(repositoryDb.getUid(), docUid, type.getName());
+				String typeUid = generateUid(repositoryDb.getPath(), filePath, type.getName());
 				
 				SoftwareUnitDB typeUnit = getSofwareUnitDB(typeUid, type.getName(), type.getType(),
-						fileDb, repositoryDb, docUnit);
+						0, repositoryDb, docUnit);
 				type.setId(typeUnit.getId());
 				
 				if(type.getType() == SoftwareUnitType.CLASS_OR_INTERFACE){
-					processClassOrInterface( (ClassOrInterfaceDeclaration) type, fileDb, typeUnit);
+					processClassOrInterface( (ClassOrInterfaceDeclaration) type, fileId, typeUnit);
 				}else if(type.getType() == SoftwareUnitType.ENUM){
-					processEnum( (EnumDeclaration) type, typeUnit, fileDb);
+					processEnum( (EnumDeclaration) type, typeUnit, fileId);
 				}
 				
 			}
@@ -90,39 +103,42 @@ public class SaveAST {
 			
 	}
 	
-	private String generateUid(String repositoryUid, String parentUid, String softwareUnitName){
-		String uid = repositoryUid + parentUid + softwareUnitName;
+	// Generate unique id for software units
+	private String generateUid(String repositoryPath, String parentName, String softwareUnitName){
+		String uid = repositoryPath + parentName + softwareUnitName;
 		return StringUtils.sha1(uid);
 	}
 	
-	private void processClassOrInterface(ClassOrInterfaceDeclaration type, FileDB fileDb, SoftwareUnitDB typeUnit){
+	// Saves fields and methods in database
+	private void processClassOrInterface(ClassOrInterfaceDeclaration type, int fileId, SoftwareUnitDB typeUnit){
 		
 		if(type.getFields() != null){
 			for(FieldDeclaration field : type.getFields()){
-				String fieldUid = generateUid(repositoryDb.getUid(), typeUnit.getUid(), type.getName()+"."+field.getName());
+				String fieldUid = generateUid(repositoryDb.getPath(), typeUnit.getName(), type.getName()+"."+field.getName());
 				SoftwareUnitDB fieldUnit = getSofwareUnitDB(fieldUid, field.getName(), SoftwareUnitType.FIELD,
-						fileDb, repositoryDb, typeUnit);
+						fileId, repositoryDb, typeUnit);
 				field.setId(fieldUnit.getId());
 			}
 		}
 
 		if(type.getMethods() != null){
 			for(MethodDeclaration method : type.getMethods()){
-				String methodUid = generateUid(repositoryDb.getUid(), typeUnit.getUid(), type.getName()+"."+method.getName());
+				String methodUid = generateUid(repositoryDb.getPath(), typeUnit.getName(), type.getName()+"."+method.getName());
 				SoftwareUnitDB methodUnit = getSofwareUnitDB(methodUid, method.getName(), SoftwareUnitType.METHOD,
-						fileDb, repositoryDb, typeUnit);
+						fileId, repositoryDb, typeUnit);
 				method.setId(methodUnit.getId());
 			}
 		}
 		
 	}
 	
-	private void processEnum(EnumDeclaration type, SoftwareUnitDB enumUnit, FileDB fileDb){
+	// Saves enum constants in database
+	private void processEnum(EnumDeclaration type, SoftwareUnitDB enumUnit, int fileId){
 		
 		if(type.getEnumConsts() != null){
 			for(EnumConstantDeclaration constDecl : type.getEnumConsts()){
-				String constUid = generateUid(repositoryDb.getUid(), enumUnit.getUid(), constDecl.getName());
-				SoftwareUnitDB constUnit = getSofwareUnitDB(constUid, constDecl.getName(), SoftwareUnitType.ENUM_CONST, fileDb,
+				String constUid = generateUid(repositoryDb.getPath(), enumUnit.getName(), constDecl.getName());
+				SoftwareUnitDB constUnit = getSofwareUnitDB(constUid, constDecl.getName(), SoftwareUnitType.ENUM_CONST, fileId,
 						repositoryDb, enumUnit);
 				constDecl.setId(constUnit.getId());
 			}
@@ -130,7 +146,8 @@ public class SaveAST {
 		
 	}
 	
-	private SoftwareUnitDB getSofwareUnitDB(String uid, String name, SoftwareUnitType type, FileDB fileDb,
+	// Saves the given software unit in database
+	private SoftwareUnitDB getSofwareUnitDB(String uid, String name, SoftwareUnitType type, int fileId,
 			RepositoryDB repoDb, SoftwareUnitDB parent){
 		
 		SoftwareUnitDB softwareUnitDB = new SoftwareUnitDB();
@@ -142,7 +159,10 @@ public class SaveAST {
 			softwareUnitDB.setName(name);
 			softwareUnitDB.setUid(uid);
 			softwareUnitDB.setType(type);
-			softwareUnitDB.setFile(fileDb);
+			
+			if(fileId != 0)
+				softwareUnitDB.setFile(new FileDB(fileId));
+			
 			softwareUnitDB.setRepository(repoDb);
 			softwareUnitDB.setSoftwareUnit(parent);
 			softUnitDao.save(softwareUnitDB);

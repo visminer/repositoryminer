@@ -40,7 +40,7 @@ public class SoftwareUnitDB implements Serializable {
 	@Column(unique = true, nullable = false)
 	private int id;
 
-	@Column(nullable = false, length = 256)
+	@Column(nullable = false, length = 1024)
 	private String name;
 
 	@Column(nullable = false)

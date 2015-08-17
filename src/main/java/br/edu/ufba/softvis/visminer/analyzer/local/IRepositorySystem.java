@@ -3,7 +3,7 @@ package br.edu.ufba.softvis.visminer.analyzer.local;
 import java.util.Date;
 import java.util.List;
 
-import br.edu.ufba.softvis.visminer.model.business.File;
+import br.edu.ufba.softvis.visminer.constant.TreeType;
 import br.edu.ufba.softvis.visminer.model.database.CommitDB;
 import br.edu.ufba.softvis.visminer.model.database.FileDB;
 import br.edu.ufba.softvis.visminer.model.database.TreeDB;
@@ -22,7 +22,6 @@ public interface IRepositorySystem {
 	 * getCommitedFiles(String commitUid) should return File with FileState.
 	 */
 	
-
 	/**
 	 * @return Repository absolute path.
 	 */
@@ -50,7 +49,7 @@ public interface IRepositorySystem {
 	 * @param treeFullName
 	 * @return List of commits made in a tree.
 	 */
-	public List<CommitDB> getCommitsByTree(String treeFullName);
+	public List<CommitDB> getCommitsByTree(String treeFullName, TreeType type);
 
 	/**
 	 * @param commitUid
@@ -67,9 +66,15 @@ public interface IRepositorySystem {
 
 	/**
 	 * @param commitUid
-	 * @return List of files path in certain snapshot.
+	 * @return List of files uids in certain snapshot.
 	 */
-	public List<File> getSnapshotFiles(String commitUid);
+	public List<String> getSnapshotFiles(String commitUid);
+
+	/**
+	 * @param treeName
+	 * Makes a checkout to give tree.
+	 */
+	public void checkoutToTree(String treeName);
 	
 	/**
 	 * Closes the repository and frees memory and resources.

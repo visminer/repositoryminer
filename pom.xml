@@ -5,7 +5,6 @@
 	<groupId>br.edu.ufba.softvis</groupId>
 	<artifactId>visminer</artifactId>
 	<name>VisMiner</name>
-	<packaging>jar</packaging>
 	<url>https://github.com/visminer/Visminer</url>
 	<version>0.9</version>
 

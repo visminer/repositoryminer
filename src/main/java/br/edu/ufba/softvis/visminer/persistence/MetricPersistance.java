@@ -6,7 +6,7 @@ import java.util.List;
 import javax.persistence.EntityManager;
 
 import br.edu.ufba.softvis.visminer.constant.MetricUid;
-import br.edu.ufba.softvis.visminer.model.database.CommitDB;
+import br.edu.ufba.softvis.visminer.model.business.Commit;
 import br.edu.ufba.softvis.visminer.model.database.MetricValueDB;
 import br.edu.ufba.softvis.visminer.model.database.MetricValuePK;
 import br.edu.ufba.softvis.visminer.model.database.SoftwareUnitXCommitDB;
@@ -95,9 +95,9 @@ public class MetricPersistance {
 	 * Pass commitPrev as parameter if you want get the value of the metric for the software unit in the previous commit.
 	 * If you want the value of the metric calculated for the software unit in the current commit pass null as parameter.
 	 */
-	public String getMetricValue(MetricUid metricUid, int id, CommitDB commitDb){
+	public String getMetricValue(MetricUid metricUid, int id, Commit commit){
 
-		MetricValuePK pk = new MetricValuePK(id, commitDb.getId(), metricUid.getId());
+		MetricValuePK pk = new MetricValuePK(id, commit.getId(), metricUid.getId());
 		MetricValueDB metricValDb = new MetricValueDB(pk, null);
 		
 		int index = metricValues.indexOf(metricValDb);
