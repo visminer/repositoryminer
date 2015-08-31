@@ -183,9 +183,12 @@ public class JavaASTGenerator implements IASTGenerator{
 			m.setThrownsExceptions(throwsList);
 		}
 		
-		ModifierKeyword modifier = ModifierKeyword.fromFlagValue(methodDecl.getModifiers());
-		if(modifier != null)
-			m.setModifier(modifier.toString());
+		List<String> modifiers = new ArrayList<String>();
+		for(Object modifier : methodDecl.modifiers()){
+			modifiers.add(modifier.toString());
+		}
+		
+		m.setModifiers(modifiers);
 		
 		MethodVisitor visitor = new MethodVisitor();
 		methodDecl.accept(visitor);
