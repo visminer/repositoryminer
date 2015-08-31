@@ -4,5 +4,6 @@
 	<metric id="SLOC">br.edu.ufba.softvis.visminer.metric.SLOCMetric</metric>
 	<metric id="NOCAI">br.edu.ufba.softvis.visminer.metric.NOCAIMetric</metric>
 	<metric id="WMC">br.edu.ufba.softvis.visminer.metric.WMCMetric</metric>
+	<metric id="TCC">br.edu.ufba.softvis.visminer.metric.TCCMetric</metric>
 </metrics>
 	

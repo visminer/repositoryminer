@@ -9,7 +9,8 @@ public enum MetricUid {
 	CC(1),
 	SLOC(2),
 	NOCAI(3),
-	WMC(4);
+	WMC(4),
+	TCC(5);
 	
 	private int id;
 	
