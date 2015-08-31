@@ -12,8 +12,13 @@ import org.eclipse.jdt.core.dom.DoStatement;
 import org.eclipse.jdt.core.dom.EnhancedForStatement;
 import org.eclipse.jdt.core.dom.ExpressionStatement;
 import org.eclipse.jdt.core.dom.ForStatement;
+import org.eclipse.jdt.core.dom.IBinding;
+import org.eclipse.jdt.core.dom.ITypeBinding;
+import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
+import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.ReturnStatement;
+import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.SwitchCase;
 import org.eclipse.jdt.core.dom.ThrowStatement;
 import org.eclipse.jdt.core.dom.TryStatement;
@@ -100,7 +105,36 @@ public class MethodVisitor extends ASTVisitor {
 	public boolean visit(ExpressionStatement node) {
 		if(node.getNodeType() == ASTNode.CONDITIONAL_EXPRESSION)
 			return addStatement(NodeType.CONDITIONAL_EXPRESSION, node.getExpression().toString());
-		return false;
+		return true;
+	}
+	
+	@Override
+	public boolean visit(MethodInvocation node) {
+		if(node.resolveMethodBinding()!=null){
+			ITypeBinding type=node.resolveMethodBinding().getDeclaringClass();
+			if(type.isFromSource()){
+				String expression = type.getQualifiedName()+"."+node.resolveMethodBinding().getName();
+				return addStatement(NodeType.METHOD_INVOCATION, expression);
+			}
+		}
+		return true;		
+	}
+	
+	
+	@Override
+	public boolean visit(SimpleName node) {		
+		if(node.resolveBinding()!=null){
+			if(node.resolveBinding().getKind()==IBinding.VARIABLE){
+				IVariableBinding variable = (IVariableBinding)node.resolveBinding();
+				if(variable.getDeclaringClass()!=null){
+					if(variable.isField() && variable.getDeclaringClass().isFromSource()){
+						String expression = variable.getDeclaringClass().getQualifiedName()+"."+variable.getName();
+						return addStatement(NodeType.FIELD_ACCESS, expression);
+					}	
+				}
+			}
+		}
+		return true;
 	}
 
 	public List<Statement> getStatements() {
