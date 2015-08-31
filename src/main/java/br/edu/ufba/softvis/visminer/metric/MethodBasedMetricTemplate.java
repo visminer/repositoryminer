@@ -1,5 +1,6 @@
 package br.edu.ufba.softvis.visminer.metric;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import br.edu.ufba.softvis.visminer.ast.AST;
@@ -16,7 +17,7 @@ public abstract class MethodBasedMetricTemplate  implements IMetric {
 	protected List<Commit> commits;
 	protected MetricPersistance persistence;
 	protected TypeDeclaration currentType;
-	protected List<FieldDeclaration> currentFields;
+	protected List<FieldDeclaration> currentFields = new ArrayList<FieldDeclaration>();
 
 	@Override
 	public void calculate(List<AST> astList, List<Commit> commits, MetricPersistance persistence){
@@ -42,9 +43,12 @@ public abstract class MethodBasedMetricTemplate  implements IMetric {
 				if(cls.getMethods() == null){
 					continue;
 				}
-
+				
+				if(cls.getFields()!= null)
+					currentFields = cls.getFields();
+				
 				currentType = type;
-				currentFields = cls.getFields();
+				
 				
 				calculate(cls.getMethods());
 			}
