@@ -1,5 +1,6 @@
 package br.edu.ufba.softvis.visminer.analyzer;
 
+import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.LinkedHashMap;
@@ -46,6 +47,7 @@ public class MetricCalculator{
 	private Map<String, IASTGenerator> astGenerators;
 	private List<String> analyzedCommits;
 	private EntityManager entityManager;
+	private List<String> sourceFolders;
 
 	
 	/**
@@ -71,7 +73,7 @@ public class MetricCalculator{
 	
 		createASTGenerators(languages);
 		this.repoSys = repoSys;
-		
+		this.sourceFolders = new ArrayList<String>();
 		this.analyzedCommits = new ArrayList<String>();
 		this.saveAST = new SaveAST(repoDb, entityManager);
 		CommitRetriever commitRetriever = new CommitRetriever();
@@ -118,6 +120,8 @@ public class MetricCalculator{
 			commitASTs.clear();
 			Commit commit = commits.get(i);
 			repoSys.checkoutToTree(commit.getName());
+			sourceFolders = new ArrayList<String>();
+			getSourceFolders(repoSys.getAbsolutePath());
 			
 			for(File file : commit.getCommitedFiles()){
 				
@@ -206,7 +210,7 @@ public class MetricCalculator{
 		 */
 		index = repoSys.getAbsolutePath().length()+1;
 		byte[] data = repoSys.getData(commitName, filePath.substring(index));
-		AST ast = gen.generate(filePath, data, saveAST.getRepositoryDB().getCharset());
+		AST ast = gen.generate(filePath, data, saveAST.getRepositoryDB().getCharset(), sourceFolders.toArray(new String[sourceFolders.size()]));
 		
 		saveAST.save(filePath, fileId, ast);
 		return ast;
@@ -234,5 +238,42 @@ public class MetricCalculator{
 		}
 		
 	}	
+	
+private void getSourceFolders(String repoPath){
+		
+		java.io.File directory = new java.io.File(repoPath);
+
+	    java.io.File[] fList = directory.listFiles(new FileFilter() {
+	        public boolean accept(java.io.File file) {
+	            return file.isDirectory() && !file.isHidden();
+	        }
+	    });
+	    
+	    for (java.io.File file : fList) {	      
+        	if(validateSourceFolder(file)){
+	            sourceFolders.add(file.getAbsolutePath());
+	            getSourceFolders(file.getAbsolutePath());
+        	}	        
+	    }
+	}
+	
+	private boolean validateSourceFolder(java.io.File f){
+		
+		java.io.File[] fList = f.listFiles(new FileFilter() {
+	        public boolean accept(java.io.File file) {
+	            return (file.isDirectory() && !file.isHidden()) || file.getName().endsWith(".java");
+	        }
+	    });
+		
+		for(java.io.File f2 : fList){
+			if(f2.getName().endsWith(".java")){
+				return true;
+			}else 			
+				if(validateSourceFolder(f2)){
+					return true;
+				}		
+		}	
+		return false;
+	}
 	
 }
