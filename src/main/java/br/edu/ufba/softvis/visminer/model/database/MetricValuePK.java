@@ -5,8 +5,6 @@ import java.io.Serializable;
 import javax.persistence.*;
 
 /**
- * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
- * @version 0.9
  * The primary key class for the metric_value database table.
  */
 @Embeddable

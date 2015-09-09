@@ -6,7 +6,7 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 
-import br.edu.ufba.softvis.visminer.analyzer.local.IRepositorySystem;
+import br.edu.ufba.softvis.visminer.analyzer.local.IVersioningSystem;
 import br.edu.ufba.softvis.visminer.model.database.CommitDB;
 import br.edu.ufba.softvis.visminer.model.database.CommitterDB;
 import br.edu.ufba.softvis.visminer.model.database.RepositoryDB;
@@ -16,12 +16,11 @@ import br.edu.ufba.softvis.visminer.persistence.impl.CommitDAOImpl;
 import br.edu.ufba.softvis.visminer.persistence.impl.CommitterDAOImpl;
 
 /**
- * @version 0.9
  * Defines how to save or to increment informations about commits and committers in database.
  */
 public class CommitAndCommitterAnalyzer{
 
-	public List<CommitDB> persist(RepositoryDB repositoryDb, IRepositorySystem repoSys, EntityManager entityManager) {
+	public List<CommitDB> persist(RepositoryDB repositoryDb, IVersioningSystem repoSys, EntityManager entityManager) {
 
 		List<CommitDB> commitsDb = repoSys.getCommits();
 		List<CommitterDB> committersDb = new ArrayList<CommitterDB>();

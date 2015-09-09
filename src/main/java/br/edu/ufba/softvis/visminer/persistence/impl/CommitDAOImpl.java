@@ -10,9 +10,6 @@ import br.edu.ufba.softvis.visminer.persistence.dao.CommitDAO;
 import br.edu.ufba.softvis.visminer.utility.StringUtils;
 
 /**
- * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
- * @version 0.9
- * 
  * Implementation of interface {@link CommitDAO}
  */
 
@@ -39,8 +36,16 @@ public class CommitDAOImpl extends DAOImpl<CommitDB, Integer> implements CommitD
 		return query.getResultList();
 		
 	}
-	
-	
+
+	@Override
+	public List<CommitDB> findNotRefIssue(int repoId) {
+
+		EntityManager em = getEntityManager();
+		TypedQuery<CommitDB> query = em.createNamedQuery("CommitDB.findNotRefIssue", CommitDB.class);
+		query.setParameter("repoId", repoId);
+		return query.getResultList();
+		
+	}
 
 
 	

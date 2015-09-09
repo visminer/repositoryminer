@@ -9,7 +9,7 @@ import java.util.Map.Entry;
 
 import javax.persistence.EntityManager;
 
-import br.edu.ufba.softvis.visminer.analyzer.local.IRepositorySystem;
+import br.edu.ufba.softvis.visminer.analyzer.local.IVersioningSystem;
 import br.edu.ufba.softvis.visminer.annotations.ASTGeneratorAnnotation;
 import br.edu.ufba.softvis.visminer.ast.AST;
 import br.edu.ufba.softvis.visminer.ast.generator.ASTGeneratorFactory;
@@ -42,11 +42,10 @@ public class MetricCalculator{
 	private Map<MetricUid, IMetric> commitMetrics;
 	private Map<MetricUid, IMetric> snapshotMetrics;
 	private SaveAST saveAST;
-	private IRepositorySystem repoSys;
+	private IVersioningSystem repoSys;
 	private Map<String, IASTGenerator> astGenerators;
 	private List<String> analyzedCommits;
 	private EntityManager entityManager;
-
 	
 	/**
 	 * @param metrics
@@ -56,7 +55,7 @@ public class MetricCalculator{
 	 * 
 	 * Calculates the metrics for the target languages.
 	 */
-	public void calculate(List<MetricUid> metrics, IRepositorySystem repoSys, RepositoryDB repoDb, List<LanguageType> languages){
+	public void calculate(List<MetricUid> metrics, IVersioningSystem repoSys, RepositoryDB repoDb, List<LanguageType> languages){
 		
 		entityManager = Database.getInstance().getEntityManager();
 		

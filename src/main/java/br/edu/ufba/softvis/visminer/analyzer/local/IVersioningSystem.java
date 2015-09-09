@@ -11,16 +11,22 @@ import br.edu.ufba.softvis.visminer.model.database.TreeDB;
 
 /**
  * @version 0.9
- * @see GitRepository
+ * @see GitSystem
  * Interface that define what is needed to support a repository.
  */
 
-public interface IRepositorySystem {
+public interface IVersioningSystem {
 
 	/* 
 	 * All methods that return commits should return the committer inside of each commit.
 	 * getCommitedFiles(String commitUid) should return File with FileState.
 	 */
+	
+	
+	/**
+	 * @param repositoryPath
+	 */
+	public void open(String repositoryPath);
 	
 	/**
 	 * @return Repository absolute path.

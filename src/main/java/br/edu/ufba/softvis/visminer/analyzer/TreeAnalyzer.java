@@ -5,7 +5,7 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 
-import br.edu.ufba.softvis.visminer.analyzer.local.IRepositorySystem;
+import br.edu.ufba.softvis.visminer.analyzer.local.IVersioningSystem;
 import br.edu.ufba.softvis.visminer.model.database.CommitDB;
 import br.edu.ufba.softvis.visminer.model.database.RepositoryDB;
 import br.edu.ufba.softvis.visminer.model.database.TreeDB;
@@ -18,7 +18,7 @@ import br.edu.ufba.softvis.visminer.persistence.impl.TreeDAOImpl;
  */
 public class TreeAnalyzer{
 
-	public Void persist(List<CommitDB> commitsDb, RepositoryDB repositoryDb, IRepositorySystem repoSys,
+	public Void persist(List<CommitDB> commitsDb, RepositoryDB repositoryDb, IVersioningSystem repoSys,
 			EntityManager entityManager) {
 
 		TreeDAO treeDao = new TreeDAOImpl();

@@ -8,8 +8,6 @@ import java.util.List;
 
 
 /**
- * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
- * @version 0.9
  * The persistent class for the software_unit_x_commit database table.
  */
 @Entity

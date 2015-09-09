@@ -1,21 +1,37 @@
 package br.edu.ufba.softvis.visminer.model.database;
 
 import java.io.Serializable;
-
-import javax.persistence.*;
-
 import java.util.Date;
 import java.util.List;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
+import br.edu.ufba.softvis.visminer.constant.StatusType;
+
 
 /**
- * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
- * @version 0.9
  * The persistent class for the issue database table.
  */
 @Entity
 @Table(name="issue")
-@NamedQuery(name="IssueDB.findAll", query="SELECT i FROM IssueDB i")
+@NamedQueries({
+	@NamedQuery(name="IssueDB.minFindByRepository", query="SELECT i.number, i.id FROM IssueDB i where i.repository.id = :id")
+})
 public class IssueDB implements Serializable {
 	private static final long serialVersionUID = 1L;
 
@@ -25,7 +41,10 @@ public class IssueDB implements Serializable {
 	@Column(unique=true, nullable=false)
 	private int id;
 
-	@Column(length=45)
+	@Column(length=100, nullable=false)
+	private String creator;
+	
+	@Column(length=100)
 	private String assignee;
 
 	@Temporal(TemporalType.TIMESTAMP)
@@ -35,17 +54,15 @@ public class IssueDB implements Serializable {
 	@Column(name="comments_number", nullable=false)
 	private int commentsNumber;
 
-	@Column(name="create_date", nullable=false, length=45)
-	private String createDate;
-
-	@Lob
-	private String labels;
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name="create_date", nullable=false)
+	private Date createDate;
 
 	@Column(nullable=false)
 	private int number;
 
-	@Column(nullable=false, length=6)
-	private String status;
+	@Column(nullable=false)
+	private int status;
 
 	@Column(nullable=false, length=500)
 	private String title;
@@ -54,6 +71,9 @@ public class IssueDB implements Serializable {
 	@Column(name="update_date")
 	private Date updateDate;
 
+	@Lob
+	private String body; 
+	
 	//bi-directional many-to-one association to MilestoneDB
 	@ManyToOne
 	@JoinColumn(name="milestone_id")
@@ -64,19 +84,12 @@ public class IssueDB implements Serializable {
 	@JoinColumn(name="repository_id", nullable=false)
 	private RepositoryDB repository;
 
-	//bi-directional many-to-many association to CommitDB
-	@ManyToMany
-	@JoinTable(
-		name="issue_reference_commit"
-		, joinColumns={
-			@JoinColumn(name="issue_id", nullable=false)
-			}
-		, inverseJoinColumns={
-			@JoinColumn(name="commit_id", nullable=false)
-			}
-		)
-	private List<CommitDB> commits;
-
+	@OneToMany(mappedBy="issue", cascade=CascadeType.ALL)
+	private List<LabelDB> labels;
+	
+	@OneToMany(mappedBy="issue")
+	private List<CommitReferenceIssueDB> commitReferenceIssues;
+	
 	public IssueDB() {
 	}
 
@@ -91,21 +104,23 @@ public class IssueDB implements Serializable {
 	 * @param status
 	 * @param title
 	 * @param updateDate
+	 * @param body
 	 */
-	public IssueDB(int id, String assignee, Date closedDate,
-			int commentsNumber, String createDate, String labels, int number,
-			String status, String title, Date updateDate) {
+	public IssueDB(int id, String creator, String assignee, Date closedDate,
+			int commentsNumber, Date createDate, int number,
+			StatusType status, String title, Date updateDate, String body) {
 		super();
 		this.id = id;
+		this.creator = creator;
 		this.assignee = assignee;
 		this.closedDate = closedDate;
 		this.commentsNumber = commentsNumber;
 		this.createDate = createDate;
-		this.labels = labels;
 		this.number = number;
-		this.status = status;
+		this.status = status != null ? status.getId() : 0;
 		this.title = title;
 		this.updateDate = updateDate;
+		this.body = body;
 	}
 
 	/**
@@ -120,6 +135,20 @@ public class IssueDB implements Serializable {
 	 */
 	public void setId(int id) {
 		this.id = id;
+	}
+
+	/**
+	 * @return the creator
+	 */
+	public String getCreator() {
+		return creator;
+	}
+
+	/**
+	 * @param creator the creator to set
+	 */
+	public void setCreator(String creator) {
+		this.creator = creator;
 	}
 
 	/**
@@ -167,29 +196,15 @@ public class IssueDB implements Serializable {
 	/**
 	 * @return the createDate
 	 */
-	public String getCreateDate() {
+	public Date getCreateDate() {
 		return createDate;
 	}
 
 	/**
 	 * @param createDate the createDate to set
 	 */
-	public void setCreateDate(String createDate) {
+	public void setCreateDate(Date createDate) {
 		this.createDate = createDate;
-	}
-
-	/**
-	 * @return the labels
-	 */
-	public String getLabels() {
-		return labels;
-	}
-
-	/**
-	 * @param labels the labels to set
-	 */
-	public void setLabels(String labels) {
-		this.labels = labels;
 	}
 
 	/**
@@ -209,15 +224,15 @@ public class IssueDB implements Serializable {
 	/**
 	 * @return the status
 	 */
-	public String getStatus() {
-		return status;
+	public StatusType getStatus() {
+		return StatusType.parse(status);
 	}
 
 	/**
 	 * @param status the status to set
 	 */
-	public void setStatus(String status) {
-		this.status = status;
+	public void setStatus(StatusType status) {
+		this.status = status != null ? status.getId() : 0;
 	}
 
 	/**
@@ -249,6 +264,20 @@ public class IssueDB implements Serializable {
 	}
 
 	/**
+	 * @return the body
+	 */
+	public String getBody() {
+		return body;
+	}
+
+	/**
+	 * @param body the body to set
+	 */
+	public void setBody(String body) {
+		this.body = body;
+	}
+
+	/**
 	 * @return the milestone
 	 */
 	public MilestoneDB getMilestone() {
@@ -277,17 +306,31 @@ public class IssueDB implements Serializable {
 	}
 
 	/**
-	 * @return the commits
+	 * @return the commitReferenceIssues
 	 */
-	public List<CommitDB> getCommits() {
-		return commits;
+	public List<CommitReferenceIssueDB> getCommitReferenceIssues() {
+		return commitReferenceIssues;
 	}
 
 	/**
-	 * @param commits the commits to set
+	 * @param commitReferenceIssues the commitReferenceIssues to set
 	 */
-	public void setCommits(List<CommitDB> commits) {
-		this.commits = commits;
+	public void setCommitReferenceIssues(List<CommitReferenceIssueDB> commitReferenceIssues) {
+		this.commitReferenceIssues = commitReferenceIssues;
+	}
+
+	/**
+	 * @return the labels
+	 */
+	public List<LabelDB> getLabels() {
+		return labels;
+	}
+
+	/**
+	 * @param labels the labels to set
+	 */
+	public void setLabels(List<LabelDB> labels) {
+		this.labels = labels;
 	}
 
 }

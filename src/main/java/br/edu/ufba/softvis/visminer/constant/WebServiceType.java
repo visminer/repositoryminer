@@ -4,13 +4,14 @@ package br.edu.ufba.softvis.visminer.constant;
  * @version 0.9
  * Web repository types.
  */
-public enum WebRepositoryType {
+public enum WebServiceType {
 
+	NONE(0),
 	GITHUB(1);
 	
 	private int id;
 	
-	private WebRepositoryType(int id){
+	private WebServiceType(int id){
 		this.id = id;
 	}
 	
@@ -25,9 +26,9 @@ public enum WebRepositoryType {
 	 * @param id
 	 * @return Web repository type with given id.
 	 */
-	public static WebRepositoryType parse(int id){
+	public static WebServiceType parse(int id){
 		
-		for(WebRepositoryType repoServType : WebRepositoryType.values()){
+		for(WebServiceType repoServType : WebServiceType.values()){
 			if(repoServType.getId() == id){
 				return repoServType;
 			}

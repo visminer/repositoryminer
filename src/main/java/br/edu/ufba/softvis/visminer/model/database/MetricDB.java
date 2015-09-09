@@ -9,13 +9,10 @@ import br.edu.ufba.softvis.visminer.constant.MetricUid;
 import br.edu.ufba.softvis.visminer.model.business.Metric;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 
 /**
- * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
- * @version 0.9
  * The persistent class for the metric database table.
  */
 @Entity
@@ -58,11 +55,11 @@ public class MetricDB implements Serializable {
 	public MetricDB(MetricUid id, String acronym, String description, String name,
 			MetricType type) {
 		super();
-		this.id = id.getId();
+		this.id = id != null ? id.getId() : 0;
 		this.acronym = acronym;
 		this.description = description;
 		this.name = name;
-		this.type = type.getId();
+		this.type = type != null ? type.getId() : 0;
 	}
 
 	/**
@@ -76,7 +73,7 @@ public class MetricDB implements Serializable {
 	 * @param id the id to set
 	 */
 	public void setId(MetricUid id) {
-		this.id = id.getId();
+		this.id = id != null ? id.getId() : 0;
 	}
 
 	/**
@@ -132,7 +129,7 @@ public class MetricDB implements Serializable {
 	 * @param type the type to set
 	 */
 	public void setType(MetricType type) {
-		this.type = type.getId();
+		this.type = type != null ? type.getId() : 0;
 	}
 
 	/**

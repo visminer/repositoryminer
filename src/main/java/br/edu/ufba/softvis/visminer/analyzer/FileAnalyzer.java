@@ -5,7 +5,7 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 
-import br.edu.ufba.softvis.visminer.analyzer.local.IRepositorySystem;
+import br.edu.ufba.softvis.visminer.analyzer.local.IVersioningSystem;
 import br.edu.ufba.softvis.visminer.model.database.CommitDB;
 import br.edu.ufba.softvis.visminer.model.database.FileDB;
 import br.edu.ufba.softvis.visminer.model.database.FileXCommitDB;
@@ -21,7 +21,7 @@ import br.edu.ufba.softvis.visminer.persistence.impl.FileXCommitDAOImpl;
 
 public class FileAnalyzer{
 
-	public void persist(List<CommitDB> commitsDb, IRepositorySystem repoSys, EntityManager entityManager) {
+	public void persist(List<CommitDB> commitsDb, IVersioningSystem repoSys, EntityManager entityManager) {
 
 		List<FileDB> filesDb = new ArrayList<FileDB>();
 		List<FileXCommitDB> filesXCommitsDb = new ArrayList<FileXCommitDB>();

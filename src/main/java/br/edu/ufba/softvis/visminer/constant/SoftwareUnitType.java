@@ -6,6 +6,7 @@ package br.edu.ufba.softvis.visminer.constant;
  */
 public enum SoftwareUnitType {
 
+	NONE(0),
 	PROJECT(1),
 	PACKAGE(2),
 	FILE(3),

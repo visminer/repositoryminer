@@ -1,6 +1,8 @@
 package br.edu.ufba.softvis.visminer.metric;
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import br.edu.ufba.softvis.visminer.annotations.MetricAnnotation;
 import br.edu.ufba.softvis.visminer.ast.AST;
@@ -20,6 +22,12 @@ import br.edu.ufba.softvis.visminer.persistence.MetricPersistance;
 	)
 public class SLOCMetric implements IMetric{
 
+	private Pattern pattern;
+	
+	public SLOCMetric(){
+		pattern = Pattern.compile("(\r\n)|(\r)|(\n)");
+	}
+	
 	@Override
 	public void calculate(List<AST> astList, List<Commit> commits, MetricPersistance persistence){
 		
@@ -33,21 +41,14 @@ public class SLOCMetric implements IMetric{
 		if(source == null || source.length() == 0)
 			return 0;
 		
-		int len = source.length();
-		int lines = 1;
+		Matcher m = pattern.matcher(source);
 		
-		for(int i = 0; i < len; i++){
-			char c = source.charAt(i);
-			if(c == '\r'){
-				lines++;
-				if(i+1 < len && source.charAt(i+1) == '\n')
-					i++;
-			}else if(c == '\n'){
-				lines++;
-			}
-		}
+		int i = 0;
 		
-		return lines;
+		while(m.find())
+			i++;
+		
+		return i;
 		
 	}
 

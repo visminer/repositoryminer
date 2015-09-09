@@ -4,19 +4,23 @@ import java.io.Serializable;
 
 import javax.persistence.*;
 
+import br.edu.ufba.softvis.visminer.constant.StatusType;
+
 import java.util.Date;
 import java.util.List;
 
 
 /**
- * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
- * @version 0.9
  * The persistent class for the milestone database table.
  */
 @Entity
 @Table(name="milestone")
-@NamedQuery(name="MilestoneDB.findAll", query="SELECT m FROM MilestoneDB m")
+@NamedQueries({
+	@NamedQuery(name="MilestoneDB.minFindByRepository", query="SELECT m.number, m.id FROM MilestoneDB m WHERE m.repository.id = :id"),
+	@NamedQuery(name="MilestoneDB.deleteByRepository", query="DELETE FROM MilestoneDB m WHERE m.repository.id = :id")
+})
 public class MilestoneDB implements Serializable {
+	
 	private static final long serialVersionUID = 1L;
 
 	@Id
@@ -48,8 +52,8 @@ public class MilestoneDB implements Serializable {
 	@Column(name="opened_issues", nullable=false)
 	private int openedIssues;
 
-	@Column(nullable=false, length=6)
-	private String state;
+	@Column(nullable=false)
+	private int status;
 
 	@Column(nullable=false, length=500)
 	private String title;
@@ -80,7 +84,7 @@ public class MilestoneDB implements Serializable {
 	 */
 	public MilestoneDB(int id, int closedIssues, Date createDate,
 			String creator, String description, Date dueDate, int number,
-			int openedIssues, String state, String title) {
+			int openedIssues, StatusType status, String title) {
 		super();
 		this.id = id;
 		this.closedIssues = closedIssues;
@@ -90,7 +94,7 @@ public class MilestoneDB implements Serializable {
 		this.dueDate = dueDate;
 		this.number = number;
 		this.openedIssues = openedIssues;
-		this.state = state;
+		this.status = status != null ? status.getId() : 0;
 		this.title = title;
 	}
 
@@ -207,17 +211,17 @@ public class MilestoneDB implements Serializable {
 	}
 
 	/**
-	 * @return the state
+	 * @return the status
 	 */
-	public String getState() {
-		return state;
+	public StatusType getStatus() {
+		return StatusType.parse(status);
 	}
 
 	/**
-	 * @param state the state to set
+	 * @param status the status to set
 	 */
-	public void setState(String state) {
-		this.state = state;
+	public void setStatus(StatusType status) {
+		this.status = status != null ? status.getId() : 0;
 	}
 
 	/**
