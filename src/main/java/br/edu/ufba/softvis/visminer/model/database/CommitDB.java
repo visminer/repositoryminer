@@ -26,17 +26,18 @@ import javax.persistence.TemporalType;
 import br.edu.ufba.softvis.visminer.model.business.Commit;
 
 /**
- * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
- * @version 0.9 The persistent class for the commit database table.
+ * The persistent class for the commit database table.
  */
 @Entity
 @Table(name = "commit")
 @NamedQueries({ 
-	@NamedQuery(name = "CommitDB.findByTree", query = "select c from TreeDB t join t.commits c where t.id = :id order by c.date asc"),
-	@NamedQuery(name = "CommitDB.findByRepository", query = "select distinct(c) from TreeDB t join t.commits c where "
-			+ " t.repository.uid = :uid order by c.date asc")
+	@NamedQuery(name = "CommitDB.findByTree", query = "select c from CommitDB c join c.trees t where t.id = :id order by c.date asc"),
+	@NamedQuery(name = "CommitDB.findByRepository", query = "select distinct(c) from CommitDB c join c.trees t where "
+			+ " t.repository.uid = :uid order by c.date asc"),
+	@NamedQuery(name = "CommitDB.findNotRefIssue", query = "select distinct(c) from TreeDB t join t.commits c left join "
+			+ "c.commitReferenceIssues cri where t.repository.id = :repoId and cri.id.commitId is null")
 })
-public class CommitDB implements Serializable {
+public class CommitDB implements Serializable{
 	private static final long serialVersionUID = 1L;
 
 	@Id
@@ -69,12 +70,13 @@ public class CommitDB implements Serializable {
 	private List<FileXCommitDB> fileXCommits;
 
 	// bi-directional many-to-many association to IssueDB
-	@ManyToMany(mappedBy = "commits")
-	private List<IssueDB> issues;
-
+	@OneToMany(mappedBy="commit")
+	private List<CommitReferenceIssueDB> commitReferenceIssues;
+	
 	// bi-directional many-to-many association to SoftwareUnitDB
 	@ManyToMany
-	@JoinTable(name = "software_unit_x_commit", joinColumns = { @JoinColumn(name = "commit_id", nullable = false) }, inverseJoinColumns = { @JoinColumn(name = "software_unit_id", nullable = false) })
+	@JoinTable(name = "software_unit_x_commit", joinColumns = { @JoinColumn(name = "commit_id", nullable = false) },
+		inverseJoinColumns = { @JoinColumn(name = "software_unit_id", nullable = false) })
 	private List<SoftwareUnitDB> softwareUnits;
 
 	public CommitDB() {
@@ -200,18 +202,17 @@ public class CommitDB implements Serializable {
 	}
 
 	/**
-	 * @return the issues
+	 * @return the commitReferenceIssues
 	 */
-	public List<IssueDB> getIssues() {
-		return issues;
+	public List<CommitReferenceIssueDB> getCommitReferenceIssues() {
+		return commitReferenceIssues;
 	}
 
 	/**
-	 * @param issues
-	 *            the issues to set
+	 * @param commitReferenceIssues the commitReferenceIssues to set
 	 */
-	public void setIssues(List<IssueDB> issues) {
-		this.issues = issues;
+	public void setCommitReferenceIssues(List<CommitReferenceIssueDB> commitReferenceIssues) {
+		this.commitReferenceIssues = commitReferenceIssues;
 	}
 
 	/**

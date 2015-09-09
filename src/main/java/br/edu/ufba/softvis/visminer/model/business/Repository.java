@@ -2,12 +2,10 @@ package br.edu.ufba.softvis.visminer.model.business;
 
 import java.util.List;
 
-import br.edu.ufba.softvis.visminer.constant.WebRepositoryType;
-import br.edu.ufba.softvis.visminer.constant.RepositoryType;
+import br.edu.ufba.softvis.visminer.constant.WebServiceType;
+import br.edu.ufba.softvis.visminer.constant.VersioningSystemType;
 
 /**
- * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
- * @version 0.9
  * User friendly repository bean class.
  * This class will be used for user interface.
  */
@@ -18,9 +16,9 @@ public class Repository {
 	private String description;
 	private String name;
 	private String path;
-	private String remoteUrl;
-	private RepositoryType type;
-	private WebRepositoryType serviceType;
+	private String owner;
+	private VersioningSystemType type;
+	private WebServiceType serviceType;
 	private String uid;
 	private String charset;
 	
@@ -35,21 +33,21 @@ public class Repository {
 	 * @param description
 	 * @param name
 	 * @param path
-	 * @param remoteUrl
+	 * @param owner
 	 * @param type
 	 * @param serviceType
 	 * @param uid
 	 * @param charset
 	 */
 	public Repository(int id, String description, String name, String path,
-			String remoteUrl, RepositoryType type,
-			WebRepositoryType serviceType, String uid, String charset) {
+			String owner, VersioningSystemType type,
+			WebServiceType serviceType, String uid, String charset) {
 		super();
 		this.id = id;
 		this.description = description;
 		this.name = name;
 		this.path = path;
-		this.remoteUrl = remoteUrl;
+		this.owner = owner;
 		this.type = type;
 		this.serviceType = serviceType;
 		this.uid = uid;
@@ -113,44 +111,44 @@ public class Repository {
 	}
 
 	/**
-	 * @return the remoteUrl
+	 * @return the owner
 	 */
-	public String getRemoteUrl() {
-		return remoteUrl;
+	public String getOwner() {
+		return owner;
 	}
 
 	/**
-	 * @param remoteUrl the remoteUrl to set
+	 * @param owner the owner to set
 	 */
-	public void setRemoteUrl(String remoteUrl) {
-		this.remoteUrl = remoteUrl;
+	public void setOwner(String owner) {
+		this.owner = owner;
 	}
 
 	/**
 	 * @return the type
 	 */
-	public RepositoryType getType() {
+	public VersioningSystemType getType() {
 		return type;
 	}
 
 	/**
 	 * @param type the type to set
 	 */
-	public void setType(RepositoryType type) {
+	public void setType(VersioningSystemType type) {
 		this.type = type;
 	}
 
 	/**
 	 * @return the serviceType
 	 */
-	public WebRepositoryType getServiceType() {
+	public WebServiceType getServiceType() {
 		return serviceType;
 	}
 
 	/**
 	 * @param serviceType the serviceType to set
 	 */
-	public void setServiceType(WebRepositoryType serviceType) {
+	public void setServiceType(WebServiceType serviceType) {
 		this.serviceType = serviceType;
 	}
 

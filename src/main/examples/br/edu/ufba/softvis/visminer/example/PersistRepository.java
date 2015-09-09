@@ -1,42 +1,49 @@
 package br.edu.ufba.softvis.visminer.example;
 
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
+
+import javax.persistence.EntityManager;
 
 import br.edu.ufba.softvis.visminer.constant.LanguageType;
 import br.edu.ufba.softvis.visminer.constant.MetricUid;
-import br.edu.ufba.softvis.visminer.constant.RepositoryType;
-import br.edu.ufba.softvis.visminer.constant.WebRepositoryType;
+import br.edu.ufba.softvis.visminer.constant.VersioningSystemType;
+import br.edu.ufba.softvis.visminer.constant.WebServiceType;
 import br.edu.ufba.softvis.visminer.main.VisMiner;
 import br.edu.ufba.softvis.visminer.model.business.Repository;
+import br.edu.ufba.softvis.visminer.model.database.RepositoryDB;
+import br.edu.ufba.softvis.visminer.persistence.Database;
+import br.edu.ufba.softvis.visminer.persistence.dao.RepositoryDAO;
+import br.edu.ufba.softvis.visminer.persistence.impl.RepositoryDAOImpl;
 
 //This example show how to persist a repository
 public class PersistRepository {
 
-	private String repositoryDescription = "Test";
-	private String repositoryName = "Test";
-	private String repositoryPath = "/home/felipe/git/jgit-cookbook";
-	private RepositoryType repositoryType = RepositoryType.GIT;
-	private String repositoryRemoteUrl = "https://github.com/centic9/jgit-cookbook";
-	private WebRepositoryType repositoryServiceType = WebRepositoryType.GITHUB;
+	private String repositoryDescription = "Teste";
+	private String repositoryName = "Teste";
+	private String repositoryOwner = "felipegustavo";
+	private String repositoryPath = "/home/felipe/Teste/.git";
+	private VersioningSystemType repositoryType = VersioningSystemType.GIT;
+	private WebServiceType repositoryServiceType = WebServiceType.GITHUB;
 	private String charset = "UTF-8";
 	private List<MetricUid> metrics = null;
 	private List<LanguageType> languages = null;
 	
-	public static void main(String[] args) {
-
+	public static void main(String[] args){
 		VisMiner vis = new VisMiner();
 		vis.setDBConfig(DatabaseConfig.getDBConfig());
 		new PersistRepository().persistRepository();
-		
 	}
 
 	public void persistRepository(){
 		
 		Repository repository = new Repository(0, repositoryDescription, repositoryName, repositoryPath,
-				repositoryRemoteUrl, repositoryType, repositoryServiceType, "", charset);
+				repositoryOwner, repositoryType, repositoryServiceType, "", charset);
 		
 		VisMiner vis = new VisMiner();
-		vis.persistRepository(repository, metrics, languages);
+		
+			vis.connectWithWebRepository("felipegustavo", "acesso123info", repositoryPath.replace("/.git", ""));
 		
 	}
 
@@ -64,27 +71,27 @@ public class PersistRepository {
 		this.repositoryPath = repositoryPath;
 	}
 
-	public RepositoryType getRepositoryType() {
+	public VersioningSystemType getRepositoryType() {
 		return repositoryType;
 	}
 
-	public void setRepositoryType(RepositoryType repositoryType) {
+	public void setRepositoryType(VersioningSystemType repositoryType) {
 		this.repositoryType = repositoryType;
 	}
 
-	public String getRepositoryRemoteUrl() {
-		return repositoryRemoteUrl;
+	public String getRepositoryOwner() {
+		return repositoryOwner;
 	}
 
-	public void setRepositoryRemoteUrl(String repositoryRemoteUrl) {
-		this.repositoryRemoteUrl = repositoryRemoteUrl;
+	public void setRepositoryOwner(String repositoryOwner) {
+		this.repositoryOwner = repositoryOwner;
 	}
 
-	public WebRepositoryType getRepositoryServiceType() {
+	public WebServiceType getRepositoryServiceType() {
 		return repositoryServiceType;
 	}
 
-	public void setRepositoryServiceType(WebRepositoryType repositoryServiceType) {
+	public void setRepositoryServiceType(WebServiceType repositoryServiceType) {
 		this.repositoryServiceType = repositoryServiceType;
 	}
 

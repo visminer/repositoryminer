@@ -6,7 +6,9 @@ package br.edu.ufba.softvis.visminer.constant;
  */
 public enum MetricType {
 
-	COMMIT(1), SNAPSHOT(2);
+	NONE(0),
+	COMMIT(1),
+	SNAPSHOT(2);
 	
 	private int id;
 	

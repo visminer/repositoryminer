@@ -1,10 +1,12 @@
 package br.edu.ufba.softvis.visminer.persistence.impl;
 
 import java.lang.reflect.ParameterizedType;
-import java.util.Collection;
+import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
 import javax.persistence.NoResultException;
+import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -13,9 +15,6 @@ import javax.persistence.criteria.Root;
 import br.edu.ufba.softvis.visminer.persistence.dao.DAO;
 
 /**
- * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
- * @version 0.9
- * 
  * Implementation of interface {@link DAO}
  */
 
@@ -33,102 +32,162 @@ public class DAOImpl<E, K> implements DAO<E, K>{
 	}
 	
 	@Override
-	public void batchSave(Collection<E> objects) {
+	public void batchSave(List<E> objects) {
 
-		entityManager.getTransaction().begin();
-		int i = 0;
-		for(E object : objects){
-			entityManager.persist(object);
-			if((i % 1000) == 0){
-				entityManager.getTransaction().commit();
-				entityManager.clear();
-				entityManager.getTransaction().begin();
-			}
-			i++;
-		}
-		entityManager.getTransaction().commit();
-		entityManager.clear();
+		EntityTransaction ts = entityManager.getTransaction();
+		ts.begin();
 		
-	}
-
-	@Override
-	public void batchMerge(Collection<E> objects) {
-
-		entityManager.getTransaction().begin();
-		int i = 0;
-		for(E object : objects){			
-			entityManager.merge(object);
+		for(int i = 0; i < objects.size(); i++){
+			
+			entityManager.persist(objects.get(i));
+			
 			if((i % 1000) == 0){
-				entityManager.getTransaction().commit();
+				ts.commit();
 				entityManager.clear();
-				entityManager.getTransaction().begin();
+				ts.begin();
 			}
-			i++;
+			
 		}
 		
-		entityManager.getTransaction().commit();
+		ts.commit();
 		entityManager.clear();
 		
-	}
-
-	@Override
-	public void batchDelete(Collection<E> objects) {
-		
-		entityManager.getTransaction().begin();
-		int i = 0;
-		for(E object : objects){			
-			entityManager.remove(object);
-			if((i % 1000) == 0){
-				entityManager.getTransaction().commit();
-				entityManager.clear();
-				entityManager.getTransaction().begin();
-			}
-			i++;
-		}
-		
-		entityManager.getTransaction().commit();
-		entityManager.clear();
-		
-	}
-
-	@Override
-	public void save(E object) {
-		entityManager.getTransaction().begin();
-		entityManager.persist(object);
-		entityManager.getTransaction().commit();
-		entityManager.clear();
-	}
-
-	@Override
-	public E merge(E object) {
-		entityManager.getTransaction().begin();
-		E o = entityManager.merge(object);
-		entityManager.getTransaction().commit();
-		entityManager.clear();
-		return o;
-	}
-
-	@Override
-	public void delete(E object) {
-		entityManager.getTransaction().begin();
-		entityManager.remove(object);
-		entityManager.getTransaction().commit();
-		entityManager.clear();
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
+	public void batchMerge(List<E> objects) {
+
+		EntityTransaction ts = entityManager.getTransaction();
+		ts.begin();
+		
+		for(int i = 0; i < objects.size(); i++){
+			
+			Object o = objects.get(i);
+			objects.set(i, (E) entityManager.merge(o));
+			
+			if((i % 1000) == 0){
+				ts.commit();
+				entityManager.clear();
+				ts.begin();
+			}
+			
+		}
+		
+		ts.commit();
+		entityManager.clear();
+		
+	}
+
+	@Override
+	public void batchDelete(List<E> objects) {
+		
+		EntityTransaction ts = entityManager.getTransaction();
+		ts.begin();
+		
+		for(int i = 0; i < objects.size(); i++){
+			
+			entityManager.remove(objects.get(i));
+			
+			if((i % 1000) == 0){
+				ts.commit();
+				entityManager.clear();
+				ts.begin();
+			}
+			
+		}
+		
+		ts.commit();
+		entityManager.clear();
+		
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public void batchDelete2(List<K> ids){
+		
+		EntityTransaction ts = entityManager.getTransaction();
+		ts.begin();
+		
+		for(int i = 0; i < ids.size(); i++){
+			
+			Object o = entityManager.getReference(entityClass, ids.get(i));
+			entityManager.remove(o);
+			
+			if((i % 1000) == 0){
+				ts.commit();
+				entityManager.clear();
+				ts.begin();
+			}
+			
+		}
+		
+		ts.commit();
+		entityManager.clear();
+		
+	}
+	
+	@Override
+	public void save(E object) {
+		
+		EntityTransaction ts = entityManager.getTransaction();
+		ts.begin();
+		entityManager.persist(object);
+		ts.commit();
+		entityManager.clear();
+		
+	}
+
+	@Override
+	public E merge(E object) {
+		
+		EntityTransaction ts = entityManager.getTransaction();
+		ts.begin();
+		E o = entityManager.merge(object);
+		ts.commit();
+		entityManager.clear();
+		return o;
+		
+	}
+
+	@Override
+	public void delete(E object) {
+		
+		EntityTransaction ts = entityManager.getTransaction();
+		ts.begin();
+		entityManager.remove(object);
+		ts.commit();
+		entityManager.clear();
+		
+	}
+
+	@SuppressWarnings("unchecked")
+	public void delete2(K id){
+		
+		EntityTransaction ts = entityManager.getTransaction();
+		ts.begin();
+		Object o = entityManager.getReference(entityClass, id);
+		entityManager.remove(o);
+		ts.commit();
+		entityManager.clear();
+		
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
 	public E find(K id) {
+		
 		try{
 			return (E) entityManager.find(entityClass, id);
 		}catch(NoResultException e){
 			return null;
 		}
+		
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Collection<E> findAll() {
+	public List<E> findAll() {
 		
 		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
 		CriteriaQuery<E> q = cb.createQuery(entityClass);
@@ -139,6 +198,17 @@ public class DAOImpl<E, K> implements DAO<E, K>{
 		
 	}
 
+	@Override
+	public Object getSingleResult(Query query){
+		
+		try{
+			return query.getSingleResult();
+		} catch(NoResultException e){
+			return null;
+		}
+		
+	}
+	
 	@Override
 	public void setEntityManager(EntityManager entityManager) {
 		this.entityManager = entityManager;

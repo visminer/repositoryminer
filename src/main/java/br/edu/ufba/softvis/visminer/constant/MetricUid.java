@@ -6,6 +6,7 @@ package br.edu.ufba.softvis.visminer.constant;
  */
 public enum MetricUid {
 
+	NONE(0),
 	CC(1),
 	SLOC(2),
 	NOCAI(3),

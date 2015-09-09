@@ -22,8 +22,7 @@ import br.edu.ufba.softvis.visminer.constant.SoftwareUnitType;
 import br.edu.ufba.softvis.visminer.model.business.SoftwareUnit;
 
 /**
- * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
- * @version 0.9 The persistent class for the software_unit database table.
+ * The persistent class for the software_unit database table.
  */
 @Entity
 @Table(name = "software_unit")
@@ -86,7 +85,7 @@ public class SoftwareUnitDB implements Serializable {
 		super();
 		this.id = id;
 		this.name = name;
-		this.type = type.getId();
+		this.type = type != null ? type.getId() : 0;
 		this.uid = uid;
 	}
 
@@ -132,7 +131,7 @@ public class SoftwareUnitDB implements Serializable {
 	 *            the type to set
 	 */
 	public void setType(SoftwareUnitType type) {
-		this.type = type.getId();
+		this.type = type != null ? type.getId() : 0;
 	}
 
 	/**

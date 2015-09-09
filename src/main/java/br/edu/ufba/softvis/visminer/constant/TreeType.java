@@ -6,7 +6,9 @@ package br.edu.ufba.softvis.visminer.constant;
  */
 public enum TreeType {
 
-	BRANCH(1), TAG(2);
+	NONE(0),
+	BRANCH(1),
+	TAG(2);
 
 	private int id;
 	

@@ -16,9 +16,6 @@ public class ListAllCommitsFromRepository {
 		visminer.setDBConfig(DatabaseConfig.getDBConfig());
 		
 		PersistRepository persistRepo = new PersistRepository();
-		if(!visminer.isRepositoryPersisted(persistRepo.getRepositoryPath())){
-			persistRepo.persistRepository();
-		}
 		
 		CommitRetriever retriever = new CommitRetriever();
 		List<Commit> commits = retriever.retrieveByRepository(persistRepo.getRepositoryPath());

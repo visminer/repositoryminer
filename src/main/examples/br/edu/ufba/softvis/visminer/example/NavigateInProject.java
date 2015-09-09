@@ -23,9 +23,6 @@ public class NavigateInProject {
 		NavigateInProject main = new NavigateInProject();
 		
 		PersistRepository persistRepo = new PersistRepository();
-		if(!visminer.isRepositoryPersisted(persistRepo.getRepositoryPath())){
-			persistRepo.persistRepository();
-		}
 		
 		RepositoryRetriever retriever = new RepositoryRetriever();
 		main.repository = retriever.retrieveByPath(persistRepo.getRepositoryPath());

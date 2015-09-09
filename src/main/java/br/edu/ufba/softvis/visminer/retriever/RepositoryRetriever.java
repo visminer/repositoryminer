@@ -121,14 +121,27 @@ public class RepositoryRetriever extends Retriever {
 		super.createEntityManager();
 		super.shareEntityManager(dao);
 		
-		String uid = StringUtils.sha1(path.replace("\\", "/"));
-		RepositoryDB repoDB = dao.findByUid(uid);
+		RepositoryDB repoDB = dao.findByPath(path);
 		if (repoDB != null) {
 			repository = addTreesAndCommitters(repoDB.toBusiness());
 		}
 
 		super.closeEntityManager();
 		return repository;
+	}
+	
+	public boolean checkIfExists(String repositoryPath){
+
+		RepositoryDAO dao = new RepositoryDAOImpl();
+
+		super.createEntityManager();
+		super.shareEntityManager(dao);
+
+		boolean result = dao.hasRepository(repositoryPath);
+
+		super.closeEntityManager();
+		return result;
+
 	}
 
 }

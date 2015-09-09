@@ -1,12 +1,13 @@
 package br.edu.ufba.softvis.visminer.analyzer;
 
+import java.io.IOException;
 import java.util.List;
 
 import javax.management.openmbean.KeyAlreadyExistsException;
 import javax.persistence.EntityManager;
 
-import br.edu.ufba.softvis.visminer.analyzer.local.IRepositorySystem;
-import br.edu.ufba.softvis.visminer.analyzer.local.SupportedRepository;
+import br.edu.ufba.softvis.visminer.analyzer.local.IVersioningSystem;
+import br.edu.ufba.softvis.visminer.analyzer.local.VersioningSystemFactory;
 import br.edu.ufba.softvis.visminer.constant.LanguageType;
 import br.edu.ufba.softvis.visminer.constant.MetricUid;
 import br.edu.ufba.softvis.visminer.constant.SoftwareUnitType;
@@ -27,13 +28,16 @@ import br.edu.ufba.softvis.visminer.utility.StringUtils;
  */
 public class RepositoryAnalyzer{
 
+	private static final String EXCEPTION_MESSAGE = "Repository already exists in database";
+	
 	/*
 	 * This class is responsible for join all the analyzers and make the
 	 * repository analyzis.
 	*/
 	public void persist(Repository repoBusi, List<MetricUid> metrics, List<LanguageType> languages) {
 		
-		IRepositorySystem repoSys = SupportedRepository.getRepository(repoBusi.getPath(), repoBusi.getType());
+		IVersioningSystem repoSys = VersioningSystemFactory.getRepository(repoBusi.getType());
+		repoSys.open(repoBusi.getPath());
 		
 		EntityManager entityManager = Database.getInstance().getEntityManager();
 		
@@ -44,14 +48,14 @@ public class RepositoryAnalyzer{
 		softwareUnitDao.setEntityManager(entityManager);
 		
 		String path = repoSys.getAbsolutePath();
-		String uid = StringUtils.sha1(path);
-		
-		if(repositoryDao.findByUid(uid) != null){
-			throw new KeyAlreadyExistsException("Repository already exists in database");
+		if(repositoryDao.hasRepository(path)){
+			throw new KeyAlreadyExistsException(EXCEPTION_MESSAGE);
 		}
 		
-		RepositoryDB repositoryDb = new RepositoryDB(0, repoBusi.getDescription(), repoBusi.getName(),
-				path, repoBusi.getType(), uid, repoBusi.getCharset());
+		String uid = StringUtils.sha1(path);
+		RepositoryDB repositoryDb = new RepositoryDB(0, repoBusi.getDescription(),
+				repoBusi.getName(), repoBusi.getOwner(), path, repoBusi.getType(),
+				repoBusi.getServiceType(), uid, repoBusi.getCharset());
 		
 		if(repoBusi.getCharset() == null){
 			repositoryDb.setCharset("UTF-8"); //UTF-8 is used as default charset
@@ -84,19 +88,21 @@ public class RepositoryAnalyzer{
 	 * @param repositoryPath
 	 * @param metrics
 	 * Does not analyze the repository, only calculates a list of metrics from beginning of the repository.
+	 * @throws IOException 
 	 */
-	public void recalculateMetrics(String repositoryPath, List<MetricUid> metrics) {
+	public void recalculateMetrics(String repositoryPath, List<MetricUid> metrics){
 		
 		EntityManager entityManager = Database.getInstance().getEntityManager();
 		RepositoryDAO repositoryDao = new RepositoryDAOImpl();
 		repositoryDao.setEntityManager(entityManager);
 		
-		RepositoryDB repoDb = repositoryDao.findByUid(StringUtils.sha1(repositoryPath));
+		RepositoryDB repoDb = repositoryDao.findByPath(repositoryPath);
 		if(repoDb == null || metrics == null || metrics.size() == 0){
 			return;
 		}
 		
-		IRepositorySystem repoSys = SupportedRepository.getRepository(repoDb.getPath(), repoDb.getType());
+		IVersioningSystem repoSys = VersioningSystemFactory.getRepository(repoDb.getType());
+		repoSys.open(repositoryPath);
 		
 		//MetricCalculator.calculate(metrics, repoSys, repoDb, entityManager);
 		

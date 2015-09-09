@@ -79,7 +79,7 @@ public class TreeDB implements Serializable {
 		this.fullName = fullName;
 		this.lastUpdate = lastUpdate;
 		this.name = name;
-		this.type = type.getId();
+		this.type = type != null ? type.getId() : 0;
 	}
 
 	/**
@@ -154,7 +154,7 @@ public class TreeDB implements Serializable {
 	 *            the type to set
 	 */
 	public void setType(TreeType type) {
-		this.type = type.getId();
+		this.type = type != null ? type.getId() : 0;
 	}
 
 	/**

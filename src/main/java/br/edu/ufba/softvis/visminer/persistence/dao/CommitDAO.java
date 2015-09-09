@@ -5,11 +5,7 @@ import java.util.List;
 import br.edu.ufba.softvis.visminer.model.database.CommitDB;
 
 /**
- * 
- * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
- * @version 0.9
  * Commit table DAO interface.
- * 
  */
 public interface CommitDAO extends DAO<CommitDB, Integer> {
 
@@ -25,5 +21,11 @@ public interface CommitDAO extends DAO<CommitDB, Integer> {
 	 * @return All commits from a given repository.
 	 */
 	public List<CommitDB> findByRepository(String repositoryPath);
+	
+	/**
+	 * @param repoId
+	 * @return Commits that does not reference issues.
+	 */
+	public List<CommitDB> findNotRefIssue(int repoId);
 	
 }
