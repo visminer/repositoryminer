@@ -105,6 +105,35 @@ public class CPPASTVisitor extends ASTVisitor {
 
 		return parameters;
 	}
+	
+	/**
+	 * From a given Method declaration, it extracts all of its modifiers.
+	 * 
+	 * @param funcDeclr
+	 *            enclosure for CPP method declaration
+	 * @return all of method's modifiers
+	 */
+	private List<String> extractModifiers(
+			ICPPASTFunctionDeclarator funcDecl) {
+		
+		List<String> modifiers = new ArrayList<String>();
+		
+		if(funcDecl.isConst())
+			modifiers.add("const");
+		if(funcDecl.isFinal())
+			modifiers.add("final");
+		if(funcDecl.isOverride())
+			modifiers.add("override");
+		if(funcDecl.isMutable())
+			modifiers.add("mutable");
+		if(funcDecl.isPureVirtual())
+			modifiers.add("purevirtual");
+		if(funcDecl.isVolatile())
+			modifiers.add("volatile");
+
+		return modifiers;
+	}
+
 
 	/**
 	 * It extracts a method declaration from the CDT enclosure for CPP methods.
@@ -117,13 +146,7 @@ public class CPPASTVisitor extends ASTVisitor {
 			ICPPASTFunctionDeclarator funcDecl, IASTDeclSpecifier funcSpec) {
 		MethodDeclaration currMethod = new MethodDeclaration();
 		currMethod.setName(funcDecl.getName().toString());
-		// FIXME it seems way too much modifiers are being added...
-		currMethod.setModifier(((funcDecl.isConst() ? "const " : "")
-				+ (funcDecl.isFinal() ? "final " : "")
-				+ (funcDecl.isOverride() ? "override " : "")
-				+ (funcDecl.isMutable() ? "mutable " : "")
-				+ (funcDecl.isPureVirtual() ? "purevirtual " : "") + (funcDecl
-				.isVolatile() ? "volatile " : "")).trim());
+		currMethod.setModifiers(extractModifiers(funcDecl));
 		currMethod.setParameters(extractParameters(funcDecl));
 		currMethod.setStatements(null);
 		currMethod.setThrownsExceptions(null);

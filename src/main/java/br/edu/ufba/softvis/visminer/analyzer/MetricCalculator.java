@@ -1,5 +1,6 @@
 package br.edu.ufba.softvis.visminer.analyzer;
 
+import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.LinkedHashMap;
@@ -46,7 +47,8 @@ public class MetricCalculator{
 	private Map<String, IASTGenerator> astGenerators;
 	private List<String> analyzedCommits;
 	private EntityManager entityManager;
-	
+	private List<String> sourceFolders;
+
 	/**
 	 * @param metrics
 	 * @param repoSys
@@ -56,70 +58,72 @@ public class MetricCalculator{
 	 * Calculates the metrics for the target languages.
 	 */
 	public void calculate(List<MetricUid> metrics, IVersioningSystem repoSys, RepositoryDB repoDb, List<LanguageType> languages){
-		
+
 		entityManager = Database.getInstance().getEntityManager();
-		
+
 		TreeDAO treeDao = new TreeDAOImpl();
 		treeDao.setEntityManager(entityManager);
 		List<TreeDB> treesDb = treeDao.findByRepository(repoDb.getId());
-		
+
 		if(treesDb == null){
 			entityManager.close();
 			return;
 		}
-	
+
 		createASTGenerators(languages);
 		this.repoSys = repoSys;
-		
+		this.sourceFolders = new ArrayList<String>();
 		this.analyzedCommits = new ArrayList<String>();
 		this.saveAST = new SaveAST(repoDb, entityManager);
 		CommitRetriever commitRetriever = new CommitRetriever();
-		
+
 		this.commitMetrics = new LinkedHashMap<MetricUid, IMetric>();
 		this.snapshotMetrics = new LinkedHashMap<MetricUid, IMetric>();
 		MetricConfig.getImplementations(metrics, commitMetrics, snapshotMetrics);
-		
+
 		for(TreeDB treeDb : treesDb){
 			if(treeDb.getType() == TreeType.BRANCH){
 				List<Commit> commits = commitRetriever.retrieveByTree(treeDb.getId());
 				calculateMetrics(commits);
 			}
 		}
-		
+
 		entityManager.close();
 	}
 
 	// This is the main method in metric calculation, it manages all other process.
 	private void calculateMetrics(List<Commit> commits) {
-		
+
 		MetricPersistance persistence = new MetricPersistance(entityManager);
 		persistence.initBatchPersistence();
-		
+
 		List<String> snapshotFilesUids = null;
 		List<File> commitFiles = null;
-		
+
 		int nextCommit = getNextCommitToAnalysis(commits, commitFiles, snapshotFilesUids);
-		
+
 		FileDAO dao = new FileDAOImpl();
 		dao.setEntityManager(entityManager);
 		List<FileDB> snapshotFiles = dao.getFilesByUids(snapshotFilesUids);
 
 		Map<String, AST> commitASTs = new LinkedHashMap<String, AST>();
 		Map<String, AST> snapshotASTs = new LinkedHashMap<String, AST>();
-		
+
 		repoSys.checkoutToTree(commits.get(nextCommit).getName());
 		initASTs(commitASTs, snapshotASTs, commitFiles, snapshotFiles, commits.get(nextCommit).getName());
 		calculationMetricsHelper(commitMetrics, snapshotMetrics, commits.subList(0, nextCommit+1),
 				commitASTs, snapshotASTs, persistence);
-	
+
 		for(int i = nextCommit+1; i < commits.size(); i++){
-			
+
 			commitASTs.clear();
 			Commit commit = commits.get(i);
 			repoSys.checkoutToTree(commit.getName());
-			
+			sourceFolders = new ArrayList<String>();
+			getSourceFolders(repoSys.getAbsolutePath());
+
 			for(File file : commit.getCommitedFiles()){
-				
+
 				if(file.getFileState().isDeleted()){
 					snapshotASTs.remove(file.getPath());
 				}else{
@@ -129,20 +133,20 @@ public class MetricCalculator{
 						commitASTs.put(file.getPath(), ast);
 					}
 				}
-				
+
 			}
-			
+
 			calculationMetricsHelper(commitMetrics, snapshotMetrics, commits.subList(0, i+1), commitASTs, snapshotASTs, persistence);
-			
+
 		}
-		
+
 		persistence.flushAllMetricValues();
-		
+
 	}	
-	
+
 	// Initializes astGenerators, the map is filled with extensions and ast generators 
 	private void createASTGenerators(List<LanguageType> languages){
-		
+
 		astGenerators = new Hashtable<String, IASTGenerator>();
 		for(LanguageType lang : languages){
 			IASTGenerator astGen = ASTGeneratorFactory.create(lang);
@@ -151,13 +155,13 @@ public class MetricCalculator{
 				astGenerators.put(str, astGen);
 			}
 		}
-		
+
 	}	
-	
+
 	/* Return the next commit that should be processed, commits already processed are stored
 	to avoid overhead */
 	private int getNextCommitToAnalysis(List<Commit> commits, List<File> commitFiles, List<String> snapshotFilesUids){
-		
+
 		int i = 0;
 		for(; i < commits.size(); i++){
 			Commit c = commits.get(i);
@@ -166,13 +170,13 @@ public class MetricCalculator{
 				break;
 			}
 		}
-		
+
 		commitFiles = commits.get(i).getCommitedFiles();
 		snapshotFilesUids = repoSys.getSnapshotFiles(commits.get(i).getName());
 		return i;
-		
+
 	}
-	
+
 	// Initializes the ASTs maps to next commit that should be processed
 	private void initASTs(Map<String, AST> commitASTs, Map<String, AST> snapshotASTs, List<File> commitFiles,
 			List<FileDB> snapshotFiles, String commitName){
@@ -184,20 +188,20 @@ public class MetricCalculator{
 			if(commitFiles.contains(f))
 				commitASTs.put(f.getPath(), ast);
 		}
-		
+
 	}
 
 	// Creates the AST for the given file and save their software units
 	private AST processAST(String filePath, int fileId, String commitName){
-		
+
 		int index = filePath.lastIndexOf(".") + 1;
 		String ext = filePath.substring(index);
 		IASTGenerator gen = astGenerators.get(ext);
-		
+
 		if(gen == null){
 			return null;
 		}
-		
+
 		/*
 		 *  Absolute path doesn't work correctly, with absolute path JGIT doesn't find the file.
 		 *  I save the absolute path, so I need to remove the repository absolute path part.
@@ -205,33 +209,70 @@ public class MetricCalculator{
 		 */
 		index = repoSys.getAbsolutePath().length()+1;
 		byte[] data = repoSys.getData(commitName, filePath.substring(index));
-		AST ast = gen.generate(filePath, data, saveAST.getRepositoryDB().getCharset());
-		
+		AST ast = gen.generate(filePath, data, saveAST.getRepositoryDB().getCharset(), sourceFolders.toArray(new String[sourceFolders.size()]));
+
 		saveAST.save(filePath, fileId, ast);
 		return ast;
-		
+
 	}
-	
+
 	// Simple helper to calculate the metrics
 	private void calculationMetricsHelper(Map<MetricUid, IMetric> commitMetrics, Map<MetricUid, IMetric> snapshotMetrics,
 			List<Commit> commits, Map<String, AST> commitASTs, Map<String, AST> snapshotASTs, MetricPersistance persistence){
-		
+
 		List<AST> commitsASTsList = new ArrayList<AST>(commitASTs.values());
 		List<AST> snapshotASTsList = new ArrayList<AST>(snapshotASTs.values());
-		
+
 		Commit c = commits.get(commits.size() - 1);
 		persistence.setCommitId(c.getId());
-		
+
 		for(Entry<MetricUid, IMetric> entry : commitMetrics.entrySet()){
 			persistence.setMetric(entry.getKey());
 			entry.getValue().calculate(commitsASTsList, commits, persistence);
 		}
-		
+
 		for(Entry<MetricUid, IMetric> entry : snapshotMetrics.entrySet()){
 			persistence.setMetric(entry.getKey());
 			entry.getValue().calculate(snapshotASTsList, commits, persistence);
 		}
-		
+
 	}	
-	
+
+	private void getSourceFolders(String repoPath){
+
+		java.io.File directory = new java.io.File(repoPath);
+
+		java.io.File[] fList = directory.listFiles(new FileFilter() {
+			public boolean accept(java.io.File file) {
+				return file.isDirectory() && !file.isHidden();
+			}
+		});
+
+		for (java.io.File file : fList) {	      
+			if(validateSourceFolder(file)){
+				sourceFolders.add(file.getAbsolutePath());
+				getSourceFolders(file.getAbsolutePath());
+			}	        
+		}
+	}
+
+	private boolean validateSourceFolder(java.io.File f){
+
+		java.io.File[] fList = f.listFiles(new FileFilter() {
+			public boolean accept(java.io.File file) {
+				return (file.isDirectory() && !file.isHidden()) || file.getName().endsWith(".java");
+			}
+		});
+
+		for(java.io.File f2 : fList){
+			if(f2.getName().endsWith(".java")){
+				return true;
+			}else 			
+				if(validateSourceFolder(f2)){
+					return true;
+				}		
+		}	
+		return false;
+	}
+
 }

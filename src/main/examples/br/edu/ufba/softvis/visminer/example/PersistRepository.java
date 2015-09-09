@@ -1,10 +1,8 @@
 package br.edu.ufba.softvis.visminer.example;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 
-import javax.persistence.EntityManager;
 
 import br.edu.ufba.softvis.visminer.constant.LanguageType;
 import br.edu.ufba.softvis.visminer.constant.MetricUid;
@@ -12,21 +10,17 @@ import br.edu.ufba.softvis.visminer.constant.VersioningSystemType;
 import br.edu.ufba.softvis.visminer.constant.WebServiceType;
 import br.edu.ufba.softvis.visminer.main.VisMiner;
 import br.edu.ufba.softvis.visminer.model.business.Repository;
-import br.edu.ufba.softvis.visminer.model.database.RepositoryDB;
-import br.edu.ufba.softvis.visminer.persistence.Database;
-import br.edu.ufba.softvis.visminer.persistence.dao.RepositoryDAO;
-import br.edu.ufba.softvis.visminer.persistence.impl.RepositoryDAOImpl;
 
 //This example show how to persist a repository
 public class PersistRepository {
 
-	private String repositoryDescription = "Teste";
-	private String repositoryName = "Teste";
-	private String repositoryOwner = "felipegustavo";
-	private String repositoryPath = "/home/felipe/Teste/.git";
+	private String repositoryDescription = "Put here repository description";
+	private String repositoryName = "Put here repository name";
+	private String repositoryOwner = "Put here repository owner";
+	private String repositoryPath = "Put here repository path";
 	private VersioningSystemType repositoryType = VersioningSystemType.GIT;
 	private WebServiceType repositoryServiceType = WebServiceType.GITHUB;
-	private String charset = "UTF-8";
+	private String charset = "UTF-8"; // this is the default value, does not need to be setted
 	private List<MetricUid> metrics = null;
 	private List<LanguageType> languages = null;
 	
@@ -42,8 +36,12 @@ public class PersistRepository {
 				repositoryOwner, repositoryType, repositoryServiceType, "", charset);
 		
 		VisMiner vis = new VisMiner();
-		
-			vis.connectWithWebRepository("felipegustavo", "acesso123info", repositoryPath.replace("/.git", ""));
+		try {
+			vis.persistRepository(repository, metrics, languages);
+			vis.connectWithWebRepository(repositoryPath.replace("/.git", ""));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		
 	}
 

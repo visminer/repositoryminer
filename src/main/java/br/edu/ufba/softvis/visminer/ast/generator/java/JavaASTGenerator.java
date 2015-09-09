@@ -2,6 +2,7 @@ package br.edu.ufba.softvis.visminer.ast.generator.java;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.jdt.core.dom.ASTParser;
@@ -42,7 +43,7 @@ import br.edu.ufba.softvis.visminer.constant.LanguageType;
 )
 public class JavaASTGenerator implements IASTGenerator{
 
-	public AST generate(String filePath, byte[] source, String charset){
+	public AST generate(String filePath, byte[] source, String charset, String[] sourceFolders){
 		
 		Document document = new  Document();
 		document.setName(filePath);
@@ -64,8 +65,17 @@ public class JavaASTGenerator implements IASTGenerator{
 		
 		ASTParser parser = ASTParser.newParser(org.eclipse.jdt.core.dom.AST.JLS8);
 		parser.setSource(sourceCode.toCharArray());
+		parser.setResolveBindings(true);
 		parser.setKind(ASTParser.K_COMPILATION_UNIT);
-		parser.setBindingsRecovery(true);
+		parser.setBindingsRecovery(true);		
+		parser.setUnitName(filePath.substring(filePath.lastIndexOf("/") + 1));
+		
+		String[] classpath = {System.getProperty("java.home").replace("\\", "/")+"/lib/rt.jar"};
+		
+		String[] encoding = new String[sourceFolders.length];
+		Arrays.fill(encoding,charset);		
+					
+		parser.setEnvironment(classpath, sourceFolders, encoding, true);
 		
 		CompilationUnit root = (CompilationUnit) parser.createAST(null);
 		
@@ -183,9 +193,12 @@ public class JavaASTGenerator implements IASTGenerator{
 			m.setThrownsExceptions(throwsList);
 		}
 		
-		ModifierKeyword modifier = ModifierKeyword.fromFlagValue(methodDecl.getModifiers());
-		if(modifier != null)
-			m.setModifier(modifier.toString());
+		List<String> modifiers = new ArrayList<String>();
+		for(Object modifier : methodDecl.modifiers()){
+			modifiers.add(modifier.toString());
+		}
+		
+		m.setModifiers(modifiers);
 		
 		MethodVisitor visitor = new MethodVisitor();
 		methodDecl.accept(visitor);

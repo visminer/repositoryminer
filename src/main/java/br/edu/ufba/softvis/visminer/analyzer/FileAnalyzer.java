@@ -15,7 +15,6 @@ import br.edu.ufba.softvis.visminer.persistence.impl.FileDAOImpl;
 import br.edu.ufba.softvis.visminer.persistence.impl.FileXCommitDAOImpl;
 
 /**
- * @version 0.9
  * Defines how to save or to increment informations about files in database.
  */
 
