@@ -6,7 +6,7 @@ public class MethodDeclaration {
 
 	private int id;
 	private String name;
-	private String modifier;
+	private List<String> modifiers;
 	private String returnType;
 	private List<Statement> statements;
 	private List<ParameterDeclaration> parameters;
@@ -38,18 +38,7 @@ public class MethodDeclaration {
 	public void setName(String name) {
 		this.name = name;
 	}
-	/**
-	 * @return the modifier
-	 */
-	public String getModifier() {
-		return modifier;
-	}
-	/**
-	 * @param modifier the modifier to set
-	 */
-	public void setModifier(String modifier) {
-		this.modifier = modifier;
-	}
+
 	/**
 	 * @return the returnType
 	 */
@@ -121,6 +110,18 @@ public class MethodDeclaration {
 	 */
 	public void setThrownsExceptions(List<String> thrownsExceptions) {
 		this.thrownsExceptions = thrownsExceptions;
+	}
+	/**
+	 * @return the modifiers
+	 */
+	public List<String> getModifiers() {
+		return modifiers;
+	}
+	/**
+	 * @param modifiers the modifiers to set
+	 */
+	public void setModifiers(List<String> modifiers) {
+		this.modifiers = modifiers;
 	}
 
 }

@@ -78,7 +78,7 @@ public class CPPASTGenerator implements IASTGenerator {
 		return include;
 	}
 
-	public AST generate(String filePath, byte[] source, String charset) {
+	public AST generate(String filePath, byte[] source, String charset, String[] sourceFolders) {
 		document = new Document();
 		document.setName(filePath);
 		document.setMethods(new ArrayList<MethodDeclaration>());

@@ -27,7 +27,7 @@ import br.edu.ufba.softvis.visminer.constant.LanguageType;
 public class NoneASTGenerator implements IASTGenerator{
 
 	@Override
-	public AST generate(String filePath, byte[] source, String charset) {
+	public AST generate(String filePath, byte[] source, String charset, String[] sourceFolders) {
 		
 		Document doc = new Document();
 		doc.setName(filePath);
