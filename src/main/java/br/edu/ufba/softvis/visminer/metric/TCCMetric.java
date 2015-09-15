@@ -84,11 +84,13 @@ public class TCCMetric extends MethodBasedMetricTemplate{
 				if(stm.getNodeType().equals(NodeType.METHOD_INVOCATION)){
 					String exp = stm.getExpression();
 					String type = exp.substring(0,exp.lastIndexOf("."));
-					String methodInv = exp.substring(exp.lastIndexOf(".")+1);				
+					String methodInv = exp.substring(exp.lastIndexOf(".")+1);	
+					
 					if(currentType.getName().equals(type)){
-						if(isGetterOrSetter(methodInv)){
-							accessedFields.add(String.valueOf(methodInv.charAt(3)).toLowerCase()+methodInv.substring(4));
-							accessedFields.add(methodInv.substring(3));
+						if(isGetterOrSetter(methodInv)){	
+							String field = methodInv.substring(3);
+							accessedFields.add(Character.toLowerCase(field.charAt(0)) + (field.length() > 1 ? field.substring(1) : ""));
+							accessedFields.add(field);
 						}
 					}
 					
@@ -114,9 +116,10 @@ public class TCCMetric extends MethodBasedMetricTemplate{
 	
 	private boolean isGetterOrSetter(String methodInv){
 		
-		if(methodInv.startsWith("get") || methodInv.startsWith("set")){
+		if(methodInv.startsWith("get") || methodInv.startsWith("set") ||  methodInv.startsWith("is")){
 			for(FieldDeclaration fd : currentFields){
-				if(fd.getName().equals(methodInv.substring(3)) || fd.getName().equals(String.valueOf(methodInv.charAt(3)).toLowerCase()+methodInv.substring(4))){
+				String field = methodInv.substring(3);
+				if(fd.getName().equals(field) || fd.getName().equals(Character.toLowerCase(field.charAt(0)) + (field.length() > 1 ? field.substring(1) : ""))){
 					return true;
 				}
 			}		
