@@ -116,7 +116,7 @@ public class TCCMetric extends MethodBasedMetricTemplate{
 	
 	private boolean isGetterOrSetter(String methodInv){
 		
-		if(methodInv.startsWith("get") || methodInv.startsWith("set") ||  methodInv.startsWith("is")){
+		if((methodInv.startsWith("get") || methodInv.startsWith("set")) && methodInv.length()>3){
 			for(FieldDeclaration fd : currentFields){
 				String field = methodInv.substring(3);
 				if(fd.getName().equals(field) || fd.getName().equals(Character.toLowerCase(field.charAt(0)) + (field.length() > 1 ? field.substring(1) : ""))){
