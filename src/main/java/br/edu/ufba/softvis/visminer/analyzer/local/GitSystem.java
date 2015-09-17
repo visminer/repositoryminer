@@ -52,12 +52,31 @@ public class GitSystem implements IVersioningSystem{
 	
 	private static final String HEAD = "HEAD";
 	
+	// Process the repository path
+	private String processPath(String repositoryPath){
+
+		String path = repositoryPath.replace("\\", "/").trim();
+
+		if(path.endsWith("/.git")){
+			return path;
+		}else if(path.endsWith("/.git/")){
+			return path.substring(0, path.length()-1);
+		}else if(path.endsWith("/")){
+			return path.concat(".git");
+		}else{
+			return path.concat("/.git");
+		}
+
+	}	
+	
 	@Override
-	public void open(String repositoryPath) {
+	public void open(String path) {
 		
 		FileRepositoryBuilder repositoryBuilder = new FileRepositoryBuilder();
+		String processedPath = processPath(path);
+		
 		try {
-			repository = repositoryBuilder.setGitDir(new File(repositoryPath))
+			repository = repositoryBuilder.setGitDir(new File(processedPath))
 							.readEnvironment() //read git environment variables
 							.findGitDir()
 							.build();
@@ -75,7 +94,7 @@ public class GitSystem implements IVersioningSystem{
 		
 		commands = Arrays.asList("git", "log", "--numstat", "--oneline", "--max-count=1", "");
 		
-		this.repositoryPath = repository.getWorkTree().getAbsolutePath();
+		repositoryPath = repository.getWorkTree().getAbsolutePath();
 
 	}
 	

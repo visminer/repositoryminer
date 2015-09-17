@@ -11,7 +11,7 @@ public class DatabaseConfig {
 		dbConfig.setUrl("jdbc:mysql://localhost/visminer");
 		dbConfig.setUser("root");
 		dbConfig.setPassword("1234");
-		dbConfig.setGeneration("none");
+		dbConfig.setGeneration("drop-and-create-tables");
 		dbConfig.setLogging("off");
 		
 		return dbConfig;

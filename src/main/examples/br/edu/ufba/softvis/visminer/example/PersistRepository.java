@@ -38,7 +38,7 @@ public class PersistRepository {
 		VisMiner vis = new VisMiner();
 		try {
 			vis.persistRepository(repository, metrics, languages);
-			vis.connectWithWebRepository(repositoryPath.replace("/.git", ""));
+			vis.connectWithWebRepository(repositoryPath);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
