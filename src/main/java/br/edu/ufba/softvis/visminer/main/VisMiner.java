@@ -11,10 +11,10 @@ import br.edu.ufba.softvis.visminer.constant.LanguageType;
 import br.edu.ufba.softvis.visminer.constant.MetricUid;
 import br.edu.ufba.softvis.visminer.model.business.Repository;
 import br.edu.ufba.softvis.visminer.persistence.Database;
+import br.edu.ufba.softvis.visminer.retriever.RepositoryRetriever;
 import br.edu.ufba.softvis.visminer.utility.PropertyReader;
 
 /**
- * @version 0.9
  * Provides core operations.
  */
 public class VisMiner {
@@ -108,6 +108,14 @@ public class VisMiner {
 	public void connectWithWebRepository(String repositoryPath){
 		MilestoneAndIssueAnalyzer analyzer = new MilestoneAndIssueAnalyzer();
 		analyzer.analyze(repositoryPath);
+	}
+	
+	/**
+	 * @param repositoryPath
+	 * @return True if the repository is already persisted and False otherwise.
+	 */
+	public boolean checkRepository(String repositoryPath){
+		return new RepositoryRetriever().checkIfExists(repositoryPath);
 	}
 	
 }
