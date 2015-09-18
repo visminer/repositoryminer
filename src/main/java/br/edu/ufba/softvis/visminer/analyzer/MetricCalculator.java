@@ -101,6 +101,11 @@ public class MetricCalculator{
 
 		int nextCommit = getNextCommitToAnalysis(commits, commitFiles, snapshotFilesUids);
 
+		// No commits to analyze
+		if(nextCommit == commits.size()){
+			return;
+		}
+		
 		FileDAO dao = new FileDAOImpl();
 		dao.setEntityManager(entityManager);
 		List<FileDB> snapshotFiles = dao.getFilesByUids(snapshotFilesUids);
@@ -170,6 +175,10 @@ public class MetricCalculator{
 			}
 		}
 
+		if(i == commits.size()){
+			return i;
+		}
+		
 		commitFiles = commits.get(i).getCommitedFiles();
 		snapshotFilesUids = repoSys.getSnapshotFiles(commits.get(i).getName());
 		return i;
