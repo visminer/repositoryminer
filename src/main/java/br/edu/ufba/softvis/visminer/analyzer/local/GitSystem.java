@@ -94,7 +94,7 @@ public class GitSystem implements IVersioningSystem{
 		
 		commands = Arrays.asList("git", "log", "--numstat", "--oneline", "--max-count=1", "");
 		
-		repositoryPath = repository.getWorkTree().getAbsolutePath();
+		repositoryPath = repository.getWorkTree().getAbsolutePath().replace("\\", "/");
 
 	}
 	
