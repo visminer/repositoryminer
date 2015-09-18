@@ -23,7 +23,6 @@ import br.edu.ufba.softvis.visminer.persistence.impl.SoftwareUnitDAOImpl;
 import br.edu.ufba.softvis.visminer.utility.StringUtils;
 
 /**
- * @version 0.9
  * Defines how to save or to increment informations about the repository in database.
  */
 public class RepositoryAnalyzer{

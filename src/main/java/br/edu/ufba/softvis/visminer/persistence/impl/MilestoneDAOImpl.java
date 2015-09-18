@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
 import javax.persistence.Query;
 
 import br.edu.ufba.softvis.visminer.model.database.MilestoneDB;
