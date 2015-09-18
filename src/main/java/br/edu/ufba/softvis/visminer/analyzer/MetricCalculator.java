@@ -18,7 +18,6 @@ import br.edu.ufba.softvis.visminer.ast.generator.IASTGenerator;
 import br.edu.ufba.softvis.visminer.config.MetricConfig;
 import br.edu.ufba.softvis.visminer.constant.LanguageType;
 import br.edu.ufba.softvis.visminer.constant.MetricUid;
-import br.edu.ufba.softvis.visminer.constant.TreeType;
 import br.edu.ufba.softvis.visminer.metric.IMetric;
 import br.edu.ufba.softvis.visminer.model.business.Commit;
 import br.edu.ufba.softvis.visminer.model.business.File;
@@ -35,7 +34,6 @@ import br.edu.ufba.softvis.visminer.persistence.impl.TreeDAOImpl;
 import br.edu.ufba.softvis.visminer.retriever.CommitRetriever;
 
 /**
- * @version 0.9
  * Manages all the process to calculate the metrics.
  */
 public class MetricCalculator{
@@ -48,7 +46,7 @@ public class MetricCalculator{
 	private List<String> analyzedCommits;
 	private EntityManager entityManager;
 	private List<String> sourceFolders;
-
+	
 	/**
 	 * @param metrics
 	 * @param repoSys
@@ -63,6 +61,7 @@ public class MetricCalculator{
 
 		TreeDAO treeDao = new TreeDAOImpl();
 		treeDao.setEntityManager(entityManager);
+		
 		List<TreeDB> treesDb = treeDao.findByRepository(repoDb.getId());
 
 		if(treesDb == null){
@@ -71,6 +70,7 @@ public class MetricCalculator{
 		}
 
 		createASTGenerators(languages);
+		
 		this.repoSys = repoSys;
 		this.sourceFolders = new ArrayList<String>();
 		this.analyzedCommits = new ArrayList<String>();
@@ -82,13 +82,12 @@ public class MetricCalculator{
 		MetricConfig.getImplementations(metrics, commitMetrics, snapshotMetrics);
 
 		for(TreeDB treeDb : treesDb){
-			if(treeDb.getType() == TreeType.BRANCH){
-				List<Commit> commits = commitRetriever.retrieveByTree(treeDb.getId());
-				calculateMetrics(commits);
-			}
+			List<Commit> commits = commitRetriever.retrieveByTree(treeDb.getId());
+			calculateMetrics(commits);
 		}
 
 		entityManager.close();
+		
 	}
 
 	// This is the main method in metric calculation, it manages all other process.

@@ -8,11 +8,12 @@ import br.edu.ufba.softvis.visminer.model.business.File;
 import br.edu.ufba.softvis.visminer.model.business.FileState;
 import br.edu.ufba.softvis.visminer.model.business.Tree;
 import br.edu.ufba.softvis.visminer.model.database.CommitDB;
+import br.edu.ufba.softvis.visminer.model.database.FileDB;
 import br.edu.ufba.softvis.visminer.model.database.FileXCommitDB;
 import br.edu.ufba.softvis.visminer.persistence.dao.CommitDAO;
-import br.edu.ufba.softvis.visminer.persistence.dao.FileXCommitDAO;
+import br.edu.ufba.softvis.visminer.persistence.dao.FileDAO;
 import br.edu.ufba.softvis.visminer.persistence.impl.CommitDAOImpl;
-import br.edu.ufba.softvis.visminer.persistence.impl.FileXCommitDAOImpl;
+import br.edu.ufba.softvis.visminer.persistence.impl.FileDAOImpl;
 
 public class CommitRetriever extends Retriever {
 
@@ -20,18 +21,22 @@ public class CommitRetriever extends Retriever {
 
 		List<File> files = new ArrayList<File>();
 
-		FileXCommitDAO fxcDao = new FileXCommitDAOImpl();
-		super.shareEntityManager(fxcDao);
+		FileDAO fileDAO = new FileDAOImpl();
+		super.shareEntityManager(fileDAO);
 
-		for (FileXCommitDB fxc : fxcDao.findByCommit(commit.getId())) {
+		for (FileDB fileDB : fileDAO.findCommitedFiles(commit.getId())) {
+			
+			FileXCommitDB fxc = fileDB.getFileXCommits().get(0);
 			FileState fileState = new FileState(fxc.getLinesAdded(),
 					fxc.getLinesRemoved(), fxc.isRemoved());
-			File file = fxc.getFile().toBusiness();
+			File file = fileDB.toBusiness();
 			file.setFileState(fileState);
 			files.add(file);
+			
 		}
 
 		return files;
+		
 	}
 
 	public List<Commit> retrieveByTree(int treeId) {

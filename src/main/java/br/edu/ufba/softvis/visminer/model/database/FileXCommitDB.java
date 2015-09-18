@@ -5,13 +5,11 @@ import javax.persistence.*;
 
 
 /**
- * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
- * @version 0.9
  * The persistent class for the file_x_commit database table.
  */
 @Entity
 @Table(name="file_x_commit")
-@NamedQuery(name="FileXCommitDB.findByCommit", query="SELECT fxc FROM FileXCommitDB fxc join fxc.file f where fxc.id.commitId = :commitId")
+@NamedQuery(name="FileXCommitDB.findByCommit", query="SELECT fxc FROM FileXCommitDB fxc where fxc.id.commitId = :commitId")
 public class FileXCommitDB implements Serializable {
 	private static final long serialVersionUID = 1L;
 
