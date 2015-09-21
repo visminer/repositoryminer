@@ -2,11 +2,13 @@ package br.edu.ufba.softvis.visminer.analyzer;
 
 import java.io.FileFilter;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.persistence.EntityManager;
 
@@ -43,7 +45,7 @@ public class MetricCalculator{
 	private SaveAST saveAST;
 	private IVersioningSystem repoSys;
 	private Map<String, IASTGenerator> astGenerators;
-	private List<String> analyzedCommits;
+	private Set<String> analyzedCommits;
 	private EntityManager entityManager;
 	private List<String> sourceFolders;
 	
@@ -73,7 +75,7 @@ public class MetricCalculator{
 		
 		this.repoSys = repoSys;
 		this.sourceFolders = new ArrayList<String>();
-		this.analyzedCommits = new ArrayList<String>();
+		this.analyzedCommits = new HashSet<String>();
 		this.saveAST = new SaveAST(repoDb, entityManager);
 		CommitRetriever commitRetriever = new CommitRetriever();
 
@@ -117,10 +119,14 @@ public class MetricCalculator{
 		initASTs(commitASTs, snapshotASTs, commitFiles, snapshotFiles, commits.get(nextCommit).getName());
 		calculationMetricsHelper(commitMetrics, snapshotMetrics, commits.subList(0, nextCommit+1),
 				commitASTs, snapshotASTs, persistence);
-
+		
 		for(int i = nextCommit+1; i < commits.size(); i++){
 
 			commitASTs.clear();
+			
+			// add commit to list of commits already analyzed
+			analyzedCommits.add(commits.get(i).getName());
+			
 			Commit commit = commits.get(i);
 			repoSys.checkoutToTree(commit.getName());
 			sourceFolders = new ArrayList<String>();
@@ -143,7 +149,7 @@ public class MetricCalculator{
 			calculationMetricsHelper(commitMetrics, snapshotMetrics, commits.subList(0, i+1), commitASTs, snapshotASTs, persistence);
 
 		}
-
+		
 		persistence.flushAllMetricValues();
 
 	}	

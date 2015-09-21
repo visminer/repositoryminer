@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.LogCommand;
+import org.eclipse.jgit.api.ResetCommand.ResetType;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.errors.IncorrectObjectTypeException;
 import org.eclipse.jgit.errors.MissingObjectException;
@@ -346,9 +347,8 @@ public class GitSystem implements IVersioningSystem{
 
 			List<String> files = new ArrayList<String>();
 			while(treeWalk.next()){
-				String path = repositoryPath+"/"+treeWalk.getPathString();
+				String path = repositoryPath + "/" + treeWalk.getPathString();
 				files.add(StringUtils.sha1(path));
-
 			}
 
 			return files;
@@ -363,9 +363,14 @@ public class GitSystem implements IVersioningSystem{
 	public void checkoutToTree(String treeName){
 		
 		try{
+			
+			if(!git.status().call().isClean()){
+				git.reset().setMode(ResetType.HARD).setRef(treeName).call();
+			}
 			git.checkout().setName(treeName).call();
+			
 		}catch(GitAPIException e){
-			throw new VisMinerAPIException(e.getMessage(), e);
+			throw new VisMinerAPIException(treeName);
 		}
 		
 	}

@@ -41,7 +41,7 @@ public class SoftwareUnitRetriever extends Retriever {
 		
 	}
 
-	public List<SoftwareUnit> findByRepository(int repositoryId, int commitId) {
+	public SoftwareUnit findByRepository(int repositoryId, int commitId) {
 		
 		List<SoftwareUnit> softwareUnits = new ArrayList<SoftwareUnit>();
 		SoftwareUnitDAO dao = new SoftwareUnitDAOImpl();
@@ -61,7 +61,7 @@ public class SoftwareUnitRetriever extends Retriever {
 		}
 
 		processListToTree(softwareUnits);
-		return softwareUnits;
+		return softwareUnits.get(0);
 		
 	}
 

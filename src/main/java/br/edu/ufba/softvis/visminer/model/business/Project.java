@@ -7,8 +7,7 @@ import br.edu.ufba.softvis.visminer.retriever.CommitRetriever;
 import br.edu.ufba.softvis.visminer.retriever.SoftwareUnitRetriever;
 
 /**
- * @version 0.9 User friendly project bean class. This class will be used for
- *          user interface.
+ * User friendly project bean class. This class will be used for user interface.
  */
 
 public class Project {
@@ -16,11 +15,9 @@ public class Project {
 	private List<Committer> committers;
 	private List<Commit> commits;
 	private List<File> files;
-	private List<SoftwareUnit> softwareUnits;
+	private SoftwareUnit softwareUnit;
 	private Tree currentTree;
 	private Repository repository;
-
-	// Auxiliary properties
 
 	// Index of current commit in commits list.
 	private int currentCommit;
@@ -52,7 +49,7 @@ public class Project {
 		SoftwareUnitRetriever retriever = new SoftwareUnitRetriever();
 
 		currentCommit++;
-		softwareUnits = retriever.findByRepository(repository.getId(),
+		softwareUnit = retriever.findByRepository(repository.getId(),
 				currentCommit);
 
 		Commit commit = commits.get(currentCommit);
@@ -63,7 +60,7 @@ public class Project {
 		// Compute only the new files.
 		updateFiles(commit.getCommitedFiles());
 
-		readSoftwareUnitTree(softwareUnits);
+		readSoftwareUnitTree(softwareUnit.getChildren());
 
 		return true;
 
@@ -83,7 +80,7 @@ public class Project {
 		SoftwareUnitRetriever retriever = new SoftwareUnitRetriever();
 
 		currentCommit--;
-		softwareUnits = retriever.findByRepository(repository.getId(),
+		softwareUnit = retriever.findByRepository(repository.getId(),
 				currentCommit);
 
 		Commit commit = commits.get(currentCommit + 1);
@@ -97,7 +94,7 @@ public class Project {
 			updateFiles(commits.get(i).getCommitedFiles());
 		}
 
-		readSoftwareUnitTree(softwareUnits);
+		readSoftwareUnitTree(softwareUnit.getChildren());
 
 		return true;
 
@@ -120,7 +117,7 @@ public class Project {
 		if ((currentCommit - index) < 0) {
 
 			// Computes if commit is after current commit.
-			softwareUnits = retriever.findByRepository(repository.getId(),
+			softwareUnit = retriever.findByRepository(repository.getId(),
 					index);
 
 			// From current commit forward adding new committers.
@@ -135,7 +132,7 @@ public class Project {
 		} else if ((currentCommit - index) > 0) {
 
 			// Computes if commit is before current commit.
-			softwareUnits = retriever.findByRepository(repository.getId(),
+			softwareUnit = retriever.findByRepository(repository.getId(),
 					index);
 
 			// From current commit backward removing committers.
@@ -155,7 +152,7 @@ public class Project {
 
 		}
 
-		readSoftwareUnitTree(softwareUnits);
+		readSoftwareUnitTree(softwareUnit.getChildren());
 		return true;
 
 	}
@@ -257,7 +254,7 @@ public class Project {
 		SoftwareUnitRetriever retriever = new SoftwareUnitRetriever();
 
 		currentCommit = commits.size() - 1;
-		softwareUnits = retriever.findByRepository(repository.getId(),
+		softwareUnit = retriever.findByRepository(repository.getId(),
 				currentCommit);
 
 		committers = new ArrayList<Committer>();
@@ -268,7 +265,7 @@ public class Project {
 			committersUpdateHelper(commit.getCommitter(), false);
 			updateFiles(commit.getCommitedFiles());
 		}
-		readSoftwareUnitTree(softwareUnits);
+		readSoftwareUnitTree(softwareUnit.getChildren());
 
 	}
 
@@ -369,16 +366,16 @@ public class Project {
 	 * @return All software units presents in actual repository state, defined
 	 *         by current commit.
 	 */
-	public List<SoftwareUnit> getSoftwareUnits() {
-		return softwareUnits;
+	public SoftwareUnit getsoftwareUnit() {
+		return softwareUnit;
 	}
 
 	/**
-	 * @param softwareUnits
-	 *            the softwareUnits to set
+	 * @param softwareUnit
+	 *            the softwareUnit to set
 	 */
-	public void setSoftwareUnits(List<SoftwareUnit> softwareUnits) {
-		this.softwareUnits = softwareUnits;
+	public void setsoftwareUnit(SoftwareUnit softwareUnit) {
+		this.softwareUnit = softwareUnit;
 	}
 
 	/**

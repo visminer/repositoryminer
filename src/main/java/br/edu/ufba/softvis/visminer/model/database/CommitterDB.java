@@ -21,14 +21,14 @@ import javax.persistence.Table;
 import br.edu.ufba.softvis.visminer.model.business.Committer;
 
 /**
- * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
- * @version 0.9 The persistent class for the committer database table.
+ * The persistent class for the committer database table.
  */
 @Entity
 @Table(name = "committer")
 @NamedQueries({
 		@NamedQuery(name = "CommitterDB.findByEmail", query = "select c from CommitterDB c where c.email = :email"),
-		@NamedQuery(name = "CommitterDB.findByRepository", query = "select c from CommitterDB c join c.repositories r where r.id = :id") })
+		@NamedQuery(name = "CommitterDB.findByRepository", query = "select c from RepositoryDB r inner join r.committers c"
+				+ " inner join c.commits c2 where r.id = :repositoryId group by c.id order by min(c2.date) asc") })
 public class CommitterDB implements Serializable {
 	private static final long serialVersionUID = 1L;
 

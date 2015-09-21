@@ -10,8 +10,6 @@ import br.edu.ufba.softvis.visminer.model.database.TreeDB;
 
 
 /**
- * @version 0.9
- * @see GitSystem
  * Interface that define what is needed to support a repository.
  */
 
@@ -21,7 +19,6 @@ public interface IVersioningSystem {
 	 * All methods that return commits should return the committer inside of each commit.
 	 * getCommitedFiles(String commitUid) should return File with FileState.
 	 */
-	
 	
 	/**
 	 * @param repositoryPath
@@ -78,7 +75,7 @@ public interface IVersioningSystem {
 
 	/**
 	 * @param treeName
-	 * Makes a checkout to give tree.
+	 * Makes a checkout to a give tree.
 	 */
 	public void checkoutToTree(String treeName);
 	
