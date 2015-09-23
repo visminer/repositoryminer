@@ -15,14 +15,14 @@ import br.edu.ufba.softvis.visminer.constant.LanguageType;
  * The objective of this class is create an AST to programming languages
  * or any file that we don't have parser support or parser is not necessary.
  * 
- * The extensions accepted for this generator are: xml, html, css, txt, md
+ * The extensions accepted for this generator are: xml, html, css, txt, md, properties, gradle
  * 
  */
 
 
 @ASTGeneratorAnnotation(
 		language = LanguageType.NONE,
-		extensions = {"xml", "html", "css", "txt", "md"}
+		extensions = {"xml", "html", "css", "txt", "md", "properties", "gradle"}
 )
 public class NoneASTGenerator implements IASTGenerator{
 

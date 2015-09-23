@@ -17,7 +17,7 @@ import br.edu.ufba.softvis.visminer.persistence.MetricPersistance;
 				+ " used to measure the size of a computer program by counting the number of lines in the text of"
 				+ " the program's source code.",
 		acronym = "SLOC",
-		type = MetricType.COMMIT,
+		type = MetricType.SNAPSHOT,
 		uid = MetricUid.SLOC
 	)
 public class SLOCMetric implements IMetric{
@@ -31,8 +31,15 @@ public class SLOCMetric implements IMetric{
 	@Override
 	public void calculate(List<AST> astList, List<Commit> commits, MetricPersistance persistence){
 		
+		int max = 0;
 		for(AST ast : astList){
-			persistence.postMetricValue(ast.getDocument().getId(), String.valueOf(count(ast.getSourceCode())));
+			int sloc = count(ast.getSourceCode());
+			max += sloc;
+			persistence.postMetricValue(ast.getDocument().getId(), String.valueOf(sloc));
+		}
+		
+		if(astList != null && astList.size() > 0){
+			persistence.postMetricValue(astList.get(0).getProject().getId(), String.valueOf(max));
 		}
 	}
 	

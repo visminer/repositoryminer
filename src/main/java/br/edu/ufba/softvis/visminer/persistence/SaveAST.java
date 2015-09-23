@@ -60,7 +60,7 @@ public class SaveAST {
 	 * Saves the software units found in the given AST in database.
 	 */
 	public void save(String filePath, int fileId, AST ast){
-
+		
 		SoftwareUnitDB parent = null;
 		ast.setProject(project);
 		
@@ -105,8 +105,10 @@ public class SaveAST {
 	
 	// Generate unique id for software units
 	private String generateUid(String repositoryPath, String parentName, String softwareUnitName){
+		
 		String uid = repositoryPath + parentName + softwareUnitName;
 		return StringUtils.sha1(uid);
+		
 	}
 	
 	// Saves fields and methods in database
@@ -150,16 +152,13 @@ public class SaveAST {
 	private SoftwareUnitDB getSofwareUnitDB(String uid, String name, SoftwareUnitType type, int fileId,
 			RepositoryDB repoDb, SoftwareUnitDB parent){
 		
-		SoftwareUnitDB softwareUnitDB = new SoftwareUnitDB();
+		SoftwareUnitDB softwareUnitDB;
 		
 		if(uidMap.containsKey(uid)){
-			softwareUnitDB.setId(uidMap.get(uid));
+			softwareUnitDB = new SoftwareUnitDB(uidMap.get(uid), name, type, uid);
 		}else{				
 			
-			softwareUnitDB.setName(name);
-			softwareUnitDB.setUid(uid);
-			softwareUnitDB.setType(type);
-			
+			softwareUnitDB = new SoftwareUnitDB(0, name, type, uid);
 			if(fileId != 0)
 				softwareUnitDB.setFile(new FileDB(fileId));
 			
@@ -167,6 +166,7 @@ public class SaveAST {
 			softwareUnitDB.setSoftwareUnit(parent);
 			softUnitDao.save(softwareUnitDB);
 			uidMap.put(uid, softwareUnitDB.getId());
+			
 		}
 
 		return softwareUnitDB;

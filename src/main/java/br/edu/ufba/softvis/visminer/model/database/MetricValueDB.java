@@ -9,8 +9,8 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name="metric_value")
-@NamedQuery(name="MetricValueDB.findBySoftwareUnitAndCommit", query="SELECT m FROM MetricValueDB m join m.metric m2 "
-		+ "where m.id.commitId = :commitId and m.id.softwareUnitId = :softwareUnitId")
+@NamedQuery(name="MetricValueDB.findBySoftwareUnitAndCommit", query="SELECT mv FROM MetricValueDB mv"
+		+ " where mv.id.softwareUnitId = :softwareUnitId and mv.id.commitId = :commitId")
 
 public class MetricValueDB implements Serializable {
 	private static final long serialVersionUID = 1L;

@@ -98,8 +98,8 @@ public class MetricCalculator{
 		MetricPersistance persistence = new MetricPersistance(entityManager);
 		persistence.initBatchPersistence();
 
-		List<String> snapshotFilesUids = null;
-		List<File> commitFiles = null;
+		List<String> snapshotFilesUids = new ArrayList<String>();
+		List<File> commitFiles = new ArrayList<File>();
 
 		int nextCommit = getNextCommitToAnalysis(commits, commitFiles, snapshotFilesUids);
 
@@ -107,7 +107,6 @@ public class MetricCalculator{
 		if(nextCommit == commits.size()){
 			return;
 		}
-		
 		FileDAO dao = new FileDAOImpl();
 		dao.setEntityManager(entityManager);
 		List<FileDB> snapshotFiles = dao.getFilesByUids(snapshotFilesUids);
@@ -185,8 +184,9 @@ public class MetricCalculator{
 			return i;
 		}
 		
-		commitFiles = commits.get(i).getCommitedFiles();
-		snapshotFilesUids = repoSys.getSnapshotFiles(commits.get(i).getName());
+		commitFiles.addAll(commits.get(i).getCommitedFiles());
+		snapshotFilesUids.addAll(repoSys.getSnapshotFiles(commits.get(i).getName()));
+		
 		return i;
 
 	}
@@ -196,11 +196,17 @@ public class MetricCalculator{
 			List<FileDB> snapshotFiles, String commitName){
 
 		for(FileDB fileDb : snapshotFiles){
+			
 			File f = fileDb.toBusiness();
 			AST ast = processAST(f.getPath(), f.getId(), commitName);
+			
+			if(ast == null)
+				continue;
+				
 			snapshotASTs.put(f.getPath(), ast);
 			if(commitFiles.contains(f))
 				commitASTs.put(f.getPath(), ast);
+			
 		}
 
 	}
@@ -211,7 +217,7 @@ public class MetricCalculator{
 		int index = filePath.lastIndexOf(".") + 1;
 		String ext = filePath.substring(index);
 		IASTGenerator gen = astGenerators.get(ext);
-
+		
 		if(gen == null){
 			return null;
 		}
@@ -224,7 +230,6 @@ public class MetricCalculator{
 		index = repoSys.getAbsolutePath().length()+1;
 		byte[] data = repoSys.getData(commitName, filePath.substring(index));
 		AST ast = gen.generate(filePath, data, saveAST.getRepositoryDB().getCharset(), sourceFolders.toArray(new String[sourceFolders.size()]));
-
 		saveAST.save(filePath, fileId, ast);
 		return ast;
 

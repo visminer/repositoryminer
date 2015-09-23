@@ -49,10 +49,10 @@ public class Project {
 		SoftwareUnitRetriever retriever = new SoftwareUnitRetriever();
 
 		currentCommit++;
-		softwareUnit = retriever.findByRepository(repository.getId(),
-				currentCommit);
-
 		Commit commit = commits.get(currentCommit);
+		
+		softwareUnit = retriever.findByRepository(repository.getId(),
+				commit.getId());
 
 		// Updates committers
 		committersUpdateHelper(commit.getCommitter(), false);
@@ -80,10 +80,11 @@ public class Project {
 		SoftwareUnitRetriever retriever = new SoftwareUnitRetriever();
 
 		currentCommit--;
+		Commit commit = commits.get(currentCommit);
 		softwareUnit = retriever.findByRepository(repository.getId(),
-				currentCommit);
+				commit.getId());
 
-		Commit commit = commits.get(currentCommit + 1);
+		commit = commits.get(currentCommit + 1);
 		committersUpdateHelper(commit.getCommitter(), true);
 
 		files = new ArrayList<File>();
@@ -107,41 +108,41 @@ public class Project {
 	 */
 	public boolean setCurrentCommit(Commit commit) {
 
-		int index = commits.indexOf(commit);
-		if (index == -1) {
+		int nextCommit = commits.indexOf(commit);
+		if (nextCommit == -1) {
 			return false;
 		}
 
 		SoftwareUnitRetriever retriever = new SoftwareUnitRetriever();
 		
-		if ((currentCommit - index) < 0) {
+		if (currentCommit < nextCommit) {
 
 			// Computes if commit is after current commit.
 			softwareUnit = retriever.findByRepository(repository.getId(),
-					index);
-
+					commits.get(nextCommit).getId());
+			
 			// From current commit forward adding new committers.
-			for (int i = currentCommit + 1; i <= index; i++) {
+			for (int i = currentCommit + 1; i <= nextCommit; i++) {
 				Commit commit2 = commits.get(i);
 				committersUpdateHelper(commit2.getCommitter(), false);
 				// Process only commitd files in the new commits.
 				updateFiles(commit.getCommitedFiles());
 			}
-			currentCommit = index;
+			currentCommit = nextCommit;
 
-		} else if ((currentCommit - index) > 0) {
+		} else if (currentCommit > nextCommit) {
 
 			// Computes if commit is before current commit.
 			softwareUnit = retriever.findByRepository(repository.getId(),
-					index);
+					commits.get(nextCommit).getId());
 
 			// From current commit backward removing committers.
-			for (int i = currentCommit; i > index; i--) {
+			for (int i = currentCommit; i > nextCommit; i--) {
 				Commit commit2 = commits.get(i);
 				committersUpdateHelper(commit2.getCommitter(), true);
 			}
 
-			currentCommit = index;
+			currentCommit = nextCommit;
 
 			// Empty files list and recomputes files from the beginning until
 			// new current commit.
@@ -255,7 +256,7 @@ public class Project {
 
 		currentCommit = commits.size() - 1;
 		softwareUnit = retriever.findByRepository(repository.getId(),
-				currentCommit);
+				commits.get(currentCommit).getId());
 
 		committers = new ArrayList<Committer>();
 		files = new ArrayList<File>();

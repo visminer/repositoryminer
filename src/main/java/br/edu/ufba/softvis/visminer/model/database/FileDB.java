@@ -26,7 +26,7 @@ import br.edu.ufba.softvis.visminer.model.business.File;
 	@NamedQuery(name="FileDB.findByCode", query="select f.id from FileDB f where f.uid = :uid"),
 	@NamedQuery(name="FileDB.findCommitedFiles", query="select f from FileDB f join f.fileXCommits "
 			+ "fxc where fxc.id.commitId = :id"),
-	@NamedQuery(name="FileDB.findByUids", query="select f from FileDB f where f.uid in (:uids)")
+	@NamedQuery(name="FileDB.findByUids", query="select f from FileDB f where f.uid in :uids")
 })
 
 public class FileDB implements Serializable {

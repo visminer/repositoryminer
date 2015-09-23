@@ -27,6 +27,7 @@ public class NOCAIMetric implements IMetric{
 	public void calculate(List<AST> astList, List<Commit> commits, MetricPersistance persistence){
 		
 		Map<Integer, Integer> packageCls = new HashMap<Integer, Integer>();
+		int projectQtd = 0;
 		for(AST ast : astList){
 			
 			Document doc = ast.getDocument();
@@ -37,23 +38,28 @@ public class NOCAIMetric implements IMetric{
 			}
 			
 			if(doc.getPackageDeclaration() != null){
+				
 				id = doc.getPackageDeclaration().getId();
-			}else{
-				id = ast.getProject().getId();
+				
+				if(packageCls.containsKey(id)){
+					int aux = packageCls.get(id);
+					packageCls.put(id, aux + num);
+				}else{
+					packageCls.put(id, num);
+				}
+				
 			}
-			
-			if(packageCls.containsKey(id)){
-				int aux = packageCls.get(id);
-				packageCls.put(id, aux + num);
-			}else{
-				packageCls.put(id, num);
-			}
+
+			projectQtd += num;
 			
 		}
 		
 		for(Entry<Integer, Integer> entry : packageCls.entrySet()){
 			persistence.postMetricValue(entry.getKey(), String.valueOf(entry.getValue()));
 		}
+		
+		if(astList != null)
+			persistence.postMetricValue(astList.get(0).getProject().getId(), String.valueOf(projectQtd));
 		
 	}
 

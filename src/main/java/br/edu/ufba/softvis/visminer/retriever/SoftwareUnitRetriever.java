@@ -23,7 +23,6 @@ public class SoftwareUnitRetriever extends Retriever {
 		
 		super.createEntityManager();
 		super.shareEntityManager(dao);
-		
 		List<SoftwareUnitDB> softUnitsDb = dao.findByFile(fileId);
 		if (softUnitsDb != null) {
 			softwareUnits = SoftwareUnitDB.toBusiness(softUnitsDb);
@@ -34,7 +33,7 @@ public class SoftwareUnitRetriever extends Retriever {
 				softUnit.setMetricValues(metricsVal);
 			}
 		}
-
+		
 		super.closeEntityManager();
 		
 		return softwareUnits;
@@ -48,7 +47,6 @@ public class SoftwareUnitRetriever extends Retriever {
 		
 		super.createEntityManager();
 		super.shareEntityManager(dao);
-
 		List<SoftwareUnitDB> softUnitsDb = dao.findByRepository(repositoryId);
 		if (softUnitsDb != null) {
 			softwareUnits = SoftwareUnitDB.toBusiness(softUnitsDb);

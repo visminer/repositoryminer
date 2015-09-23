@@ -10,9 +10,6 @@ import br.edu.ufba.softvis.visminer.model.database.MetricValuePK;
 import br.edu.ufba.softvis.visminer.persistence.dao.MetricValueDAO;
 
 /**
- * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
- * @version 0.9
- * 
  * Implementation of interface {@link MetricValueDAO}
  */
 
@@ -28,7 +25,8 @@ public class MetricValueDAOImpl extends DAOImpl<MetricValueDB, MetricValuePK> im
 		query.setHint("javax.persistence.cache.retrieveMode", "BYPASS");
 		query.setParameter("commitId", commitId);
 		query.setParameter("softwareUnitId", softwareUnitId);
-		return query.getResultList();
+		List<MetricValueDB> l = query.getResultList();
+		return l;
 		
 	}
 
