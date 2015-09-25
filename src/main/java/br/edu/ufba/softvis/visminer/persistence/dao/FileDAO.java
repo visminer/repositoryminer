@@ -10,12 +10,6 @@ import br.edu.ufba.softvis.visminer.model.database.FileDB;
 public interface FileDAO extends DAO<FileDB, Integer> {
 
 	/**
-	 * @param commitId
-	 * @return List of files by commit.
-	 */
-	public List<FileDB> findCommitedFiles(int commitId);
-	
-	/**
 	 * @param uids
 	 * @return List of files by their uids
 	 */

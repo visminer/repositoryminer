@@ -28,7 +28,7 @@ import br.edu.ufba.softvis.visminer.model.database.RepositoryDB;
 import br.edu.ufba.softvis.visminer.model.database.TreeDB;
 import br.edu.ufba.softvis.visminer.persistence.Database;
 import br.edu.ufba.softvis.visminer.persistence.MetricPersistance;
-import br.edu.ufba.softvis.visminer.persistence.SaveAST;
+import br.edu.ufba.softvis.visminer.persistence.ProcessAST;
 import br.edu.ufba.softvis.visminer.persistence.dao.FileDAO;
 import br.edu.ufba.softvis.visminer.persistence.dao.TreeDAO;
 import br.edu.ufba.softvis.visminer.persistence.impl.FileDAOImpl;
@@ -42,7 +42,7 @@ public class MetricCalculator{
 
 	private Map<MetricUid, IMetric> commitMetrics;
 	private Map<MetricUid, IMetric> snapshotMetrics;
-	private SaveAST saveAST;
+	private ProcessAST processAST;
 	private IVersioningSystem repoSys;
 	private Map<String, IASTGenerator> astGenerators;
 	private Set<String> analyzedCommits;
@@ -76,7 +76,7 @@ public class MetricCalculator{
 		this.repoSys = repoSys;
 		this.sourceFolders = new ArrayList<String>();
 		this.analyzedCommits = new HashSet<String>();
-		this.saveAST = new SaveAST(repoDb, entityManager);
+		this.processAST = new ProcessAST(repoDb, entityManager);
 		CommitRetriever commitRetriever = new CommitRetriever();
 
 		this.commitMetrics = new LinkedHashMap<MetricUid, IMetric>();
@@ -102,7 +102,6 @@ public class MetricCalculator{
 		List<File> commitFiles = new ArrayList<File>();
 
 		int nextCommit = getNextCommitToAnalysis(commits, commitFiles, snapshotFilesUids);
-
 		// No commits to analyze
 		if(nextCommit == commits.size()){
 			return;
@@ -116,6 +115,7 @@ public class MetricCalculator{
 
 		repoSys.checkoutToTree(commits.get(nextCommit).getName());
 		initASTs(commitASTs, snapshotASTs, commitFiles, snapshotFiles, commits.get(nextCommit).getName());
+		processAST.flushSoftwareUnits(commits.get(nextCommit).getId());
 		calculationMetricsHelper(commitMetrics, snapshotMetrics, commits.subList(0, nextCommit+1),
 				commitASTs, snapshotASTs, persistence);
 		
@@ -132,19 +132,26 @@ public class MetricCalculator{
 			getSourceFolders(repoSys.getAbsolutePath());
 
 			for(File file : commit.getCommitedFiles()){
-
+				
 				if(file.getFileState().isDeleted()){
-					snapshotASTs.remove(file.getPath());
+					
+					AST ast = snapshotASTs.remove(file.getPath());
+					if(ast != null)
+						processAST.process(file.getPath(), file.getId(), ast, true);
+					
 				}else{
-					AST ast = processAST(file.getPath(), file.getId(), commit.getName());
+					
+					AST ast = createAST(file.getPath(), file.getId(), commit.getName(), file.getFileState().isDeleted());
 					if(ast != null){
 						snapshotASTs.put(file.getPath(), ast);
 						commitASTs.put(file.getPath(), ast);
 					}
+					
 				}
 
 			}
-
+			
+			processAST.flushSoftwareUnits(commit.getId());
 			calculationMetricsHelper(commitMetrics, snapshotMetrics, commits.subList(0, i+1), commitASTs, snapshotASTs, persistence);
 
 		}
@@ -186,7 +193,6 @@ public class MetricCalculator{
 		
 		commitFiles.addAll(commits.get(i).getCommitedFiles());
 		snapshotFilesUids.addAll(repoSys.getSnapshotFiles(commits.get(i).getName()));
-		
 		return i;
 
 	}
@@ -198,7 +204,7 @@ public class MetricCalculator{
 		for(FileDB fileDb : snapshotFiles){
 			
 			File f = fileDb.toBusiness();
-			AST ast = processAST(f.getPath(), f.getId(), commitName);
+			AST ast = createAST(f.getPath(), f.getId(), commitName, false);
 			
 			if(ast == null)
 				continue;
@@ -208,20 +214,21 @@ public class MetricCalculator{
 				commitASTs.put(f.getPath(), ast);
 			
 		}
+		
 
 	}
 
 	// Creates the AST for the given file and save their software units
-	private AST processAST(String filePath, int fileId, String commitName){
+	private AST createAST(String filePath, int fileId, String commitName, boolean t){
 
 		int index = filePath.lastIndexOf(".") + 1;
 		String ext = filePath.substring(index);
 		IASTGenerator gen = astGenerators.get(ext);
-		
+
 		if(gen == null){
 			return null;
 		}
-
+		
 		/*
 		 *  Absolute path doesn't work correctly, with absolute path JGIT doesn't find the file.
 		 *  I save the absolute path, so I need to remove the repository absolute path part.
@@ -229,8 +236,9 @@ public class MetricCalculator{
 		 */
 		index = repoSys.getAbsolutePath().length()+1;
 		byte[] data = repoSys.getData(commitName, filePath.substring(index));
-		AST ast = gen.generate(filePath, data, saveAST.getRepositoryDB().getCharset(), sourceFolders.toArray(new String[sourceFolders.size()]));
-		saveAST.save(filePath, fileId, ast);
+		AST ast = gen.generate(filePath, data, processAST.getRepositoryDB().getCharset(), sourceFolders.toArray(new String[sourceFolders.size()]));
+		processAST.process(filePath, fileId, ast, false);
+			
 		return ast;
 
 	}

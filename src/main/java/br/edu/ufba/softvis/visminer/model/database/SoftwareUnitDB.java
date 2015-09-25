@@ -29,7 +29,8 @@ import br.edu.ufba.softvis.visminer.model.business.SoftwareUnit;
 @NamedQueries({
 		@NamedQuery(name = "SoftwareUnitDB.findByUid", query = "select sw from SoftwareUnitDB sw where sw.uid = :uid"),
 		@NamedQuery(name = "SoftwareUnitDB.findByFile", query = "select sw from SoftwareUnitDB sw where sw.file.id = :id"),
-		@NamedQuery(name = "SoftwareUnitDB.findByRepository", query = "select sw from SoftwareUnitDB sw where sw.repository.id = :id") })
+		@NamedQuery(name = "SoftwareUnitDB.findByRepository", query = "select swu from SoftwareUnitDB swu"
+				+ " inner join swu.commits c where swu.repository.id = :repositoryId and c.id = :commitId") })
 public class SoftwareUnitDB implements Serializable {
 	private static final long serialVersionUID = 1L;
 

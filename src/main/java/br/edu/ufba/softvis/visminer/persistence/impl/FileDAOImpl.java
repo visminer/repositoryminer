@@ -15,18 +15,6 @@ import br.edu.ufba.softvis.visminer.persistence.dao.FileDAO;
 public class FileDAOImpl extends DAOImpl<FileDB, Integer> implements FileDAO {
 
 	@Override
-	public List<FileDB> findCommitedFiles(int commitId) {
-		
-		EntityManager em = getEntityManager();
-		TypedQuery<FileDB> query = em.createNamedQuery("FileDB.findCommitedFiles", FileDB.class);
-		query.setHint("javax.persistence.cache.storeMode", "BYPASS");
-		query.setHint("javax.persistence.cache.retrieveMode", "BYPASS");
-		query.setParameter("id", commitId);
-		return query.getResultList();
-		
-	}
-
-	@Override
 	public List<FileDB> getFilesByUids(List<String> uids){
 		
 		EntityManager em = getEntityManager();

@@ -47,7 +47,7 @@ import br.edu.ufba.softvis.visminer.constant.LanguageType;
 @ASTGeneratorAnnotation(
 		language = LanguageType.CPP,
 		extensions = {"h", "cpp", "hpp"}
-)
+		)
 public class CPPASTGenerator implements IASTGenerator {
 
 	private Document document;
@@ -105,17 +105,15 @@ public class CPPASTGenerator implements IASTGenerator {
 		}
 
 		IASTPreprocessorIncludeStatement[] includes = tu.getIncludeDirectives();
-		if ((includes != null) && (includes.length > 0)) {
-			List<ImportDeclaration> importsDecls = new ArrayList<ImportDeclaration>();
-			for (IASTPreprocessorIncludeStatement include : includes) {
-				ImportDeclaration importDecl = new ImportDeclaration();
-				importDecl.setName(parseInclude(include.getRawSignature()));
-				importDecl.setStatic(false);
-				importDecl.setOnDemand(false);
-				importsDecls.add(importDecl);
-			}
-			document.setImports(importsDecls);
+		List<ImportDeclaration> importsDecls = new ArrayList<ImportDeclaration>();
+		for (IASTPreprocessorIncludeStatement include : includes) {
+			ImportDeclaration importDecl = new ImportDeclaration();
+			importDecl.setName(parseInclude(include.getRawSignature()));
+			importDecl.setStatic(false);
+			importDecl.setOnDemand(false);
+			importsDecls.add(importDecl);
 		}
+		document.setImports(importsDecls);
 
 		CPPASTVisitor visitor = new CPPASTVisitor(this);
 		tu.accept(visitor);

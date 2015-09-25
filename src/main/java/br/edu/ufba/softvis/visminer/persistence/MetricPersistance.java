@@ -9,36 +9,25 @@ import br.edu.ufba.softvis.visminer.constant.MetricUid;
 import br.edu.ufba.softvis.visminer.model.business.Commit;
 import br.edu.ufba.softvis.visminer.model.database.MetricValueDB;
 import br.edu.ufba.softvis.visminer.model.database.MetricValuePK;
-import br.edu.ufba.softvis.visminer.model.database.SoftwareUnitXCommitDB;
-import br.edu.ufba.softvis.visminer.model.database.SoftwareUnitXCommitPK;
 import br.edu.ufba.softvis.visminer.persistence.dao.MetricValueDAO;
-import br.edu.ufba.softvis.visminer.persistence.dao.SoftwareUnitXCommitDAO;
 import br.edu.ufba.softvis.visminer.persistence.impl.MetricValueDAOImpl;
-import br.edu.ufba.softvis.visminer.persistence.impl.SoftwareUnitXCommitImpl;
 
 /**
- * @version 0.9
  * Persistence interface for metrics calculation.
  */
 public class MetricPersistance {
 
 	
-	private SoftwareUnitXCommitDAO softUnitXCommitDao;
 	private MetricValueDAO metricValueDao;
 
 	private int commitId;
 	private MetricUid metric;
 	
-	private List<SoftwareUnitXCommitDB> unitsXCommits;
 	private List<MetricValueDB> metricValues;
 	
 	public MetricPersistance(EntityManager entityManager) {
 
-		this.unitsXCommits = new ArrayList<SoftwareUnitXCommitDB>();
 		this.metricValues  = new ArrayList<MetricValueDB>();
-
-		this.softUnitXCommitDao = new SoftwareUnitXCommitImpl();
-		this.softUnitXCommitDao.setEntityManager(entityManager);
 
 		this.metricValueDao = new MetricValueDAOImpl();
 		this.metricValueDao.setEntityManager(entityManager);
@@ -62,18 +51,10 @@ public class MetricPersistance {
 	}
 	
 	public void initBatchPersistence() {
-		unitsXCommits.clear();
 		metricValues.clear();
 	}
 	
 	public void postMetricValue(int softwareUnitId, String value){
-		
-		SoftwareUnitXCommitPK unitXCommitPk = new SoftwareUnitXCommitPK(softwareUnitId, commitId);
-		SoftwareUnitXCommitDB unitXCommit = new SoftwareUnitXCommitDB(unitXCommitPk);
-		
-		if(!unitsXCommits.contains(unitXCommit)){
-			unitsXCommits.add(unitXCommit);
-		}
 		
 		MetricValuePK metricValPk = new MetricValuePK(softwareUnitId, commitId, metric.getId());
 		MetricValueDB metricValDb =  new MetricValueDB(metricValPk, value);
@@ -83,7 +64,6 @@ public class MetricPersistance {
 	}
 	
 	public void flushAllMetricValues() {
-		softUnitXCommitDao.batchMerge(unitsXCommits);
 		metricValueDao.batchMerge(metricValues);
 	}
 

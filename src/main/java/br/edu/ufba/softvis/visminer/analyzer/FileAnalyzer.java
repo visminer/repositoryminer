@@ -38,7 +38,6 @@ public class FileAnalyzer{
 				
 				int index = filesDb.indexOf(file);
 				FileXCommitDB fxcDb = file.getFileXCommits().get(0);
-				
 				if(index == -1){
 					filesDb.add(file);
 					file.setFileXCommits(null);

@@ -2,6 +2,8 @@ package br.edu.ufba.softvis.visminer.analyzer;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -23,6 +25,15 @@ public class CommitAndCommitterAnalyzer{
 	public List<CommitDB> persist(RepositoryDB repositoryDb, IVersioningSystem repoSys, EntityManager entityManager) {
 
 		List<CommitDB> commitsDb = repoSys.getCommits();
+		Collections.sort(commitsDb, new Comparator<CommitDB>() {
+
+			@Override
+			public int compare(CommitDB o1, CommitDB o2) {
+				return o1.getDate().compareTo(o2.getDate());
+			}
+			
+		});
+		
 		List<CommitterDB> committersDb = new ArrayList<CommitterDB>();
 		List<CommitterDB> committersDbInsert = new ArrayList<CommitterDB>();
 		

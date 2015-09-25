@@ -1,8 +1,6 @@
 package br.edu.ufba.softvis.visminer.model.business;
 
 /**
- * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
- * @version 0.9
  * User friendly file state bean class.
  * This class will be used for user interface.
  */

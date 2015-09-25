@@ -1,40 +1,55 @@
 package br.edu.ufba.softvis.visminer.retriever;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import br.edu.ufba.softvis.visminer.model.business.Commit;
 import br.edu.ufba.softvis.visminer.model.business.File;
 import br.edu.ufba.softvis.visminer.model.business.FileState;
-import br.edu.ufba.softvis.visminer.model.business.Tree;
 import br.edu.ufba.softvis.visminer.model.database.CommitDB;
-import br.edu.ufba.softvis.visminer.model.database.FileDB;
 import br.edu.ufba.softvis.visminer.model.database.FileXCommitDB;
 import br.edu.ufba.softvis.visminer.persistence.dao.CommitDAO;
 import br.edu.ufba.softvis.visminer.persistence.dao.FileDAO;
+import br.edu.ufba.softvis.visminer.persistence.dao.FileXCommitDAO;
 import br.edu.ufba.softvis.visminer.persistence.impl.CommitDAOImpl;
 import br.edu.ufba.softvis.visminer.persistence.impl.FileDAOImpl;
+import br.edu.ufba.softvis.visminer.persistence.impl.FileXCommitDAOImpl;
 
 public class CommitRetriever extends Retriever {
 
+	// this map is used as temporary memory to avoid go to database many times
+	private Map<Integer, File> filesDBAux;
+	
 	private List<File> retrieveFiles(Commit commit) {
-
-		List<File> files = new ArrayList<File>();
 
 		FileDAO fileDAO = new FileDAOImpl();
 		super.shareEntityManager(fileDAO);
 
-		for (FileDB fileDB : fileDAO.findCommitedFiles(commit.getId())) {
+		FileXCommitDAO fxcDAO = new FileXCommitDAOImpl();
+		super.shareEntityManager(fxcDAO);
+		
+		List<File> files = new ArrayList<File>();
+		
+		for (FileXCommitDB fxc : fxcDAO.findByCommit(commit.getId())) {
 			
-			FileXCommitDB fxc = fileDB.getFileXCommits().get(0);
 			FileState fileState = new FileState(fxc.getLinesAdded(),
 					fxc.getLinesRemoved(), fxc.isRemoved());
-			File file = fileDB.toBusiness();
+			
+			File fileTemp = filesDBAux.get(fxc.getId().getFileId());
+			
+			if(fileTemp == null){
+				fileTemp = fileDAO.find(fxc.getId().getFileId()).toBusiness();
+				filesDBAux.put(fxc.getId().getFileId(), fileTemp);
+			}
+			
+			File file = fileTemp;
 			file.setFileState(fileState);
 			files.add(file);
 			
 		}
-
+		
 		return files;
 		
 	}
@@ -47,6 +62,7 @@ public class CommitRetriever extends Retriever {
 		super.createEntityManager();
 		super.shareEntityManager(dao);
 
+		filesDBAux = new HashMap<Integer, File>();
 		List<CommitDB> commitsDb = dao.findByTree(treeId);
 		if (commitsDb != null) {
 			commits.addAll(CommitDB.toBusiness(commitsDb));
@@ -55,15 +71,12 @@ public class CommitRetriever extends Retriever {
 			}
 		}
 
+		filesDBAux = null;
 		super.closeEntityManager();
-		
 		return commits;
+		
 	}
 
-	public List<Commit> retrieveByTree(Tree tree) {
-		return retrieveByTree(tree.getId());
-	}
-	
 	public List<Commit> retrieveByRepository(String repositoryPath){
 		
 		List<Commit> commits = new ArrayList<Commit>();
@@ -72,6 +85,7 @@ public class CommitRetriever extends Retriever {
 		super.createEntityManager();
 		super.shareEntityManager(dao);
 
+		filesDBAux = new HashMap<Integer, File>();
 		List<CommitDB> commitsDb = dao.findByRepository(repositoryPath);
 		if (commitsDb != null) {
 			commits.addAll(CommitDB.toBusiness(commitsDb));
@@ -80,8 +94,8 @@ public class CommitRetriever extends Retriever {
 			}
 		}
 
+		filesDBAux = null;
 		super.closeEntityManager();
-		
 		return commits;
 		
 	}

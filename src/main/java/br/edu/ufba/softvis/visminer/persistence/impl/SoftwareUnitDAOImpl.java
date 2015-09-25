@@ -10,7 +10,6 @@ import br.edu.ufba.softvis.visminer.model.database.SoftwareUnitDB;
 import br.edu.ufba.softvis.visminer.persistence.dao.SoftwareUnitDAO;
 
 /**
- * @version 0.9
  * Implementation of interface {@link SoftwareUnitDAO}
  */
 
@@ -42,11 +41,12 @@ public class SoftwareUnitDAOImpl extends DAOImpl<SoftwareUnitDB, Integer> implem
 	}
 
 	@Override
-	public List<SoftwareUnitDB> findByRepository(int repositoryId) {
+	public List<SoftwareUnitDB> findByRepository(int repositoryId, int commitId) {
 
 		EntityManager em = getEntityManager();
 		TypedQuery<SoftwareUnitDB> query = em.createNamedQuery("SoftwareUnitDB.findByRepository", SoftwareUnitDB.class);
-		query.setParameter("id", repositoryId);
+		query.setParameter("repositoryId", repositoryId);
+		query.setParameter("commitId", commitId);
 		return query.getResultList();
 		
 	}
