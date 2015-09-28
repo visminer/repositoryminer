@@ -8,11 +8,11 @@ public class DatabaseConfig {
 		
 		DBConfig dbConfig = new DBConfig();
 		dbConfig.setDriver("com.mysql.jdbc.Driver");
-		dbConfig.setUrl("jdbc:mysql://localhost/visminer");
+		dbConfig.setUrl("jdbc:mysql://localhost/v");
 		dbConfig.setUser("root");
 		dbConfig.setPassword("1234");
-	//	dbConfig.setGeneration("drop-and-create-tables");
-		dbConfig.setLogging("off");
+		dbConfig.setGeneration("drop-and-create-tables");
+		dbConfig.setLogging("fine");
 		
 		return dbConfig;
 		

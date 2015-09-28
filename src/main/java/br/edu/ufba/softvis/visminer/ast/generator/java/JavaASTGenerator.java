@@ -1,6 +1,5 @@
 package br.edu.ufba.softvis.visminer.ast.generator.java;
 
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -26,7 +25,6 @@ import br.edu.ufba.softvis.visminer.ast.PackageDeclaration;
 import br.edu.ufba.softvis.visminer.ast.ParameterDeclaration;
 import br.edu.ufba.softvis.visminer.ast.generator.IASTGenerator;
 import br.edu.ufba.softvis.visminer.constant.LanguageType;
-import br.edu.ufba.softvis.visminer.error.VisMinerAPIException;
 
 /**
  * Java AST generator
@@ -44,35 +42,21 @@ import br.edu.ufba.softvis.visminer.error.VisMinerAPIException;
 		)
 public class JavaASTGenerator implements IASTGenerator{
 
-	public AST generate(String filePath, byte[] source, String charset, String[] sourceFolders){
+	public AST generate(String filePath, String source, String[] sourceFolders){
 
 		Document document = new  Document();
 		document.setName(filePath);
 
-		if(source == null){
-			AST ast = new AST();
-			ast.setDocument(document);
-			return ast;
-		}
-
-		String sourceCode;
-		try {
-			sourceCode = new String(source, charset);
-		} catch (UnsupportedEncodingException e) {
-			throw new VisMinerAPIException(e.getMessage(), e);
-		}
-
 		ASTParser parser = ASTParser.newParser(org.eclipse.jdt.core.dom.AST.JLS8);
-		parser.setSource(sourceCode.toCharArray());
+		parser.setSource(source.toCharArray());
 		parser.setResolveBindings(true);
 		parser.setKind(ASTParser.K_COMPILATION_UNIT);
 		parser.setBindingsRecovery(true);		
 		parser.setUnitName(filePath.substring(filePath.lastIndexOf("/") + 1));
 
 		String[] classpath = {System.getProperty("java.home").replace("\\", "/")+"/lib/rt.jar"};
-
 		String[] encoding = new String[sourceFolders.length];
-		Arrays.fill(encoding,charset);		
+		Arrays.fill(encoding, "UTF-8");		
 
 		parser.setEnvironment(classpath, sourceFolders, encoding, true);
 

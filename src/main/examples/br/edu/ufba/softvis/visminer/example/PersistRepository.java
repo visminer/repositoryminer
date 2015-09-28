@@ -6,14 +6,10 @@ import java.util.List;
 
 import br.edu.ufba.softvis.visminer.constant.LanguageType;
 import br.edu.ufba.softvis.visminer.constant.MetricUid;
-import br.edu.ufba.softvis.visminer.constant.VersioningSystemType;
-import br.edu.ufba.softvis.visminer.constant.WebServiceType;
+import br.edu.ufba.softvis.visminer.constant.SCMType;
+import br.edu.ufba.softvis.visminer.constant.WebSCMType;
 import br.edu.ufba.softvis.visminer.main.VisMiner;
 import br.edu.ufba.softvis.visminer.model.business.Repository;
-import br.edu.ufba.softvis.visminer.model.database.SoftwareUnitDB;
-import br.edu.ufba.softvis.visminer.persistence.Database;
-import br.edu.ufba.softvis.visminer.persistence.impl.SoftwareUnitDAOImpl;
-import br.edu.ufba.softvis.visminer.retriever.RepositoryRetriever;
 
 //This example show how to persist a repository
 public class PersistRepository {
@@ -22,32 +18,25 @@ public class PersistRepository {
 	private String repositoryName = "Put here repository name";
 	private String repositoryOwner = "Put here repository owner";
 	private String repositoryPath = "/home/felipe/git/jgit-cookbook";
-	private VersioningSystemType repositoryType = VersioningSystemType.GIT;
-	private WebServiceType repositoryServiceType = WebServiceType.GITHUB;
-	private String charset = "UTF-8"; // this is the default value, does not need to be setted
+	private SCMType repositoryType = SCMType.GIT;
+	private WebSCMType repositoryServiceType = WebSCMType.GITHUB;
 	private List<MetricUid> metrics = Arrays.asList(MetricUid.SLOC);
-	private List<LanguageType> languages = Arrays.asList(LanguageType.JAVA);
+	private List<LanguageType> languages = Arrays.asList(LanguageType.JAVA, LanguageType.NONE);
 
 	public static void main(String[] args){
 		VisMiner vis = new VisMiner();
 		vis.setDBConfig(DatabaseConfig.getDBConfig());
-		
-	//	new PersistRepository().persistRepository();
-		
-		RepositoryRetriever r = new RepositoryRetriever();
-		
-		
+		new PersistRepository().persistRepository();
 	}
 
 	public void persistRepository(){
 
 		Repository repository = new Repository(0, repositoryDescription, repositoryName, repositoryPath,
-				repositoryOwner, repositoryType, repositoryServiceType, "", charset);
+				repositoryOwner, repositoryType, repositoryServiceType, "");
 
 		VisMiner vis = new VisMiner();
 		try {
 			vis.persistRepository(repository, metrics, languages);
-			//vis.connectWithWebRepository(repositoryPath);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -78,11 +67,11 @@ public class PersistRepository {
 		this.repositoryPath = repositoryPath;
 	}
 
-	public VersioningSystemType getRepositoryType() {
+	public SCMType getRepositoryType() {
 		return repositoryType;
 	}
 
-	public void setRepositoryType(VersioningSystemType repositoryType) {
+	public void setRepositoryType(SCMType repositoryType) {
 		this.repositoryType = repositoryType;
 	}
 
@@ -94,20 +83,12 @@ public class PersistRepository {
 		this.repositoryOwner = repositoryOwner;
 	}
 
-	public WebServiceType getRepositoryServiceType() {
+	public WebSCMType getRepositoryServiceType() {
 		return repositoryServiceType;
 	}
 
-	public void setRepositoryServiceType(WebServiceType repositoryServiceType) {
+	public void setRepositoryServiceType(WebSCMType repositoryServiceType) {
 		this.repositoryServiceType = repositoryServiceType;
-	}
-
-	public String getCharset() {
-		return charset;
-	}
-
-	public void setCharset(String charset) {
-		this.charset = charset;
 	}
 
 	public List<MetricUid> getMetrics() {

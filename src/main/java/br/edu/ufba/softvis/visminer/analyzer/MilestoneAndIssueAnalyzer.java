@@ -10,8 +10,8 @@ import java.util.regex.Pattern;
 
 import javax.persistence.EntityManager;
 
-import br.edu.ufba.softvis.visminer.analyzer.remote.IRepositoryService;
-import br.edu.ufba.softvis.visminer.analyzer.remote.RepositoryServiceFactory;
+import br.edu.ufba.softvis.visminer.analyzer.scm.web.WebSCM;
+import br.edu.ufba.softvis.visminer.analyzer.scm.web.WebSCMFactory;
 import br.edu.ufba.softvis.visminer.constant.IssueCommand;
 import br.edu.ufba.softvis.visminer.model.database.CommitDB;
 import br.edu.ufba.softvis.visminer.model.database.CommitReferenceIssueDB;
@@ -74,33 +74,33 @@ public class MilestoneAndIssueAnalyzer{
 	}
 
 	public void analyze(String repositoryPath, String user, String password){
-		IRepositoryService service = getService(repositoryPath);
+		WebSCM service = getService(repositoryPath);
 		service.connect(repoDB.getOwner(), repoDB.getName(), user, password);
 		processAll(service);
 	}
 	
 	public void analyze(String repositoryPath, String token){
-		IRepositoryService service = getService(repositoryPath);
+		WebSCM service = getService(repositoryPath);
 		service.connect(repoDB.getOwner(), repoDB.getName(), token);
 		processAll(service);
 	}
 	
 	public void analyze(String repositoryPath){
-		IRepositoryService service = getService(repositoryPath);
+		WebSCM service = getService(repositoryPath);
 		service.connect(repoDB.getOwner(), repoDB.getName());
 		processAll(service);
 	}
 	
-	private IRepositoryService getService(String repositoryPath){
+	private WebSCM getService(String repositoryPath){
 		
 		repoDB = repoDAO.findByPath(repositoryPath);
-		IRepositoryService service = RepositoryServiceFactory.getService(repoDB.getServiceType());
+		WebSCM service = WebSCMFactory.getService(repoDB.getServiceType());
 		return service;
 		
 	}
 	
 	// process issues and milestones
-	private void processAll(IRepositoryService service){
+	private void processAll(WebSCM service){
 		
 		milesMap = mileDAO.minimalFindByRepository(repoDB.getId());
 		List<MilestoneDB> milestones = service.getAllMilestones();

@@ -2,8 +2,8 @@ package br.edu.ufba.softvis.visminer.model.business;
 
 import java.util.List;
 
-import br.edu.ufba.softvis.visminer.constant.WebServiceType;
-import br.edu.ufba.softvis.visminer.constant.VersioningSystemType;
+import br.edu.ufba.softvis.visminer.constant.WebSCMType;
+import br.edu.ufba.softvis.visminer.constant.SCMType;
 
 /**
  * User friendly repository bean class.
@@ -17,10 +17,9 @@ public class Repository {
 	private String name;
 	private String path;
 	private String owner;
-	private VersioningSystemType type;
-	private WebServiceType serviceType;
+	private SCMType type;
+	private WebSCMType serviceType;
 	private String uid;
-	private String charset;
 	
 	private List<Committer> committers;
 	private List<Tree> trees;
@@ -40,8 +39,8 @@ public class Repository {
 	 * @param charset
 	 */
 	public Repository(int id, String description, String name, String path,
-			String owner, VersioningSystemType type,
-			WebServiceType serviceType, String uid, String charset) {
+			String owner, SCMType type,
+			WebSCMType serviceType, String uid) {
 		super();
 		this.id = id;
 		this.description = description;
@@ -51,7 +50,6 @@ public class Repository {
 		this.type = type;
 		this.serviceType = serviceType;
 		this.uid = uid;
-		this.charset = charset;
 	}
 
 	/**
@@ -127,28 +125,28 @@ public class Repository {
 	/**
 	 * @return the type
 	 */
-	public VersioningSystemType getType() {
+	public SCMType getType() {
 		return type;
 	}
 
 	/**
 	 * @param type the type to set
 	 */
-	public void setType(VersioningSystemType type) {
+	public void setType(SCMType type) {
 		this.type = type;
 	}
 
 	/**
 	 * @return the serviceType
 	 */
-	public WebServiceType getServiceType() {
+	public WebSCMType getServiceType() {
 		return serviceType;
 	}
 
 	/**
 	 * @param serviceType the serviceType to set
 	 */
-	public void setServiceType(WebServiceType serviceType) {
+	public void setServiceType(WebSCMType serviceType) {
 		this.serviceType = serviceType;
 	}
 
@@ -164,20 +162,6 @@ public class Repository {
 	 */
 	public void setUid(String uid) {
 		this.uid = uid;
-	}
-
-	/**
-	 * @return the charset
-	 */
-	public String getCharset() {
-		return charset;
-	}
-
-	/**
-	 * @param charset the charset to set
-	 */
-	public void setCharset(String charset) {
-		this.charset = charset;
 	}
 
 	/**

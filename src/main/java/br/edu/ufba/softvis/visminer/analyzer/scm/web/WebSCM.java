@@ -1,4 +1,4 @@
-package br.edu.ufba.softvis.visminer.analyzer.remote;
+package br.edu.ufba.softvis.visminer.analyzer.scm.web;
 
 import java.util.List;
 
@@ -8,7 +8,7 @@ import br.edu.ufba.softvis.visminer.model.database.MilestoneDB;
 /**
  * Interface that define what is needed to support a web-based repository.
  */
-public interface IRepositoryService {
+public interface WebSCM {
 
 	/**
 	 * @param owner

@@ -1,19 +1,16 @@
-package br.edu.ufba.softvis.visminer.analyzer.local;
+package br.edu.ufba.softvis.visminer.analyzer.scm;
 
-import java.util.Date;
 import java.util.List;
-
 import br.edu.ufba.softvis.visminer.constant.TreeType;
 import br.edu.ufba.softvis.visminer.model.database.CommitDB;
 import br.edu.ufba.softvis.visminer.model.database.FileDB;
 import br.edu.ufba.softvis.visminer.model.database.TreeDB;
 
-
 /**
  * Interface that define what is needed to support a repository.
  */
 
-public interface IVersioningSystem {
+public interface SCM {
 
 	/* 
 	 * All methods that return commits should return the committer inside of each commit.
@@ -35,14 +32,6 @@ public interface IVersioningSystem {
 	 */
 	public List<TreeDB> getTrees();
 
-
-	/**
-	 * @param treeName
-	 * @return Date of last commit made.
-	 */
-	public Date getLastCommitDate(String treeName);
-
-	
 	/**
 	 * @return List of all commits made.
 	 */
@@ -59,25 +48,35 @@ public interface IVersioningSystem {
 	 * @param filePath
 	 * @return File data as bytes.
 	 */
-	public byte[] getData(String commitUid, String filePath);
+	public String getSource(String commitUid, String filePath);
 
 	/**
 	 * @param commitUid
 	 * @return List of modified files (with modifications) in a commit.
 	 */
-	public List<FileDB> getCommitedFiles(CommitDB commitDb);
+	public List<FileDB> getCommitedFiles(CommitDB commitDB);
 
 	/**
 	 * @param commitUid
 	 * @return List of files uids in certain snapshot.
 	 */
-	public List<String> getSnapshotFiles(String commitUid);
+	public List<String> getRepositoryFiles(String hash);
 
 	/**
 	 * @param treeName
 	 * Makes a checkout to a give tree.
 	 */
-	public void checkoutToTree(String treeName);
+	public void checkout(String hash);
+	
+	/**
+	 * Removes the working branch created by visminer to make the mining.
+	 */
+	public void deleteVMBranch();
+	
+	/**
+	 * Resets repository HEAD to master
+	 */
+	public void reset();
 	
 	/**
 	 * Closes the repository and frees memory and resources.

@@ -35,7 +35,7 @@ public class CommitRetriever extends Retriever {
 		for (FileXCommitDB fxc : fxcDAO.findByCommit(commit.getId())) {
 			
 			FileState fileState = new FileState(fxc.getLinesAdded(),
-					fxc.getLinesRemoved(), fxc.isRemoved());
+					fxc.getLinesRemoved(), fxc.getChange());
 			
 			File fileTemp = filesDBAux.get(fxc.getId().getFileId());
 			

@@ -17,8 +17,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
-import br.edu.ufba.softvis.visminer.constant.VersioningSystemType;
-import br.edu.ufba.softvis.visminer.constant.WebServiceType;
+import br.edu.ufba.softvis.visminer.constant.SCMType;
+import br.edu.ufba.softvis.visminer.constant.WebSCMType;
 import br.edu.ufba.softvis.visminer.model.business.Repository;
 
 /**
@@ -59,9 +59,6 @@ public class RepositoryDB implements Serializable {
 	@Column(unique = true, nullable = false, length = 40)
 	private String uid;
 
-	@Column(nullable = false, length = 20)
-	private String charset;
-
 	@ManyToMany(mappedBy = "repositories")
 	private List<CommitterDB> committers;
 
@@ -85,8 +82,8 @@ public class RepositoryDB implements Serializable {
 	}
 
 	public RepositoryDB(int id, String description, String name, String owner,
-			String path, VersioningSystemType type,	WebServiceType serviceType,
-			String uid, String charset) {
+			String path, SCMType type,	WebSCMType serviceType,
+			String uid) {
 		
 		super();
 		this.id = id;
@@ -97,7 +94,6 @@ public class RepositoryDB implements Serializable {
 		this.type = type != null ? type.getId() : 0;
 		this.serviceType = serviceType != null ? serviceType.getId() : 0;
 		this.uid = uid;
-		this.charset = charset;
 		
 	}
 
@@ -178,30 +174,30 @@ public class RepositoryDB implements Serializable {
 	/**
 	 * @return the type
 	 */
-	public VersioningSystemType getType() {
-		return VersioningSystemType.parse(type);
+	public SCMType getType() {
+		return SCMType.parse(type);
 	}
 
 	/**
 	 * @param type
 	 *            the type to set
 	 */
-	public void setType(VersioningSystemType type) {
+	public void setType(SCMType type) {
 		this.type = type != null ? type.getId() : 0;
 	}
 
 	/**
 	 * @return the serviceType
 	 */
-	public WebServiceType getServiceType() {
-		return WebServiceType.parse(serviceType);
+	public WebSCMType getServiceType() {
+		return WebSCMType.parse(serviceType);
 	}
 
 	/**
 	 * @param serviceType
 	 *            the serviceType to set
 	 */
-	public void setServiceType(WebServiceType serviceType) {
+	public void setServiceType(WebSCMType serviceType) {
 		this.serviceType = serviceType != null ? serviceType.getId() : 0;
 	}
 
@@ -218,21 +214,6 @@ public class RepositoryDB implements Serializable {
 	 */
 	public void setUid(String uid) {
 		this.uid = uid;
-	}
-
-	/**
-	 * @return the charset
-	 */
-	public String getCharset() {
-		return charset;
-	}
-
-	/**
-	 * @param charset
-	 *            the charset to set
-	 */
-	public void setCharset(String charset) {
-		this.charset = charset;
 	}
 
 	/**
@@ -317,7 +298,7 @@ public class RepositoryDB implements Serializable {
 		Repository repository = new Repository(this.getId(),
 				this.getDescription(), this.getName(), this.getPath(),
 				this.getOwner(), this.getType(), this.getServiceType(),
-				this.getUid(), this.getCharset());
+				this.getUid());
 
 		return repository;
 	}
@@ -336,7 +317,7 @@ public class RepositoryDB implements Serializable {
 			Repository repository = new Repository(repo.getId(),
 					repo.getDescription(), repo.getName(), repo.getPath(),
 					repo.getOwner(), repo.getType(), repo.getServiceType(),
-					repo.getUid(), repo.getCharset());
+					repo.getUid());
 
 			bizzRepos.add(repository);
 		}

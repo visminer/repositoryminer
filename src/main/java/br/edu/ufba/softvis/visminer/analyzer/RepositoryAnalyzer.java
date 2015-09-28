@@ -6,8 +6,8 @@ import java.util.List;
 import javax.management.openmbean.KeyAlreadyExistsException;
 import javax.persistence.EntityManager;
 
-import br.edu.ufba.softvis.visminer.analyzer.local.IVersioningSystem;
-import br.edu.ufba.softvis.visminer.analyzer.local.VersioningSystemFactory;
+import br.edu.ufba.softvis.visminer.analyzer.scm.SCM;
+import br.edu.ufba.softvis.visminer.analyzer.scm.SCMFactory;
 import br.edu.ufba.softvis.visminer.constant.LanguageType;
 import br.edu.ufba.softvis.visminer.constant.MetricUid;
 import br.edu.ufba.softvis.visminer.constant.SoftwareUnitType;
@@ -35,7 +35,7 @@ public class RepositoryAnalyzer{
 	*/
 	public void persist(Repository repoBusi, List<MetricUid> metrics, List<LanguageType> languages) {
 		
-		IVersioningSystem repoSys = VersioningSystemFactory.getRepository(repoBusi.getType());
+		SCM repoSys = SCMFactory.getRepository(repoBusi.getType());
 		repoSys.open(repoBusi.getPath());
 		
 		EntityManager entityManager = Database.getInstance().getEntityManager();
@@ -54,11 +54,7 @@ public class RepositoryAnalyzer{
 		String uid = StringUtils.sha1(path);
 		RepositoryDB repositoryDb = new RepositoryDB(0, repoBusi.getDescription(),
 				repoBusi.getName(), repoBusi.getOwner(), path, repoBusi.getType(),
-				repoBusi.getServiceType(), uid, repoBusi.getCharset());
-		
-		if(repoBusi.getCharset() == null){
-			repositoryDb.setCharset("UTF-8"); //UTF-8 is used as default charset
-		}
+				repoBusi.getServiceType(), uid);
 		
 		repositoryDao.save(repositoryDb);
 		List<CommitDB> commitsDB = new CommitAndCommitterAnalyzer().persist(repositoryDb, repoSys, entityManager);
@@ -79,6 +75,9 @@ public class RepositoryAnalyzer{
 
 		entityManager.clear();
 		entityManager.close();
+		
+		repoSys.deleteVMBranch();
+		repoSys.reset();
 		repoSys.close();
 		
 	}
@@ -100,7 +99,7 @@ public class RepositoryAnalyzer{
 			return;
 		}
 		
-		IVersioningSystem repoSys = VersioningSystemFactory.getRepository(repoDb.getType());
+		SCM repoSys = SCMFactory.getRepository(repoDb.getType());
 		repoSys.open(repositoryPath);
 		
 		//MetricCalculator.calculate(metrics, repoSys, repoDb, entityManager);
