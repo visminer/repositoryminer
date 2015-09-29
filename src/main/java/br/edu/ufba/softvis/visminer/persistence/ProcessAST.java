@@ -36,11 +36,11 @@ import br.edu.ufba.softvis.visminer.utility.StringUtils;
  */
 public class ProcessAST {
 
-	// Uids of the software units that still stand
+	// Uids of the software units that appear in current commit
 	private Map<String, Integer> snapshotUids;
 
-	// Uids of the software units that were removed
-	private Map<String, Integer> removedUids;
+	// Uids of the software units that already appear
+	private Map<String, Integer> allUids;
 
 	// Number of children of the packages, if a package has no children it is deleted
 	private Map<Integer, Integer> pkgChildren;
@@ -58,7 +58,7 @@ public class ProcessAST {
 	public ProcessAST(RepositoryDB repositoryDb, EntityManager entityManager){
 
 		snapshotUids = new HashMap<String, Integer>();
-		removedUids = new HashMap<String, Integer>();
+		allUids = new HashMap<String, Integer>();
 		pkgChildren = new HashMap<Integer, Integer>();
 
 		softUnitDao = new SoftwareUnitDAOImpl();
@@ -197,39 +197,42 @@ public class ProcessAST {
 	private SoftwareUnitDB getSofwareUnitDB(String uid, String name, SoftwareUnitType type, int fileId,
 			RepositoryDB repoDb, SoftwareUnitDB parent, boolean isDelete){
 
+		if(isDelete && type == SoftwareUnitType.PACKAGE){
+
+			return new SoftwareUnitDB(snapshotUids.get(uid), name, type, uid);
+
+		}else if(isDelete){
+
+			countPackageChidren(parent, true);
+			return new SoftwareUnitDB(snapshotUids.remove(uid), name, type, uid);
+
+		}
+		
 		SoftwareUnitDB softwareUnitDB;
-		Integer id = snapshotUids.get(uid);
+		Integer id = allUids.get(uid);
 
 		if(id != null){
 
 			softwareUnitDB = new SoftwareUnitDB(id, name, type, uid);
-
-			if(isDelete){
-				snapshotUids.remove(uid);
-				removedUids.put(uid, id);
-				countPackageChidren(parent, true);
+			if(!snapshotUids.containsKey(uid)){
+				snapshotUids.put(uid, id);
+				countPackageChidren(parent, false);
 			}
-
-		}else if( (id = removedUids.get(uid)) != null ){
-
-			// The software unit one time removed reappeared
-			snapshotUids.put(uid, id);
-			removedUids.remove(uid);
-
-			softwareUnitDB = new SoftwareUnitDB(id, name, type, uid);
-			countPackageChidren(parent, false);
 
 		}else{				
 
 			softwareUnitDB = new SoftwareUnitDB(0, name, type, uid);
+			countPackageChidren(parent, false);
+			
 			if(fileId != 0)
 				softwareUnitDB.setFile(new FileDB(fileId));
 
 			softwareUnitDB.setRepository(repoDb);
 			softwareUnitDB.setSoftwareUnit(parent);
 			softUnitDao.save(softwareUnitDB);
+			
+			allUids.put(uid, softwareUnitDB.getId());
 			snapshotUids.put(uid, softwareUnitDB.getId());
-			countPackageChidren(parent, false);
 
 		}
 
@@ -251,22 +254,14 @@ public class ProcessAST {
 			if(isDelete){
 
 				qtd--;
-				int size = qtd >= 0 ? qtd : 0;
-				pkgChildren.put(softUnit.getId(), size);
-
-				if(size == 0){
+				pkgChildren.put(softUnit.getId(), qtd);
+				if(qtd == 0)
 					snapshotUids.remove(softUnit.getUid());
-					removedUids.put(softUnit.getUid(), softUnit.getId());
-				}
 
-			}else{
-
-				if(qtd != null)
-					pkgChildren.put(softUnit.getId(), pkgChildren.get(softUnit.getId())+1);
-				else
-					pkgChildren.put(softUnit.getId(), 1);
-
-			}
+			}else if(qtd != null)
+				pkgChildren.put(softUnit.getId(), pkgChildren.get(softUnit.getId())+1);
+			else
+				pkgChildren.put(softUnit.getId(), 1);
 
 		}
 
@@ -276,7 +271,7 @@ public class ProcessAST {
 	 * @param commitId
 	 * Persists in database the relationship between software unit and commit.
 	 */
-	public void flushSoftwareUnits(int commitId){
+	public void flushSoftwareUnits(int commitId, String name){
 
 		List<SoftwareUnitXCommitDB> list = new ArrayList<SoftwareUnitXCommitDB>();
 		for(Integer softUnitId : snapshotUids.values()){
@@ -286,7 +281,7 @@ public class ProcessAST {
 		}
 
 		softUnitXCommitDAO.batchSave(list);
-
+		
 	}
 
 }

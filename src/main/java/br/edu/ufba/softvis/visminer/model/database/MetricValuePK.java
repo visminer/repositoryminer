@@ -12,13 +12,13 @@ public class MetricValuePK implements Serializable {
 	//default serial version id, required for serializable classes.
 	private static final long serialVersionUID = 1L;
 
-	@Column(name="software_unit_id", insertable=true, updatable=false, nullable=false)
+	@Column(name="software_unit_id", insertable=true, updatable=true, nullable=false)
 	private int softwareUnitId;
 
-	@Column(name="commit_id", insertable=true, updatable=false, nullable=false)
+	@Column(name="commit_id", insertable=true, updatable=true, nullable=false)
 	private int commitId;
 
-	@Column(name="metric_id", insertable=true, updatable=false, nullable=false)
+	@Column(name="metric_id", insertable=true, updatable=true, nullable=false)
 	private int metricId;
 
 	public MetricValuePK() {

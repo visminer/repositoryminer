@@ -24,9 +24,9 @@ public class FileXCommitDB implements Serializable {
 	@Column(name="lines_removed")
 	private int linesRemoved;
 
-	@Column(nullable=false)
-	private int change;
-
+	@Column(name="change_type")
+	private int changeType;
+	
 	//bi-directional many-to-one association to CommitDB
 	@ManyToOne
 	@JoinColumn(name="commit_id", nullable=false, insertable=false, updatable=false)
@@ -52,7 +52,7 @@ public class FileXCommitDB implements Serializable {
 		this.id = id;
 		this.linesAdded = linesAdded;
 		this.linesRemoved = linesRemoved;
-		this.change = change != null ? change.getId() : 0;
+		//this.change = change != null ? change.getId() : 0;
 	}
 
 	/**
@@ -100,15 +100,15 @@ public class FileXCommitDB implements Serializable {
 	/**
 	 * @return the change
 	 */
-	public ChangeType getChange() {
-		return ChangeType.parse(change);
+	public ChangeType getChangeType() {
+		return ChangeType.parse(changeType);
 	}
 
 	/**
 	 * @param change the change to set
 	 */
-	public void setChange(ChangeType change) {
-		this.change = change != null ? change.getId() : 0;
+	public void setChangeType(ChangeType changeType) {
+		this.changeType = changeType != null ? changeType.getId() : 0;
 	}
 
 	/**

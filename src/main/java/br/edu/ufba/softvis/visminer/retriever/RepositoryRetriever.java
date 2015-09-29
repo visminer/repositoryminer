@@ -16,7 +16,6 @@ import br.edu.ufba.softvis.visminer.persistence.dao.TreeDAO;
 import br.edu.ufba.softvis.visminer.persistence.impl.CommitterDAOImpl;
 import br.edu.ufba.softvis.visminer.persistence.impl.RepositoryDAOImpl;
 import br.edu.ufba.softvis.visminer.persistence.impl.TreeDAOImpl;
-import br.edu.ufba.softvis.visminer.utility.StringUtils;
 
 public class RepositoryRetriever extends Retriever {
 

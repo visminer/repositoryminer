@@ -49,6 +49,7 @@ public class MetricCalculator{
 	private Set<String> analyzedCommits;
 	private EntityManager entityManager;
 	private List<String> sourceFolders;
+	private MetricPersistance persistence;
 	
 	/**
 	 * @param metrics
@@ -82,6 +83,8 @@ public class MetricCalculator{
 
 		this.commitMetrics = new LinkedHashMap<MetricUid, IMetric>();
 		this.snapshotMetrics = new LinkedHashMap<MetricUid, IMetric>();
+		this.persistence = new MetricPersistance(entityManager, repoDb.getUid());
+		
 		MetricConfig.getImplementations(metrics, commitMetrics, snapshotMetrics);
 
 		for(TreeDB treeDb : treesDb){
@@ -95,9 +98,6 @@ public class MetricCalculator{
 
 	// This is the main method in metric calculation, it manages all other process.
 	private void calculateMetrics(List<Commit> commits) {
-
-		MetricPersistance persistence = new MetricPersistance(entityManager);
-		persistence.initBatchPersistence();
 
 		List<String> snapshotFilesUids = new ArrayList<String>();
 		List<File> commitFiles = new ArrayList<File>();
@@ -118,9 +118,9 @@ public class MetricCalculator{
 
 		repoSys.checkout(commits.get(nextCommit).getName());
 		initASTs(commitASTs, snapshotASTs, commitFiles, snapshotFiles, commits.get(nextCommit).getName());
-		processAST.flushSoftwareUnits(commits.get(nextCommit).getId());
+		processAST.flushSoftwareUnits(commits.get(nextCommit).getId(), "");
 		calculationMetricsHelper(commitMetrics, snapshotMetrics, commits.subList(0, nextCommit+1),
-				commitASTs, snapshotASTs, persistence);
+				commitASTs, snapshotASTs);
 		
 		for(int i = nextCommit+1; i < commits.size(); i++){
 
@@ -135,7 +135,7 @@ public class MetricCalculator{
 			getSourceFolders(repoSys.getAbsolutePath());
 
 			for(File file : commit.getCommitedFiles()){
-				
+			
 				if(file.getFileState().getChange() == ChangeType.DELETE){
 					
 					AST ast = snapshotASTs.remove(file.getPath());
@@ -154,8 +154,8 @@ public class MetricCalculator{
 
 			}
 			
-			processAST.flushSoftwareUnits(commit.getId());
-			calculationMetricsHelper(commitMetrics, snapshotMetrics, commits.subList(0, i+1), commitASTs, snapshotASTs, persistence);
+			processAST.flushSoftwareUnits(commit.getId(), commit.getName());
+			calculationMetricsHelper(commitMetrics, snapshotMetrics, commits.subList(0, i+1), commitASTs, snapshotASTs);
 
 		}
 		
@@ -248,7 +248,7 @@ public class MetricCalculator{
 
 	// Simple helper to calculate the metrics
 	private void calculationMetricsHelper(Map<MetricUid, IMetric> commitMetrics, Map<MetricUid, IMetric> snapshotMetrics,
-			List<Commit> commits, Map<String, AST> commitASTs, Map<String, AST> snapshotASTs, MetricPersistance persistence){
+			List<Commit> commits, Map<String, AST> commitASTs, Map<String, AST> snapshotASTs){
 
 		List<AST> commitsASTsList = new ArrayList<AST>(commitASTs.values());
 		List<AST> snapshotASTsList = new ArrayList<AST>(snapshotASTs.values());

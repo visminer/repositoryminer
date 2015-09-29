@@ -104,7 +104,7 @@ public class GitRepository implements SCM{
 
 		diffFormatter = new DiffFormatter(DisabledOutputStream.INSTANCE);
 		diffFormatter.setRepository(repository);
-		diffFormatter.setBinaryFileThreshold(2 * 1024); // 2 mb is the max
+		//diffFormatter.setBinaryFileThreshold(2 * 1024); // 2 mb is the max
 		diffFormatter.setContext(0);
 		diffFormatter.setDiffComparator(RawTextComparator.DEFAULT);
 		diffFormatter.setDetectRenames(false);
@@ -294,7 +294,8 @@ public class GitRepository implements SCM{
 			RevTree tree = revCommit.getTree();
 			TreeWalk treeWalk = TreeWalk.forPath(reader, filePath, tree);
 			byte[] bytes = reader.open(treeWalk.getObjectId(0)).getBytes();
-
+			reader.close();
+			
 			return new String(bytes, CHARSET);
 
 		} catch (UnsupportedEncodingException e) {
@@ -316,6 +317,7 @@ public class GitRepository implements SCM{
 
 		try{
 			
+			String repoPath = getAbsolutePath();
 			RevCommit revCommit = revWalk.parseCommit(ObjectId.fromString(commitDB.getName()));
 			AnyObjectId currentCommit = repository.resolve(commitDB.getName());
 			AnyObjectId oldCommit = revCommit.getParentCount() > 0 ? 
@@ -334,21 +336,23 @@ public class GitRepository implements SCM{
 				FileXCommitDB fxcDB = new FileXCommitDB();
 				
 				fxcDB.setId(new FileXCommitPK(0, commitDB.getId()));
-				fileDB.setPath(entry.getNewPath());
-				fileDB.setUid(StringUtils.sha1(fileDB.getPath()));
 				
-				if(entry.getChangeType() == org.eclipse.jgit.diff.DiffEntry.ChangeType.DELETE){
-					fxcDB.setChange(ChangeType.DELETE);
-				}else{
-					
-					getFileChanges(entry.getNewPath(), parentCommit, revCommit, fxcDB);
-					if((entry.getChangeType() == org.eclipse.jgit.diff.DiffEntry.ChangeType.ADD)
+				String path = !entry.getNewPath().equals("/dev/null") ? entry.getNewPath() 
+						: entry.getOldPath();
+				
+				fileDB.setPath(repoPath + "/" + path);
+				fileDB.setUid(StringUtils.sha1(fileDB.getPath()));
+				getFileChanges(path, parentCommit, revCommit, fxcDB);
+				
+				if(entry.getChangeType() == org.eclipse.jgit.diff.DiffEntry.ChangeType.DELETE)
+					fxcDB.setChangeType(ChangeType.DELETE);
+				else if((entry.getChangeType() == org.eclipse.jgit.diff.DiffEntry.ChangeType.ADD)
 							|| entry.getChangeType() == org.eclipse.jgit.diff.DiffEntry.ChangeType.COPY)
-						fxcDB.setChange(ChangeType.ADD);
-					else
-						fxcDB.setChange(ChangeType.MODIFY);
+						fxcDB.setChangeType(ChangeType.ADD);
+				else
+						fxcDB.setChangeType(ChangeType.MODIFY);
 					
-				}
+				
 				
 				List<FileXCommitDB> fxcList = new ArrayList<FileXCommitDB>(1);
 				fxcList.add(fxcDB);
@@ -439,6 +443,7 @@ public class GitRepository implements SCM{
 	@Override
 	public void checkout(String hash){
 
+		reset();
 		deleteVMBranch();
 		try {
 

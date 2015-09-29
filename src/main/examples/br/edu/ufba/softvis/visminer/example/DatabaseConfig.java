@@ -12,7 +12,7 @@ public class DatabaseConfig {
 		dbConfig.setUser("root");
 		dbConfig.setPassword("1234");
 		dbConfig.setGeneration("drop-and-create-tables");
-		dbConfig.setLogging("fine");
+		dbConfig.setLogging("off");
 		
 		return dbConfig;
 		

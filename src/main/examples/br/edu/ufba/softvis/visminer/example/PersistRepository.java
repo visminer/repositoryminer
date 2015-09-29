@@ -9,7 +9,10 @@ import br.edu.ufba.softvis.visminer.constant.MetricUid;
 import br.edu.ufba.softvis.visminer.constant.SCMType;
 import br.edu.ufba.softvis.visminer.constant.WebSCMType;
 import br.edu.ufba.softvis.visminer.main.VisMiner;
+import br.edu.ufba.softvis.visminer.model.business.Commit;
+import br.edu.ufba.softvis.visminer.model.business.File;
 import br.edu.ufba.softvis.visminer.model.business.Repository;
+import br.edu.ufba.softvis.visminer.retriever.CommitRetriever;
 
 //This example show how to persist a repository
 public class PersistRepository {
@@ -17,16 +20,18 @@ public class PersistRepository {
 	private String repositoryDescription = "Put here repository description";
 	private String repositoryName = "Put here repository name";
 	private String repositoryOwner = "Put here repository owner";
-	private String repositoryPath = "/home/felipe/git/jgit-cookbook";
+	private static String repositoryPath = "/home/felipe/git/Visminer-Test";
 	private SCMType repositoryType = SCMType.GIT;
 	private WebSCMType repositoryServiceType = WebSCMType.GITHUB;
-	private List<MetricUid> metrics = Arrays.asList(MetricUid.SLOC);
+	private List<MetricUid> metrics = Arrays.asList(MetricUid.SLOC, MetricUid.ATFD, MetricUid.CC, MetricUid.NOCAI, MetricUid.TCC, MetricUid.WMC);
 	private List<LanguageType> languages = Arrays.asList(LanguageType.JAVA, LanguageType.NONE);
 
 	public static void main(String[] args){
+		
 		VisMiner vis = new VisMiner();
 		vis.setDBConfig(DatabaseConfig.getDBConfig());
 		new PersistRepository().persistRepository();
+		
 	}
 
 	public void persistRepository(){
