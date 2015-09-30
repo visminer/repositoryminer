@@ -12,12 +12,13 @@ import java.util.Set;
 
 import javax.persistence.EntityManager;
 
-import br.edu.ufba.softvis.visminer.analyzer.local.IVersioningSystem;
+import br.edu.ufba.softvis.visminer.analyzer.scm.SCM;
 import br.edu.ufba.softvis.visminer.annotations.ASTGeneratorAnnotation;
 import br.edu.ufba.softvis.visminer.ast.AST;
 import br.edu.ufba.softvis.visminer.ast.generator.ASTGeneratorFactory;
 import br.edu.ufba.softvis.visminer.ast.generator.IASTGenerator;
 import br.edu.ufba.softvis.visminer.config.MetricConfig;
+import br.edu.ufba.softvis.visminer.constant.ChangeType;
 import br.edu.ufba.softvis.visminer.constant.LanguageType;
 import br.edu.ufba.softvis.visminer.constant.MetricUid;
 import br.edu.ufba.softvis.visminer.metric.IMetric;
@@ -43,11 +44,12 @@ public class MetricCalculator{
 	private Map<MetricUid, IMetric> commitMetrics;
 	private Map<MetricUid, IMetric> snapshotMetrics;
 	private ProcessAST processAST;
-	private IVersioningSystem repoSys;
+	private SCM repoSys;
 	private Map<String, IASTGenerator> astGenerators;
 	private Set<String> analyzedCommits;
 	private EntityManager entityManager;
 	private List<String> sourceFolders;
+	private MetricPersistance persistence;
 	
 	/**
 	 * @param metrics
@@ -57,7 +59,7 @@ public class MetricCalculator{
 	 * 
 	 * Calculates the metrics for the target languages.
 	 */
-	public void calculate(List<MetricUid> metrics, IVersioningSystem repoSys, RepositoryDB repoDb, List<LanguageType> languages){
+	public void calculate(List<MetricUid> metrics, SCM repoSys, RepositoryDB repoDb, List<LanguageType> languages){
 
 		entityManager = Database.getInstance().getEntityManager();
 
@@ -81,6 +83,8 @@ public class MetricCalculator{
 
 		this.commitMetrics = new LinkedHashMap<MetricUid, IMetric>();
 		this.snapshotMetrics = new LinkedHashMap<MetricUid, IMetric>();
+		this.persistence = new MetricPersistance(entityManager, repoDb.getUid());
+		
 		MetricConfig.getImplementations(metrics, commitMetrics, snapshotMetrics);
 
 		for(TreeDB treeDb : treesDb){
@@ -95,17 +99,16 @@ public class MetricCalculator{
 	// This is the main method in metric calculation, it manages all other process.
 	private void calculateMetrics(List<Commit> commits) {
 
-		MetricPersistance persistence = new MetricPersistance(entityManager);
-		persistence.initBatchPersistence();
-
 		List<String> snapshotFilesUids = new ArrayList<String>();
 		List<File> commitFiles = new ArrayList<File>();
 
 		int nextCommit = getNextCommitToAnalysis(commits, commitFiles, snapshotFilesUids);
+		
 		// No commits to analyze
 		if(nextCommit == commits.size()){
 			return;
 		}
+		
 		FileDAO dao = new FileDAOImpl();
 		dao.setEntityManager(entityManager);
 		List<FileDB> snapshotFiles = dao.getFilesByUids(snapshotFilesUids);
@@ -113,11 +116,11 @@ public class MetricCalculator{
 		Map<String, AST> commitASTs = new LinkedHashMap<String, AST>();
 		Map<String, AST> snapshotASTs = new LinkedHashMap<String, AST>();
 
-		repoSys.checkoutToTree(commits.get(nextCommit).getName());
+		repoSys.checkout(commits.get(nextCommit).getName());
 		initASTs(commitASTs, snapshotASTs, commitFiles, snapshotFiles, commits.get(nextCommit).getName());
-		processAST.flushSoftwareUnits(commits.get(nextCommit).getId());
+		processAST.flushSoftwareUnits(commits.get(nextCommit).getId(), "");
 		calculationMetricsHelper(commitMetrics, snapshotMetrics, commits.subList(0, nextCommit+1),
-				commitASTs, snapshotASTs, persistence);
+				commitASTs, snapshotASTs);
 		
 		for(int i = nextCommit+1; i < commits.size(); i++){
 
@@ -127,13 +130,13 @@ public class MetricCalculator{
 			analyzedCommits.add(commits.get(i).getName());
 			
 			Commit commit = commits.get(i);
-			repoSys.checkoutToTree(commit.getName());
+			repoSys.checkout(commit.getName());
 			sourceFolders = new ArrayList<String>();
 			getSourceFolders(repoSys.getAbsolutePath());
 
 			for(File file : commit.getCommitedFiles()){
-				
-				if(file.getFileState().isDeleted()){
+			
+				if(file.getFileState().getChange() == ChangeType.DELETE){
 					
 					AST ast = snapshotASTs.remove(file.getPath());
 					if(ast != null)
@@ -141,7 +144,7 @@ public class MetricCalculator{
 					
 				}else{
 					
-					AST ast = createAST(file.getPath(), file.getId(), commit.getName(), file.getFileState().isDeleted());
+					AST ast = createAST(file.getPath(), file.getId(), commit.getName());
 					if(ast != null){
 						snapshotASTs.put(file.getPath(), ast);
 						commitASTs.put(file.getPath(), ast);
@@ -151,8 +154,8 @@ public class MetricCalculator{
 
 			}
 			
-			processAST.flushSoftwareUnits(commit.getId());
-			calculationMetricsHelper(commitMetrics, snapshotMetrics, commits.subList(0, i+1), commitASTs, snapshotASTs, persistence);
+			processAST.flushSoftwareUnits(commit.getId(), commit.getName());
+			calculationMetricsHelper(commitMetrics, snapshotMetrics, commits.subList(0, i+1), commitASTs, snapshotASTs);
 
 		}
 		
@@ -192,7 +195,7 @@ public class MetricCalculator{
 		}
 		
 		commitFiles.addAll(commits.get(i).getCommitedFiles());
-		snapshotFilesUids.addAll(repoSys.getSnapshotFiles(commits.get(i).getName()));
+		snapshotFilesUids.addAll(repoSys.getRepositoryFiles(commits.get(i).getName()));
 		return i;
 
 	}
@@ -204,7 +207,7 @@ public class MetricCalculator{
 		for(FileDB fileDb : snapshotFiles){
 			
 			File f = fileDb.toBusiness();
-			AST ast = createAST(f.getPath(), f.getId(), commitName, false);
+			AST ast = createAST(f.getPath(), f.getId(), commitName);
 			
 			if(ast == null)
 				continue;
@@ -219,7 +222,7 @@ public class MetricCalculator{
 	}
 
 	// Creates the AST for the given file and save their software units
-	private AST createAST(String filePath, int fileId, String commitName, boolean t){
+	private AST createAST(String filePath, int fileId, String commitName){
 
 		int index = filePath.lastIndexOf(".") + 1;
 		String ext = filePath.substring(index);
@@ -235,8 +238,8 @@ public class MetricCalculator{
 		 *  index is the start of relative path, transforming "repository_path/file_path" into "file_path".
 		 */
 		index = repoSys.getAbsolutePath().length()+1;
-		byte[] data = repoSys.getData(commitName, filePath.substring(index));
-		AST ast = gen.generate(filePath, data, processAST.getRepositoryDB().getCharset(), sourceFolders.toArray(new String[sourceFolders.size()]));
+		String source = repoSys.getSource(commitName, filePath.substring(index));
+		AST ast = gen.generate(filePath, source, sourceFolders.toArray(new String[sourceFolders.size()]));
 		processAST.process(filePath, fileId, ast, false);
 			
 		return ast;
@@ -245,7 +248,7 @@ public class MetricCalculator{
 
 	// Simple helper to calculate the metrics
 	private void calculationMetricsHelper(Map<MetricUid, IMetric> commitMetrics, Map<MetricUid, IMetric> snapshotMetrics,
-			List<Commit> commits, Map<String, AST> commitASTs, Map<String, AST> snapshotASTs, MetricPersistance persistence){
+			List<Commit> commits, Map<String, AST> commitASTs, Map<String, AST> snapshotASTs){
 
 		List<AST> commitsASTsList = new ArrayList<AST>(commitASTs.values());
 		List<AST> snapshotASTsList = new ArrayList<AST>(snapshotASTs.values());

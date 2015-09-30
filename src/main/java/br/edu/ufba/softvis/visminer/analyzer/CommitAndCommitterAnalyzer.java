@@ -8,7 +8,7 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 
-import br.edu.ufba.softvis.visminer.analyzer.local.IVersioningSystem;
+import br.edu.ufba.softvis.visminer.analyzer.scm.SCM;
 import br.edu.ufba.softvis.visminer.model.database.CommitDB;
 import br.edu.ufba.softvis.visminer.model.database.CommitterDB;
 import br.edu.ufba.softvis.visminer.model.database.RepositoryDB;
@@ -22,7 +22,7 @@ import br.edu.ufba.softvis.visminer.persistence.impl.CommitterDAOImpl;
  */
 public class CommitAndCommitterAnalyzer{
 
-	public List<CommitDB> persist(RepositoryDB repositoryDb, IVersioningSystem repoSys, EntityManager entityManager) {
+	public List<CommitDB> persist(RepositoryDB repositoryDb, SCM repoSys, EntityManager entityManager) {
 
 		List<CommitDB> commitsDb = repoSys.getCommits();
 		Collections.sort(commitsDb, new Comparator<CommitDB>() {

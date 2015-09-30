@@ -4,6 +4,6 @@ import br.edu.ufba.softvis.visminer.ast.AST;
 
 public interface IASTGenerator {
 
-	public AST generate(String filePath, byte[] source, String charset, String[] sourceFolders);
+	public AST generate(String filePath, String source, String[] sourceFolders);
 
 }

@@ -29,6 +29,7 @@ public class CCMetric extends MethodBasedMetricTemplate{
 		}
 	}	
 	
+	@SuppressWarnings("incomplete-switch")
 	private int calculate(MethodDeclaration method) {
 		if (method.getStatements() == null) {
 			return 1;

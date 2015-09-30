@@ -3,6 +3,8 @@ package br.edu.ufba.softvis.visminer.model.database;
 import java.io.Serializable;
 import javax.persistence.*;
 
+import br.edu.ufba.softvis.visminer.constant.ChangeType;
+
 
 /**
  * The persistent class for the file_x_commit database table.
@@ -22,9 +24,9 @@ public class FileXCommitDB implements Serializable {
 	@Column(name="lines_removed")
 	private int linesRemoved;
 
-	@Column(nullable=false)
-	private boolean removed;
-
+	@Column(name="change_type")
+	private int changeType;
+	
 	//bi-directional many-to-one association to CommitDB
 	@ManyToOne
 	@JoinColumn(name="commit_id", nullable=false, insertable=false, updatable=false)
@@ -45,12 +47,12 @@ public class FileXCommitDB implements Serializable {
 	 * @param removed
 	 */
 	public FileXCommitDB(FileXCommitPK id, int linesAdded, int linesRemoved,
-			boolean removed) {
+			ChangeType change) {
 		super();
 		this.id = id;
 		this.linesAdded = linesAdded;
 		this.linesRemoved = linesRemoved;
-		this.removed = removed;
+		//this.change = change != null ? change.getId() : 0;
 	}
 
 	/**
@@ -96,17 +98,17 @@ public class FileXCommitDB implements Serializable {
 	}
 
 	/**
-	 * @return the removed
+	 * @return the change
 	 */
-	public boolean isRemoved() {
-		return removed;
+	public ChangeType getChangeType() {
+		return ChangeType.parse(changeType);
 	}
 
 	/**
-	 * @param removed the removed to set
+	 * @param change the change to set
 	 */
-	public void setRemoved(boolean removed) {
-		this.removed = removed;
+	public void setChangeType(ChangeType changeType) {
+		this.changeType = changeType != null ? changeType.getId() : 0;
 	}
 
 	/**

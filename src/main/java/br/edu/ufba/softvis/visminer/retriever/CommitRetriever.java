@@ -35,16 +35,15 @@ public class CommitRetriever extends Retriever {
 		for (FileXCommitDB fxc : fxcDAO.findByCommit(commit.getId())) {
 			
 			FileState fileState = new FileState(fxc.getLinesAdded(),
-					fxc.getLinesRemoved(), fxc.isRemoved());
+					fxc.getLinesRemoved(), fxc.getChangeType());
 			
 			File fileTemp = filesDBAux.get(fxc.getId().getFileId());
-			
 			if(fileTemp == null){
 				fileTemp = fileDAO.find(fxc.getId().getFileId()).toBusiness();
 				filesDBAux.put(fxc.getId().getFileId(), fileTemp);
 			}
 			
-			File file = fileTemp;
+			File file = new File(fileTemp.getId(), fileTemp.getPath(), fileTemp.getUid());
 			file.setFileState(fileState);
 			files.add(file);
 			

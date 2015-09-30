@@ -4,14 +4,14 @@ package br.edu.ufba.softvis.visminer.constant;
  * @version 0.9
  * Repository types
  */
-public enum VersioningSystemType {
+public enum SCMType {
 
 	NONE(0),
 	GIT(1);
 	
 	private int id;
 	
-	private VersioningSystemType(int id){
+	private SCMType(int id){
 		this.id = id;
 	}
 	
@@ -28,9 +28,9 @@ public enum VersioningSystemType {
 	 * @param id
 	 * @return Repository type with given id.
 	 */
-	public static VersioningSystemType parse(int id){
+	public static SCMType parse(int id){
 		
-		for(VersioningSystemType repoType : VersioningSystemType.values()){
+		for(SCMType repoType : SCMType.values()){
 			if(repoType.getId() == id){
 				return repoType;
 			}

@@ -1,5 +1,7 @@
 package br.edu.ufba.softvis.visminer.model.business;
 
+import br.edu.ufba.softvis.visminer.constant.ChangeType;
+
 /**
  * User friendly file state bean class.
  * This class will be used for user interface.
@@ -9,20 +11,20 @@ public class FileState {
 
 	private int linesAdded;
 	private int linesRemoved;
-	private boolean deleted;
+	private ChangeType change;
 	
 	public FileState(){}
 
 	/**
 	 * @param linesAdded
 	 * @param linesRemoved
-	 * @param deleted
+	 * @param change
 	 */
-	public FileState(int linesAdded, int linesRemoved, boolean deleted) {
+	public FileState(int linesAdded, int linesRemoved, ChangeType change) {
 		super();
 		this.linesAdded = linesAdded;
 		this.linesRemoved = linesRemoved;
-		this.deleted = deleted;
+		this.change = change;
 	}
 
 	/**
@@ -54,17 +56,18 @@ public class FileState {
 	}
 
 	/**
-	 * @return the deleted
+	 * @return the change
 	 */
-	public boolean isDeleted() {
-		return deleted;
+	public ChangeType getChange() {
+		return change;
 	}
 
 	/**
-	 * @param deleted the deleted to set
+	 * @param change the change to set
 	 */
-	public void setDeleted(boolean deleted) {
-		this.deleted = deleted;
+	public void setChange(ChangeType change) {
+		this.change = change;
 	}
+
 	
 }

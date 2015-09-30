@@ -3,6 +3,7 @@ package br.edu.ufba.softvis.visminer.model.business;
 import java.util.ArrayList;
 import java.util.List;
 
+import br.edu.ufba.softvis.visminer.constant.ChangeType;
 import br.edu.ufba.softvis.visminer.retriever.CommitRetriever;
 import br.edu.ufba.softvis.visminer.retriever.SoftwareUnitRetriever;
 
@@ -203,7 +204,7 @@ public class Project {
 				files.remove(file);
 
 				// update file state
-				if (!file.getFileState().isDeleted()) {
+				if (file.getFileState().getChange() != ChangeType.DELETE){
 					files.add(file);
 				}
 			}

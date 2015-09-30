@@ -1,7 +1,5 @@
 package br.edu.ufba.softvis.visminer.ast.generator.none;
 
-import java.io.UnsupportedEncodingException;
-
 import br.edu.ufba.softvis.visminer.annotations.ASTGeneratorAnnotation;
 import br.edu.ufba.softvis.visminer.ast.AST;
 import br.edu.ufba.softvis.visminer.ast.Document;
@@ -27,22 +25,12 @@ import br.edu.ufba.softvis.visminer.constant.LanguageType;
 public class NoneASTGenerator implements IASTGenerator{
 
 	@Override
-	public AST generate(String filePath, byte[] source, String charset, String[] sourceFolders) {
+	public AST generate(String filePath, String source, String[] sourceFolders) {
 		
 		Document doc = new Document();
 		doc.setName(filePath);
 		AST ast = new AST();
-		
-		if(source == null){
-			ast.setSourceCode(null);
-		}else{
-			try {
-				ast.setSourceCode(new String(source, charset));
-			} catch (UnsupportedEncodingException e) {
-				e.printStackTrace();
-			}
-		}
-		
+		ast.setSourceCode(source);
 		ast.setDocument(doc);
 		return ast;
 		

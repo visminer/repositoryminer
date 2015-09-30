@@ -57,6 +57,7 @@ public class CPPASTGenerator implements IASTGenerator {
 	private List<EnumDeclaration> enumerators = new ArrayList<EnumDeclaration>();
 
 	private IScanner createScanner(String filePath) {
+		
 		FileContent fContent = FileContent
 				.createForExternalFileLocation(filePath);
 
@@ -65,9 +66,11 @@ public class CPPASTGenerator implements IASTGenerator {
 				new GPPScannerExtensionConfiguration(), null);
 
 		return scanner;
+		
 	}
 
 	private String parseInclude(String rawInclude) {
+		
 		String include = "";
 
 		if (rawInclude != null) {
@@ -76,9 +79,11 @@ public class CPPASTGenerator implements IASTGenerator {
 		}
 
 		return include;
+		
 	}
 
-	public AST generate(String filePath, byte[] source, String charset, String[] sourceFolders) {
+	public AST generate(String filePath, String source, String[] sourceFolders) {
+		
 		document = new Document();
 		document.setName(filePath);
 		document.setMethods(new ArrayList<MethodDeclaration>());
@@ -86,6 +91,7 @@ public class CPPASTGenerator implements IASTGenerator {
 		IASTTranslationUnit tu = null;
 
 		try {
+			
 			IScanner scanner = createScanner(filePath);
 			ICPPParserExtensionConfiguration config = new ANSICPPParserExtensionConfiguration();
 
@@ -95,6 +101,7 @@ public class CPPASTGenerator implements IASTGenerator {
 			if (!parser.encounteredError()) {
 				tu = parser.parse();
 			}
+			
 		} catch (Exception e) {
 		}
 

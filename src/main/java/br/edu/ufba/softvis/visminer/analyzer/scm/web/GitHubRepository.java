@@ -1,4 +1,4 @@
-package br.edu.ufba.softvis.visminer.analyzer.remote;
+package br.edu.ufba.softvis.visminer.analyzer.scm.web;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -18,10 +18,10 @@ import br.edu.ufba.softvis.visminer.model.database.LabelDB;
 import br.edu.ufba.softvis.visminer.model.database.MilestoneDB;
 
 /**
- * @see IRepositoryService
+ * @see WebSCM
  * Implementation for GITHub repositories.
  */
-public class GitHubService implements IRepositoryService {
+public class GitHubRepository implements WebSCM {
 
 	private IssueService issueServ;
 	private MilestoneService milestoneServ;

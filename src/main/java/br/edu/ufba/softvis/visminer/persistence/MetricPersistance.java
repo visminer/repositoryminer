@@ -7,10 +7,13 @@ import javax.persistence.EntityManager;
 
 import br.edu.ufba.softvis.visminer.constant.MetricUid;
 import br.edu.ufba.softvis.visminer.model.business.Commit;
+import br.edu.ufba.softvis.visminer.model.business.SoftwareUnit;
 import br.edu.ufba.softvis.visminer.model.database.MetricValueDB;
 import br.edu.ufba.softvis.visminer.model.database.MetricValuePK;
 import br.edu.ufba.softvis.visminer.persistence.dao.MetricValueDAO;
+import br.edu.ufba.softvis.visminer.persistence.dao.SoftwareUnitDAO;
 import br.edu.ufba.softvis.visminer.persistence.impl.MetricValueDAOImpl;
+import br.edu.ufba.softvis.visminer.persistence.impl.SoftwareUnitDAOImpl;
 
 /**
  * Persistence interface for metrics calculation.
@@ -22,15 +25,21 @@ public class MetricPersistance {
 
 	private int commitId;
 	private MetricUid metric;
+	private SoftwareUnit projectUnit;
 	
 	private List<MetricValueDB> metricValues;
 	
-	public MetricPersistance(EntityManager entityManager) {
+	public MetricPersistance(EntityManager entityManager, String repositoryUid) {
 
 		this.metricValues  = new ArrayList<MetricValueDB>();
 
 		this.metricValueDao = new MetricValueDAOImpl();
 		this.metricValueDao.setEntityManager(entityManager);
+		
+		SoftwareUnitDAO softUnitDAO = new SoftwareUnitDAOImpl();
+		softUnitDAO.setEntityManager(entityManager);
+		
+		projectUnit = softUnitDAO.findByUid(repositoryUid).toBusiness();
 
 	}
 
@@ -50,21 +59,17 @@ public class MetricPersistance {
 		this.metric = metric;
 	}
 	
-	public void initBatchPersistence() {
-		metricValues.clear();
-	}
-	
 	public void postMetricValue(int softwareUnitId, String value){
 		
 		MetricValuePK metricValPk = new MetricValuePK(softwareUnitId, commitId, metric.getId());
 		MetricValueDB metricValDb =  new MetricValueDB(metricValPk, value);
-		
 		metricValues.add(metricValDb);
 		
 	}
 	
 	public void flushAllMetricValues() {
 		metricValueDao.batchMerge(metricValues);
+		metricValues.clear();
 	}
 
 	/**
@@ -95,4 +100,8 @@ public class MetricPersistance {
 
 	}
 
+	public SoftwareUnit getProject(){
+		return projectUnit;
+	}
+	
 }
