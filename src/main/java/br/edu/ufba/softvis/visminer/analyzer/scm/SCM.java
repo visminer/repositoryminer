@@ -69,16 +69,6 @@ public interface SCM {
 	public void checkout(String hash);
 	
 	/**
-	 * Removes the working branch created by visminer to make the mining.
-	 */
-	public void deleteVMBranch();
-	
-	/**
-	 * Resets repository HEAD to master
-	 */
-	public void reset();
-	
-	/**
 	 * Closes the repository and frees memory and resources.
 	 */
 	public void close();

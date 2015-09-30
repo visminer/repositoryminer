@@ -37,7 +37,6 @@ public class RepositoryAnalyzer{
 		
 		SCM repoSys = SCMFactory.getRepository(repoBusi.getType());
 		repoSys.open(repoBusi.getPath());
-		repoSys.reset();
 		
 		EntityManager entityManager = Database.getInstance().getEntityManager();
 		
@@ -77,8 +76,6 @@ public class RepositoryAnalyzer{
 		entityManager.clear();
 		entityManager.close();
 		
-		repoSys.reset();
-		repoSys.deleteVMBranch();
 		repoSys.close();
 		
 	}

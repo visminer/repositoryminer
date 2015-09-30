@@ -11,12 +11,9 @@ import java.util.Scanner;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.LogCommand;
-import org.eclipse.jgit.api.errors.CheckoutConflictException;
+import org.eclipse.jgit.api.ResetCommand.ResetType;
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.api.errors.InvalidRefNameException;
 import org.eclipse.jgit.api.errors.NoHeadException;
-import org.eclipse.jgit.api.errors.RefAlreadyExistsException;
-import org.eclipse.jgit.api.errors.RefNotFoundException;
 import org.eclipse.jgit.diff.DiffEntry;
 import org.eclipse.jgit.diff.DiffFormatter;
 import org.eclipse.jgit.diff.RawTextComparator;
@@ -61,7 +58,6 @@ public class GitRepository implements SCM{
 	private TreeWalk treeWalk;
 	private DiffFormatter diffFormatter;
 
-	private static final String VISMINER_BRANCH = "vm";
 	private static final String CHARSET = "UTF-8";
 
 	// Process the repository path
@@ -443,59 +439,17 @@ public class GitRepository implements SCM{
 	@Override
 	public void checkout(String hash){
 
-		reset();
-		deleteVMBranch();
-		try {
-
-			git.checkout().setCreateBranch(true).setName(VISMINER_BRANCH).setStartPoint(hash).
-			setForce(true).call();
-
-		} catch (RefAlreadyExistsException e) {
-			clean(e);
-		} catch (RefNotFoundException e) {
-			clean(e);
-		} catch (InvalidRefNameException e) {
-			clean(e);
-		} catch (CheckoutConflictException e) {
-			clean(e);
-		} catch (GitAPIException e) {
-			clean(e);
-		}
-
-	}
-
-	@Override
-	public void deleteVMBranch(){
-
 		try{
 
-			List<Ref> refs = git.branchList().call();
-			for(Ref ref : refs){
-
-				if(ref.getName().endsWith(VISMINER_BRANCH)){
-					git.branchDelete().setBranchNames(VISMINER_BRANCH).setForce(true).call();
-					break;
-				}
-
-			}
+			if(!git.status().call().isClean())
+				git.reset().setMode(ResetType.HARD).setRef(hash).call();
+			
+			git.checkout().setName(hash).call();
 
 		}catch(GitAPIException e){
 			clean(e);
 		}
 
-	}
-
-	@Override
-	public void reset(){
-
-		try{
-
-			git.checkout().setName("master").setForce(true).call();
-			git.branchDelete().setBranchNames(VISMINER_BRANCH).setForce(true).call();
-
-		}catch(GitAPIException e){
-			clean(e);
-		}
 	}
 
 	public void close() {
