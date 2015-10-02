@@ -125,7 +125,6 @@ public class MetricCalculator{
 		for(int i = nextCommit+1; i < commits.size(); i++){
 
 			commitASTs.clear();
-			// add commit to list of commits already analyzed
 			analyzedCommits.add(commits.get(i).getName());
 			
 			Commit commit = commits.get(i);
@@ -231,13 +230,7 @@ public class MetricCalculator{
 			return null;
 		}
 		
-		/*
-		 *  Absolute path doesn't work correctly, with absolute path JGIT doesn't find the file.
-		 *  I save the absolute path, so I need to remove the repository absolute path part.
-		 *  index is the start of relative path, transforming "repository_path/file_path" into "file_path".
-		 */
-		index = repoSys.getAbsolutePath().length()+1;
-		String source = repoSys.getSource(commitName, filePath.substring(index));
+		String source = repoSys.getSource(commitName, filePath);
 		AST ast = gen.generate(filePath, source, sourceFolders.toArray(new String[sourceFolders.size()]));
 		processAST.process(filePath, fileId, ast, false);
 			

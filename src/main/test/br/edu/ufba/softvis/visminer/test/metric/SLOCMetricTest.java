@@ -17,16 +17,13 @@ import br.edu.ufba.softvis.visminer.test.VisminerTest;
 public class SLOCMetricTest {
 
 	private static VisminerTest visminerTest;
-	private static VisMiner visminer;
 	private static Repository repository;
-	private static RepositoryRetriever repoRetriever;
 	
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 		visminerTest = VisminerTest.getInstance();
-		visminer = visminerTest.getVisminer();
+		visminerTest.getVisminer();
 		repository = visminerTest.getRepository(); 
-		repoRetriever = visminerTest.getRepositoryRetriever();
 	}
 	
 	@Test
@@ -37,8 +34,8 @@ public class SLOCMetricTest {
 		//printSoftwareUnits(javaProject); // printa entidades de software do snapshot do ultimo commit
 		
 		for(SoftwareUnit s : javaProject.getChildren()){ 
-			System.out.println("Type: "+s.getType()+" - " + visminerTest.removeRepositoryPathNameFromFileName(s.getName()) + " | SLOC " + s.getMetricValues().get(MetricUid.SLOC));
-			String fileRelativeName = visminerTest.removeRepositoryPathNameFromFileName(s.getName());
+			System.out.println("Type: "+s.getType()+" - " + s.getName() + " | SLOC " + s.getMetricValues().get(MetricUid.SLOC));
+			String fileRelativeName = s.getName();
 			int valueMetric = 0;
 			
 			try {
@@ -74,19 +71,20 @@ public class SLOCMetricTest {
 	private static void printSoftwareUnits(SoftwareUnit javaProject){
 
 		for(SoftwareUnit s : javaProject.getChildren()){ 
-			// Pega pacotes, classes/enums e arquivos
-			// Dos arquivos em geral só pega aqueles que podemos calular métricas, como um .txt
 			
-			if(s.getType() == SoftwareUnitType.CLASS_OR_INTERFACE){ // pego só as classes do pacote defualt
+			if(s.getType() == SoftwareUnitType.CLASS_OR_INTERFACE){
+				
 				printClassesInterfaces(s);
+				
 			} else if(s.getType() == SoftwareUnitType.PACKAGE){
-				/* Alguns acostumados com a apresentação do eclipse podem estranhar os pacotes aparecerem como uma lista plana,
-				mas isso é como as coisas acontecem no java.
-			 	No java não existe o conceito de subpacotes, a apresentação do eclipse é só uma mera questão grafica. */
-				System.out.println("Pacote " + visminerTest.removeRepositoryPathNameFromFileName(s.getName()) + " | NOCAI " + s.getMetricValues().get(MetricUid.NOCAI));
+				
+				System.out.println("Pacote " + s.getName() + " | NOCAI " + s.getMetricValues().get(MetricUid.NOCAI));
 				printSoftwareUnits(s);
+				
 			} else if(s.getType() == SoftwareUnitType.ENUM || s.getType() == SoftwareUnitType.FILE){
-				System.out.println("Nome " + visminerTest.removeRepositoryPathNameFromFileName(s.getName()) + " | SLOC " + s.getMetricValues().get(MetricUid.SLOC));
+				
+				System.out.println("Nome " + s.getName() + " | SLOC " + s.getMetricValues().get(MetricUid.SLOC));
+				
 			}
 			
 		}
@@ -95,13 +93,15 @@ public class SLOCMetricTest {
 	
 	private static void printClassesInterfaces(SoftwareUnit s){
 
-		System.out.println("Classe " + visminerTest.removeRepositoryPathNameFromFileName(s.getName()) + " | WMC " + s.getMetricValues().get(MetricUid.WMC) +
+		System.out.println("Classe " + s.getName() + " | WMC " + s.getMetricValues().get(MetricUid.WMC) +
 				" " + " | SLOC " + s.getMetricValues().get(MetricUid.SLOC));
 
-		for(SoftwareUnit s2 : s.getChildren()){ // metodos e propriedades
+		for(SoftwareUnit s2 : s.getChildren()){
+			
 			if(s2.getType() == SoftwareUnitType.METHOD){
-				System.out.println("Método " + visminerTest.removeRepositoryPathNameFromFileName(s2.getName()) + " | CC " + s2.getMetricValues().get(MetricUid.CC));
+				System.out.println("Método " + s2.getName() + " | CC " + s2.getMetricValues().get(MetricUid.CC));
 			}
+			
 		}
 
 	}

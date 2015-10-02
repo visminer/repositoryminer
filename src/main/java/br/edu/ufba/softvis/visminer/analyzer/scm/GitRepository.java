@@ -339,8 +339,8 @@ public class GitRepository implements SCM{
 						String path = !entry.getNewPath().equals("/dev/null") ? entry.getNewPath() 
 								: entry.getOldPath();
 
-						fileDB.setPath(repoPath + "/" + path);
-						fileDB.setUid(StringUtils.sha1(fileDB.getPath()));
+						fileDB.setPath(path);
+						fileDB.setUid(StringUtils.sha1(repoPath + "/" + fileDB.getPath()));
 						getFileChanges(path, parentCommit, revCommit, fxcDB);
 
 						if(entry.getChangeType() == org.eclipse.jgit.diff.DiffEntry.ChangeType.DELETE)

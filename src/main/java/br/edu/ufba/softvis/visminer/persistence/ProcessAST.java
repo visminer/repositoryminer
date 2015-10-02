@@ -204,8 +204,10 @@ public class ProcessAST {
 		}else if(isDelete){
 			
 			countPackageChidren(parent, true);
-			return new SoftwareUnitDB(snapshotUids.remove(uid), name, type, uid);
-
+			if(snapshotUids.containsKey(uid))
+				return new SoftwareUnitDB(snapshotUids.remove(uid), name, type, uid);
+			else 
+				return new SoftwareUnitDB(allUids.remove(uid), name, type, uid);
 		}
 		
 		SoftwareUnitDB softwareUnitDB;

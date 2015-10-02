@@ -101,15 +101,4 @@ public class VisminerTest {
 		return visminer.checkRepository(repositoryPath);
 	}
 	
-	public String removeRepositoryPathNameFromFileName(String fileName){
-		String preffix = repositoryPath;
-			
-		if (fileName.startsWith(repositoryPath)){
-			if (!preffix.endsWith("/")) preffix += "/";
-			fileName = fileName.substring(preffix.length());
-			
-		}
-		return fileName;
-	}
-
 }
