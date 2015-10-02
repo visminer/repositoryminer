@@ -68,7 +68,7 @@ public class MetricPersistance {
 	}
 	
 	public void flushAllMetricValues() {
-		metricValueDao.batchMerge(metricValues);
+		metricValueDao.batchSave(metricValues);
 		metricValues.clear();
 	}
 

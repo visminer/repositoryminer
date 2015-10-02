@@ -72,5 +72,10 @@ public interface SCM {
 	 * Closes the repository and frees memory and resources.
 	 */
 	public void close();
+		
+	/**
+	 * Returns repository to master branch
+	 */
+	public void reset();
 	
 }

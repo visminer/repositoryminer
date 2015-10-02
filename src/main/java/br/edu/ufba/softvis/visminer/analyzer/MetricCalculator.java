@@ -125,7 +125,6 @@ public class MetricCalculator{
 		for(int i = nextCommit+1; i < commits.size(); i++){
 
 			commitASTs.clear();
-			
 			// add commit to list of commits already analyzed
 			analyzedCommits.add(commits.get(i).getName());
 			
@@ -133,7 +132,7 @@ public class MetricCalculator{
 			repoSys.checkout(commit.getName());
 			sourceFolders = new ArrayList<String>();
 			getSourceFolders(repoSys.getAbsolutePath());
-
+			
 			for(File file : commit.getCommitedFiles()){
 			
 				if(file.getFileState().getChange() == ChangeType.DELETE){

@@ -141,7 +141,7 @@ public class JavaASTGenerator implements IASTGenerator{
 		StringBuilder builder = null;
 
 		builder = new StringBuilder();
-		builder.append(methodDecl.getName().getFullyQualifiedName()+"(");
+		builder.append(methodDecl.getName().getFullyQualifiedName()).append("(");
 
 		List<ParameterDeclaration> params = new ArrayList<ParameterDeclaration>();
 		for(SingleVariableDeclaration var : (List<SingleVariableDeclaration>) methodDecl.parameters()){

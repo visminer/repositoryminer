@@ -57,7 +57,8 @@ public class GitRepository implements SCM{
 	private RevWalk revWalk;
 	private TreeWalk treeWalk;
 	private DiffFormatter diffFormatter;
-
+	private String vmBranch;
+	
 	private static final String CHARSET = "UTF-8";
 
 	// Process the repository path
@@ -100,11 +101,13 @@ public class GitRepository implements SCM{
 
 		diffFormatter = new DiffFormatter(DisabledOutputStream.INSTANCE);
 		diffFormatter.setRepository(repository);
-		//diffFormatter.setBinaryFileThreshold(2 * 1024); // 2 mb is the max
+		diffFormatter.setBinaryFileThreshold(2 * 1024);
 		diffFormatter.setContext(0);
 		diffFormatter.setDiffComparator(RawTextComparator.DEFAULT);
 		diffFormatter.setDetectRenames(false);
 
+		vmBranch = "vm";
+		
 	}
 
 	@Override
@@ -147,7 +150,7 @@ public class GitRepository implements SCM{
 		}catch(GitAPIException e){
 			clean(e);
 		}
-		
+
 		return null;
 
 	}
@@ -163,7 +166,7 @@ public class GitRepository implements SCM{
 		} catch (IOException e) {
 			clean(e);
 		}
-		
+
 		return null;
 
 	}
@@ -195,7 +198,7 @@ public class GitRepository implements SCM{
 		}catch(IOException e){
 			clean(e);
 		}
-		
+
 		return null;
 
 	}
@@ -235,7 +238,7 @@ public class GitRepository implements SCM{
 		} catch (IOException e) {
 			clean(e);
 		}
-		
+
 		return null;
 
 	}
@@ -291,7 +294,7 @@ public class GitRepository implements SCM{
 			TreeWalk treeWalk = TreeWalk.forPath(reader, filePath, tree);
 			byte[] bytes = reader.open(treeWalk.getObjectId(0)).getBytes();
 			reader.close();
-			
+
 			return new String(bytes, CHARSET);
 
 		} catch (UnsupportedEncodingException e) {
@@ -305,64 +308,64 @@ public class GitRepository implements SCM{
 		}
 
 		return "";
-		
+
 	}
 
 	@Override
 	public List<FileDB> getCommitedFiles(CommitDB commitDB){
 
 		try{
-			
+
 			String repoPath = getAbsolutePath();
 			RevCommit revCommit = revWalk.parseCommit(ObjectId.fromString(commitDB.getName()));
 			AnyObjectId currentCommit = repository.resolve(commitDB.getName());
 			AnyObjectId oldCommit = revCommit.getParentCount() > 0 ? 
 					repository.resolve(revCommit.getParent(0).getName()) : null;
 
-			List<DiffEntry> diffs = null;
-			diffs = diffFormatter.scan(oldCommit, currentCommit);
+					List<DiffEntry> diffs = null;
+					diffs = diffFormatter.scan(oldCommit, currentCommit);
 
-			List<FileDB> filesDB = new ArrayList<FileDB>();
-			for(DiffEntry entry : diffs) {
+					List<FileDB> filesDB = new ArrayList<FileDB>();
+					for(DiffEntry entry : diffs) {
 
-				RevCommit parentCommit = oldCommit == null ? null : 
-					revWalk.parseCommit(ObjectId.fromString(oldCommit.getName()));
-				
-				FileDB fileDB = new FileDB();
-				FileXCommitDB fxcDB = new FileXCommitDB();
-				
-				fxcDB.setId(new FileXCommitPK(0, commitDB.getId()));
-				
-				String path = !entry.getNewPath().equals("/dev/null") ? entry.getNewPath() 
-						: entry.getOldPath();
-				
-				fileDB.setPath(repoPath + "/" + path);
-				fileDB.setUid(StringUtils.sha1(fileDB.getPath()));
-				getFileChanges(path, parentCommit, revCommit, fxcDB);
-				
-				if(entry.getChangeType() == org.eclipse.jgit.diff.DiffEntry.ChangeType.DELETE)
-					fxcDB.setChangeType(ChangeType.DELETE);
-				else if((entry.getChangeType() == org.eclipse.jgit.diff.DiffEntry.ChangeType.ADD)
-							|| entry.getChangeType() == org.eclipse.jgit.diff.DiffEntry.ChangeType.COPY)
-						fxcDB.setChangeType(ChangeType.ADD);
-				else
-						fxcDB.setChangeType(ChangeType.MODIFY);
-					
-				
-				
-				List<FileXCommitDB> fxcList = new ArrayList<FileXCommitDB>(1);
-				fxcList.add(fxcDB);
-				fileDB.setFileXCommits(fxcList);
-				filesDB.add(fileDB);
-				
-			}
+						RevCommit parentCommit = oldCommit == null ? null : 
+							revWalk.parseCommit(ObjectId.fromString(oldCommit.getName()));
 
-			return filesDB;
+						FileDB fileDB = new FileDB();
+						FileXCommitDB fxcDB = new FileXCommitDB();
+
+						fxcDB.setId(new FileXCommitPK(0, commitDB.getId()));
+
+						String path = !entry.getNewPath().equals("/dev/null") ? entry.getNewPath() 
+								: entry.getOldPath();
+
+						fileDB.setPath(repoPath + "/" + path);
+						fileDB.setUid(StringUtils.sha1(fileDB.getPath()));
+						getFileChanges(path, parentCommit, revCommit, fxcDB);
+
+						if(entry.getChangeType() == org.eclipse.jgit.diff.DiffEntry.ChangeType.DELETE)
+							fxcDB.setChangeType(ChangeType.DELETE);
+						else if((entry.getChangeType() == org.eclipse.jgit.diff.DiffEntry.ChangeType.ADD)
+								|| entry.getChangeType() == org.eclipse.jgit.diff.DiffEntry.ChangeType.COPY)
+							fxcDB.setChangeType(ChangeType.ADD);
+						else
+							fxcDB.setChangeType(ChangeType.MODIFY);
+
+
+
+						List<FileXCommitDB> fxcList = new ArrayList<FileXCommitDB>(1);
+						fxcList.add(fxcDB);
+						fileDB.setFileXCommits(fxcList);
+						filesDB.add(fileDB);
+
+					}
+
+					return filesDB;
 
 		}catch(IOException e){
 			clean(e);
 		}
-		
+
 		return null;
 
 	}
@@ -431,7 +434,7 @@ public class GitRepository implements SCM{
 		}catch(IOException e){
 			clean(e);
 		}
-		
+
 		return null;
 
 	}
@@ -442,13 +445,17 @@ public class GitRepository implements SCM{
 		try{
 
 			if(!git.status().call().isClean())
-				git.reset().setMode(ResetType.HARD).setRef(hash).call();
+				git.reset().setMode(ResetType.HARD).call();
 			
-			git.checkout().setName(hash).call();
-
+			git.checkout().setName("master").setForce(true).call();
+			deleteVMBranch();
+			git.checkout().setCreateBranch(true).setStartPoint(hash).
+				setName(vmBranch).setForce(true).call();
+			
 		}catch(GitAPIException e){
 			clean(e);
 		}
+		
 
 	}
 
@@ -461,12 +468,48 @@ public class GitRepository implements SCM{
 		repository.close();
 
 	}
+
+	private void deleteVMBranch(){
+
+		try{
+
+			List<Ref> refs = git.branchList().call();
+			for(Ref ref : refs){
+
+				if(ref.getName().endsWith(vmBranch)){
+					git.branchDelete().setBranchNames(vmBranch).setForce(true).call();
+					break;
+				}
+
+			}
+
+		}catch(GitAPIException e){
+			clean(e);
+		}
+
+	}
+
+	public void reset(){
+		
+		try{
+			
+			if(!git.status().call().isClean())
+				git.reset().setMode(ResetType.HARD).call();
+			
+			git.checkout().setName("master").setForce(true).call();
+			git.branchDelete().setBranchNames(vmBranch).setForce(true).call();
+			
+		}catch(Exception e){
+			clean(e);
+		}
+
+	}
 	
 	private void clean(Throwable e){
-		
+
 		close();
 		throw new VisMinerAPIException(e.getMessage(), e);
-		
+
 	}
 
 }

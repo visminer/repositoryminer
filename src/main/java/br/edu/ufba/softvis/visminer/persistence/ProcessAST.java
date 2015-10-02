@@ -202,12 +202,9 @@ public class ProcessAST {
 			return new SoftwareUnitDB(snapshotUids.get(uid), name, type, uid);
 
 		}else if(isDelete){
-
+			
 			countPackageChidren(parent, true);
-			if(snapshotUids.containsKey(uid))
-				return new SoftwareUnitDB(snapshotUids.remove(uid), name, type, uid);
-			else
-				return new SoftwareUnitDB(allUids.get(uid), name, type, uid);
+			return new SoftwareUnitDB(snapshotUids.remove(uid), name, type, uid);
 
 		}
 		
@@ -282,9 +279,7 @@ public class ProcessAST {
 			SoftwareUnitXCommitDB elem = new SoftwareUnitXCommitDB(pk);
 			list.add(elem);
 		}
-
 		softUnitXCommitDAO.batchSave(list);
-		
 	}
 
 }

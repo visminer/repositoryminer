@@ -75,7 +75,8 @@ public class RepositoryAnalyzer{
 
 		entityManager.clear();
 		entityManager.close();
-		
+
+		repoSys.reset();
 		repoSys.close();
 		
 	}
