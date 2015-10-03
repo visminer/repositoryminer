@@ -1,9 +1,10 @@
 package br.edu.ufba.softvis.visminer.analyzer.scm;
 
+import java.io.IOException;
+
 import br.edu.ufba.softvis.visminer.constant.SCMType;
 
 /**
- * @version 0.9
  * Manage all the repositories and web repositories supported by VisMiner.
  */
 
@@ -16,8 +17,20 @@ public class SCMFactory {
 	public static SCM getRepository(SCMType repositoryType){
 
 		switch(repositoryType){
-			case GIT : return new GitRepository();
+			case GIT : return checkGIT();
 			default : return null;
+		}
+		
+	}
+	
+	//Checks if git is installed, if yes git is used, otherwise jgit is used.
+	private static SCM checkGIT(){
+		
+		try {
+			Runtime.getRuntime().exec("git --version");
+			return new GitRepository();
+		} catch (IOException e) {
+			return new JGitRepository();
 		}
 		
 	}

@@ -18,7 +18,7 @@ import br.edu.ufba.softvis.visminer.persistence.MetricPersistance;
 				+ " used to measure the size of a computer program by counting the number of lines in the text of"
 				+ " the program's source code.",
 				acronym = "SLOC",
-				type = MetricType.COMMIT,
+				type = MetricType.SNAPSHOT,
 				uid = MetricUid.SLOC
 		)
 public class SLOCMetric implements IMetric{

@@ -20,7 +20,7 @@ import br.edu.ufba.softvis.visminer.constant.NodeType;
 				+ "methods are considered to be connected when they access ,in common, "
 				+ "at least one attribute of the measured class.",
 		acronym = "TCC",
-		type = MetricType.COMMIT,
+		type = MetricType.SNAPSHOT,
 		uid = MetricUid.TCC
 	)
 

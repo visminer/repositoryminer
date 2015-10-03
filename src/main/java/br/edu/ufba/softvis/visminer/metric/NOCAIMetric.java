@@ -58,8 +58,7 @@ public class NOCAIMetric implements IMetric{
 			persistence.postMetricValue(entry.getKey(), String.valueOf(entry.getValue()));
 		}
 		
-		if(astList != null)
-			persistence.postMetricValue(astList.get(0).getProject().getId(), String.valueOf(projectQtd));
+		persistence.postMetricValue(persistence.getProject().getId(), String.valueOf(projectQtd));
 		
 	}
 

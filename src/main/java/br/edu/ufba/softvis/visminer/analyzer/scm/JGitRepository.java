@@ -46,9 +46,11 @@ import br.edu.ufba.softvis.visminer.model.database.FileXCommitPK;
 import br.edu.ufba.softvis.visminer.model.database.TreeDB;
 import br.edu.ufba.softvis.visminer.utility.StringUtils;
 
-
-//FIXME: This implementations are temporary
-public class GitRepository implements SCM {
+/**
+ * @see SCM
+ * Implementation for GIT repositories.
+ */
+public class JGitRepository implements SCM{
 
 	private Repository repository;
 	private Git git;
@@ -56,7 +58,7 @@ public class GitRepository implements SCM {
 	private TreeWalk treeWalk;
 	private DiffFormatter diffFormatter;
 	private String vmBranch;
-
+	
 	private static final String CHARSET = "UTF-8";
 
 	// Process the repository path
@@ -104,7 +106,7 @@ public class GitRepository implements SCM {
 		diffFormatter.setDetectRenames(false);
 
 		vmBranch = "vm";
-
+		
 	}
 
 	@Override
@@ -443,15 +445,16 @@ public class GitRepository implements SCM {
 
 			if(!git.status().call().isClean())
 				git.reset().setMode(ResetType.HARD).call();
-
-			makeCheckout("master", false);
+			
+			git.checkout().setName("master").setForce(true).call();
 			deleteVMBranch();
-			makeCheckout(hash, true);
-
+			git.checkout().setCreateBranch(true).setStartPoint(hash).
+				setName(vmBranch).setForce(true).call();
+			
 		}catch(GitAPIException e){
 			clean(e);
 		}
-
+		
 
 	}
 
@@ -486,21 +489,21 @@ public class GitRepository implements SCM {
 	}
 
 	public void reset(){
-
+		
 		try{
-
+			
 			if(!git.status().call().isClean())
 				git.reset().setMode(ResetType.HARD).call();
-
-			makeCheckout("master", false);
+			
+			git.checkout().setName("master").setForce(true).call();
 			git.branchDelete().setBranchNames(vmBranch).setForce(true).call();
-
+			
 		}catch(Exception e){
 			clean(e);
 		}
 
 	}
-
+	
 	private void clean(Throwable e){
 
 		close();
@@ -508,18 +511,4 @@ public class GitRepository implements SCM {
 
 	}
 
-	private void makeCheckout(String hash, boolean create){
-		
-		try{
-			if(create)
-				Runtime.getRuntime().exec("git checkout -f -b vm " + hash, null, new File(getAbsolutePath()));
-			else
-				Runtime.getRuntime().exec("git checkout -f " + hash, null, new File(getAbsolutePath()));
-				
-		}catch(IOException e){
-			throw new VisMinerAPIException(e.getMessage(), e);
-		}
-		
-	}
-	
 }

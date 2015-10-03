@@ -17,7 +17,7 @@ import br.edu.ufba.softvis.visminer.constant.NodeType;
 		description = "Access To Foreign Data (ATFD) counts the number of attributes"+
 					  "from unrelated classes that are accessed directly or by invoking accessor methods.",
 		acronym = "ATFD",
-		type = MetricType.COMMIT,
+		type = MetricType.SNAPSHOT,
 		uid = MetricUid.ATFD
 	)
 

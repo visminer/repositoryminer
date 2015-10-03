@@ -118,7 +118,7 @@ public class MetricCalculator{
 
 		repoSys.checkout(commits.get(nextCommit).getName());
 		initASTs(commitASTs, snapshotASTs, commitFiles, snapshotFiles, commits.get(nextCommit).getName());
-		processAST.flushSoftwareUnits(commits.get(nextCommit).getId(), "");
+		processAST.flushSoftwareUnits(commits.get(nextCommit).getId());
 		calculationMetricsHelper(commitMetrics, snapshotMetrics, commits.subList(0, nextCommit+1),
 				commitASTs, snapshotASTs);
 		
@@ -152,7 +152,7 @@ public class MetricCalculator{
 
 			}
 			
-			processAST.flushSoftwareUnits(commit.getId(), commit.getName());
+			processAST.flushSoftwareUnits(commit.getId());
 			calculationMetricsHelper(commitMetrics, snapshotMetrics, commits.subList(0, i+1), commitASTs, snapshotASTs);
 
 		}

@@ -13,7 +13,7 @@ import br.edu.ufba.softvis.visminer.model.business.Commit;
 		description = "Weighted Method Count is the sum of the statical complexity of all methods of a class." 
 				+ " The Cyclomatic complexity metric is used to quantify the method’s complexity.",
 				acronym = "WMC",
-				type = MetricType.COMMIT,
+				type = MetricType.SNAPSHOT,
 				uid = MetricUid.WMC,
 				requisites = {MetricUid.CC}
 		)

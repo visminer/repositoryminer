@@ -7,11 +7,9 @@ import org.junit.Test;
 
 import br.edu.ufba.softvis.visminer.constant.MetricUid;
 import br.edu.ufba.softvis.visminer.constant.SoftwareUnitType;
-import br.edu.ufba.softvis.visminer.main.VisMiner;
 import br.edu.ufba.softvis.visminer.model.business.Project;
 import br.edu.ufba.softvis.visminer.model.business.Repository;
 import br.edu.ufba.softvis.visminer.model.business.SoftwareUnit;
-import br.edu.ufba.softvis.visminer.retriever.RepositoryRetriever;
 import br.edu.ufba.softvis.visminer.test.VisminerTest;
 
 public class SLOCMetricTest {
@@ -21,9 +19,11 @@ public class SLOCMetricTest {
 	
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
+		
 		visminerTest = VisminerTest.getInstance();
 		visminerTest.getVisminer();
 		repository = visminerTest.getRepository(); 
+		
 	}
 	
 	@Test

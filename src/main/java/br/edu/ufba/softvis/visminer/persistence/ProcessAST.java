@@ -273,7 +273,7 @@ public class ProcessAST {
 	 * @param commitId
 	 * Persists in database the relationship between software unit and commit.
 	 */
-	public void flushSoftwareUnits(int commitId, String name){
+	public void flushSoftwareUnits(int commitId){
 
 		List<SoftwareUnitXCommitDB> list = new ArrayList<SoftwareUnitXCommitDB>();
 		for(Integer softUnitId : snapshotUids.values()){
@@ -282,6 +282,7 @@ public class ProcessAST {
 			list.add(elem);
 		}
 		softUnitXCommitDAO.batchSave(list);
+		
 	}
 
 }

@@ -21,7 +21,7 @@ public class VisminerTestSuite {
 	public static void setUpBeforeClass() throws Exception {
 		
 		VisminerTest.getInstance(); //just to make sure that the repository was started before the tests start
-
+		
 	}
 	
 

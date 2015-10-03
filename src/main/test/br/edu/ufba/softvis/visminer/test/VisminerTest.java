@@ -16,39 +16,35 @@ public class VisminerTest {
 	private Repository repository;
 	private RepositoryRetriever repoRetriever;
 	
-	/*
-	 * repositoryPath must be changed to the correct path on you environment
-	 * */
-	//private String repositoryPath = "C:\\renato\\dev\\pagseguro-test"; 
-	private String repositoryPath = "C:/renato/dev/Visminer-Test"; 
-	
+	private String repositoryPath = "C:\\Users\\felipe\\test-felipe\\Visminer-Test"; 
 	private static VisminerTest vt;
 
 	private VisminerTest() {
+		
 		visminer = new VisMiner();
 		configParameters();
 		repoRetriever = new RepositoryRetriever();
+		
 		if (!isRepositoryProcessed()) {
 			startRepository();
 		}
 
 		repository = repoRetriever.retrieveByPath(repositoryPath);
-		//printCommitters(listCommitters());
 
 	}
 
 	public static VisminerTest getInstance() {
+
 		if (vt == null) {
 			vt = new VisminerTest();
 		}
 		return vt;
+		
 	}
 
 	public VisMiner getVisminer() {
 		return visminer;
 	}
-
-
 
 	public Repository getRepository() {
 		return repository;
@@ -65,11 +61,10 @@ public class VisminerTest {
 
 		DBConfig dbConfig = new DBConfig();
 		dbConfig.setDriver("com.mysql.jdbc.Driver");
-		dbConfig.setUrl("jdbc:mysql://localhost/visminer-test");
+		dbConfig.setUrl("jdbc:mysql://localhost/pagseguro");
 		dbConfig.setUser("root");
-		dbConfig.setPassword("admin");
-		dbConfig.setGeneration("create-tables"); //only creates tables if they do not exist
-		//dbConfig.setGeneration("drop-and-create-tables"); //drop and create the tables anyway
+		dbConfig.setPassword("1234");
+		dbConfig.setGeneration("drop-and-create-tables");
 		dbConfig.setLogging("off");
 		visminer.setDBConfig(dbConfig);
 
@@ -78,18 +73,17 @@ public class VisminerTest {
 	private void startRepository() {
 
 		Repository repository = new Repository();
-		repository.setDescription("VisMiner Repository");
-		repository.setName("visminer");
+		repository.setDescription("Repositório da api de integração do pagseguro em java");
+		repository.setOwner("pagseguro");
+		repository.setName("java");
 		repository.setPath(repositoryPath);
 		repository.setType(SCMType.GIT);
-
-		// repository.setCharset("UTF-8"); N„o È obrigatÛrio
 
 		MetricUid[] metrics = { MetricUid.SLOC, MetricUid.CC, MetricUid.NOCAI, 
 				MetricUid.WMC, MetricUid.TCC };
 		LanguageType[] langs = { LanguageType.JAVA };
+		
 		try {
-			// Arrays.asList(metrics)
 			visminer.persistRepository(repository, Arrays.asList(metrics), Arrays.asList(langs));
 		} catch (IOException e) {
 			e.printStackTrace();

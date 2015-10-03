@@ -15,7 +15,7 @@ import br.edu.ufba.softvis.visminer.constant.NodeType;
 				+ " program. It is a quantitative measure of the number of linearly independent paths through a"
 				+ " program's source code.",
 				acronym = "CC",
-				type = MetricType.COMMIT,
+				type = MetricType.SNAPSHOT,
 				uid = MetricUid.CC
 		)
 public class CCMetric extends MethodBasedMetricTemplate{
