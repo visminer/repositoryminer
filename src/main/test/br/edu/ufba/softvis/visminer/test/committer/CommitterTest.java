@@ -63,9 +63,10 @@ public class CommitterTest {
 	
 	@Test
 	public void testFirstAndLastCommitters() {
+		
 		/*
 		 * obs. to verify those who are the first and last committers I looked in gitk
-		 * */
+		 */
 		
 		repository.getProject().firstCommit();
 		Committer firstCommitter = repository.getProject().getCurrentCommit().getCommitter();
@@ -79,8 +80,8 @@ public class CommitterTest {
 		
 		repository.getProject().lastCommit();
 		Committer lastCommitter = repository.getProject().getCurrentCommit().getCommitter();
-		assertEquals("renatonovais@gmail.com",lastCommitter.getEmail());
-		assertEquals("renatoln",lastCommitter.getName());
+		assertEquals("felipegustavo1000@gmail.com",lastCommitter.getEmail());
+		assertEquals("felipe gustavo de souza gomes",lastCommitter.getName());
 		
 		/*
 		//pagseguro

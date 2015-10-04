@@ -6,7 +6,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import br.edu.ufba.softvis.visminer.constant.MetricUid;
-import br.edu.ufba.softvis.visminer.constant.SoftwareUnitType;
 import br.edu.ufba.softvis.visminer.model.business.Project;
 import br.edu.ufba.softvis.visminer.model.business.Repository;
 import br.edu.ufba.softvis.visminer.model.business.SoftwareUnit;
@@ -33,7 +32,7 @@ public class SLOCMetricTest {
 		SoftwareUnit javaProject = project.getsoftwareUnit();
 		
 		for(SoftwareUnit s : javaProject.getChildren()){ 
-			System.out.println("Type: "+s.getType()+" - " + s.getName() + " | SLOC " + s.getMetricValues().get(MetricUid.SLOC));
+
 			String fileRelativeName = s.getName();
 			int valueMetric = 0;
 			
@@ -60,29 +59,6 @@ public class SLOCMetricTest {
 			
 		}
 		
-		
-	}
-	
-	
-	
-	
-	private static void printSoftwareUnits(SoftwareUnit javaProject){
-
-		for(SoftwareUnit s : javaProject.getChildren()){ 
-			
-			if(s.getType() == SoftwareUnitType.PACKAGE){
-				
-				System.out.println("Pacote " + s.getName() + " | NOCAI " + s.getMetricValues().get(MetricUid.NOCAI));
-				printSoftwareUnits(s);
-				
-			} else {
-				
-				System.out.println("Nome " + s.getName() + " | SLOC " + s.getMetricValues().get(MetricUid.SLOC));
-				
-			}
-			
-		}
-
 	}
 	
 }
