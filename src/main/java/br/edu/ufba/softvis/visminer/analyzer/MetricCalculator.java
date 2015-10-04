@@ -138,11 +138,11 @@ public class MetricCalculator{
 					
 					AST ast = snapshotASTs.remove(file.getPath());
 					if(ast != null)
-						processAST.process(file.getPath(), file.getId(), ast, true);
+						processAST.process(file, ast, true);
 					
 				}else{
 					
-					AST ast = createAST(file.getPath(), file.getId(), commit.getName());
+					AST ast = createAST(file, commit.getName());
 					if(ast != null){
 						snapshotASTs.put(file.getPath(), ast);
 						commitASTs.put(file.getPath(), ast);
@@ -205,7 +205,7 @@ public class MetricCalculator{
 		for(FileDB fileDb : snapshotFiles){
 			
 			File f = fileDb.toBusiness();
-			AST ast = createAST(f.getPath(), f.getId(), commitName);
+			AST ast = createAST(f, commitName);
 			
 			if(ast == null)
 				continue;
@@ -220,19 +220,19 @@ public class MetricCalculator{
 	}
 
 	// Creates the AST for the given file and save their software units
-	private AST createAST(String filePath, int fileId, String commitName){
+	private AST createAST(File file, String commitName){
 
-		int index = filePath.lastIndexOf(".") + 1;
-		String ext = filePath.substring(index);
+		int index = file.getPath().lastIndexOf(".") + 1;
+		String ext = file.getPath().substring(index);
 		IASTGenerator gen = astGenerators.get(ext);
 
 		if(gen == null){
 			return null;
 		}
 		
-		String source = repoSys.getSource(commitName, filePath);
-		AST ast = gen.generate(filePath, source, sourceFolders.toArray(new String[sourceFolders.size()]));
-		processAST.process(filePath, fileId, ast, false);
+		String source = repoSys.getSource(commitName, file.getPath());
+		AST ast = gen.generate(file.getPath(), source, sourceFolders.toArray(new String[sourceFolders.size()]));
+		processAST.process(file, ast, false);
 			
 		return ast;
 
@@ -286,6 +286,9 @@ public class MetricCalculator{
 			}
 		});
 
+		if(fList == null)
+			return false;
+		
 		for(java.io.File f2 : fList){
 			if(f2.getName().endsWith(".java")){
 				return true;

@@ -18,6 +18,7 @@ import br.edu.ufba.softvis.visminer.ast.PackageDeclaration;
 import br.edu.ufba.softvis.visminer.ast.Project;
 import br.edu.ufba.softvis.visminer.ast.TypeDeclaration;
 import br.edu.ufba.softvis.visminer.constant.SoftwareUnitType;
+import br.edu.ufba.softvis.visminer.model.business.File;
 import br.edu.ufba.softvis.visminer.model.database.FileDB;
 import br.edu.ufba.softvis.visminer.model.database.RepositoryDB;
 import br.edu.ufba.softvis.visminer.model.database.SoftwareUnitDB;
@@ -82,6 +83,7 @@ public class ProcessAST {
 	 * @param filePath
 	 * @param fileId
 	 * @param ast
+	 * 
 	 * If isDelete is false:
 	 * Saves the software units found in the given AST in database.
 	 * Marks the software units found in the AST as owned by the snapshot.
@@ -89,19 +91,20 @@ public class ProcessAST {
 	 * If isDelete is true:
 	 * Removes the software units found in the AST from the list of software units owned by the snapshot. 
 	 */
-	public void process(String filePath, int fileId, AST ast, boolean isDelete){
+	public void process(File file, AST ast, boolean isDelete){
 
 		SoftwareUnitDB parent = null;
 		ast.setProject(project);
 
 		Document doc = ast.getDocument();
-
+		
 		if(doc.getPackageDeclaration() != null){
 
 			PackageDeclaration pkgDecl = doc.getPackageDeclaration();
-			String uid = generateUid(repositoryDb.getPath(), null, pkgDecl.getName());
+			String pkgPath = repositoryDb.getPath()+"/"+file.getPath().
+					substring(0, file.getPath().lastIndexOf("/"));
 
-			SoftwareUnitDB pkgUnit = getSofwareUnitDB(uid, pkgDecl.getName(), SoftwareUnitType.PACKAGE,
+			SoftwareUnitDB pkgUnit = getSofwareUnitDB(getUid(pkgPath), pkgDecl.getName(), SoftwareUnitType.PACKAGE,
 					0, repositoryDb, projectUnit, isDelete);
 			pkgDecl.setId(pkgUnit.getId());
 			parent = pkgUnit;	
@@ -110,18 +113,19 @@ public class ProcessAST {
 			parent = projectUnit;
 		}
 
-		String docUid = generateUid(repositoryDb.getPath(), parent.getName(), filePath);
-		SoftwareUnitDB docUnit = getSofwareUnitDB(docUid, doc.getName(), SoftwareUnitType.FILE,
-				fileId, repositoryDb, parent, isDelete);
+		SoftwareUnitDB docUnit = getSofwareUnitDB(file.getUid(), doc.getName(), SoftwareUnitType.FILE,
+				file.getId(), repositoryDb, parent, isDelete);
 		doc.setId(docUnit.getId());
 
 		if(doc.getMethods() != null){
 
 			for(MethodDeclaration method : doc.getMethods()){
-				String methodUid = generateUid(repositoryDb.getPath(), doc.getName(), doc.getName()+"/"+method.getName());
-				SoftwareUnitDB methodUnit = getSofwareUnitDB(methodUid, method.getName(), SoftwareUnitType.METHOD,
-						fileId, repositoryDb, docUnit, isDelete);
+				
+				String methodPath = repositoryDb.getPath()+"/"+file.getPath()+"/"+method.getName();
+				SoftwareUnitDB methodUnit = getSofwareUnitDB(getUid(methodPath), method.getName(),
+						SoftwareUnitType.METHOD, file.getId(), repositoryDb, docUnit, isDelete);
 				method.setId(methodUnit.getId());
+				
 			}
 
 		}
@@ -129,60 +133,59 @@ public class ProcessAST {
 		if(doc.getTypes() != null){
 			for(TypeDeclaration type : doc.getTypes()){
 
-				String typeUid = generateUid(repositoryDb.getPath(), filePath, type.getName());
+				String typePath = repositoryDb.getPath()+"/"+file.getPath()+"/"+type.getName();
 
-				SoftwareUnitDB typeUnit = getSofwareUnitDB(typeUid, type.getName(), type.getType(),
-						0, repositoryDb, docUnit, isDelete);
+				SoftwareUnitDB typeUnit = getSofwareUnitDB(getUid(typePath), type.getName(), type.getType(),
+						file.getId(), repositoryDb, docUnit, isDelete);
 				type.setId(typeUnit.getId());
 
 				if(type.getType() == SoftwareUnitType.CLASS_OR_INTERFACE){
-					processClassOrInterface( (ClassOrInterfaceDeclaration) type, fileId,
-							typeUnit, isDelete);
+					processClassOrInterface( (ClassOrInterfaceDeclaration) type, file.getId(),
+							typeUnit, isDelete, typePath);
 				}else if(type.getType() == SoftwareUnitType.ENUM){
-					processEnum( (EnumDeclaration) type, typeUnit, fileId, isDelete);
+					processEnum( (EnumDeclaration) type, typeUnit, file.getId(), isDelete, typePath);
 				}
+				
 			}
 		}
 	}
 
 
-	// Generate unique id for software units
-	private String generateUid(String repositoryPath, String parentName, String softwareUnitName){
-
-		String uid = repositoryPath + parentName + softwareUnitName;
-		return StringUtils.sha1(uid);
-
-	}
-
 	// Saves fields and methods in database
 	private void processClassOrInterface(ClassOrInterfaceDeclaration type, int fileId,
-			SoftwareUnitDB typeUnit, boolean isDelete){
+			SoftwareUnitDB typeUnit, boolean isDelete, String typePath){
 
 		for(FieldDeclaration field : type.getFields()){
-			String fieldUid = generateUid(repositoryDb.getPath(), typeUnit.getName(), type.getName()+"."+field.getName());
-			SoftwareUnitDB fieldUnit = getSofwareUnitDB(fieldUid, field.getName(), SoftwareUnitType.FIELD,
+			
+			String fieldPath = typePath+"/"+field.getName();
+			SoftwareUnitDB fieldUnit = getSofwareUnitDB(getUid(fieldPath), field.getName(), SoftwareUnitType.FIELD,
 					fileId, repositoryDb, typeUnit, isDelete);
 			field.setId(fieldUnit.getId());
+			
 		}
 
 		for(MethodDeclaration method : type.getMethods()){
-			String methodUid = generateUid(repositoryDb.getPath(), typeUnit.getName(), type.getName()+"."+method.getName());
-			SoftwareUnitDB methodUnit = getSofwareUnitDB(methodUid, method.getName(), SoftwareUnitType.METHOD,
+			
+			String methodPath = typePath+"/"+method.getName();
+			SoftwareUnitDB methodUnit = getSofwareUnitDB(getUid(methodPath), method.getName(), SoftwareUnitType.METHOD,
 					fileId, repositoryDb, typeUnit, isDelete);
 			method.setId(methodUnit.getId());
+			
 		}
 
 	}
 
 	// Saves enum constants in database
 	private void processEnum(EnumDeclaration type, SoftwareUnitDB enumUnit,
-			int fileId, boolean isDelete){
+			int fileId, boolean isDelete, String typePath){
 
 		for(EnumConstantDeclaration constDecl : type.getEnumConsts()){
-			String constUid = generateUid(repositoryDb.getPath(), enumUnit.getName(), constDecl.getName());
-			SoftwareUnitDB constUnit = getSofwareUnitDB(constUid, constDecl.getName(), SoftwareUnitType.ENUM_CONST, fileId,
+			
+			String constPath = typePath+"/"+constDecl.getName();
+			SoftwareUnitDB constUnit = getSofwareUnitDB(getUid(constPath), constDecl.getName(), SoftwareUnitType.ENUM_CONST, fileId,
 					repositoryDb, enumUnit, isDelete);
 			constDecl.setId(constUnit.getId());
+			
 		}
 
 	}
@@ -204,10 +207,8 @@ public class ProcessAST {
 		}else if(isDelete){
 			
 			countPackageChidren(parent, true);
-			if(snapshotUids.containsKey(uid))
-				return new SoftwareUnitDB(snapshotUids.remove(uid), name, type, uid);
-			else 
-				return new SoftwareUnitDB(allUids.remove(uid), name, type, uid);
+			return new SoftwareUnitDB(snapshotUids.remove(uid), name, type, uid);
+			
 		}
 		
 		SoftwareUnitDB softwareUnitDB;
@@ -285,4 +286,9 @@ public class ProcessAST {
 		
 	}
 
+	// Converts path to sha1 hash
+	private String getUid(String path){
+		return StringUtils.sha1(path);
+	}
+	
 }

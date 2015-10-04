@@ -31,7 +31,6 @@ public class SLOCMetricTest {
 		
 		Project project = repository.getProject();
 		SoftwareUnit javaProject = project.getsoftwareUnit();
-		//printSoftwareUnits(javaProject); // printa entidades de software do snapshot do ultimo commit
 		
 		for(SoftwareUnit s : javaProject.getChildren()){ 
 			System.out.println("Type: "+s.getType()+" - " + s.getName() + " | SLOC " + s.getMetricValues().get(MetricUid.SLOC));
@@ -43,7 +42,6 @@ public class SLOCMetricTest {
 			} catch (NumberFormatException e) {
 				//for the case where the metric is null FIX it later
 			}
-			
 			
 			if (fileRelativeName.equals("README.md"))
 				assertEquals(3, valueMetric);
@@ -72,16 +70,12 @@ public class SLOCMetricTest {
 
 		for(SoftwareUnit s : javaProject.getChildren()){ 
 			
-			if(s.getType() == SoftwareUnitType.CLASS_OR_INTERFACE){
-				
-				printClassesInterfaces(s);
-				
-			} else if(s.getType() == SoftwareUnitType.PACKAGE){
+			if(s.getType() == SoftwareUnitType.PACKAGE){
 				
 				System.out.println("Pacote " + s.getName() + " | NOCAI " + s.getMetricValues().get(MetricUid.NOCAI));
 				printSoftwareUnits(s);
 				
-			} else if(s.getType() == SoftwareUnitType.ENUM || s.getType() == SoftwareUnitType.FILE){
+			} else {
 				
 				System.out.println("Nome " + s.getName() + " | SLOC " + s.getMetricValues().get(MetricUid.SLOC));
 				
@@ -91,19 +85,4 @@ public class SLOCMetricTest {
 
 	}
 	
-	private static void printClassesInterfaces(SoftwareUnit s){
-
-		System.out.println("Classe " + s.getName() + " | WMC " + s.getMetricValues().get(MetricUid.WMC) +
-				" " + " | SLOC " + s.getMetricValues().get(MetricUid.SLOC));
-
-		for(SoftwareUnit s2 : s.getChildren()){
-			
-			if(s2.getType() == SoftwareUnitType.METHOD){
-				System.out.println("Método " + s2.getName() + " | CC " + s2.getMetricValues().get(MetricUid.CC));
-			}
-			
-		}
-
-	}
-
 }

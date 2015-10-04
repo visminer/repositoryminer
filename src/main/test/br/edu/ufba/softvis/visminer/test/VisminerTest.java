@@ -61,10 +61,10 @@ public class VisminerTest {
 
 		DBConfig dbConfig = new DBConfig();
 		dbConfig.setDriver("com.mysql.jdbc.Driver");
-		dbConfig.setUrl("jdbc:mysql://localhost/pagseguro");
+		dbConfig.setUrl("jdbc:mysql://localhost/visminer");
 		dbConfig.setUser("root");
 		dbConfig.setPassword("1234");
-		dbConfig.setGeneration("drop-and-create-tables");
+		dbConfig.setGeneration("none");
 		dbConfig.setLogging("off");
 		visminer.setDBConfig(dbConfig);
 
@@ -73,15 +73,14 @@ public class VisminerTest {
 	private void startRepository() {
 
 		Repository repository = new Repository();
-		repository.setDescription("Repositório da api de integração do pagseguro em java");
-		repository.setOwner("pagseguro");
-		repository.setName("java");
+		repository.setDescription("Repositório do Visminer");
+		repository.setOwner("visminer");
+		repository.setName("Visminer");
 		repository.setPath(repositoryPath);
 		repository.setType(SCMType.GIT);
 
-		MetricUid[] metrics = { MetricUid.SLOC, MetricUid.CC, MetricUid.NOCAI, 
-				MetricUid.WMC, MetricUid.TCC };
-		LanguageType[] langs = { LanguageType.JAVA };
+		MetricUid[] metrics = {MetricUid.ATFD, MetricUid.CC, MetricUid.NOCAI, MetricUid.SLOC, MetricUid.TCC, MetricUid.WMC};
+		LanguageType[] langs = {LanguageType.JAVA};
 		
 		try {
 			visminer.persistRepository(repository, Arrays.asList(metrics), Arrays.asList(langs));

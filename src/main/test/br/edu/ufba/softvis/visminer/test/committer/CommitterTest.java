@@ -71,6 +71,7 @@ public class CommitterTest {
 		Committer firstCommitter = repository.getProject().getCurrentCommit().getCommitter();
 		assertEquals("visminerproject@gmail.com",firstCommitter.getEmail());
 		assertEquals("visminer",firstCommitter.getName());
+		
 		/*
 		//pagseguro 
 		assertEquals("desenvolvedores@pagseguro.com.br",firstCommitter.getEmail());
@@ -78,8 +79,9 @@ public class CommitterTest {
 		
 		repository.getProject().lastCommit();
 		Committer lastCommitter = repository.getProject().getCurrentCommit().getCommitter();
-		assertEquals("felipegustavo1000@gmail.com",lastCommitter.getEmail());
-		assertEquals("felipe",lastCommitter.getName());
+		assertEquals("renatonovais@gmail.com",lastCommitter.getEmail());
+		assertEquals("renatoln",lastCommitter.getName());
+		
 		/*
 		//pagseguro
 		assertEquals("cegoncalves@uolinc.com",lastCommitter.getEmail());

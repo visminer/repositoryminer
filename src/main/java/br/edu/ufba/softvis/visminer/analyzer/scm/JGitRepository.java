@@ -511,4 +511,8 @@ public class JGitRepository implements SCM{
 
 	}
 
+	protected Git getGit(){
+		return this.git;
+	}
+	
 }
