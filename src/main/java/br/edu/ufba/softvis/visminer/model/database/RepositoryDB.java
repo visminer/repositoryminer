@@ -295,12 +295,10 @@ public class RepositoryDB implements Serializable {
 	 * @return the bizz representation of Repository
 	 */
 	public Repository toBusiness() {
-		Repository repository = new Repository(this.getId(),
-				this.getDescription(), this.getName(), this.getPath(),
-				this.getOwner(), this.getType(), this.getServiceType(),
-				this.getUid());
-
-		return repository;
+		
+		return new Repository(id, description, name, path, owner,
+				getType(), getServiceType(), uid);
+		
 	}
 
 	/**
@@ -311,8 +309,12 @@ public class RepositoryDB implements Serializable {
 	 * @return collection of "Business" repositories
 	 */
 	public static List<Repository> toBusiness(List<RepositoryDB> repositories) {
+		
 		List<Repository> bizzRepos = new ArrayList<Repository>();
-
+		
+		if(repositories == null)
+			return bizzRepos;
+		
 		for (RepositoryDB repo : repositories) {
 			Repository repository = new Repository(repo.getId(),
 					repo.getDescription(), repo.getName(), repo.getPath(),

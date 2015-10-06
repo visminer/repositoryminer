@@ -75,8 +75,6 @@ public class ProcessAST {
 		project.setId(projectUnit.getId());
 		project.setName(projectUnit.getName());
 
-		snapshotUids.put(projectUnit.getUid(), projectUnit.getId());
-
 	}
 
 	/**

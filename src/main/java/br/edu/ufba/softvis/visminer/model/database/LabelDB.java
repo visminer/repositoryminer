@@ -1,6 +1,8 @@
 package br.edu.ufba.softvis.visminer.model.database;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -13,6 +15,8 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+
+import br.edu.ufba.softvis.visminer.model.business.Label;
 
 /**
  * The persistent class for the label database table.
@@ -138,6 +142,24 @@ public class LabelDB implements Serializable{
 		} else if (!name.equals(other.name))
 			return false;
 		return true;
+	}
+	
+	public static List<Label> toBusiness(List<LabelDB> labels){
+		
+		List<Label> bizzLabels = new ArrayList<Label>();
+		
+		if(labels == null)
+			return bizzLabels;
+		
+		for(LabelDB l : labels){
+			
+			Label label = new Label(l.getId(), l.getColor(), l.getName());
+			bizzLabels.add(label);
+			
+		}
+		
+		return bizzLabels;
+		
 	}
 	
 }

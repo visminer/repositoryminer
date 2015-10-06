@@ -1,13 +1,28 @@
 package br.edu.ufba.softvis.visminer.model.database;
 
 import java.io.Serializable;
-
-import javax.persistence.*;
-
-import br.edu.ufba.softvis.visminer.constant.StatusType;
-
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
+import br.edu.ufba.softvis.visminer.constant.StatusType;
+import br.edu.ufba.softvis.visminer.model.business.Milestone;
 
 
 /**
@@ -16,8 +31,8 @@ import java.util.List;
 @Entity
 @Table(name="milestone")
 @NamedQueries({
-	@NamedQuery(name="MilestoneDB.minFindByRepository", query="SELECT m.number, m.id FROM MilestoneDB m WHERE m.repository.id = :id"),
-	@NamedQuery(name="MilestoneDB.deleteByRepository", query="DELETE FROM MilestoneDB m WHERE m.repository.id = :id")
+	@NamedQuery(name="MilestoneDB.minFindByRepository", query="SELECT m.number, m.id FROM MilestoneDB m WHERE m.repository.id = :repositoryId"),
+	@NamedQuery(name="MilestoneDB.findByRepository", query="SELECT m FROM MilestoneDB m WHERE m.repository.id = :repositoryId")
 })
 public class MilestoneDB implements Serializable {
 	
@@ -265,5 +280,31 @@ public class MilestoneDB implements Serializable {
 	public void setRepository(RepositoryDB repository) {
 		this.repository = repository;
 	}
+	
+	public Milestone toBusiness(){
+		
+		return new Milestone(id, closedIssues, createDate, creator,
+				description, dueDate, number, openedIssues, getStatus(), title);
+		
+	}
 
+	public static List<Milestone> toBusiness(List<MilestoneDB> milestones){
+		
+		List<Milestone> bizzMilestones = new ArrayList<Milestone>();
+		
+		if(milestones == null)
+			return bizzMilestones;
+		
+		for(MilestoneDB m : milestones){
+			
+			Milestone milestone = new Milestone(m.getId(), m.getClosedIssues(), m.getCreateDate(), m.getCreator(), m.getDescription(),
+					m.getDueDate(), m.getNumber(), m.getOpenedIssues(), m.getStatus(), m.getTitle());
+			bizzMilestones.add(milestone);
+			
+		}
+		
+		return bizzMilestones;
+		
+	}
+	
 }

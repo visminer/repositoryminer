@@ -33,7 +33,7 @@ public class FileXCommitDB implements Serializable {
 	private CommitDB commit;
 
 	//bi-directional many-to-one association to FileDB
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name="file_id", nullable=false, insertable=false, updatable=false)
 	private FileDB file;
 

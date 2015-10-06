@@ -1,72 +1,61 @@
 package br.edu.ufba.softvis.visminer.model.business;
 
-/**
- * User friendly committer bean class.
- * This class will be used for user interface.
- */
-
-public class Committer {
+public class Label {
 
 	private int id;
-	private String email;
+	private String color;
 	private String name;
-	
-	public Committer(){}
 
+	public Label(){}
+	
 	/**
 	 * @param id
-	 * @param email
+	 * @param color
 	 * @param name
 	 */
-	public Committer(int id, String email, String name) {
+	public Label(int id, String color, String name) {
 		super();
 		this.id = id;
-		this.email = email;
+		this.color = color;
 		this.name = name;
 	}
-
 	/**
 	 * @return the id
 	 */
 	public int getId() {
 		return id;
 	}
-
 	/**
 	 * @param id the id to set
 	 */
 	public void setId(int id) {
 		this.id = id;
 	}
-
 	/**
-	 * @return the email
+	 * @return the color
 	 */
-	public String getEmail() {
-		return email;
+	public String getColor() {
+		return color;
 	}
-
 	/**
-	 * @param email the email to set
+	 * @param color the color to set
 	 */
-	public void setEmail(String email) {
-		this.email = email;
+	public void setColor(String color) {
+		this.color = color;
 	}
-
 	/**
 	 * @return the name
 	 */
 	public String getName() {
 		return name;
 	}
-
 	/**
 	 * @param name the name to set
 	 */
 	public void setName(String name) {
 		this.name = name;
 	}
-
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -74,23 +63,19 @@ public class Committer {
 		result = prime * result + id;
 		return result;
 	}
-
+	
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj) {
+		if (this == obj)
 			return true;
-		}
-		if (obj == null) {
+		if (obj == null)
 			return false;
-		}
-		if (!(obj instanceof Committer)) {
+		if (getClass() != obj.getClass())
 			return false;
-		}
-		Committer other = (Committer) obj;
-		if (id != other.id) {
+		Label other = (Label) obj;
+		if (id != other.id)
 			return false;
-		}
 		return true;
-	}
+	}	
 	
 }

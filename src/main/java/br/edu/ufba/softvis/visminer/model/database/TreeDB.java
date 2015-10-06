@@ -205,8 +205,12 @@ public class TreeDB implements Serializable {
 	 * @return collection of "business" trees
 	 */
 	public static List<Tree> toBusiness(List<TreeDB> trees) {
+		
 		List<Tree> bizzTrees = new ArrayList<Tree>();
 
+		if(trees == null)
+			return bizzTrees;
+		
 		for (TreeDB t : trees) {
 			Tree tree = new Tree(t.getId(), t.getLastUpdate(), t.getName(),
 					t.getFullName(), t.getType());

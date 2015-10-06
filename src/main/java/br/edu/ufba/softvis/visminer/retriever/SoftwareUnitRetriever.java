@@ -48,6 +48,7 @@ public class SoftwareUnitRetriever extends Retriever {
 		super.createEntityManager();
 		super.shareEntityManager(dao);
 		List<SoftwareUnitDB> softUnitsDb = dao.findByRepository(repositoryId, commitId);
+		
 		if (softUnitsDb != null) {
 			softwareUnits = SoftwareUnitDB.toBusiness(softUnitsDb);
 

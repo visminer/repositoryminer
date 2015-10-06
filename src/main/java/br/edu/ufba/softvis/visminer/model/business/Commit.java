@@ -4,8 +4,6 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
- * @version 0.9
  * User friendly commit bean class.
  * This class will be used for user interface.
  */
@@ -18,6 +16,7 @@ public class Commit {
 	private String name;
 	private List<File> commitedFiles;
 	private Committer committer;
+	private List<IssueCommand> commands;
 	
 	public Commit(){}
 
@@ -117,6 +116,20 @@ public class Commit {
 	 */
 	public void setCommitter(Committer committer) {
 		this.committer = committer;
+	}
+
+	/**
+	 * @return the commands
+	 */
+	public List<IssueCommand> getCommands() {
+		return commands;
+	}
+
+	/**
+	 * @param commands the commands to set
+	 */
+	public void setCommands(List<IssueCommand> commands) {
+		this.commands = commands;
 	}
 
 	@Override

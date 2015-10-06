@@ -166,16 +166,6 @@ public class FileDB implements Serializable {
 	}
 	
 	/**
-	 * @return the bizz representation of File
-	 */
-	public File toBusiness() {
-		File file = new File(this.getId(), this.getPath(),
-				this.getUid());
-		
-		return file;
-	}
-
-	/**
 	 * Converts from DB beans to Bizz beans
 	 * 
 	 * @param repositories
@@ -195,5 +185,11 @@ public class FileDB implements Serializable {
 		return bizzFiles;
 	}
 
+	/**
+	 * @return the bizz representation of File
+	 */
+	public File toBusiness(){
+		return new File(id, path, uid);
+	}
 
 }

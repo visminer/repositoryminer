@@ -12,7 +12,7 @@ import javax.persistence.EntityManager;
 
 import br.edu.ufba.softvis.visminer.analyzer.scm.web.WebSCM;
 import br.edu.ufba.softvis.visminer.analyzer.scm.web.WebSCMFactory;
-import br.edu.ufba.softvis.visminer.constant.IssueCommand;
+import br.edu.ufba.softvis.visminer.constant.IssueCommandType;
 import br.edu.ufba.softvis.visminer.model.database.CommitDB;
 import br.edu.ufba.softvis.visminer.model.database.CommitReferenceIssueDB;
 import br.edu.ufba.softvis.visminer.model.database.CommitReferenceIssuePK;
@@ -232,7 +232,7 @@ public class MilestoneAndIssueAnalyzer{
 	
 	private void analyzeCommitMessage(){
 		
-		Map<String, Integer> commandMap = IssueCommand.toMap();
+		Map<String, Integer> commandMap = IssueCommandType.toMap();
 		List<CommitDB> commits = commitDAO.findNotRefIssue(repoDB.getId());
 		
 		// creates regex string
@@ -244,6 +244,7 @@ public class MilestoneAndIssueAnalyzer{
 		while(it.hasNext()){
 			builder.append(it.next()+"|");
 		}
+		
 		builder.replace(builder.length()-1, builder.length(), ")");
 		builder.append(" #[0-9]+|#[0-9]+");
 		Pattern pattern = Pattern.compile(builder.toString());
@@ -267,7 +268,7 @@ public class MilestoneAndIssueAnalyzer{
 				int index = issuesRef.indexOf(ref);
 				if(index >= 0){
 					CommitReferenceIssueDB aux = issuesRef.get(index);
-					if(aux.getCommand() == IssueCommand.NONE)
+					if(aux.getCommand() == IssueCommandType.NONE)
 						aux.setCommand(ref.getCommand());
 				}else if(ref != null){
 					issuesRef.add(ref);
@@ -290,7 +291,7 @@ public class MilestoneAndIssueAnalyzer{
 		if(elem == null) return null;
 		
 		CommitReferenceIssuePK pk = new CommitReferenceIssuePK(commitId, elem);
-		CommitReferenceIssueDB issueRef = new CommitReferenceIssueDB(pk, IssueCommand.parse(command));
+		CommitReferenceIssueDB issueRef = new CommitReferenceIssueDB(pk, IssueCommandType.parse(command));
 		return issueRef;
 		
 	}

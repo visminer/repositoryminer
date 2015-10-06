@@ -6,6 +6,7 @@ import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 
 import br.edu.ufba.softvis.visminer.model.database.IssueDB;
 import br.edu.ufba.softvis.visminer.persistence.dao.IssueDAO;
@@ -22,7 +23,7 @@ public class IssueDAOImpl extends DAOImpl<IssueDB, Integer> implements IssueDAO 
 		
 		EntityManager em = getEntityManager();
 		Query query = em.createNamedQuery("IssueDB.minFindByRepository");
-		query.setParameter("id", repositoryId);
+		query.setParameter("repositoryId", repositoryId);
 		
 		Map<Integer, Integer> map = new HashMap<Integer, Integer>();
 		List<Object[]> objs = query.getResultList();
@@ -36,5 +37,15 @@ public class IssueDAOImpl extends DAOImpl<IssueDB, Integer> implements IssueDAO 
 		
 	}
 
+	
+	@Override
+	public List<IssueDB> findByRepository(int repositoryId) {
+		
+		EntityManager em = getEntityManager();
+		TypedQuery<IssueDB> query = em.createNamedQuery("IssueDB.findByRepository", IssueDB.class);
+		query.setParameter("repositoryId", repositoryId);
+		return query.getResultList();
+		
+	}	
 
 }

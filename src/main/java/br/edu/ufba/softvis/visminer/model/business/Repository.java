@@ -1,8 +1,13 @@
 package br.edu.ufba.softvis.visminer.model.business;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import br.edu.ufba.softvis.visminer.constant.WebSCMType;
+import br.edu.ufba.softvis.visminer.retriever.CommitterRetriever;
+import br.edu.ufba.softvis.visminer.retriever.IssueRetriever;
+import br.edu.ufba.softvis.visminer.retriever.MilestoneRetriever;
+import br.edu.ufba.softvis.visminer.retriever.TreeRetriever;
 import br.edu.ufba.softvis.visminer.constant.SCMType;
 
 /**
@@ -20,13 +25,15 @@ public class Repository {
 	private SCMType type;
 	private WebSCMType serviceType;
 	private String uid;
-	
+
 	private List<Committer> committers;
 	private List<Tree> trees;
+	private List<Issue> issues;
+	private List<Milestone> milestones;
 	private Project project;
-	
+
 	public Repository(){}
-	
+
 	/**
 	 * @param id
 	 * @param description
@@ -206,6 +213,34 @@ public class Repository {
 		this.project = project;
 	}
 
+	/**
+	 * @return the issues
+	 */
+	public List<Issue> getIssues() {
+		return issues;
+	}
+
+	/**
+	 * @param issues the issues to set
+	 */
+	public void setIssues(List<Issue> issues) {
+		this.issues = issues;
+	}
+
+	/**
+	 * @return the milestones
+	 */
+	public List<Milestone> getMilestones() {
+		return milestones;
+	}
+
+	/**
+	 * @param milestones the milestones to set
+	 */
+	public void setMilestones(List<Milestone> milestones) {
+		this.milestones = milestones;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -226,6 +261,54 @@ public class Repository {
 		if (id != other.id)
 			return false;
 		return true;
-	}	
-	
+	}
+
+	public void explore(){
+
+
+		TreeRetriever treeRet = new TreeRetriever();
+		CommitterRetriever committerRet = new CommitterRetriever();
+		MilestoneRetriever mileRet = new MilestoneRetriever();
+		IssueRetriever issueRet = new IssueRetriever();
+
+		this.trees = treeRet.findTrees(id);
+		this.committers = committerRet.findCommitters(id);
+		this.milestones = mileRet.retrieverByRepository(id);
+		this.issues = issueRet.retrieverByRepository(id);
+
+		//Associates mileestones and issues
+		if(milestones.size() > 0){
+			for(Issue i : this.issues){
+
+				int index = milestones.indexOf(i.getMilestone());
+				if(index > -1){
+
+					Milestone m = milestones.get(index);
+					i.setMilestone(m);
+
+					if(m.getIssues() == null)
+						m.setIssues(new ArrayList<Issue>());
+
+					m.getIssues().add(i);
+
+				}
+
+			}
+		}
+
+		Project project = new Project(this);
+		for (Tree t : trees) {
+			String s = t.getName().toLowerCase();
+			if (s.equals("master")) {
+				project.setCurrentTree(t);
+			}
+		}
+
+		if (project.getCurrentTree() == null) 
+			project.setCurrentTree(trees.get(0));
+
+		this.project = project;
+
+	}
+
 }

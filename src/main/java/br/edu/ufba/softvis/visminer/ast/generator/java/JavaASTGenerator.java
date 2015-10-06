@@ -60,14 +60,21 @@ public class JavaASTGenerator implements IASTGenerator{
 
 		parser.setEnvironment(classpath, sourceFolders, encoding, true);
 		CompilationUnit root = null;
-		
+
 		try{
 			root = (CompilationUnit) parser.createAST(null);
 		}catch(IllegalStateException e){
+			
+			parser.setSource(source.toCharArray());
+			parser.setKind(ASTParser.K_COMPILATION_UNIT);
+			parser.setResolveBindings(false);
+			parser.setBindingsRecovery(false);
 			parser.setEnvironment(null, null, null, false);
+			
 			root = (CompilationUnit) parser.createAST(null);
+			
 		}
-		
+
 		String pkgName = null;
 		if(root.getPackage() != null){
 			PackageDeclaration pkgDecl = new PackageDeclaration();
@@ -162,7 +169,7 @@ public class JavaASTGenerator implements IASTGenerator{
 			builder.replace(builder.length()-1, builder.length(), ")");
 		else
 			builder.append(")");
-		
+
 		m.setName(builder.toString());
 		m.setParameters(params);
 

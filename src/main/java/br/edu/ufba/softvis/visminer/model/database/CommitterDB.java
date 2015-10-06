@@ -185,8 +185,12 @@ public class CommitterDB implements Serializable {
 	 * @return collection of "business" committers
 	 */
 	public static List<Committer> toBusiness(List<CommitterDB> committers) {
+		
 		List<Committer> bizzCommitters = new ArrayList<Committer>();
 
+		if(committers == null)
+			return bizzCommitters;
+		
 		for (CommitterDB c : committers) {
 			Committer committer = new Committer(c.getId(), c.getEmail(),
 					c.getName());

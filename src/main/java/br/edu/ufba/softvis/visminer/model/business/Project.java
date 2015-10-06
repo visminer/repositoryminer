@@ -5,6 +5,7 @@ import java.util.List;
 
 import br.edu.ufba.softvis.visminer.constant.ChangeType;
 import br.edu.ufba.softvis.visminer.retriever.CommitRetriever;
+import br.edu.ufba.softvis.visminer.retriever.IssueRetriever;
 import br.edu.ufba.softvis.visminer.retriever.SoftwareUnitRetriever;
 
 /**
@@ -252,6 +253,8 @@ public class Project {
 
 		CommitRetriever commitRetriever = new CommitRetriever();
 		commits = commitRetriever.retrieveByTree(currentTree.getId());
+		
+		IssueRetriever issueRet = new IssueRetriever();
 
 		SoftwareUnitRetriever retriever = new SoftwareUnitRetriever();
 
@@ -262,10 +265,21 @@ public class Project {
 		committers = new ArrayList<Committer>();
 		files = new ArrayList<File>();
 
-		// Set committers and files in their lists.
 		for (Commit commit : commits) {
+			
 			committersUpdateHelper(commit.getCommitter(), false);
 			updateFiles(commit.getCommitedFiles());
+			commit.setCommands(issueRet.retrieveByCommit(commit.getId()));
+			
+			if(commit.getCommands() != null){
+				List<IssueCommand> list = commit.getCommands();
+				for(int i = 0; i < list.size(); i++){
+					Issue is = list.get(i).getIssue();
+					int index = repository.getIssues().indexOf(is);
+					list.get(i).setIssue(repository.getIssues().get(index));
+				}
+			}
+			
 		}
 		readSoftwareUnitTree(softwareUnit.getChildren());
 

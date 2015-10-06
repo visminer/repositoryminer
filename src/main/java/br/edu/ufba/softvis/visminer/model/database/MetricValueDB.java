@@ -128,9 +128,5 @@ public class MetricValueDB implements Serializable {
 		return true;
 	}
 
-	@Override
-	public String toString() {
-		return "C: "+id.getCommitId()+" M: "+id.getMetricId()+" S: "+id.getSoftwareUnitId();
-	}
 	
 }

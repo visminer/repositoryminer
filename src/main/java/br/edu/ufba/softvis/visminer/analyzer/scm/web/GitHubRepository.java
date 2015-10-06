@@ -12,6 +12,8 @@ import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.IssueService;
 import org.eclipse.egit.github.core.service.MilestoneService;
 
+import com.mysql.jdbc.util.Base64Decoder;
+
 import br.edu.ufba.softvis.visminer.constant.StatusType;
 import br.edu.ufba.softvis.visminer.model.database.IssueDB;
 import br.edu.ufba.softvis.visminer.model.database.LabelDB;
@@ -61,7 +63,7 @@ public class GitHubRepository implements WebSCM {
 				IssueDB issueDB = new IssueDB(0, issue.getUser().getLogin(), null,
 						issue.getClosedAt(), issue.getComments(), issue.getCreatedAt(),
 						issue.getNumber(), StatusType.parse(issue.getState()),
-						issue.getTitle(), issue.getUpdatedAt(), issue.getBody());
+						issue.getTitle(), issue.getUpdatedAt(),issue.getBody());
 				
 				if(issue.getAssignee() != null){
 					issueDB.setAssignee(issue.getAssignee().getLogin());

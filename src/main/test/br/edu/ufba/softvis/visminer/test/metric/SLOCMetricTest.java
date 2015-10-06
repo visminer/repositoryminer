@@ -33,6 +33,8 @@ public class SLOCMetricTest {
 		
 		for(SoftwareUnit s : javaProject.getChildren()){ 
 
+			System.out.println(s.getName());
+			
 			String fileRelativeName = s.getName();
 			int valueMetric = 0;
 			

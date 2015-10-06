@@ -1,12 +1,14 @@
 package br.edu.ufba.softvis.visminer.model.database;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -22,6 +24,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import br.edu.ufba.softvis.visminer.constant.StatusType;
+import br.edu.ufba.softvis.visminer.model.business.Issue;
 
 
 /**
@@ -30,7 +33,8 @@ import br.edu.ufba.softvis.visminer.constant.StatusType;
 @Entity
 @Table(name="issue")
 @NamedQueries({
-	@NamedQuery(name="IssueDB.minFindByRepository", query="SELECT i.number, i.id FROM IssueDB i where i.repository.id = :id")
+	@NamedQuery(name="IssueDB.minFindByRepository", query="SELECT i.number, i.id FROM IssueDB i where i.repository.id = :repositoryId"),
+	@NamedQuery(name="IssueDB.findByRepository", query="SELECT i FROM IssueDB i where i.repository.id = :repositoryId")
 })
 public class IssueDB implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -84,7 +88,7 @@ public class IssueDB implements Serializable {
 	@JoinColumn(name="repository_id", nullable=false)
 	private RepositoryDB repository;
 
-	@OneToMany(mappedBy="issue", cascade=CascadeType.ALL)
+	@OneToMany(mappedBy="issue", cascade=CascadeType.ALL, fetch=FetchType.EAGER)
 	private List<LabelDB> labels;
 	
 	@OneToMany(mappedBy="issue")
@@ -331,6 +335,36 @@ public class IssueDB implements Serializable {
 	 */
 	public void setLabels(List<LabelDB> labels) {
 		this.labels = labels;
+	}
+	
+	public static List<Issue> toBusiness(List<IssueDB> issues){
+		
+		List<Issue> bizzIssues = new ArrayList<Issue>();
+		
+		if(issues == null)
+			return bizzIssues;
+		
+		for(IssueDB i : issues){
+			
+			Issue issue = new Issue(i.getId(), i.getCreator(), i.getAssignee(),
+					i.getClosedDate(), i.getCommentsNumber(), i.getCreateDate(), i.getNumber(),
+					i.getStatus(), i.getTitle(), i.getUpdateDate(), i.getBody());
+			issue.setLabels(LabelDB.toBusiness(i.getLabels()));
+			
+			if(i.getMilestone() != null)
+				issue.setMilestone(i.getMilestone().toBusiness());
+			
+			bizzIssues.add(issue);
+			
+		}
+		
+		return bizzIssues;
+		
+	}
+	
+	public Issue toBusiness(){
+		return new Issue(id, creator, assignee, closedDate, commentsNumber, 
+				createDate, commentsNumber, getStatus(), title, updateDate, body);
 	}
 
 }
