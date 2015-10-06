@@ -30,6 +30,7 @@ public class VisminerTest {
 		}
 
 		repository = repoRetriever.retrieveByPath(repositoryPath);
+		repository.explore();
 
 	}
 
@@ -64,7 +65,7 @@ public class VisminerTest {
 		dbConfig.setUrl("jdbc:mysql://localhost/visminer");
 		dbConfig.setUser("root");
 		dbConfig.setPassword("1234");
-		dbConfig.setGeneration("none");
+		dbConfig.setGeneration("drop-and-create-tables");
 		dbConfig.setLogging("off");
 		visminer.setDBConfig(dbConfig);
 
@@ -80,7 +81,7 @@ public class VisminerTest {
 		repository.setType(SCMType.GIT);
 
 		MetricUid[] metrics = {MetricUid.ATFD, MetricUid.CC, MetricUid.NOCAI, MetricUid.SLOC, MetricUid.TCC, MetricUid.WMC};
-		LanguageType[] langs = {LanguageType.JAVA};
+		LanguageType[] langs = {LanguageType.JAVA, LanguageType.NONE};
 		
 		try {
 			visminer.persistRepository(repository, Arrays.asList(metrics), Arrays.asList(langs));
