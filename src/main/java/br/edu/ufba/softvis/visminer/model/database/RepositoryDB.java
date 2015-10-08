@@ -320,7 +320,9 @@ public class RepositoryDB implements Serializable {
 					repo.getDescription(), repo.getName(), repo.getPath(),
 					repo.getOwner(), repo.getType(), repo.getServiceType(),
 					repo.getUid());
-
+			repository.setTrees(TreeDB.toBusiness(repo.getTrees()));
+			repository.setCommitters(CommitterDB.toBusiness(repo.getCommitters()));
+			
 			bizzRepos.add(repository);
 		}
 
