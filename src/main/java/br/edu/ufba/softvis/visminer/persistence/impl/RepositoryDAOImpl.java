@@ -10,7 +10,6 @@ import br.edu.ufba.softvis.visminer.utility.StringUtils;
 /**
  * Implementation of interface {@link RepositoryDAO}
  */
-
 public class RepositoryDAOImpl extends DAOImpl<RepositoryDB, Integer> implements RepositoryDAO{
 
 	@Override
@@ -30,16 +29,14 @@ public class RepositoryDAOImpl extends DAOImpl<RepositoryDB, Integer> implements
 		EntityManager em = getEntityManager();
 		TypedQuery<Long> query = em.createNamedQuery("RepositoryDB.countByUid", Long.class);
 		query.setParameter("uid", uid);
-		return ( (Long)query.getSingleResult() != 0);
+		return ( (Long) getSingleResult(query) != 0);
 		
 	}
 
 	@Override
 	public RepositoryDB findByPath(String path){
-		
 		String uid = StringUtils.sha1(path.replace("\\", "/"));
 		return findByUid(uid);
-		
 	}
 	
 }

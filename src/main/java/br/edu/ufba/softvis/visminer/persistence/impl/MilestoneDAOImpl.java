@@ -14,10 +14,9 @@ import br.edu.ufba.softvis.visminer.persistence.dao.MilestoneDAO;
 /**
  * Implementation of interface {@link MilestoneDAO}
  */
-
+@SuppressWarnings("unchecked")
 public class MilestoneDAOImpl extends DAOImpl<MilestoneDB, Integer> implements MilestoneDAO{
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public Map<Integer, Integer> minimalFindByRepository(int repositoryId) {
 		
@@ -28,7 +27,7 @@ public class MilestoneDAOImpl extends DAOImpl<MilestoneDB, Integer> implements M
 		Map<Integer, Integer> map = new HashMap<Integer, Integer>();
 		List<Object[]> objs = query.getResultList();
 		
-		if(objs.size() == 0) return null;
+		if(objs == null) return map;
 		
 		for(Object[] obj : objs){
 			map.put( (Integer)obj[0], (Integer)obj[1]);
@@ -44,7 +43,7 @@ public class MilestoneDAOImpl extends DAOImpl<MilestoneDB, Integer> implements M
 		EntityManager em = getEntityManager();
 		TypedQuery<MilestoneDB> query = em.createNamedQuery("MilestoneDB.findByRepository", MilestoneDB.class);
 		query.setParameter("repositoryId", repositoryId);
-		return query.getResultList();
+		return getResultList(query);
 		
 	}	
 

@@ -14,10 +14,9 @@ import br.edu.ufba.softvis.visminer.persistence.dao.IssueDAO;
 /**
  * Implementation of interface {@link IssueDAO}
  */
-
+@SuppressWarnings("unchecked")
 public class IssueDAOImpl extends DAOImpl<IssueDB, Integer> implements IssueDAO {
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public Map<Integer, Integer> minimalFindByRepository(int repositoryId) {
 		
@@ -28,7 +27,7 @@ public class IssueDAOImpl extends DAOImpl<IssueDB, Integer> implements IssueDAO 
 		Map<Integer, Integer> map = new HashMap<Integer, Integer>();
 		List<Object[]> objs = query.getResultList();
 		
-		if(objs.size() == 0) return null;
+		if(objs == null) return map;
 		
 		for(Object[] obj : objs){
 			map.put( (Integer)obj[0], (Integer)obj[1]);
@@ -44,7 +43,7 @@ public class IssueDAOImpl extends DAOImpl<IssueDB, Integer> implements IssueDAO 
 		EntityManager em = getEntityManager();
 		TypedQuery<IssueDB> query = em.createNamedQuery("IssueDB.findByRepository", IssueDB.class);
 		query.setParameter("repositoryId", repositoryId);
-		return query.getResultList();
+		return getResultList(query);
 		
 	}	
 

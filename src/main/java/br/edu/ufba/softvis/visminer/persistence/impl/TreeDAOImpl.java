@@ -9,12 +9,9 @@ import br.edu.ufba.softvis.visminer.model.database.TreeDB;
 import br.edu.ufba.softvis.visminer.persistence.dao.TreeDAO;
 
 /**
- * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
- * @version 0.9
- * 
  * Implementation of interface {@link TreeDAO}
  */
-
+@SuppressWarnings("unchecked")
 public class TreeDAOImpl extends DAOImpl<TreeDB, Integer> implements TreeDAO{
 
 	@Override
@@ -23,7 +20,7 @@ public class TreeDAOImpl extends DAOImpl<TreeDB, Integer> implements TreeDAO{
 		EntityManager em = getEntityManager();
 		TypedQuery<TreeDB> query = em.createNamedQuery("TreeDB.findByRepository", TreeDB.class);
 		query.setParameter("repositoryId", repositoryId);
-		return query.getResultList();
+		return getResultList(query);
 		
 	}
 

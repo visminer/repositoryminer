@@ -12,16 +12,16 @@ import br.edu.ufba.softvis.visminer.utility.StringUtils;
 /**
  * Implementation of interface {@link CommitDAO}
  */
-
+@SuppressWarnings("unchecked")
 public class CommitDAOImpl extends DAOImpl<CommitDB, Integer> implements CommitDAO{
-
+	
 	@Override
 	public List<CommitDB> findByTree(int treeId) {
 		
 		EntityManager em = getEntityManager();
 		TypedQuery<CommitDB> query = em.createNamedQuery("CommitDB.findByTree", CommitDB.class);
 		query.setParameter("id", treeId);
-		return query.getResultList();
+		return getResultList(query);
 		
 	}
 
@@ -33,7 +33,7 @@ public class CommitDAOImpl extends DAOImpl<CommitDB, Integer> implements CommitD
 		EntityManager em = getEntityManager();
 		TypedQuery<CommitDB> query = em.createNamedQuery("CommitDB.findByRepository", CommitDB.class);
 		query.setParameter("uid", uid);
-		return query.getResultList();
+		return getResultList(query);
 		
 	}
 
@@ -43,7 +43,7 @@ public class CommitDAOImpl extends DAOImpl<CommitDB, Integer> implements CommitD
 		EntityManager em = getEntityManager();
 		TypedQuery<CommitDB> query = em.createNamedQuery("CommitDB.findNotRefIssue", CommitDB.class);
 		query.setParameter("repoId", repoId);
-		return query.getResultList();
+		return getResultList(query);
 		
 	}
 

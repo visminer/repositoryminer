@@ -11,6 +11,7 @@ import br.edu.ufba.softvis.visminer.persistence.dao.LabelDAO;
 /**
  * Implementation of interface {@link LabelDAO}
  */
+@SuppressWarnings("unchecked")
 public class LabelDAOImpl extends DAOImpl<LabelDB, Integer> implements LabelDAO{
 
 	@Override
@@ -19,7 +20,7 @@ public class LabelDAOImpl extends DAOImpl<LabelDB, Integer> implements LabelDAO{
 		EntityManager em = getEntityManager();
 		TypedQuery<LabelDB> query = em.createNamedQuery("LabelDB.findByIssue", LabelDB.class);
 		query.setParameter("id", issueId);
-		return query.getResultList();
+		return getResultList(query);
 		
 	}
 

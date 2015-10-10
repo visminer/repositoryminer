@@ -69,6 +69,14 @@ public interface DAO<E, K> {
 	 * @return Finds all objects.
 	 */
 	public List<E> findAll();
+	
+	/**
+	 * 
+	 * @param query
+	 * @return The result set
+	 */
+	@SuppressWarnings("rawtypes")
+	public List getResultList(Query query);
 
 	/**
 	 * @param query

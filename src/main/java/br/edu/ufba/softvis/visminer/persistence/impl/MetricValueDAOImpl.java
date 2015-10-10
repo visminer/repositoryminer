@@ -12,7 +12,7 @@ import br.edu.ufba.softvis.visminer.persistence.dao.MetricValueDAO;
 /**
  * Implementation of interface {@link MetricValueDAO}
  */
-
+@SuppressWarnings("unchecked")
 public class MetricValueDAOImpl extends DAOImpl<MetricValueDB, MetricValuePK> implements MetricValueDAO{
 
 	@Override
@@ -25,8 +25,7 @@ public class MetricValueDAOImpl extends DAOImpl<MetricValueDB, MetricValuePK> im
 		query.setHint("javax.persistence.cache.retrieveMode", "BYPASS");
 		query.setParameter("commitId", commitId);
 		query.setParameter("softwareUnitId", softwareUnitId);
-		List<MetricValueDB> l = query.getResultList();
-		return l;
+		return getResultList(query);
 		
 	}
 

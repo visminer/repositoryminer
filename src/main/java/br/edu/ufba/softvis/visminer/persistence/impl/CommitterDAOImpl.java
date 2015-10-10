@@ -9,12 +9,10 @@ import br.edu.ufba.softvis.visminer.model.database.CommitterDB;
 import br.edu.ufba.softvis.visminer.persistence.dao.CommitterDAO;
 
 /**
- * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
- * @version 0.9
- * 
  * Implementation of interface {@link CommitterDAO}
  */
 
+@SuppressWarnings("unchecked")
 public class CommitterDAOImpl extends DAOImpl<CommitterDB, Integer> implements CommitterDAO {
 
 	@Override
@@ -23,12 +21,7 @@ public class CommitterDAOImpl extends DAOImpl<CommitterDB, Integer> implements C
 		EntityManager em = getEntityManager();
 		TypedQuery<CommitterDB> query = em.createNamedQuery("CommitterDB.findByEmail", CommitterDB.class);
 		query.setParameter("email", email);
-		
-		try{
-			return query.getSingleResult();
-		}catch(Exception e){
-			return null;
-		}
+		return (CommitterDB) getSingleResult(query);
 		
 	}
 
@@ -40,7 +33,7 @@ public class CommitterDAOImpl extends DAOImpl<CommitterDB, Integer> implements C
 		query.setHint("javax.persistence.cache.storeMode", "BYPASS");
 		query.setHint("javax.persistence.cache.retrieveMode", "BYPASS");
 		query.setParameter("repositoryId", repositoryId);
-		return query.getResultList();
+		return getResultList(query);
 		
 	}
 
