@@ -197,4 +197,41 @@ public class SLOCMetricTest {
 			
 		}
 	}
+	
+	@Test
+	public void testTotalLocSecondCommit() {
+		
+		Project project = repository.getProject();
+		SoftwareUnit javaProject = project.getsoftwareUnit();
+		project.firstCommit(); 
+		project.nextCommit();
+		javaProject = project.getsoftwareUnit();
+		
+		int valueMetric = 0;
+		
+		try {
+			valueMetric = Integer.parseInt(javaProject.getMetricValues().get(MetricUid.SLOC));
+		}catch(NumberFormatException e) {}
+
+		assertEquals(2366, valueMetric);
+		
+	}
+	
+	@Test
+	public void testTotalLocFirstCommit() {
+		
+		Project project = repository.getProject();
+		SoftwareUnit javaProject = project.getsoftwareUnit();
+		project.firstCommit(); 
+		javaProject = project.getsoftwareUnit();
+		
+		int valueMetric = 0;
+		
+		try {
+			valueMetric = Integer.parseInt(javaProject.getMetricValues().get(MetricUid.SLOC));
+		}catch(NumberFormatException e) {}
+
+		assertEquals(2, valueMetric);
+		
+	}
 }
