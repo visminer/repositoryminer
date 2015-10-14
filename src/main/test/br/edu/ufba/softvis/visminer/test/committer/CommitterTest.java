@@ -1,13 +1,15 @@
 package br.edu.ufba.softvis.visminer.test.committer;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import br.edu.ufba.softvis.visminer.main.VisMiner;
+import br.edu.ufba.softvis.visminer.model.business.Commit;
 import br.edu.ufba.softvis.visminer.model.business.Committer;
 import br.edu.ufba.softvis.visminer.model.business.Repository;
 import br.edu.ufba.softvis.visminer.test.VisminerTest;
@@ -21,11 +23,9 @@ public class CommitterTest {
 	
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-		
 		visminerTest = VisminerTest.getInstance();
 		visminer = visminerTest.getVisminer();
 		repository = visminerTest.getRepository(); 
-		
 	}
 	
 	/*
@@ -63,16 +63,14 @@ public class CommitterTest {
 	
 	@Test
 	public void testFirstAndLastCommitters() {
-		
 		/*
 		 * obs. to verify those who are the first and last committers I looked in gitk
-		 */
+		 * */
 		
 		repository.getProject().firstCommit();
 		Committer firstCommitter = repository.getProject().getCurrentCommit().getCommitter();
 		assertEquals("visminerproject@gmail.com",firstCommitter.getEmail());
 		assertEquals("visminer",firstCommitter.getName());
-		
 		/*
 		//pagseguro 
 		assertEquals("desenvolvedores@pagseguro.com.br",firstCommitter.getEmail());
@@ -81,8 +79,7 @@ public class CommitterTest {
 		repository.getProject().lastCommit();
 		Committer lastCommitter = repository.getProject().getCurrentCommit().getCommitter();
 		assertEquals("felipegustavo1000@gmail.com",lastCommitter.getEmail());
-		assertEquals("felipe gustavo de souza gomes",lastCommitter.getName());
-		
+		assertEquals("felipe",lastCommitter.getName());
 		/*
 		//pagseguro
 		assertEquals("cegoncalves@uolinc.com",lastCommitter.getEmail());
@@ -91,39 +88,50 @@ public class CommitterTest {
 		
 	}
 	
+	@Test
+	public void testIdbyCommitter(){
+		repository.getProject().lastCommit();
+		Committer committer = repository.getProject().getCurrentCommit().getCommitter();
+		assertEquals(1,committer.getId());
+		
+		
+		repository.getProject().firstCommit();
+		Committer committerFirst = repository.getProject().getCurrentCommit().getCommitter();
+		assertEquals(1,committerFirst.getId());
+		
+			
+		}
+	
+	
+	
+	@Test 
+	public void testAmountCommitsbyCommitter(){
+		repository.getProject().lastCommit();
+		List<Commit> commits = repository.getProject().getCommitsByCommitterName("felipe");
+		assertEquals(56,commits.size());
+	
+	}
+		
+	@Test
+	public void testSetCommitter(){
+		repository.getProject().lastCommit();
+		Committer committer = new Committer(8,"rafael@gmail.com","Rafael");	
+		repository.getProject().getCurrentCommit().setCommitter(committer);
+		
+		String name = repository.getProject().getCurrentCommit().getCommitter().getName();
+		assertEquals("Rafael",name);
+		
+		String email = repository.getProject().getCurrentCommit().getCommitter().getEmail();
+		assertEquals("rafael@gmail.com",email);
+		
+		int id = repository.getProject().getCurrentCommit().getCommitter().getId();
+		assertEquals(8,id);
+	
+	}
+	
+	
 
 }
 
 
-/*
-for (Committer committer : committers) {
- 
-	System.out.println("Id - Name: " + committer.getId() + " - " + committer.getName());
-	System.out.println("Email: " + committer.getEmail());
-}
-*/
-/*
-(2) Id - Name: 1 - cegoncalves
-Email: cegoncalves@uolinc.com
-(5) Id - Name: 2 - amaurihamasus2it
-Email: amauri.hamasu@s2it.com.br
-(8) Id - Name: 3 - Guilherme Rigo Recio
-Email: grecio@uolinc.com
-(9) Id - Name: 4 - Carlos Gustavo Berganton
-Email: cad_cberganton@uolinc.com
-(11) Id - Name: 5 - Andre Abe Vicente
-Email: avicente@uolinc.com
-(10) Id - Name: 6 - Ribaldo
-Email: rribaldo@uolinc.com
-(1) Id - Name: 7 - pagseguro
-Email: desenvolvedores@pagseguro.com.br
-(3) Id - Name: 8 - Wellington Camargo
-Email: wellington.camargo@s2it.com.br
-(4) Id - Name: 9 - bruno_krebs
-Email: bruno.krebs@tecsinapse.com.br
-(7) Id - Name: 10 - Personal
-Email: gamaral@ubuntu.(none)
-(6) Id - Name: 11 - andresilvas2it
-Email: andre.silva@s2it.com.br
- * 
- * */
+
