@@ -31,7 +31,6 @@ public class DAOImpl<E, K> implements DAO<E, K>{
 		entityClass = (Class) genericClass.getActualTypeArguments()[0];
 	}
 	
-	@Override
 	public void batchSave(List<E> objects) {
 
 		EntityTransaction ts = entityManager.getTransaction();
@@ -55,7 +54,6 @@ public class DAOImpl<E, K> implements DAO<E, K>{
 	}
 
 	@SuppressWarnings("unchecked")
-	@Override
 	public void batchMerge(List<E> objects) {
 
 		EntityTransaction ts = entityManager.getTransaction();
@@ -79,7 +77,6 @@ public class DAOImpl<E, K> implements DAO<E, K>{
 		
 	}
 
-	@Override
 	public void batchDelete(List<E> objects) {
 		
 		EntityTransaction ts = entityManager.getTransaction();
@@ -103,7 +100,6 @@ public class DAOImpl<E, K> implements DAO<E, K>{
 	}
 
 	@SuppressWarnings("unchecked")
-	@Override
 	public void batchDelete2(List<K> ids){
 		
 		EntityTransaction ts = entityManager.getTransaction();
@@ -127,7 +123,6 @@ public class DAOImpl<E, K> implements DAO<E, K>{
 		
 	}
 	
-	@Override
 	public void save(E object) {
 		
 		EntityTransaction ts = entityManager.getTransaction();
@@ -138,7 +133,6 @@ public class DAOImpl<E, K> implements DAO<E, K>{
 		
 	}
 
-	@Override
 	public E merge(E object) {
 		
 		EntityTransaction ts = entityManager.getTransaction();
@@ -150,7 +144,6 @@ public class DAOImpl<E, K> implements DAO<E, K>{
 		
 	}
 
-	@Override
 	public void delete(E object) {
 		
 		EntityTransaction ts = entityManager.getTransaction();
@@ -174,7 +167,6 @@ public class DAOImpl<E, K> implements DAO<E, K>{
 	}
 	
 	@SuppressWarnings("unchecked")
-	@Override
 	public E find(K id) {
 		
 		try{
@@ -186,7 +178,6 @@ public class DAOImpl<E, K> implements DAO<E, K>{
 	}
 
 	@SuppressWarnings("unchecked")
-	@Override
 	public List<E> findAll() {
 		
 		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
@@ -198,7 +189,6 @@ public class DAOImpl<E, K> implements DAO<E, K>{
 		
 	}
 
-	@Override
 	public Object getSingleResult(Query query){
 		
 		try{
@@ -209,12 +199,10 @@ public class DAOImpl<E, K> implements DAO<E, K>{
 		
 	}
 	
-	@Override
 	public void setEntityManager(EntityManager entityManager) {
 		this.entityManager = entityManager;
 	}
 
-	@Override
 	public EntityManager getEntityManager() {
 		return entityManager;
 	}

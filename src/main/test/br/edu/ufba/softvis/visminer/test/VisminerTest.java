@@ -16,7 +16,7 @@ public class VisminerTest {
 	private Repository repository;
 	private RepositoryRetriever repoRetriever;
 	
-	private String repositoryPath = "C:\\Users\\felipe\\test-felipe\\Visminer-Test"; 
+	private String repositoryPath = "C:\\Users\\Gabriel\\Visminer-Test"; 
 	private static VisminerTest vt;
 
 	private VisminerTest() {
@@ -63,7 +63,7 @@ public class VisminerTest {
 		dbConfig.setDriver("com.mysql.jdbc.Driver");
 		dbConfig.setUrl("jdbc:mysql://localhost/visminer");
 		dbConfig.setUser("root");
-		dbConfig.setPassword("1234");
+		dbConfig.setPassword("gv060793");
 		dbConfig.setGeneration("none");
 		dbConfig.setLogging("off");
 		visminer.setDBConfig(dbConfig);

@@ -19,7 +19,6 @@ public abstract class MethodBasedMetricTemplate  implements IMetric {
 	protected TypeDeclaration currentType;
 	protected List<FieldDeclaration> currentFields = new ArrayList<FieldDeclaration>();
 
-	@Override
 	public void calculate(List<AST> astList, List<Commit> commits, MetricPersistance persistence){
 		
 		this.commits = commits;

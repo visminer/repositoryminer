@@ -15,7 +15,6 @@ import br.edu.ufba.softvis.visminer.persistence.dao.MetricValueDAO;
 
 public class MetricValueDAOImpl extends DAOImpl<MetricValueDB, MetricValuePK> implements MetricValueDAO{
 
-	@Override
 	public List<MetricValueDB> findBySoftwareUnitAndCommit(int softwareUnitId, int commitId) {
 		
 		EntityManager em = getEntityManager();

@@ -17,7 +17,6 @@ import br.edu.ufba.softvis.visminer.persistence.dao.CommitterDAO;
 
 public class CommitterDAOImpl extends DAOImpl<CommitterDB, Integer> implements CommitterDAO {
 
-	@Override
 	public CommitterDB findByEmail(String email) {
 		
 		EntityManager em = getEntityManager();
@@ -32,7 +31,6 @@ public class CommitterDAOImpl extends DAOImpl<CommitterDB, Integer> implements C
 		
 	}
 
-	@Override
 	public List<CommitterDB> findByRepository(int repositoryId) {
 	
 		EntityManager em = getEntityManager();

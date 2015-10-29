@@ -15,7 +15,6 @@ import br.edu.ufba.softvis.visminer.utility.StringUtils;
 
 public class CommitDAOImpl extends DAOImpl<CommitDB, Integer> implements CommitDAO{
 
-	@Override
 	public List<CommitDB> findByTree(int treeId) {
 		
 		EntityManager em = getEntityManager();
@@ -25,7 +24,6 @@ public class CommitDAOImpl extends DAOImpl<CommitDB, Integer> implements CommitD
 		
 	}
 
-	@Override
 	public List<CommitDB> findByRepository(String repositoryPath) {
 		
 		String uid = StringUtils.sha1(repositoryPath.replace("\\", "/"));
@@ -37,7 +35,6 @@ public class CommitDAOImpl extends DAOImpl<CommitDB, Integer> implements CommitD
 		
 	}
 
-	@Override
 	public List<CommitDB> findNotRefIssue(int repoId) {
 
 		EntityManager em = getEntityManager();

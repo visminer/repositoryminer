@@ -15,7 +15,6 @@ import br.edu.ufba.softvis.visminer.persistence.dao.FileXCommitDAO;
 
 public class FileXCommitDAOImpl extends DAOImpl<FileXCommitDB, FileXCommitPK> implements FileXCommitDAO {
 
-	@Override
 	public List<FileXCommitDB> findByCommit(int commitId) {
 		
 		EntityManager em = getEntityManager();

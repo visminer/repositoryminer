@@ -13,7 +13,6 @@ import br.edu.ufba.softvis.visminer.utility.StringUtils;
 
 public class RepositoryDAOImpl extends DAOImpl<RepositoryDB, Integer> implements RepositoryDAO{
 
-	@Override
 	public RepositoryDB findByUid(String uid) {
 		
 		EntityManager em = getEntityManager();
@@ -23,7 +22,6 @@ public class RepositoryDAOImpl extends DAOImpl<RepositoryDB, Integer> implements
 		
 	}
 
-	@Override
 	public boolean hasRepository(String repositoryPath) {
 		
 		String uid = StringUtils.sha1(repositoryPath.replace("\\", "/"));
@@ -34,7 +32,6 @@ public class RepositoryDAOImpl extends DAOImpl<RepositoryDB, Integer> implements
 		
 	}
 
-	@Override
 	public RepositoryDB findByPath(String path){
 		
 		String uid = StringUtils.sha1(path.replace("\\", "/"));

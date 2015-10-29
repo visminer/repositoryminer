@@ -13,7 +13,6 @@ import br.edu.ufba.softvis.visminer.persistence.dao.LabelDAO;
  */
 public class LabelDAOImpl extends DAOImpl<LabelDB, Integer> implements LabelDAO{
 
-	@Override
 	public List<LabelDB> findByIssue(int issueId) {
 		
 		EntityManager em = getEntityManager();

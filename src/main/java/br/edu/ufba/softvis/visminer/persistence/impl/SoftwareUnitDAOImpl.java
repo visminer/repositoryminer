@@ -29,7 +29,6 @@ public class SoftwareUnitDAOImpl extends DAOImpl<SoftwareUnitDB, Integer> implem
 		
 	}
 
-	@Override
 	public List<SoftwareUnitDB> findByFile(int fileId) {
 		
 		EntityManager em = getEntityManager();
@@ -40,7 +39,6 @@ public class SoftwareUnitDAOImpl extends DAOImpl<SoftwareUnitDB, Integer> implem
 
 	}
 
-	@Override
 	public List<SoftwareUnitDB> findByRepository(int repositoryId, int commitId) {
 
 		EntityManager em = getEntityManager();

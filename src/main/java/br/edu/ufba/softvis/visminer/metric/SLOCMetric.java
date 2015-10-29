@@ -29,7 +29,6 @@ public class SLOCMetric implements IMetric{
 		pattern = Pattern.compile("(\r\n)|(\r)|(\n)");
 	}
 
-	@Override
 	public void calculate(List<AST> astList, List<Commit> commits, MetricPersistance persistence){
 
 

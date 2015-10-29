@@ -27,27 +27,23 @@ public class GitHubRepository implements WebSCM {
 	private MilestoneService milestoneServ;
 	private RepositoryId repositoryId;
 	
-	@Override
 	public void connect(String owner, String name, String user, String password){
 		GitHubClient client = new GitHubClient();
 		client.setCredentials(user, password);
 		init(name, owner, client);
 	}
 	
-	@Override
 	public void connect(String owner, String name){
 		GitHubClient client = new GitHubClient();
 		init(name, owner, client);
 	}
 	
-	@Override
 	public void connect(String owner, String name, String token) {
 		GitHubClient client = new GitHubClient();
 		client.setOAuth2Token(token);
 		init(name, owner, client);
 	}
 	
-	@Override
 	public List<IssueDB> getAllIssues() {
 
 		int number = 1;
@@ -97,7 +93,6 @@ public class GitHubRepository implements WebSCM {
 		
 	}
 
-	@Override
 	public List<MilestoneDB> getAllMilestones() {
 
 		int number = 1;

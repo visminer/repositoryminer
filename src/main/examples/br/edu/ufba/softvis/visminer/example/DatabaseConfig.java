@@ -8,9 +8,9 @@ public class DatabaseConfig {
 		
 		DBConfig dbConfig = new DBConfig();
 		dbConfig.setDriver("com.mysql.jdbc.Driver");
-		dbConfig.setUrl("jdbc:mysql://localhost/v");
+		dbConfig.setUrl("jdbc:mysql://localhost/vismine");
 		dbConfig.setUser("root");
-		dbConfig.setPassword("1234");
+		dbConfig.setPassword("gv060793");
 		dbConfig.setGeneration("drop-and-create-tables");
 		dbConfig.setLogging("off");
 		

@@ -17,7 +17,6 @@ import br.edu.ufba.softvis.visminer.persistence.dao.MilestoneDAO;
 public class MilestoneDAOImpl extends DAOImpl<MilestoneDB, Integer> implements MilestoneDAO{
 
 	@SuppressWarnings("unchecked")
-	@Override
 	public Map<Integer, Integer> minimalFindByRepository(int repositoryId) {
 		
 		EntityManager em = getEntityManager();

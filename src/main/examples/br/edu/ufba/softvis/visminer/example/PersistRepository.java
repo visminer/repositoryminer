@@ -19,8 +19,8 @@ public class PersistRepository {
 
 	private String repositoryDescription = "Put here repository description";
 	private String repositoryName = "Put here repository name";
-	private String repositoryOwner = "Put here repository owner";
-	private static String repositoryPath = "/home/felipe/git/Visminer-Test";
+	private String repositoryOwner = "https://github.com/renatoln/pagseguro-test";
+	private String repositoryPath = "C:\\Users\\Gabriel\\Visminer-Test";
 	private SCMType repositoryType = SCMType.GIT;
 	private WebSCMType repositoryServiceType = WebSCMType.GITHUB;
 	private List<MetricUid> metrics = Arrays.asList(MetricUid.SLOC, MetricUid.ATFD, MetricUid.CC, MetricUid.NOCAI, MetricUid.TCC, MetricUid.WMC);

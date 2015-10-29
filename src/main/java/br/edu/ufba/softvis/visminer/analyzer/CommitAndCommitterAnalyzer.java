@@ -27,7 +27,6 @@ public class CommitAndCommitterAnalyzer{
 		List<CommitDB> commitsDb = repoSys.getCommits();
 		Collections.sort(commitsDb, new Comparator<CommitDB>() {
 
-			@Override
 			public int compare(CommitDB o1, CommitDB o2) {
 				return o1.getDate().compareTo(o2.getDate());
 			}

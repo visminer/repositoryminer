@@ -23,7 +23,6 @@ import br.edu.ufba.softvis.visminer.persistence.MetricPersistance;
 	)
 public class NOCAIMetric implements IMetric{
 
-	@Override
 	public void calculate(List<AST> astList, List<Commit> commits, MetricPersistance persistence){
 		
 		Map<Integer, Integer> packageCls = new HashMap<Integer, Integer>();

@@ -78,7 +78,6 @@ public class JGitRepository implements SCM{
 
 	}	
 
-	@Override
 	public void open(String path) {
 
 		FileRepositoryBuilder repositoryBuilder = new FileRepositoryBuilder();
@@ -109,12 +108,10 @@ public class JGitRepository implements SCM{
 		
 	}
 
-	@Override
 	public String getAbsolutePath() {
 		return repository.getWorkTree().getAbsolutePath().replace("\\", "/");
 	}
 
-	@Override
 	public List<TreeDB> getTrees(){
 
 		try{
@@ -170,7 +167,6 @@ public class JGitRepository implements SCM{
 
 	}
 
-	@Override
 	public List<CommitDB> getCommits(){
 
 		try{
@@ -202,7 +198,6 @@ public class JGitRepository implements SCM{
 
 	}
 
-	@Override
 	public List<CommitDB> getCommitsByTree(String treeName, TreeType type) {
 
 		Iterable<RevCommit> revCommits = null;
@@ -280,7 +275,6 @@ public class JGitRepository implements SCM{
 
 	}
 
-	@Override
 	public String getSource(String commitName, String filePath){
 
 		try {
@@ -310,7 +304,6 @@ public class JGitRepository implements SCM{
 
 	}
 
-	@Override
 	public List<FileDB> getCommitedFiles(CommitDB commitDB){
 
 		try{
@@ -410,7 +403,6 @@ public class JGitRepository implements SCM{
 
 	}
 
-	@Override
 	public List<String> getRepositoryFiles(String hash){
 
 		try{
@@ -438,7 +430,6 @@ public class JGitRepository implements SCM{
 
 	}
 
-	@Override
 	public void checkout(String hash){
 
 		try{

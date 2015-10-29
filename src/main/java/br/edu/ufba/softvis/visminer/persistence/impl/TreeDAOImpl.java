@@ -17,7 +17,6 @@ import br.edu.ufba.softvis.visminer.persistence.dao.TreeDAO;
 
 public class TreeDAOImpl extends DAOImpl<TreeDB, Integer> implements TreeDAO{
 
-	@Override
 	public List<TreeDB> findByRepository(int repositoryId) {
 		
 		EntityManager em = getEntityManager();

@@ -17,7 +17,6 @@ import br.edu.ufba.softvis.visminer.persistence.dao.IssueDAO;
 public class IssueDAOImpl extends DAOImpl<IssueDB, Integer> implements IssueDAO {
 
 	@SuppressWarnings("unchecked")
-	@Override
 	public Map<Integer, Integer> minimalFindByRepository(int repositoryId) {
 		
 		EntityManager em = getEntityManager();

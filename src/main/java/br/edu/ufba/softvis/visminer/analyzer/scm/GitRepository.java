@@ -19,7 +19,6 @@ public class GitRepository implements SCM {
 	private Git git;
 	private String vmBranch;
 	
-	@Override
 	public void open(String path) {
 
 		this.jgit = new JGitRepository();
@@ -29,42 +28,34 @@ public class GitRepository implements SCM {
 		
 	}
 
-	@Override
 	public String getAbsolutePath() {
 		return jgit.getAbsolutePath();
 	}
 
-	@Override
 	public List<TreeDB> getTrees(){
 		return jgit.getTrees();
 	}
 
-	@Override
 	public List<CommitDB> getCommits(){
 		return jgit.getCommits();
 	}
 
-	@Override
 	public List<CommitDB> getCommitsByTree(String treeName, TreeType type) {
 		return jgit.getCommitsByTree(treeName, type);
 	}
 
-	@Override
 	public String getSource(String commitName, String filePath){
 		return jgit.getSource(commitName, filePath);
 	}
 
-	@Override
 	public List<FileDB> getCommitedFiles(CommitDB commitDB){
 		return jgit.getCommitedFiles(commitDB);
 	}
 
-	@Override
 	public List<String> getRepositoryFiles(String hash){
 		return jgit.getRepositoryFiles(hash);
 	}
 
-	@Override
 	public void checkout(String hash){
 
 		try{

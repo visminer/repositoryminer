@@ -52,7 +52,7 @@ public class SLOCMetricTest {
 				} catch (NumberFormatException e) {
 					//for the case where the metric is null FIX it later
 				}
-				
+				System.out.println(valueMetric);
 				if ("br.edu.ufba.softvis.visminer.persistence.dao".equals(softwareUnit.getName()))
 					assertEquals(354, valueMetric);
 				

@@ -14,7 +14,6 @@ import br.edu.ufba.softvis.visminer.persistence.dao.FileDAO;
 
 public class FileDAOImpl extends DAOImpl<FileDB, Integer> implements FileDAO {
 
-	@Override
 	public List<FileDB> getFilesByUids(List<String> uids){
 		
 		EntityManager em = getEntityManager();
