@@ -9,16 +9,16 @@ import br.edu.ufba.softvis.visminer.persistence.impl.MilestoneDAOImpl;
 
 public class MilestoneRetriever extends Retriever{
 
-	public List<Milestone> retrieverByRepository(int repositoryId){
-		
-		MilestoneDAO dao = new MilestoneDAOImpl();
-		super.createEntityManager();
-		super.shareEntityManager(dao);
-		
-		List<MilestoneDB> milesDB = dao.findByRepository(repositoryId);
-		super.closeEntityManager();
-		return MilestoneDB.toBusiness(milesDB);
-		
-	}
-	
+  public List<Milestone> retrieverByRepository(int repositoryId){
+
+    MilestoneDAO dao = new MilestoneDAOImpl();
+    super.createEntityManager();
+    super.shareEntityManager(dao);
+
+    List<MilestoneDB> milesDB = dao.findByRepository(repositoryId);
+    super.closeEntityManager();
+    return MilestoneDB.toBusiness(milesDB);
+
+  }
+
 }

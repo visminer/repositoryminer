@@ -8,6 +8,7 @@ import br.edu.ufba.softvis.visminer.persistence.dao.MetricDAO;
  * Implementation of interface {@link MetricDAO}
  */
 
-public class MetricDAOImpl extends DAOImpl<MetricDB, Integer> implements MetricDAO{
+public class MetricDAOImpl extends DAOImpl<MetricDB, Integer> 
+implements MetricDAO{
 
 }

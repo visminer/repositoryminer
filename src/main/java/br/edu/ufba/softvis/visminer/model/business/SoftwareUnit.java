@@ -7,177 +7,176 @@ import br.edu.ufba.softvis.visminer.constant.MetricUid;
 import br.edu.ufba.softvis.visminer.constant.SoftwareUnitType;
 
 /**
- * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
- * @version 0.9
  * User friendly software unit bean class.
  * This class will be used for user interface.
  */
 
 public class SoftwareUnit {
 
-	private int id;
-	private String name;
-	private String uid;
-	private SoftwareUnitType type;
-	private SoftwareUnit parent;
-	private List<SoftwareUnit> children;
-	private Map<MetricUid, String> metricValues;
-	private File file;
-	
-	public SoftwareUnit(){}
+  private int id;
+  private String name;
+  private String uid;
+  private SoftwareUnitType type;
+  private SoftwareUnit parent;
+  private List<SoftwareUnit> children;
+  private Map<MetricUid, String> metricValues;
+  private File file;
 
-	/**
-	 * @param id
-	 * @param name
-	 * @param fullName
-	 * @param uid
-	 * @param type
-	 */
-	public SoftwareUnit(int id, String name, String uid,
-			SoftwareUnitType type) {
-		super();
-		this.id = id;
-		this.name = name;
-		this.uid = uid;
-		this.type = type;
-	}
+  public SoftwareUnit(){}
 
-	/**
-	 * @return the id
-	 */
-	public int getId() {
-		return id;
-	}
+  /**
+   * @param id
+   * @param name
+   * @param fullName
+   * @param uid
+   * @param type
+   */
+  public SoftwareUnit(int id, String name, String uid,
+      SoftwareUnitType type) {
+    super();
+    this.id = id;
+    this.name = name;
+    this.uid = uid;
+    this.type = type;
+  }
 
-	/**
-	 * @param id the id to set
-	 */
-	public void setId(int id) {
-		this.id = id;
-	}
+  public SoftwareUnit(int id) {
+    super();
+    this.id = id;
+  }
 
-	/**
-	 * @return the name
-	 */
-	public String getName() {
-		return name;
-	}
+  /**
+   * @return the id
+   */
+  public int getId() {
+    return id;
+  }
 
-	/**
-	 * @param name the name to set
-	 */
-	public void setName(String name) {
-		this.name = name;
-	}
+  /**
+   * @param id the id to set
+   */
+  public void setId(int id) {
+    this.id = id;
+  }
 
-	/**
-	 * @return the uid
-	 */
-	public String getUid() {
-		return uid;
-	}
+  /**
+   * @return the name
+   */
+  public String getName() {
+    return name;
+  }
 
-	/**
-	 * @param uid the uid to set
-	 */
-	public void setUid(String uid) {
-		this.uid = uid;
-	}
+  /**
+   * @param name the name to set
+   */
+  public void setName(String name) {
+    this.name = name;
+  }
 
-	/**
-	 * @return the type
-	 */
-	public SoftwareUnitType getType() {
-		return type;
-	}
+  /**
+   * @return the uid
+   */
+  public String getUid() {
+    return uid;
+  }
 
-	/**
-	 * @param type the type to set
-	 */
-	public void setType(SoftwareUnitType type) {
-		this.type = type;
-	}
+  /**
+   * @param uid the uid to set
+   */
+  public void setUid(String uid) {
+    this.uid = uid;
+  }
 
-	/**
-	 * @return the parent
-	 */
-	public SoftwareUnit getParent() {
-		return parent;
-	}
+  /**
+   * @return the type
+   */
+  public SoftwareUnitType getType() {
+    return type;
+  }
 
-	/**
-	 * @param parentUnit the parent to set
-	 */
-	public void setParent(SoftwareUnit parent) {
-		this.parent = parent;
-	}
+  /**
+   * @param type the type to set
+   */
+  public void setType(SoftwareUnitType type) {
+    this.type = type;
+  }
 
-	/**
-	 * @return the children
-	 */
-	public List<SoftwareUnit> getChildren() {
-		return children;
-	}
+  /**
+   * @return the parent
+   */
+  public SoftwareUnit getParent() {
+    return parent;
+  }
 
-	/**
-	 * @param children the children to set
-	 */
-	public void setChildren(List<SoftwareUnit> children) {
-		this.children = children;
-	}
+  /**
+   * @param parentUnit the parent to set
+   */
+  public void setParent(SoftwareUnit parent) {
+    this.parent = parent;
+  }
 
-	/**
-	 * @return the metricValues
-	 */
-	public Map<MetricUid, String> getMetricValues() {
-		return metricValues;
-	}
+  /**
+   * @return the children
+   */
+  public List<SoftwareUnit> getChildren() {
+    return children;
+  }
 
-	/**
-	 * @param metricValues the metricValues to set
-	 */
-	public void setMetricValues(Map<MetricUid, String> metricValues) {
-		this.metricValues = metricValues;
-	}
+  /**
+   * @param children the children to set
+   */
+  public void setChildren(List<SoftwareUnit> children) {
+    this.children = children;
+  }
 
-	/**
-	 * @return the file
-	 */
-	public File getFile() {
-		return file;
-	}
+  /**
+   * @return the metricValues
+   */
+  public Map<MetricUid, String> getMetricValues() {
+    return metricValues;
+  }
 
-	/**
-	 * @param file the file to set
-	 */
-	public void setFile(File file) {
-		this.file = file;
-	}
+  /**
+   * @param metricValues the metricValues to set
+   */
+  public void setMetricValues(Map<MetricUid, String> metricValues) {
+    this.metricValues = metricValues;
+  }
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + id;
-		return result;
-	}
+  /**
+   * @return the file
+   */
+  public File getFile() {
+    return file;
+  }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (!(obj instanceof SoftwareUnit)) {
-			return false;
-		}
-		SoftwareUnit other = (SoftwareUnit) obj;
-		if (id != other.id) {
-			return false;
-		}
-		return true;
-	}
-	
+  /**
+   * @param file the file to set
+   */
+  public void setFile(File file) {
+    this.file = file;
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + id;
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    SoftwareUnit other = (SoftwareUnit) obj;
+    if (id != other.id)
+      return false;
+    return true;
+  }
+
 }

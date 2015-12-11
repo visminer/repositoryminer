@@ -10,6 +10,6 @@ import br.edu.ufba.softvis.visminer.model.database.MilestoneDB;
  */
 public interface MilestoneDAO extends DAO<MilestoneDB, Integer>{
 
-	public Map<Integer, Integer> minimalFindByRepository(int repositoryId);
-	public List<MilestoneDB> findByRepository(int repositoryId);
+  public Map<Integer, Integer> minimalFindByRepository(int repositoryId);
+  public List<MilestoneDB> findByRepository(int repositoryId);
 }

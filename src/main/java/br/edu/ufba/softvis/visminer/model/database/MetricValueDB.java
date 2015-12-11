@@ -9,9 +9,12 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name="metric_value")
-@NamedQuery(name="MetricValueDB.findBySoftwareUnitAndCommit", query="SELECT mv FROM MetricValueDB mv"
-		+ " where mv.id.softwareUnitId = :softwareUnitId and mv.id.commitId = :commitId")
-
+@NamedQueries({
+	@NamedQuery(name="MetricValueDB.findByCommitAndType", query="select mv from"
+			+ " MetricValueDB mv where mv.metric.type = :type and "
+			+ "mv.softwareUnitXCommit.id.commitId = :commitId and "
+			+ "mv.softwareUnitXCommit.id.softwareUnitId in :softUnitIds")
+})
 public class MetricValueDB implements Serializable {
 	private static final long serialVersionUID = 1L;
 
@@ -25,13 +28,17 @@ public class MetricValueDB implements Serializable {
 	//bi-directional many-to-one association to SoftwareUnitXCommitDB
 	@ManyToOne
 	@JoinColumns({
-		@JoinColumn(name="commit_id", referencedColumnName="commit_id", nullable=false, insertable=false, updatable=false),
-		@JoinColumn(name="software_unit_id", referencedColumnName="software_unit_id", nullable=false, insertable=false, updatable=false)
+		@JoinColumn(name="commit_id", referencedColumnName="commit_id",
+				nullable=false, insertable=false, updatable=false),
+		@JoinColumn(name="software_unit_id", 
+				referencedColumnName="software_unit_id", nullable=false, 
+				insertable=false, updatable=false)
 	})
 	private SoftwareUnitXCommitDB softwareUnitXCommit;
 
 	//bi-directional many-to-one association to MetricDB
-	@JoinColumn(name="metric_id", nullable=false, insertable=false, updatable=false)
+	@JoinColumn(name="metric_id", nullable=false, insertable=false, 
+			updatable=false)
 	private MetricDB metric;
 
 	public MetricValueDB() {
@@ -85,7 +92,8 @@ public class MetricValueDB implements Serializable {
 	/**
 	 * @param softwareUnitXCommit the softwareUnitXCommit to set
 	 */
-	public void setSoftwareUnitXCommit(SoftwareUnitXCommitDB softwareUnitXCommit) {
+	public void setSoftwareUnitXCommit(SoftwareUnitXCommitDB 
+			softwareUnitXCommit) {
 		this.softwareUnitXCommit = softwareUnitXCommit;
 	}
 
@@ -128,5 +136,4 @@ public class MetricValueDB implements Serializable {
 		return true;
 	}
 
-	
 }

@@ -19,84 +19,84 @@ import br.edu.ufba.softvis.visminer.persistence.impl.FileXCommitDAOImpl;
 
 public class CommitRetriever extends Retriever {
 
-	// this map is used as temporary memory to avoid go to database many times
-	private Map<Integer, File> filesDBAux;
-	
-	private List<File> retrieveFiles(Commit commit) {
+  // this map is used as temporary memory to avoid go to database many times
+  private Map<Integer, File> filesDBAux;
 
-		FileDAO fileDAO = new FileDAOImpl();
-		super.shareEntityManager(fileDAO);
+  private List<File> retrieveFiles(Commit commit) {
 
-		FileXCommitDAO fxcDAO = new FileXCommitDAOImpl();
-		super.shareEntityManager(fxcDAO);
-		
-		List<File> files = new ArrayList<File>();
-		
-		for (FileXCommitDB fxc : fxcDAO.findByCommit(commit.getId())) {
-			
-			FileState fileState = new FileState(fxc.getLinesAdded(),
-					fxc.getLinesRemoved(), fxc.getChangeType());
-			
-			File fileTemp = filesDBAux.get(fxc.getId().getFileId());
-			if(fileTemp == null){
-				fileTemp = fileDAO.find(fxc.getId().getFileId()).toBusiness();
-				filesDBAux.put(fxc.getId().getFileId(), fileTemp);
-			}
-			
-			File file = new File(fileTemp.getId(), fileTemp.getPath(), fileTemp.getUid());
-			file.setFileState(fileState);
-			files.add(file);
-			
-		}
-		
-		return files;
-		
-	}
+    FileDAO fileDAO = new FileDAOImpl();
+    super.shareEntityManager(fileDAO);
 
-	public List<Commit> retrieveByTree(int treeId) {
+    FileXCommitDAO fxcDAO = new FileXCommitDAOImpl();
+    super.shareEntityManager(fxcDAO);
 
-		List<Commit> commits = new ArrayList<Commit>();
-		CommitDAO dao = new CommitDAOImpl();
+    List<File> files = new ArrayList<File>();
 
-		super.createEntityManager();
-		super.shareEntityManager(dao);
+    for (FileXCommitDB fxc : fxcDAO.findByCommit(commit.getId())) {
 
-		filesDBAux = new HashMap<Integer, File>();
-		List<CommitDB> commitsDb = dao.findByTree(treeId);
-		if (commitsDb != null) {
-			commits.addAll(CommitDB.toBusiness(commitsDb));
-			for (Commit commit : commits) {
-				commit.setCommitedFiles(retrieveFiles(commit));
-			}
-		}
+      FileState fileState = new FileState(fxc.getLinesAdded(),
+          fxc.getLinesRemoved(), fxc.getChangeType());
 
-		filesDBAux = null;
-		super.closeEntityManager();
-		return commits;
-		
-	}
+      File fileTemp = filesDBAux.get(fxc.getId().getFileId());
+      if(fileTemp == null){
+        fileTemp = fileDAO.find(fxc.getId().getFileId()).toBusiness();
+        filesDBAux.put(fxc.getId().getFileId(), fileTemp);
+      }
 
-	public List<Commit> retrieveByRepository(String repositoryPath){
-		
-		List<Commit> commits = new ArrayList<Commit>();
-		CommitDAO dao = new CommitDAOImpl();
+      File file = new File(fileTemp.getId(), fileTemp.getPath(), fileTemp.getUid());
+      file.setFileState(fileState);
+      files.add(file);
 
-		super.createEntityManager();
-		super.shareEntityManager(dao);
+    }
 
-		filesDBAux = new HashMap<Integer, File>();
-		List<CommitDB> commitsDb = dao.findByRepository(repositoryPath);
-		if (commitsDb != null) {
-			commits.addAll(CommitDB.toBusiness(commitsDb));
-			for (Commit commit : commits) {
-				commit.setCommitedFiles(retrieveFiles(commit));
-			}
-		}
+    return files;
 
-		filesDBAux = null;
-		super.closeEntityManager();
-		return commits;
-		
-	}
+  }
+
+  public List<Commit> retrieveByTree(int treeId) {
+
+    List<Commit> commits = new ArrayList<Commit>();
+    CommitDAO dao = new CommitDAOImpl();
+
+    super.createEntityManager();
+    super.shareEntityManager(dao);
+
+    filesDBAux = new HashMap<Integer, File>();
+    List<CommitDB> commitsDb = dao.findByTree(treeId);
+    if (commitsDb != null) {
+      commits.addAll(CommitDB.toBusiness(commitsDb));
+      for (Commit commit : commits) {
+        commit.setCommitedFiles(retrieveFiles(commit));
+      }
+    }
+
+    filesDBAux = null;
+    super.closeEntityManager();
+    return commits;
+
+  }
+
+  public List<Commit> retrieveByRepository(String repositoryPath){
+
+    List<Commit> commits = new ArrayList<Commit>();
+    CommitDAO dao = new CommitDAOImpl();
+
+    super.createEntityManager();
+    super.shareEntityManager(dao);
+
+    filesDBAux = new HashMap<Integer, File>();
+    List<CommitDB> commitsDb = dao.findByRepository(repositoryPath);
+    if (commitsDb != null) {
+      commits.addAll(CommitDB.toBusiness(commitsDb));
+      for (Commit commit : commits) {
+        commit.setCommitedFiles(retrieveFiles(commit));
+      }
+    }
+
+    filesDBAux = null;
+    super.closeEntityManager();
+    return commits;
+
+  }
 
 }

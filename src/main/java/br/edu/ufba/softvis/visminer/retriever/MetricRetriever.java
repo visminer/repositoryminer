@@ -10,21 +10,21 @@ import br.edu.ufba.softvis.visminer.persistence.impl.MetricDAOImpl;
 
 public class MetricRetriever extends Retriever{
 
-	public List<Metric> findAll(){
-		
-		List<Metric> metrics = new ArrayList<Metric>();
-		MetricDAO dao = new MetricDAOImpl();
-		
-		super.createEntityManager();
-		super.shareEntityManager(dao);
-		
-		List<MetricDB> metricsDB = (List<MetricDB>) dao.findAll();
-		if(metricsDB != null){
-			metrics.addAll(MetricDB.toBusiness(metricsDB));
-		}
-		
-		super.closeEntityManager();
-		return metrics;
-	}
-	
+  public List<Metric> findAll(){
+
+    List<Metric> metrics = new ArrayList<Metric>();
+    MetricDAO dao = new MetricDAOImpl();
+
+    super.createEntityManager();
+    super.shareEntityManager(dao);
+
+    List<MetricDB> metricsDB = (List<MetricDB>) dao.findAll();
+    if(metricsDB != null){
+      metrics.addAll(MetricDB.toBusiness(metricsDB));
+    }
+
+    super.closeEntityManager();
+    return metrics;
+  }
+
 }

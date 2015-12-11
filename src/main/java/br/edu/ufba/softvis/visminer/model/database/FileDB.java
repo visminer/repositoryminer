@@ -23,173 +23,173 @@ import br.edu.ufba.softvis.visminer.model.business.File;
 @Entity
 @Table(name="file")
 @NamedQueries({
-	@NamedQuery(name="FileDB.findByCode", query="select f.id from FileDB f where f.uid = :uid"),
-	@NamedQuery(name="FileDB.findByUids", query="select f from FileDB f where f.uid in :uids")
+  @NamedQuery(name="FileDB.findByCode", query="select f.id from FileDB f where f.uid = :uid"),
+  @NamedQuery(name="FileDB.findByUids", query="select f from FileDB f where f.uid in :uids")
 })
 
 public class FileDB implements Serializable {
-	private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-	@Id
-	@SequenceGenerator(name="FILE_ID_GENERATOR", sequenceName="FILE_SEQ")
-	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="FILE_ID_GENERATOR")
-	@Column(unique=true, nullable=false)
-	private int id;
+  @Id
+  @SequenceGenerator(name="FILE_ID_GENERATOR", sequenceName="FILE_SEQ")
+  @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="FILE_ID_GENERATOR")
+  @Column(unique=true, nullable=false)
+  private int id;
 
-	@Column(nullable=false, length=1024)
-	private String path;
+  @Column(nullable=false, length=1024)
+  private String path;
 
-	@Column(unique=true, nullable=false, length=40)
-	private String uid;
+  @Column(unique=true, nullable=false, length=40)
+  private String uid;
 
-	//bi-directional many-to-one association to FileXCommitDB
-	@OneToMany(mappedBy="file")
-	private List<FileXCommitDB> fileXCommits;
+  //bi-directional many-to-one association to FileXCommitDB
+  @OneToMany(mappedBy="file")
+  private List<FileXCommitDB> fileXCommits;
 
-	//bi-directional many-to-one association to SoftwareUnitDB
-	@OneToMany(mappedBy="file")
-	private List<SoftwareUnitDB> softwareUnits;
+  //bi-directional many-to-one association to SoftwareUnitDB
+  @OneToMany(mappedBy="file")
+  private List<SoftwareUnitDB> softwareUnits;
 
-	public FileDB() {
-	}
+  public FileDB() {
+  }
 
-	/**
-	 * @param id
-	 * @param path
-	 * @param uid
-	 */
-	public FileDB(int id, String path, String uid) {
-		super();
-		this.id = id;
-		this.path = path;
-		this.uid = uid;
-	}
-	
-	public FileDB(int id){
-		super();
-		this.id = id;
-	}
+  /**
+   * @param id
+   * @param path
+   * @param uid
+   */
+  public FileDB(int id, String path, String uid) {
+    super();
+    this.id = id;
+    this.path = path;
+    this.uid = uid;
+  }
 
-	/**
-	 * @return the id
-	 */
-	public int getId() {
-		return id;
-	}
+  public FileDB(int id){
+    super();
+    this.id = id;
+  }
 
-	/**
-	 * @param id the id to set
-	 */
-	public void setId(int id) {
-		this.id = id;
-	}
+  /**
+   * @return the id
+   */
+  public int getId() {
+    return id;
+  }
 
-	/**
-	 * @return the path
-	 */
-	public String getPath() {
-		return path;
-	}
+  /**
+   * @param id the id to set
+   */
+  public void setId(int id) {
+    this.id = id;
+  }
 
-	/**
-	 * @param path the path to set
-	 */
-	public void setPath(String path) {
-		this.path = path;
-	}
+  /**
+   * @return the path
+   */
+  public String getPath() {
+    return path;
+  }
 
-	/**
-	 * @return the uid
-	 */
-	public String getUid() {
-		return uid;
-	}
+  /**
+   * @param path the path to set
+   */
+  public void setPath(String path) {
+    this.path = path;
+  }
 
-	/**
-	 * @param uid the uid to set
-	 */
-	public void setUid(String uid) {
-		this.uid = uid;
-	}
+  /**
+   * @return the uid
+   */
+  public String getUid() {
+    return uid;
+  }
 
-	/**
-	 * @return the fileXCommits
-	 */
-	public List<FileXCommitDB> getFileXCommits() {
-		return fileXCommits;
-	}
+  /**
+   * @param uid the uid to set
+   */
+  public void setUid(String uid) {
+    this.uid = uid;
+  }
 
-	/**
-	 * @param fileXCommits the fileXCommits to set
-	 */
-	public void setFileXCommits(List<FileXCommitDB> fileXCommits) {
-		this.fileXCommits = fileXCommits;
-	}
+  /**
+   * @return the fileXCommits
+   */
+  public List<FileXCommitDB> getFileXCommits() {
+    return fileXCommits;
+  }
 
-	/**
-	 * @return the softwareUnits
-	 */
-	public List<SoftwareUnitDB> getSoftwareUnits() {
-		return softwareUnits;
-	}
+  /**
+   * @param fileXCommits the fileXCommits to set
+   */
+  public void setFileXCommits(List<FileXCommitDB> fileXCommits) {
+    this.fileXCommits = fileXCommits;
+  }
 
-	/**
-	 * @param softwareUnits the softwareUnits to set
-	 */
-	public void setSoftwareUnits(List<SoftwareUnitDB> softwareUnits) {
-		this.softwareUnits = softwareUnits;
-	}
+  /**
+   * @return the softwareUnits
+   */
+  public List<SoftwareUnitDB> getSoftwareUnits() {
+    return softwareUnits;
+  }
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((uid == null) ? 0 : uid.hashCode());
-		return result;
-	}
+  /**
+   * @param softwareUnits the softwareUnits to set
+   */
+  public void setSoftwareUnits(List<SoftwareUnitDB> softwareUnits) {
+    this.softwareUnits = softwareUnits;
+  }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		FileDB other = (FileDB) obj;
-		if (uid == null) {
-			if (other.uid != null)
-				return false;
-		} else if (!uid.equals(other.uid))
-			return false;
-		return true;
-	}
-	
-	/**
-	 * Converts from DB beans to Bizz beans
-	 * 
-	 * @param repositories
-	 *            collection of FileDB instances
-	 * @return collection of "Business" files
-	 */
-	public static List<File> toBusiness(List<FileDB> files) {
-		List<File> bizzFiles = new ArrayList<File>();
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((uid == null) ? 0 : uid.hashCode());
+    return result;
+  }
 
-		for (FileDB f : files) {
-			File file = new File(f.getId(), f.getPath(),
-					f.getUid());
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    FileDB other = (FileDB) obj;
+    if (uid == null) {
+      if (other.uid != null)
+        return false;
+    } else if (!uid.equals(other.uid))
+      return false;
+    return true;
+  }
 
-			bizzFiles.add(file);
-		}
+  /**
+   * Converts from DB beans to Bizz beans
+   * 
+   * @param repositories
+   *            collection of FileDB instances
+   * @return collection of "Business" files
+   */
+  public static List<File> toBusiness(List<FileDB> files) {
+    List<File> bizzFiles = new ArrayList<File>();
 
-		return bizzFiles;
-	}
+    for (FileDB f : files) {
+      File file = new File(f.getId(), f.getPath(),
+          f.getUid());
 
-	/**
-	 * @return the bizz representation of File
-	 */
-	public File toBusiness(){
-		return new File(id, path, uid);
-	}
+      bizzFiles.add(file);
+    }
+
+    return bizzFiles;
+  }
+
+  /**
+   * @return the bizz representation of File
+   */
+  public File toBusiness(){
+    return new File(id, path, uid);
+  }
 
 }

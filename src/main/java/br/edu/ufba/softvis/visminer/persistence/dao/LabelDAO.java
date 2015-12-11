@@ -9,6 +9,6 @@ import br.edu.ufba.softvis.visminer.model.database.LabelDB;
  */
 public interface LabelDAO extends DAO<LabelDB, Integer>{
 
-	public List<LabelDB> findByIssue(int issueId);
-	
+  public List<LabelDB> findByIssue(int issueId);
+
 }

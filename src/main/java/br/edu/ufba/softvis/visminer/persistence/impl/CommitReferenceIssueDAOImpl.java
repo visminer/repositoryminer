@@ -10,16 +10,19 @@ import br.edu.ufba.softvis.visminer.model.database.CommitReferenceIssuePK;
 import br.edu.ufba.softvis.visminer.persistence.dao.CommitReferenceIssueDAO;
 
 @SuppressWarnings("unchecked")
-public class CommitReferenceIssueDAOImpl extends DAOImpl<CommitReferenceIssueDB, CommitReferenceIssuePK> implements CommitReferenceIssueDAO{
+public class CommitReferenceIssueDAOImpl extends DAOImpl<CommitReferenceIssueDB,
+CommitReferenceIssuePK> implements CommitReferenceIssueDAO{
 
-	@Override
-	public List<CommitReferenceIssueDB> findByCommit(int commitId) {
-		
-		EntityManager em = getEntityManager();
-		TypedQuery<CommitReferenceIssueDB> query = em.createNamedQuery("CommitReferenceIssueDB.findByCommit", CommitReferenceIssueDB.class);
-		query.setParameter("commitId", commitId);
-		return (List<CommitReferenceIssueDB>) getResultList(query);
-		
-	}
+  @Override
+  public List<CommitReferenceIssueDB> findByCommit(int commitId) {
+
+    EntityManager em = getEntityManager();
+    TypedQuery<CommitReferenceIssueDB> query = em.createNamedQuery(
+        "CommitReferenceIssueDB.findByCommit", 
+        CommitReferenceIssueDB.class);
+    query.setParameter("commitId", commitId);
+    return (List<CommitReferenceIssueDB>) getResultList(query);
+
+  }
 
 }

@@ -10,152 +10,148 @@ import java.util.List;
 
 public class Commit {
 
-	private int id;
-	private Date date;
-	private String message;
-	private String name;
-	private List<File> commitedFiles;
-	private Committer committer;
-	private List<IssueCommand> commands;
-	
-	public Commit(){}
+  private int id;
+  private Date date;
+  private String message;
+  private String name;
+  private List<File> commitedFiles;
+  private Committer committer;
+  private List<IssueCommand> commands;
 
-	/**
-	 * @param id
-	 * @param date
-	 * @param message
-	 * @param name
-	 */
-	public Commit(int id, Date date, String message, String name) {
-		super();
-		this.id = id;
-		this.date = date;
-		this.message = message;
-		this.name = name;
-	}
+  public Commit(){}
 
-	/**
-	 * @return the id
-	 */
-	public int getId() {
-		return id;
-	}
+  /**
+   * @param id
+   * @param date
+   * @param message
+   * @param name
+   */
+  public Commit(int id, Date date, String message, String name) {
+    super();
+    this.id = id;
+    this.date = date;
+    this.message = message;
+    this.name = name;
+  }
 
-	/**
-	 * @param id the id to set
-	 */
-	public void setId(int id) {
-		this.id = id;
-	}
+  /**
+   * @return the id
+   */
+  public int getId() {
+    return id;
+  }
 
-	/**
-	 * @return the date
-	 */
-	public Date getDate() {
-		return date;
-	}
+  /**
+   * @param id the id to set
+   */
+  public void setId(int id) {
+    this.id = id;
+  }
 
-	/**
-	 * @param date the date to set
-	 */
-	public void setDate(Date date) {
-		this.date = date;
-	}
+  /**
+   * @return the date
+   */
+  public Date getDate() {
+    return date;
+  }
 
-	/**
-	 * @return the message
-	 */
-	public String getMessage() {
-		return message;
-	}
+  /**
+   * @param date the date to set
+   */
+  public void setDate(Date date) {
+    this.date = date;
+  }
 
-	/**
-	 * @param message the message to set
-	 */
-	public void setMessage(String message) {
-		this.message = message;
-	}
+  /**
+   * @return the message
+   */
+  public String getMessage() {
+    return message;
+  }
 
-	/**
-	 * @return the name
-	 */
-	public String getName() {
-		return name;
-	}
+  /**
+   * @param message the message to set
+   */
+  public void setMessage(String message) {
+    this.message = message;
+  }
 
-	/**
-	 * @param name the name to set
-	 */
-	public void setName(String name) {
-		this.name = name;
-	}
+  /**
+   * @return the name
+   */
+  public String getName() {
+    return name;
+  }
 
-	/**
-	 * @return the commitedFiles
-	 */
-	public List<File> getCommitedFiles() {
-		return commitedFiles;
-	}
+  /**
+   * @param name the name to set
+   */
+  public void setName(String name) {
+    this.name = name;
+  }
 
-	/**
-	 * @param commitedFiles the commitedFiles to set
-	 */
-	public void setCommitedFiles(List<File> commitedFiles) {
-		this.commitedFiles = commitedFiles;
-	}
+  /**
+   * @return the commitedFiles
+   */
+  public List<File> getCommitedFiles() {
+    return commitedFiles;
+  }
 
-	/**
-	 * @return the committer
-	 */
-	public Committer getCommitter() {
-		return committer;
-	}
+  /**
+   * @param commitedFiles the commitedFiles to set
+   */
+  public void setCommitedFiles(List<File> commitedFiles) {
+    this.commitedFiles = commitedFiles;
+  }
 
-	/**
-	 * @param committer the committer to set
-	 */
-	public void setCommitter(Committer committer) {
-		this.committer = committer;
-	}
+  /**
+   * @return the committer
+   */
+  public Committer getCommitter() {
+    return committer;
+  }
 
-	/**
-	 * @return the commands
-	 */
-	public List<IssueCommand> getCommands() {
-		return commands;
-	}
+  /**
+   * @param committer the committer to set
+   */
+  public void setCommitter(Committer committer) {
+    this.committer = committer;
+  }
 
-	/**
-	 * @param commands the commands to set
-	 */
-	public void setCommands(List<IssueCommand> commands) {
-		this.commands = commands;
-	}
+  /**
+   * @return the commands
+   */
+  public List<IssueCommand> getCommands() {
+    return commands;
+  }
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + id;
-		return result;
-	}
+  /**
+   * @param commands the commands to set
+   */
+  public void setCommands(List<IssueCommand> commands) {
+    this.commands = commands;
+  }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (!(obj instanceof Commit)) {
-			return false;
-		}
-		Commit other = (Commit) obj;
-		if (id != other.id) {
-			return false;
-		}
-		return true;
-	}
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + (int) (id ^ (id >>> 32));
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    Commit other = (Commit) obj;
+    if (id != other.id)
+      return false;
+    return true;
+  }
 
 }

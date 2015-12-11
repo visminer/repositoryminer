@@ -33,338 +33,340 @@ import br.edu.ufba.softvis.visminer.model.business.Issue;
 @Entity
 @Table(name="issue")
 @NamedQueries({
-	@NamedQuery(name="IssueDB.minFindByRepository", query="SELECT i.number, i.id FROM IssueDB i where i.repository.id = :repositoryId"),
-	@NamedQuery(name="IssueDB.findByRepository", query="SELECT i FROM IssueDB i where i.repository.id = :repositoryId")
+  @NamedQuery(name="IssueDB.minFindByRepository", query="SELECT i.number, i.id FROM IssueDB i "
+      + "where i.repository.id = :repositoryId"),
+  @NamedQuery(name="IssueDB.findByRepository", query="SELECT i FROM IssueDB i where "
+      + "i.repository.id = :repositoryId")
 })
 public class IssueDB implements Serializable {
-	private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-	@Id
-	@SequenceGenerator(name="ISSUE_ID_GENERATOR", sequenceName="ISSUE_SEQ")
-	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="ISSUE_ID_GENERATOR")
-	@Column(unique=true, nullable=false)
-	private int id;
+  @Id
+  @SequenceGenerator(name="ISSUE_ID_GENERATOR", sequenceName="ISSUE_SEQ")
+  @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="ISSUE_ID_GENERATOR")
+  @Column(unique=true, nullable=false)
+  private int id;
 
-	@Column(length=100, nullable=false)
-	private String creator;
-	
-	@Column(length=100)
-	private String assignee;
+  @Column(length=100, nullable=false)
+  private String creator;
 
-	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name="closed_date")
-	private Date closedDate;
+  @Column(length=100)
+  private String assignee;
 
-	@Column(name="comments_number", nullable=false)
-	private int commentsNumber;
+  @Temporal(TemporalType.TIMESTAMP)
+  @Column(name="closed_date")
+  private Date closedDate;
 
-	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name="create_date", nullable=false)
-	private Date createDate;
+  @Column(name="comments_number", nullable=false)
+  private int commentsNumber;
 
-	@Column(nullable=false)
-	private int number;
+  @Temporal(TemporalType.TIMESTAMP)
+  @Column(name="create_date", nullable=false)
+  private Date createDate;
 
-	@Column(nullable=false)
-	private int status;
+  @Column(nullable=false)
+  private int number;
 
-	@Column(nullable=false, length=500)
-	private String title;
+  @Column(nullable=false)
+  private int status;
 
-	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name="update_date")
-	private Date updateDate;
+  @Column(nullable=false, length=500)
+  private String title;
 
-	@Lob
-	private String body; 
-	
-	//bi-directional many-to-one association to MilestoneDB
-	@ManyToOne
-	@JoinColumn(name="milestone_id")
-	private MilestoneDB milestone;
+  @Temporal(TemporalType.TIMESTAMP)
+  @Column(name="update_date")
+  private Date updateDate;
 
-	//bi-directional many-to-one association to RepositoryDB
-	@ManyToOne
-	@JoinColumn(name="repository_id", nullable=false)
-	private RepositoryDB repository;
+  @Lob
+  private String body; 
 
-	@OneToMany(mappedBy="issue", cascade=CascadeType.ALL, fetch=FetchType.EAGER)
-	private List<LabelDB> labels;
-	
-	@OneToMany(mappedBy="issue")
-	private List<CommitReferenceIssueDB> commitReferenceIssues;
-	
-	public IssueDB() {
-	}
+  //bi-directional many-to-one association to MilestoneDB
+  @ManyToOne
+  @JoinColumn(name="milestone_id")
+  private MilestoneDB milestone;
 
-	/**
-	 * @param id
-	 * @param assignee
-	 * @param closedDate
-	 * @param commentsNumber
-	 * @param createDate
-	 * @param labels
-	 * @param number
-	 * @param status
-	 * @param title
-	 * @param updateDate
-	 * @param body
-	 */
-	public IssueDB(int id, String creator, String assignee, Date closedDate,
-			int commentsNumber, Date createDate, int number,
-			StatusType status, String title, Date updateDate, String body) {
-		super();
-		this.id = id;
-		this.creator = creator;
-		this.assignee = assignee;
-		this.closedDate = closedDate;
-		this.commentsNumber = commentsNumber;
-		this.createDate = createDate;
-		this.number = number;
-		this.status = status != null ? status.getId() : 0;
-		this.title = title;
-		this.updateDate = updateDate;
-		this.body = body;
-	}
+  //bi-directional many-to-one association to RepositoryDB
+  @ManyToOne
+  @JoinColumn(name="repository_id", nullable=false)
+  private RepositoryDB repository;
 
-	/**
-	 * @return the id
-	 */
-	public int getId() {
-		return id;
-	}
+  @OneToMany(mappedBy="issue", cascade=CascadeType.ALL, fetch=FetchType.EAGER)
+  private List<LabelDB> labels;
 
-	/**
-	 * @param id the id to set
-	 */
-	public void setId(int id) {
-		this.id = id;
-	}
+  @OneToMany(mappedBy="issue")
+  private List<CommitReferenceIssueDB> commitReferenceIssues;
 
-	/**
-	 * @return the creator
-	 */
-	public String getCreator() {
-		return creator;
-	}
+  public IssueDB() {
+  }
 
-	/**
-	 * @param creator the creator to set
-	 */
-	public void setCreator(String creator) {
-		this.creator = creator;
-	}
+  /**
+   * @param id
+   * @param assignee
+   * @param closedDate
+   * @param commentsNumber
+   * @param createDate
+   * @param labels
+   * @param number
+   * @param status
+   * @param title
+   * @param updateDate
+   * @param body
+   */
+  public IssueDB(int id, String creator, String assignee, Date closedDate,
+      int commentsNumber, Date createDate, int number,
+      StatusType status, String title, Date updateDate, String body) {
+    super();
+    this.id = id;
+    this.creator = creator;
+    this.assignee = assignee;
+    this.closedDate = closedDate;
+    this.commentsNumber = commentsNumber;
+    this.createDate = createDate;
+    this.number = number;
+    this.status = status != null ? status.getId() : 0;
+    this.title = title;
+    this.updateDate = updateDate;
+    this.body = body;
+  }
 
-	/**
-	 * @return the assignee
-	 */
-	public String getAssignee() {
-		return assignee;
-	}
+  /**
+   * @return the id
+   */
+  public int getId() {
+    return id;
+  }
 
-	/**
-	 * @param assignee the assignee to set
-	 */
-	public void setAssignee(String assignee) {
-		this.assignee = assignee;
-	}
+  /**
+   * @param id the id to set
+   */
+  public void setId(int id) {
+    this.id = id;
+  }
 
-	/**
-	 * @return the closedDate
-	 */
-	public Date getClosedDate() {
-		return closedDate;
-	}
+  /**
+   * @return the creator
+   */
+  public String getCreator() {
+    return creator;
+  }
 
-	/**
-	 * @param closedDate the closedDate to set
-	 */
-	public void setClosedDate(Date closedDate) {
-		this.closedDate = closedDate;
-	}
+  /**
+   * @param creator the creator to set
+   */
+  public void setCreator(String creator) {
+    this.creator = creator;
+  }
 
-	/**
-	 * @return the commentsNumber
-	 */
-	public int getCommentsNumber() {
-		return commentsNumber;
-	}
+  /**
+   * @return the assignee
+   */
+  public String getAssignee() {
+    return assignee;
+  }
 
-	/**
-	 * @param commentsNumber the commentsNumber to set
-	 */
-	public void setCommentsNumber(int commentsNumber) {
-		this.commentsNumber = commentsNumber;
-	}
+  /**
+   * @param assignee the assignee to set
+   */
+  public void setAssignee(String assignee) {
+    this.assignee = assignee;
+  }
 
-	/**
-	 * @return the createDate
-	 */
-	public Date getCreateDate() {
-		return createDate;
-	}
+  /**
+   * @return the closedDate
+   */
+  public Date getClosedDate() {
+    return closedDate;
+  }
 
-	/**
-	 * @param createDate the createDate to set
-	 */
-	public void setCreateDate(Date createDate) {
-		this.createDate = createDate;
-	}
+  /**
+   * @param closedDate the closedDate to set
+   */
+  public void setClosedDate(Date closedDate) {
+    this.closedDate = closedDate;
+  }
 
-	/**
-	 * @return the number
-	 */
-	public int getNumber() {
-		return number;
-	}
+  /**
+   * @return the commentsNumber
+   */
+  public int getCommentsNumber() {
+    return commentsNumber;
+  }
 
-	/**
-	 * @param number the number to set
-	 */
-	public void setNumber(int number) {
-		this.number = number;
-	}
+  /**
+   * @param commentsNumber the commentsNumber to set
+   */
+  public void setCommentsNumber(int commentsNumber) {
+    this.commentsNumber = commentsNumber;
+  }
 
-	/**
-	 * @return the status
-	 */
-	public StatusType getStatus() {
-		return StatusType.parse(status);
-	}
+  /**
+   * @return the createDate
+   */
+  public Date getCreateDate() {
+    return createDate;
+  }
 
-	/**
-	 * @param status the status to set
-	 */
-	public void setStatus(StatusType status) {
-		this.status = status != null ? status.getId() : 0;
-	}
+  /**
+   * @param createDate the createDate to set
+   */
+  public void setCreateDate(Date createDate) {
+    this.createDate = createDate;
+  }
 
-	/**
-	 * @return the title
-	 */
-	public String getTitle() {
-		return title;
-	}
+  /**
+   * @return the number
+   */
+  public int getNumber() {
+    return number;
+  }
 
-	/**
-	 * @param title the title to set
-	 */
-	public void setTitle(String title) {
-		this.title = title;
-	}
+  /**
+   * @param number the number to set
+   */
+  public void setNumber(int number) {
+    this.number = number;
+  }
 
-	/**
-	 * @return the updateDate
-	 */
-	public Date getUpdateDate() {
-		return updateDate;
-	}
+  /**
+   * @return the status
+   */
+  public StatusType getStatus() {
+    return StatusType.parse(status);
+  }
 
-	/**
-	 * @param updateDate the updateDate to set
-	 */
-	public void setUpdateDate(Date updateDate) {
-		this.updateDate = updateDate;
-	}
+  /**
+   * @param status the status to set
+   */
+  public void setStatus(StatusType status) {
+    this.status = status != null ? status.getId() : 0;
+  }
 
-	/**
-	 * @return the body
-	 */
-	public String getBody() {
-		return body;
-	}
+  /**
+   * @return the title
+   */
+  public String getTitle() {
+    return title;
+  }
 
-	/**
-	 * @param body the body to set
-	 */
-	public void setBody(String body) {
-		this.body = body;
-	}
+  /**
+   * @param title the title to set
+   */
+  public void setTitle(String title) {
+    this.title = title;
+  }
 
-	/**
-	 * @return the milestone
-	 */
-	public MilestoneDB getMilestone() {
-		return milestone;
-	}
+  /**
+   * @return the updateDate
+   */
+  public Date getUpdateDate() {
+    return updateDate;
+  }
 
-	/**
-	 * @param milestone the milestone to set
-	 */
-	public void setMilestone(MilestoneDB milestone) {
-		this.milestone = milestone;
-	}
+  /**
+   * @param updateDate the updateDate to set
+   */
+  public void setUpdateDate(Date updateDate) {
+    this.updateDate = updateDate;
+  }
 
-	/**
-	 * @return the repository
-	 */
-	public RepositoryDB getRepository() {
-		return repository;
-	}
+  /**
+   * @return the body
+   */
+  public String getBody() {
+    return body;
+  }
 
-	/**
-	 * @param repository the repository to set
-	 */
-	public void setRepository(RepositoryDB repository) {
-		this.repository = repository;
-	}
+  /**
+   * @param body the body to set
+   */
+  public void setBody(String body) {
+    this.body = body;
+  }
 
-	/**
-	 * @return the commitReferenceIssues
-	 */
-	public List<CommitReferenceIssueDB> getCommitReferenceIssues() {
-		return commitReferenceIssues;
-	}
+  /**
+   * @return the milestone
+   */
+  public MilestoneDB getMilestone() {
+    return milestone;
+  }
 
-	/**
-	 * @param commitReferenceIssues the commitReferenceIssues to set
-	 */
-	public void setCommitReferenceIssues(List<CommitReferenceIssueDB> commitReferenceIssues) {
-		this.commitReferenceIssues = commitReferenceIssues;
-	}
+  /**
+   * @param milestone the milestone to set
+   */
+  public void setMilestone(MilestoneDB milestone) {
+    this.milestone = milestone;
+  }
 
-	/**
-	 * @return the labels
-	 */
-	public List<LabelDB> getLabels() {
-		return labels;
-	}
+  /**
+   * @return the repository
+   */
+  public RepositoryDB getRepository() {
+    return repository;
+  }
 
-	/**
-	 * @param labels the labels to set
-	 */
-	public void setLabels(List<LabelDB> labels) {
-		this.labels = labels;
-	}
-	
-	public static List<Issue> toBusiness(List<IssueDB> issues){
-		
-		List<Issue> bizzIssues = new ArrayList<Issue>();
-		
-		if(issues == null)
-			return bizzIssues;
-		
-		for(IssueDB i : issues){
-			
-			Issue issue = new Issue(i.getId(), i.getCreator(), i.getAssignee(),
-					i.getClosedDate(), i.getCommentsNumber(), i.getCreateDate(), i.getNumber(),
-					i.getStatus(), i.getTitle(), i.getUpdateDate(), i.getBody());
-			issue.setLabels(LabelDB.toBusiness(i.getLabels()));
-			
-			if(i.getMilestone() != null)
-				issue.setMilestone(i.getMilestone().toBusiness());
-			
-			bizzIssues.add(issue);
-			
-		}
-		
-		return bizzIssues;
-		
-	}
-	
-	public Issue toBusiness(){
-		return new Issue(id, creator, assignee, closedDate, commentsNumber, 
-				createDate, commentsNumber, getStatus(), title, updateDate, body);
-	}
+  /**
+   * @param repository the repository to set
+   */
+  public void setRepository(RepositoryDB repository) {
+    this.repository = repository;
+  }
+
+  /**
+   * @return the commitReferenceIssues
+   */
+  public List<CommitReferenceIssueDB> getCommitReferenceIssues() {
+    return commitReferenceIssues;
+  }
+
+  /**
+   * @param commitReferenceIssues the commitReferenceIssues to set
+   */
+  public void setCommitReferenceIssues(List<CommitReferenceIssueDB> commitReferenceIssues) {
+    this.commitReferenceIssues = commitReferenceIssues;
+  }
+
+  /**
+   * @return the labels
+   */
+  public List<LabelDB> getLabels() {
+    return labels;
+  }
+
+  /**
+   * @param labels the labels to set
+   */
+  public void setLabels(List<LabelDB> labels) {
+    this.labels = labels;
+  }
+
+  public static List<Issue> toBusiness(List<IssueDB> issues){
+
+    List<Issue> bizzIssues = new ArrayList<Issue>();
+
+    if(issues == null)
+      return bizzIssues;
+
+    for(IssueDB i : issues){
+
+      Issue issue = new Issue(i.getId(), i.getCreator(), i.getAssignee(),
+          i.getClosedDate(), i.getCommentsNumber(), i.getCreateDate(), i.getNumber(),
+          i.getStatus(), i.getTitle(), i.getUpdateDate(), i.getBody());
+      issue.setLabels(LabelDB.toBusiness(i.getLabels()));
+
+      if(i.getMilestone() != null)
+        issue.setMilestone(i.getMilestone().toBusiness());
+
+      bizzIssues.add(issue);
+
+    }
+
+    return bizzIssues;
+
+  }
+
+  public Issue toBusiness(){
+    return new Issue(id, creator, assignee, closedDate, commentsNumber, 
+        createDate, commentsNumber, getStatus(), title, updateDate, body);
+  }
 
 }

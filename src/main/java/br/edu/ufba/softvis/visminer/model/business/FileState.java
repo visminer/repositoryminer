@@ -9,65 +9,65 @@ import br.edu.ufba.softvis.visminer.constant.ChangeType;
 
 public class FileState {
 
-	private int linesAdded;
-	private int linesRemoved;
-	private ChangeType change;
-	
-	public FileState(){}
+  private int linesAdded;
+  private int linesRemoved;
+  private ChangeType change;
 
-	/**
-	 * @param linesAdded
-	 * @param linesRemoved
-	 * @param change
-	 */
-	public FileState(int linesAdded, int linesRemoved, ChangeType change) {
-		super();
-		this.linesAdded = linesAdded;
-		this.linesRemoved = linesRemoved;
-		this.change = change;
-	}
+  public FileState(){}
 
-	/**
-	 * @return the linesAdded
-	 */
-	public int getLinesAdded() {
-		return linesAdded;
-	}
+  /**
+   * @param linesAdded
+   * @param linesRemoved
+   * @param change
+   */
+  public FileState(int linesAdded, int linesRemoved, ChangeType change) {
+    super();
+    this.linesAdded = linesAdded;
+    this.linesRemoved = linesRemoved;
+    this.change = change;
+  }
 
-	/**
-	 * @param linesAdded the linesAdded to set
-	 */
-	public void setLinesAdded(int linesAdded) {
-		this.linesAdded = linesAdded;
-	}
+  /**
+   * @return the linesAdded
+   */
+  public int getLinesAdded() {
+    return linesAdded;
+  }
 
-	/**
-	 * @return the linesRemoved
-	 */
-	public int getLinesRemoved() {
-		return linesRemoved;
-	}
+  /**
+   * @param linesAdded the linesAdded to set
+   */
+  public void setLinesAdded(int linesAdded) {
+    this.linesAdded = linesAdded;
+  }
 
-	/**
-	 * @param linesRemoved the linesRemoved to set
-	 */
-	public void setLinesRemoved(int linesRemoved) {
-		this.linesRemoved = linesRemoved;
-	}
+  /**
+   * @return the linesRemoved
+   */
+  public int getLinesRemoved() {
+    return linesRemoved;
+  }
 
-	/**
-	 * @return the change
-	 */
-	public ChangeType getChange() {
-		return change;
-	}
+  /**
+   * @param linesRemoved the linesRemoved to set
+   */
+  public void setLinesRemoved(int linesRemoved) {
+    this.linesRemoved = linesRemoved;
+  }
 
-	/**
-	 * @param change the change to set
-	 */
-	public void setChange(ChangeType change) {
-		this.change = change;
-	}
+  /**
+   * @return the change
+   */
+  public ChangeType getChange() {
+    return change;
+  }
 
-	
+  /**
+   * @param change the change to set
+   */
+  public void setChange(ChangeType change) {
+    this.change = change;
+  }
+
+
 }

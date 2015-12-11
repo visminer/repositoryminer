@@ -19,21 +19,21 @@ import br.edu.ufba.softvis.visminer.constant.LanguageType;
 
 
 @ASTGeneratorAnnotation(
-		language = LanguageType.NONE,
-		extensions = {"xml", "html", "css", "txt", "md", "properties", "gradle"}
-)
+    language = LanguageType.NONE,
+    extensions = {"xml", "html", "css", "txt", "md", "properties", "gradle"}
+    )
 public class NoneASTGenerator implements IASTGenerator{
 
-	@Override
-	public AST generate(String filePath, String source, String[] sourceFolders) {
-		
-		Document doc = new Document();
-		doc.setName(filePath);
-		AST ast = new AST();
-		ast.setSourceCode(source);
-		ast.setDocument(doc);
-		return ast;
-		
-	}
+  @Override
+  public AST generate(String filePath, String source, String[] sourceFolders) {
+
+    Document doc = new Document();
+    doc.setName(filePath);
+    AST ast = new AST();
+    ast.setSourceCode(source);
+    ast.setDocument(doc);
+    return ast;
+
+  }
 
 }

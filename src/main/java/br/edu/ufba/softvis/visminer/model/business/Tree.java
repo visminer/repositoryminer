@@ -13,126 +13,126 @@ import br.edu.ufba.softvis.visminer.constant.TreeType;
 
 public class Tree {
 
-	private int id;
-	private Date lastUpdate;
-	private String name;
-	private String fullName;
-	private TreeType type;
-	
-	public Tree(){}
+  private int id;
+  private Date lastUpdate;
+  private String name;
+  private String fullName;
+  private TreeType type;
 
-	/**
-	 * @param id
-	 * @param lastUpdate
-	 * @param name
-	 * @param fullName
-	 * @param type
-	 */
-	public Tree(int id, Date lastUpdate, String name, String fullName,
-			TreeType type) {
-		super();
-		this.id = id;
-		this.lastUpdate = lastUpdate;
-		this.name = name;
-		this.fullName = fullName;
-		this.type = type;
-	}
+  public Tree(){}
 
-	/**
-	 * @return the id
-	 */
-	public int getId() {
-		return id;
-	}
+  /**
+   * @param id
+   * @param lastUpdate
+   * @param name
+   * @param fullName
+   * @param type
+   */
+  public Tree(int id, Date lastUpdate, String name, String fullName,
+      TreeType type) {
+    super();
+    this.id = id;
+    this.lastUpdate = lastUpdate;
+    this.name = name;
+    this.fullName = fullName;
+    this.type = type;
+  }
 
-	/**
-	 * @param id the id to set
-	 */
-	public void setId(int id) {
-		this.id = id;
-	}
+  /**
+   * @return the id
+   */
+  public int getId() {
+    return id;
+  }
 
-	/**
-	 * @return the lastUpdate
-	 */
-	public Date getLastUpdate() {
-		return lastUpdate;
-	}
+  /**
+   * @param id the id to set
+   */
+  public void setId(int id) {
+    this.id = id;
+  }
 
-	/**
-	 * @param lastUpdate the lastUpdate to set
-	 */
-	public void setLastUpdate(Date lastUpdate) {
-		this.lastUpdate = lastUpdate;
-	}
+  /**
+   * @return the lastUpdate
+   */
+  public Date getLastUpdate() {
+    return lastUpdate;
+  }
 
-	/**
-	 * @return the name
-	 */
-	public String getName() {
-		return name;
-	}
+  /**
+   * @param lastUpdate the lastUpdate to set
+   */
+  public void setLastUpdate(Date lastUpdate) {
+    this.lastUpdate = lastUpdate;
+  }
 
-	/**
-	 * @param name the name to set
-	 */
-	public void setName(String name) {
-		this.name = name;
-	}
+  /**
+   * @return the name
+   */
+  public String getName() {
+    return name;
+  }
 
-	/**
-	 * @return the fullName
-	 */
-	public String getFullName() {
-		return fullName;
-	}
+  /**
+   * @param name the name to set
+   */
+  public void setName(String name) {
+    this.name = name;
+  }
 
-	/**
-	 * @param fullName the fullName to set
-	 */
-	public void setFullName(String fullName) {
-		this.fullName = fullName;
-	}
+  /**
+   * @return the fullName
+   */
+  public String getFullName() {
+    return fullName;
+  }
 
-	/**
-	 * @return the type
-	 */
-	public TreeType getType() {
-		return type;
-	}
+  /**
+   * @param fullName the fullName to set
+   */
+  public void setFullName(String fullName) {
+    this.fullName = fullName;
+  }
 
-	/**
-	 * @param type the type to set
-	 */
-	public void setType(TreeType type) {
-		this.type = type;
-	}
+  /**
+   * @return the type
+   */
+  public TreeType getType() {
+    return type;
+  }
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + id;
-		return result;
-	}
+  /**
+   * @param type the type to set
+   */
+  public void setType(TreeType type) {
+    this.type = type;
+  }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Tree other = (Tree) obj;
-		if (id != other.id)
-			return false;
-		return true;
-	}
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + id;
+    return result;
+  }
 
-	@Override
-	public String toString() {
-		return name;
-	}	
-	
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    Tree other = (Tree) obj;
+    if (id != other.id)
+      return false;
+    return true;
+  }
+
+  @Override
+  public String toString() {
+    return name;
+  }	
+
 }

@@ -9,10 +9,10 @@ import br.edu.ufba.softvis.visminer.model.database.FileDB;
  */
 public interface FileDAO extends DAO<FileDB, Integer> {
 
-	/**
-	 * @param uids
-	 * @return List of files by their uids
-	 */
-	public List<FileDB> getFilesByUids(List<String> uids);
-	
+  /**
+   * @param uids
+   * @return List of files by their uids.
+   */
+  public List<FileDB> getFilesByUids(List<String> uids);
+
 }

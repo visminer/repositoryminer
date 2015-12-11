@@ -10,7 +10,7 @@ import br.edu.ufba.softvis.visminer.model.database.IssueDB;
  */
 public interface IssueDAO extends DAO<IssueDB, Integer> {
 
-	public Map<Integer, Integer> minimalFindByRepository(int repositoryId);
-	public List<IssueDB> findByRepository(int repositoryId);
-	
+  public Map<Integer, Integer> minimalFindByRepository(int repositoryId);
+  public List<IssueDB> findByRepository(int repositoryId);
+
 }

@@ -9,96 +9,96 @@ import javax.persistence.*;
  */
 @Embeddable
 public class MetricValuePK implements Serializable {
-	//default serial version id, required for serializable classes.
-	private static final long serialVersionUID = 1L;
 
-	@Column(name="software_unit_id", insertable=true, updatable=true, nullable=false)
-	private int softwareUnitId;
+  private static final long serialVersionUID = 1L;
 
-	@Column(name="commit_id", insertable=true, updatable=true, nullable=false)
-	private int commitId;
+  @Column(name="software_unit_id", insertable=true, updatable=true, nullable=false)
+  private int softwareUnitId;
 
-	@Column(name="metric_id", insertable=true, updatable=true, nullable=false)
-	private int metricId;
+  @Column(name="commit_id", insertable=true, updatable=true, nullable=false)
+  private int commitId;
 
-	public MetricValuePK() {
-	}
+  @Column(name="metric_id", insertable=true, updatable=true, nullable=false)
+  private int metricId;
 
-	/**
-	 * @param softwareUnitId
-	 * @param commitId
-	 * @param metricId
-	 */
-	public MetricValuePK(int softwareUnitId, int commitId, int metricId) {
-		super();
-		this.softwareUnitId = softwareUnitId;
-		this.commitId = commitId;
-		this.metricId = metricId;
-	}
+  public MetricValuePK() {
+  }
 
-	/**
-	 * @return the softwareUnitId
-	 */
-	public int getSoftwareUnitId() {
-		return softwareUnitId;
-	}
+  /**
+   * @param softwareUnitId
+   * @param commitId
+   * @param metricId
+   */
+  public MetricValuePK(int softwareUnitId, int commitId, int metricId) {
+    super();
+    this.softwareUnitId = softwareUnitId;
+    this.commitId = commitId;
+    this.metricId = metricId;
+  }
 
-	/**
-	 * @param softwareUnitId the softwareUnitId to set
-	 */
-	public void setSoftwareUnitId(int softwareUnitId) {
-		this.softwareUnitId = softwareUnitId;
-	}
+  /**
+   * @return the softwareUnitId
+   */
+  public int getSoftwareUnitId() {
+    return softwareUnitId;
+  }
 
-	/**
-	 * @return the commitId
-	 */
-	public int getCommitId() {
-		return commitId;
-	}
+  /**
+   * @param softwareUnitId the softwareUnitId to set
+   */
+  public void setSoftwareUnitId(int softwareUnitId) {
+    this.softwareUnitId = softwareUnitId;
+  }
 
-	/**
-	 * @param commitId the commitId to set
-	 */
-	public void setCommitId(int commitId) {
-		this.commitId = commitId;
-	}
+  /**
+   * @return the commitId
+   */
+  public int getCommitId() {
+    return commitId;
+  }
 
-	/**
-	 * @return the metricId
-	 */
-	public int getMetricId() {
-		return metricId;
-	}
+  /**
+   * @param commitId the commitId to set
+   */
+  public void setCommitId(int commitId) {
+    this.commitId = commitId;
+  }
 
-	/**
-	 * @param metricId the metricId to set
-	 */
-	public void setMetricId(int metricId) {
-		this.metricId = metricId;
-	}
+  /**
+   * @return the metricId
+   */
+  public int getMetricId() {
+    return metricId;
+  }
 
-	public boolean equals(Object other) {
-		if (this == other) {
-			return true;
-		}
-		if (!(other instanceof MetricValuePK)) {
-			return false;
-		}
-		MetricValuePK castOther = (MetricValuePK)other;
-		return 
-				(this.softwareUnitId == castOther.softwareUnitId)
-				&& (this.commitId == castOther.commitId)
-				&& (this.metricId == castOther.metricId);
-	}
+  /**
+   * @param metricId the metricId to set
+   */
+  public void setMetricId(int metricId) {
+    this.metricId = metricId;
+  }
 
-	public int hashCode() {
-		final int prime = 31;
-		int hash = 17;
-		hash = hash * prime + this.softwareUnitId;
-		hash = hash * prime + this.commitId;
-		hash = hash * prime + this.metricId;
+  public boolean equals(Object other) {
+    if (this == other) {
+      return true;
+    }
+    if (!(other instanceof MetricValuePK)) {
+      return false;
+    }
+    MetricValuePK castOther = (MetricValuePK)other;
+    return 
+        (this.softwareUnitId == castOther.softwareUnitId)
+        && (this.commitId == castOther.commitId)
+        && (this.metricId == castOther.metricId);
+  }
 
-		return hash;
-	}
+  public int hashCode() {
+    final int prime = 31;
+    int hash = 17;
+    hash = hash * prime + this.softwareUnitId;
+    hash = hash * prime + this.commitId;
+    hash = hash * prime + this.metricId;
+
+    return hash;
+  }
 }

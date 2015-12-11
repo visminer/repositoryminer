@@ -14,12 +14,13 @@ import br.edu.ufba.softvis.visminer.test.metric.WMCMetricTest;
 
 @RunWith(Suite.class)
 @SuiteClasses({ CommitTest.class, CommitterTest.class, CCMetricTest.class,
-	NOCMetricTest.class, SLOCMetricTest.class, TCCMetricTest.class, WMCMetricTest.class})
+  NOCMetricTest.class, SLOCMetricTest.class, TCCMetricTest.class, 
+  WMCMetricTest.class})
 public class VisminerTestSuite {
-	
-	@BeforeClass
-	public static void setUpBeforeClass() throws Exception {
-		VisminerTest.getInstance(); //just to make sure that the repository was started before the tests start
-	}
-	
+
+  @BeforeClass
+  public static void setUpBeforeClass() throws Exception {
+    VisminerTest.getInstance(); //initializes the repository
+  }
+
 }

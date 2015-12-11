@@ -21,206 +21,207 @@ import br.edu.ufba.softvis.visminer.persistence.dao.DAO;
 
 public class DAOImpl<E, K> implements DAO<E, K>{
 
-	private EntityManager entityManager;
+  private EntityManager entityManager;
 
-	@SuppressWarnings("rawtypes")
-	private Class entityClass;
+  @SuppressWarnings("rawtypes")
+  private Class entityClass;
 
-	@SuppressWarnings("rawtypes")
-	public DAOImpl(){
-		ParameterizedType genericClass = (ParameterizedType) getClass().getGenericSuperclass();
-		entityClass = (Class) genericClass.getActualTypeArguments()[0];
-	}
+  @SuppressWarnings("rawtypes")
+  public DAOImpl(){
+    ParameterizedType genericClass = (ParameterizedType) getClass()
+        .getGenericSuperclass();
+    entityClass = (Class) genericClass.getActualTypeArguments()[0];
+  }
 
-	@Override
-	public void batchSave(List<E> objects) {
+  @Override
+  public void batchSave(List<E> objects) {
 
-		EntityTransaction ts = entityManager.getTransaction();
-		ts.begin();
+    EntityTransaction ts = entityManager.getTransaction();
+    ts.begin();
 
-		for(int i = 0; i < objects.size(); i++){
+    for(int i = 0; i < objects.size(); i++){
 
-			entityManager.persist(objects.get(i));
+      entityManager.persist(objects.get(i));
 
-			if((i % 1000) == 0){
-				ts.commit();
-				entityManager.clear();
-				ts.begin();
-			}
+      if((i % 1000) == 0){
+        ts.commit();
+        entityManager.clear();
+        ts.begin();
+      }
 
-		}
+    }
 
-		ts.commit();
-		entityManager.clear();
+    ts.commit();
+    entityManager.clear();
 
-	}
+  }
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public void batchMerge(List<E> objects) {
+  @SuppressWarnings("unchecked")
+  @Override
+  public void batchMerge(List<E> objects) {
 
-		EntityTransaction ts = entityManager.getTransaction();
-		ts.begin();
+    EntityTransaction ts = entityManager.getTransaction();
+    ts.begin();
 
-		for(int i = 0; i < objects.size(); i++){
+    for(int i = 0; i < objects.size(); i++){
 
-			Object o = objects.get(i);
-			objects.set(i, (E) entityManager.merge(o));
+      Object o = objects.get(i);
+      objects.set(i, (E) entityManager.merge(o));
 
-			if((i % 1000) == 0){
-				ts.commit();
-				entityManager.clear();
-				ts.begin();
-			}
+      if((i % 1000) == 0){
+        ts.commit();
+        entityManager.clear();
+        ts.begin();
+      }
 
-		}
+    }
 
-		ts.commit();
-		entityManager.clear();
+    ts.commit();
+    entityManager.clear();
 
-	}
+  }
 
-	@Override
-	public void batchDelete(List<E> objects) {
+  @Override
+  public void batchDelete(List<E> objects) {
 
-		EntityTransaction ts = entityManager.getTransaction();
-		ts.begin();
+    EntityTransaction ts = entityManager.getTransaction();
+    ts.begin();
 
-		for(int i = 0; i < objects.size(); i++){
+    for(int i = 0; i < objects.size(); i++){
 
-			entityManager.remove(objects.get(i));
+      entityManager.remove(objects.get(i));
 
-			if((i % 1000) == 0){
-				ts.commit();
-				entityManager.clear();
-				ts.begin();
-			}
+      if((i % 1000) == 0){
+        ts.commit();
+        entityManager.clear();
+        ts.begin();
+      }
 
-		}
+    }
 
-		ts.commit();
-		entityManager.clear();
+    ts.commit();
+    entityManager.clear();
 
-	}
+  }
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public void batchDelete2(List<K> ids){
+  @SuppressWarnings("unchecked")
+  @Override
+  public void batchDelete2(List<K> ids){
 
-		EntityTransaction ts = entityManager.getTransaction();
-		ts.begin();
+    EntityTransaction ts = entityManager.getTransaction();
+    ts.begin();
 
-		for(int i = 0; i < ids.size(); i++){
+    for(int i = 0; i < ids.size(); i++){
 
-			Object o = entityManager.getReference(entityClass, ids.get(i));
-			entityManager.remove(o);
+      Object o = entityManager.getReference(entityClass, ids.get(i));
+      entityManager.remove(o);
 
-			if((i % 1000) == 0){
-				ts.commit();
-				entityManager.clear();
-				ts.begin();
-			}
+      if((i % 1000) == 0){
+        ts.commit();
+        entityManager.clear();
+        ts.begin();
+      }
 
-		}
+    }
 
-		ts.commit();
-		entityManager.clear();
+    ts.commit();
+    entityManager.clear();
 
-	}
+  }
 
-	@Override
-	public void save(E object) {
+  @Override
+  public void save(E object) {
 
-		EntityTransaction ts = entityManager.getTransaction();
-		ts.begin();
-		entityManager.persist(object);
-		ts.commit();
-		entityManager.clear();
+    EntityTransaction ts = entityManager.getTransaction();
+    ts.begin();
+    entityManager.persist(object);
+    ts.commit();
+    entityManager.clear();
 
-	}
+  }
 
-	@Override
-	public E merge(E object) {
+  @Override
+  public E merge(E object) {
 
-		EntityTransaction ts = entityManager.getTransaction();
-		ts.begin();
-		E o = entityManager.merge(object);
-		ts.commit();
-		entityManager.clear();
-		return o;
+    EntityTransaction ts = entityManager.getTransaction();
+    ts.begin();
+    E o = entityManager.merge(object);
+    ts.commit();
+    entityManager.clear();
+    return o;
 
-	}
+  }
 
-	@Override
-	public void delete(E object) {
+  @Override
+  public void delete(E object) {
 
-		EntityTransaction ts = entityManager.getTransaction();
-		ts.begin();
-		entityManager.remove(object);
-		ts.commit();
-		entityManager.clear();
+    EntityTransaction ts = entityManager.getTransaction();
+    ts.begin();
+    entityManager.remove(object);
+    ts.commit();
+    entityManager.clear();
 
-	}
+  }
 
-	@SuppressWarnings("unchecked")
-	public void delete2(K id){
+  @SuppressWarnings("unchecked")
+  public void delete2(K id){
 
-		EntityTransaction ts = entityManager.getTransaction();
-		ts.begin();
-		Object o = entityManager.getReference(entityClass, id);
-		entityManager.remove(o);
-		ts.commit();
-		entityManager.clear();
+    EntityTransaction ts = entityManager.getTransaction();
+    ts.begin();
+    Object o = entityManager.getReference(entityClass, id);
+    entityManager.remove(o);
+    ts.commit();
+    entityManager.clear();
 
-	}
+  }
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public E find(K id) {
-		return (E) entityManager.find(entityClass, id);
-	}
+  @SuppressWarnings("unchecked")
+  @Override
+  public E find(K id) {
+    return (E) entityManager.find(entityClass, id);
+  }
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public List<E> findAll() {
+  @SuppressWarnings("unchecked")
+  @Override
+  public List<E> findAll() {
 
-		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-		CriteriaQuery<E> q = cb.createQuery(entityClass);
-		Root<E> r = q.from(entityClass);
-		q.select(r);
-		TypedQuery<E> query = entityManager.createQuery(q);
-		return getResultList(query);
+    CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+    CriteriaQuery<E> q = cb.createQuery(entityClass);
+    Root<E> r = q.from(entityClass);
+    q.select(r);
+    TypedQuery<E> query = entityManager.createQuery(q);
+    return getResultList(query);
 
-	}
+  }
 
-	@Override
-	public Object getSingleResult(Query query){
-		try{
-			return query.getSingleResult();
-		}catch(NoResultException e){
-			return null;
-		}
-	}
+  @Override
+  public Object getSingleResult(Query query){
+    try{
+      return query.getSingleResult();
+    }catch(NoResultException e){
+      return null;
+    }
+  }
 
-	@SuppressWarnings("rawtypes")
-	public List getResultList(Query query){
+  @SuppressWarnings("rawtypes")
+  public List getResultList(Query query){
 
-		List list = query.getResultList();
-		if(list == null)
-			return new ArrayList();
+    List list = query.getResultList();
+    if(list == null)
+      return new ArrayList();
 
-		return list;
+    return list;
 
-	}
+  }
 
-	@Override
-	public void setEntityManager(EntityManager entityManager) {
-		this.entityManager = entityManager;
-	}
+  @Override
+  public void setEntityManager(EntityManager entityManager) {
+    this.entityManager = entityManager;
+  }
 
-	@Override
-	public EntityManager getEntityManager() {
-		return entityManager;
-	}
+  @Override
+  public EntityManager getEntityManager() {
+    return entityManager;
+  }
 
 }

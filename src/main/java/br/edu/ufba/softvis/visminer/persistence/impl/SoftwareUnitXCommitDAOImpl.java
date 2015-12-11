@@ -8,6 +8,7 @@ import br.edu.ufba.softvis.visminer.persistence.dao.SoftwareUnitXCommitDAO;
  * Implementation of interface {@link SoftwareUnitXCommitDAO}
  */
 
-public class SoftwareUnitXCommitDAOImpl extends DAOImpl<SoftwareUnitXCommitDB, SoftwareUnitXCommitPK> implements SoftwareUnitXCommitDAO{
+public class SoftwareUnitXCommitDAOImpl extends DAOImpl<SoftwareUnitXCommitDB,
+SoftwareUnitXCommitPK> implements SoftwareUnitXCommitDAO{
 
 }

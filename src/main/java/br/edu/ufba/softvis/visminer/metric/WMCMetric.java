@@ -9,29 +9,30 @@ import br.edu.ufba.softvis.visminer.constant.MetricUid;
 import br.edu.ufba.softvis.visminer.model.business.Commit;
 
 @MetricAnnotation(
-		name = "Weighted Method Count",
-		description = "Weighted Method Count is the sum of the statical complexity of all methods of a class." 
-				+ " The Cyclomatic complexity metric is used to quantify the method’s complexity.",
-				acronym = "WMC",
-				type = MetricType.SNAPSHOT,
-				uid = MetricUid.WMC,
-				requisites = {MetricUid.CC}
-		)
+    name = "Weighted Method Count",
+    description = "Weighted Method Count is the sum of the statical complexity of all methods "
+        + "of a class. The Cyclomatic complexity metric is used to quantify the method’s "
+        + "complexity.",
+        acronym = "WMC",
+        type = MetricType.COMMIT,
+        uid = MetricUid.WMC,
+        requisites = {MetricUid.CC}
+    )
 
 public class WMCMetric extends MethodBasedMetricTemplate{
 
-	@Override
-	public void calculate(List<MethodDeclaration> methods) {
+  @Override
+  public void calculate(List<MethodDeclaration> methods) {
 
-		int wmc = 0;				
+    int wmc = 0;				
 
-		for(MethodDeclaration method : methods){
-			Commit c = commits.get(commits.size() - 1);
-			wmc += Integer.parseInt(persistence.getMetricValue(MetricUid.CC, method.getId(), c));	
-		}
+    for(MethodDeclaration method : methods){
+      Commit c = commits.get(commits.size() - 1);
+      wmc += Integer.parseInt(persistence.getMetricValue(MetricUid.CC, method.getId(), c));	
+    }
 
-		persistence.postMetricValue(currentType.getId(), String.valueOf(wmc));
+    persistence.postMetricValue(currentType.getId(), String.valueOf(wmc));
 
-	}
+  }
 
 }

@@ -11,158 +11,159 @@ import br.edu.ufba.softvis.visminer.constant.ChangeType;
  */
 @Entity
 @Table(name="file_x_commit")
-@NamedQuery(name="FileXCommitDB.findByCommit", query="SELECT fxc FROM FileXCommitDB fxc where fxc.id.commitId = :commitId")
+@NamedQuery(name="FileXCommitDB.findByCommit", query="SELECT fxc FROM FileXCommitDB fxc where"
+    + " fxc.id.commitId = :commitId")
 public class FileXCommitDB implements Serializable {
-	private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-	@EmbeddedId
-	private FileXCommitPK id;
+  @EmbeddedId
+  private FileXCommitPK id;
 
-	@Column(name="lines_added")
-	private int linesAdded;
+  @Column(name="lines_added")
+  private int linesAdded;
 
-	@Column(name="lines_removed")
-	private int linesRemoved;
+  @Column(name="lines_removed")
+  private int linesRemoved;
 
-	@Column(name="change_type")
-	private int changeType;
-	
-	//bi-directional many-to-one association to CommitDB
-	@ManyToOne
-	@JoinColumn(name="commit_id", nullable=false, insertable=false, updatable=false)
-	private CommitDB commit;
+  @Column(name="change_type")
+  private int changeType;
 
-	//bi-directional many-to-one association to FileDB
-	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name="file_id", nullable=false, insertable=false, updatable=false)
-	private FileDB file;
+  //bi-directional many-to-one association to CommitDB
+  @ManyToOne
+  @JoinColumn(name="commit_id", nullable=false, insertable=false, updatable=false)
+  private CommitDB commit;
 
-	public FileXCommitDB() {
-	}
+  //bi-directional many-to-one association to FileDB
+  @ManyToOne(fetch = FetchType.EAGER)
+  @JoinColumn(name="file_id", nullable=false, insertable=false, updatable=false)
+  private FileDB file;
 
-	/**
-	 * @param id
-	 * @param linesAdded
-	 * @param linesRemoved
-	 * @param removed
-	 */
-	public FileXCommitDB(FileXCommitPK id, int linesAdded, int linesRemoved,
-			ChangeType change) {
-		super();
-		this.id = id;
-		this.linesAdded = linesAdded;
-		this.linesRemoved = linesRemoved;
-		//this.change = change != null ? change.getId() : 0;
-	}
+  public FileXCommitDB() {
+  }
 
-	/**
-	 * @return the id
-	 */
-	public FileXCommitPK getId() {
-		return id;
-	}
+  /**
+   * @param id
+   * @param linesAdded
+   * @param linesRemoved
+   * @param removed
+   */
+  public FileXCommitDB(FileXCommitPK id, int linesAdded, int linesRemoved,
+      ChangeType change) {
+    super();
+    this.id = id;
+    this.linesAdded = linesAdded;
+    this.linesRemoved = linesRemoved;
+    //this.change = change != null ? change.getId() : 0;
+  }
 
-	/**
-	 * @param id the id to set
-	 */
-	public void setId(FileXCommitPK id) {
-		this.id = id;
-	}
+  /**
+   * @return the id
+   */
+  public FileXCommitPK getId() {
+    return id;
+  }
 
-	/**
-	 * @return the linesAdded
-	 */
-	public int getLinesAdded() {
-		return linesAdded;
-	}
+  /**
+   * @param id the id to set
+   */
+  public void setId(FileXCommitPK id) {
+    this.id = id;
+  }
 
-	/**
-	 * @param linesAdded the linesAdded to set
-	 */
-	public void setLinesAdded(int linesAdded) {
-		this.linesAdded = linesAdded;
-	}
+  /**
+   * @return the linesAdded
+   */
+  public int getLinesAdded() {
+    return linesAdded;
+  }
 
-	/**
-	 * @return the linesRemoved
-	 */
-	public int getLinesRemoved() {
-		return linesRemoved;
-	}
+  /**
+   * @param linesAdded the linesAdded to set
+   */
+  public void setLinesAdded(int linesAdded) {
+    this.linesAdded = linesAdded;
+  }
 
-	/**
-	 * @param linesRemoved the linesRemoved to set
-	 */
-	public void setLinesRemoved(int linesRemoved) {
-		this.linesRemoved = linesRemoved;
-	}
+  /**
+   * @return the linesRemoved
+   */
+  public int getLinesRemoved() {
+    return linesRemoved;
+  }
 
-	/**
-	 * @return the change
-	 */
-	public ChangeType getChangeType() {
-		return ChangeType.parse(changeType);
-	}
+  /**
+   * @param linesRemoved the linesRemoved to set
+   */
+  public void setLinesRemoved(int linesRemoved) {
+    this.linesRemoved = linesRemoved;
+  }
 
-	/**
-	 * @param change the change to set
-	 */
-	public void setChangeType(ChangeType changeType) {
-		this.changeType = changeType != null ? changeType.getId() : 0;
-	}
+  /**
+   * @return the change
+   */
+  public ChangeType getChangeType() {
+    return ChangeType.parse(changeType);
+  }
 
-	/**
-	 * @return the commit
-	 */
-	public CommitDB getCommit() {
-		return commit;
-	}
+  /**
+   * @param change the change to set
+   */
+  public void setChangeType(ChangeType changeType) {
+    this.changeType = changeType != null ? changeType.getId() : 0;
+  }
 
-	/**
-	 * @param commit the commit to set
-	 */
-	public void setCommit(CommitDB commit) {
-		this.commit = commit;
-	}
+  /**
+   * @return the commit
+   */
+  public CommitDB getCommit() {
+    return commit;
+  }
 
-	/**
-	 * @return the file
-	 */
-	public FileDB getFile() {
-		return file;
-	}
+  /**
+   * @param commit the commit to set
+   */
+  public void setCommit(CommitDB commit) {
+    this.commit = commit;
+  }
 
-	/**
-	 * @param file the file to set
-	 */
-	public void setFile(FileDB file) {
-		this.file = file;
-	}
+  /**
+   * @return the file
+   */
+  public FileDB getFile() {
+    return file;
+  }
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		return result;
-	}
+  /**
+   * @param file the file to set
+   */
+  public void setFile(FileDB file) {
+    this.file = file;
+  }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		FileXCommitDB other = (FileXCommitDB) obj;
-		if (id == null) {
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id))
-			return false;
-		return true;
-	}
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((id == null) ? 0 : id.hashCode());
+    return result;
+  }
 
-	
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    FileXCommitDB other = (FileXCommitDB) obj;
+    if (id == null) {
+      if (other.id != null)
+        return false;
+    } else if (!id.equals(other.id))
+      return false;
+    return true;
+  }
+
+
 }

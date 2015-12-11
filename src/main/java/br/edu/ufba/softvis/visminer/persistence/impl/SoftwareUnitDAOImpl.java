@@ -12,36 +12,30 @@ import br.edu.ufba.softvis.visminer.persistence.dao.SoftwareUnitDAO;
  * Implementation of interface {@link SoftwareUnitDAO}
  */
 @SuppressWarnings("unchecked")
-public class SoftwareUnitDAOImpl extends DAOImpl<SoftwareUnitDB, Integer> implements SoftwareUnitDAO{
+public class SoftwareUnitDAOImpl extends DAOImpl<SoftwareUnitDB, Integer> 
+implements SoftwareUnitDAO{
 
-	public SoftwareUnitDB findByUid(String uid) {
-		
-		EntityManager em = getEntityManager();
-		TypedQuery<SoftwareUnitDB> query = em.createNamedQuery("SoftwareUnitDB.findByUid", SoftwareUnitDB.class);
-		query.setParameter("uid", uid);
-		return (SoftwareUnitDB) getSingleResult(query);
-		
-	}
+  public SoftwareUnitDB findByUid(String uid) {
 
-	@Override
-	public List<SoftwareUnitDB> findByFile(int fileId) {
-		
-		EntityManager em = getEntityManager();
-		TypedQuery<SoftwareUnitDB> query = em.createNamedQuery("SoftwareUnitDB.findByFile", SoftwareUnitDB.class);
-		query.setParameter("id", fileId);
-		return getResultList(query);
+    EntityManager em = getEntityManager();
+    TypedQuery<SoftwareUnitDB> query = em.createNamedQuery(
+        "SoftwareUnitDB.findByUid", SoftwareUnitDB.class);
+    query.setParameter("uid", uid);
+    return (SoftwareUnitDB) getSingleResult(query);
 
-	}
+  }
 
-	@Override
-	public List<SoftwareUnitDB> findByRepository(int repositoryId, int commitId) {
+  @Override
+  public List<SoftwareUnitDB> findByRepository(int repositoryId, 
+      int commitId) {
 
-		EntityManager em = getEntityManager();
-		TypedQuery<SoftwareUnitDB> query = em.createNamedQuery("SoftwareUnitDB.findByRepository", SoftwareUnitDB.class);
-		query.setParameter("repositoryId", repositoryId);
-		query.setParameter("commitId", commitId);
-		return getResultList(query);
-		
-	}
+    EntityManager em = getEntityManager();
+    TypedQuery<SoftwareUnitDB> query = em.createNamedQuery(
+        "SoftwareUnitDB.findByRepository", SoftwareUnitDB.class);
+    query.setParameter("repositoryId", repositoryId);
+    query.setParameter("commitId", commitId);
+    return getResultList(query);
+
+  }
 
 }

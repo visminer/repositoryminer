@@ -9,6 +9,6 @@ import br.edu.ufba.softvis.visminer.model.database.FileXCommitPK;
  */
 public interface FileXCommitDAO extends DAO<FileXCommitDB, FileXCommitPK> {
 
-	List<FileXCommitDB> findByCommit(int commitId);
-	
+  List<FileXCommitDB> findByCommit(int commitId);
+
 }

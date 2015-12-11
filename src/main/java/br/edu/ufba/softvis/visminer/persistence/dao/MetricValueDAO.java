@@ -6,21 +6,18 @@ import br.edu.ufba.softvis.visminer.model.database.MetricValueDB;
 import br.edu.ufba.softvis.visminer.model.database.MetricValuePK;
 
 /**
- * 
- * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
- * @version 0.9
  * Metric_value table DAO interface.
- * 
  */
 public interface MetricValueDAO extends DAO<MetricValueDB, MetricValuePK> {
 
-	/**
-	 * 
-	 * @param softwareUnitId
-	 * @param commitId
-	 * @return List of metrics values by software unit and commit.
-	 */
-	public List<MetricValueDB> findBySoftwareUnitAndCommit(int softwareUnitId, int commitId);
-
+  /**
+   * Returns values of all calculated metrics in certain commit and 
+   * of a certain type(SNAPSHOT or COMMIT).
+   * @param commitId
+   * @param type
+   * @return
+   */
+  public List<MetricValueDB> findByCommitAndTypeAndSoftwareUnits(int commitId,
+      int type, List<Integer> softUnitIds);
 
 }

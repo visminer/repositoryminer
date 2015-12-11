@@ -13,7 +13,6 @@ import br.edu.ufba.softvis.visminer.persistence.dao.TreeDAO;
 import br.edu.ufba.softvis.visminer.persistence.impl.TreeDAOImpl;
 
 /**
- * @version 0.9
  * Defines how to save or to increment informations about trees in repository.
  */
 public class TreeAnalyzer{
