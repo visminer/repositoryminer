@@ -16,19 +16,19 @@ import br.edu.ufba.softvis.visminer.persistence.dao.FileDAO;
 @SuppressWarnings("unchecked")
 public class FileDAOImpl extends DAOImpl<FileDB, Integer> implements FileDAO {
 
-	@Override
-	public List<FileDB> getFilesByUids(List<String> uids) {
+  @Override
+  public List<FileDB> getFilesByUids(List<String> uids) {
 
-		List<FileDB> files = new ArrayList<FileDB>();
-		if(uids.isEmpty())
-			return files;
+    List<FileDB> files = new ArrayList<FileDB>();
+    if(uids.isEmpty())
+      return files;
 
-		EntityManager em = getEntityManager();
-		TypedQuery<FileDB> query = em.createNamedQuery("FileDB.findByUids",
-				FileDB.class);
-		query.setParameter("uids", uids);
-		return getResultList(query);
+    EntityManager em = getEntityManager();
+    TypedQuery<FileDB> query = em.createNamedQuery("FileDB.findByUids",
+        FileDB.class);
+    query.setParameter("uids", uids);
+    return getResultList(query);
 
-	}
+  }
 
 }

@@ -15,36 +15,38 @@ import br.edu.ufba.softvis.visminer.persistence.dao.MilestoneDAO;
  * Implementation of interface {@link MilestoneDAO}
  */
 @SuppressWarnings("unchecked")
-public class MilestoneDAOImpl extends DAOImpl<MilestoneDB, Integer> implements MilestoneDAO{
+public class MilestoneDAOImpl extends DAOImpl<MilestoneDB, Integer> 
+implements MilestoneDAO{
 
-	@Override
-	public Map<Integer, Integer> minimalFindByRepository(int repositoryId) {
-		
-		EntityManager em = getEntityManager();
-		Query query = em.createNamedQuery("MilestoneDB.minFindByRepository");
-		query.setParameter("repositoryId", repositoryId);
-		
-		Map<Integer, Integer> map = new HashMap<Integer, Integer>();
-		List<Object[]> objs = query.getResultList();
-		
-		if(objs == null) return map;
-		
-		for(Object[] obj : objs){
-			map.put( (Integer)obj[0], (Integer)obj[1]);
-		}
-		
-		return map;
-		
-	}
-	
-	@Override
-	public List<MilestoneDB> findByRepository(int repositoryId) {
-		
-		EntityManager em = getEntityManager();
-		TypedQuery<MilestoneDB> query = em.createNamedQuery("MilestoneDB.findByRepository", MilestoneDB.class);
-		query.setParameter("repositoryId", repositoryId);
-		return getResultList(query);
-		
-	}	
+  @Override
+  public Map<Integer, Integer> minimalFindByRepository(int repositoryId) {
+
+    EntityManager em = getEntityManager();
+    Query query = em.createNamedQuery("MilestoneDB.minFindByRepository");
+    query.setParameter("repositoryId", repositoryId);
+
+    Map<Integer, Integer> map = new HashMap<Integer, Integer>();
+    List<Object[]> objs = query.getResultList();
+
+    if(objs == null) return map;
+
+    for(Object[] obj : objs){
+      map.put( (Integer)obj[0], (Integer)obj[1]);
+    }
+
+    return map;
+
+  }
+
+  @Override
+  public List<MilestoneDB> findByRepository(int repositoryId) {
+
+    EntityManager em = getEntityManager();
+    TypedQuery<MilestoneDB> query = em.createNamedQuery(
+        "MilestoneDB.findByRepository", MilestoneDB.class);
+    query.setParameter("repositoryId", repositoryId);
+    return getResultList(query);
+
+  }	
 
 }

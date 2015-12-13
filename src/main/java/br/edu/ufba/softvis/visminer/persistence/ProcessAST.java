@@ -1,8 +1,6 @@
 package br.edu.ufba.softvis.visminer.persistence;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.persistence.EntityManager;
@@ -22,8 +20,6 @@ import br.edu.ufba.softvis.visminer.model.business.File;
 import br.edu.ufba.softvis.visminer.model.database.FileDB;
 import br.edu.ufba.softvis.visminer.model.database.RepositoryDB;
 import br.edu.ufba.softvis.visminer.model.database.SoftwareUnitDB;
-import br.edu.ufba.softvis.visminer.model.database.SoftwareUnitXCommitDB;
-import br.edu.ufba.softvis.visminer.model.database.SoftwareUnitXCommitPK;
 import br.edu.ufba.softvis.visminer.persistence.dao.SoftwareUnitDAO;
 import br.edu.ufba.softvis.visminer.persistence.dao.SoftwareUnitXCommitDAO;
 import br.edu.ufba.softvis.visminer.persistence.impl.SoftwareUnitDAOImpl;
@@ -32,261 +28,267 @@ import br.edu.ufba.softvis.visminer.utility.StringUtils;
 
 /**
  * This class is used to manage the ASTs.
- * Saves in database the software units(methods, classes and others) found in one AST.
- * To mark all the software units that appear in a snapshot and save this relationship in database. 
+ * Saves in database the software units(methods, classes and others) found 
+ * in one AST. To mark all the software units that appear in a snapshot and 
+ * save this relationship in database. 
  */
 public class ProcessAST {
 
-	// Uids of the software units that appear in current commit
-	private Map<String, Integer> snapshotUids;
+  // Uids of the software units that appear in current commit
+  private Map<String, Integer> snapshotUids;
 
-	// Uids of the software units that already appear
-	private Map<String, Integer> allUids;
+  // Uids of the software units that already appear
+  private Map<String, Integer> allUids;
 
-	// Number of children of the packages, if a package has no children it is deleted
-	private Map<Integer, Integer> pkgChildren;
+  // Number of children of the packages, if a package has no children it
+  // is deleted
+  private Map<Integer, Integer> pkgChildren;
 
-	private SoftwareUnitDAO softUnitDao;
-	private SoftwareUnitXCommitDAO softUnitXCommitDAO;
-	private Project project;
-	private SoftwareUnitDB projectUnit;
-	private RepositoryDB repositoryDb;
+  private SoftwareUnitDAO softUnitDao;
+  private SoftwareUnitXCommitDAO softUnitXCommitDAO;
+  private Project project;
+  private SoftwareUnitDB projectUnit;
+  private RepositoryDB repositoryDb;
 
-	public RepositoryDB getRepositoryDB(){
-		return this.repositoryDb;
-	}
+  public RepositoryDB getRepositoryDB(){
+    return this.repositoryDb;
+  }
 
-	public ProcessAST(RepositoryDB repositoryDb, EntityManager entityManager){
+  public ProcessAST(RepositoryDB repositoryDb, EntityManager entityManager){
 
-		snapshotUids = new HashMap<String, Integer>();
-		allUids = new HashMap<String, Integer>();
-		pkgChildren = new HashMap<Integer, Integer>();
+    snapshotUids = new HashMap<String, Integer>();
+    allUids = new HashMap<String, Integer>();
+    pkgChildren = new HashMap<Integer, Integer>();
 
-		softUnitDao = new SoftwareUnitDAOImpl();
-		softUnitDao.setEntityManager(entityManager);
+    softUnitDao = new SoftwareUnitDAOImpl();
+    softUnitDao.setEntityManager(entityManager);
 
-		softUnitXCommitDAO = new SoftwareUnitXCommitDAOImpl();
-		softUnitXCommitDAO.setEntityManager(entityManager);
+    softUnitXCommitDAO = new SoftwareUnitXCommitDAOImpl();
+    softUnitXCommitDAO.setEntityManager(entityManager);
 
-		this.repositoryDb = repositoryDb;
-		projectUnit = softUnitDao.findByUid(repositoryDb.getUid());
+    this.repositoryDb = repositoryDb;
+    projectUnit = softUnitDao.findByUid(repositoryDb.getUid());
 
-		project = new Project();
-		project.setId(projectUnit.getId());
-		project.setName(projectUnit.getName());
+    project = new Project();
+    project.setId(projectUnit.getId());
+    project.setName(projectUnit.getName());
 
-	}
+  }
 
-	/**
-	 * @param filePath
-	 * @param fileId
-	 * @param ast
-	 * 
-	 * If isDelete is false:
-	 * Saves the software units found in the given AST in database.
-	 * Marks the software units found in the AST as owned by the snapshot.
-	 * 
-	 * If isDelete is true:
-	 * Removes the software units found in the AST from the list of software units owned by the snapshot. 
-	 */
-	public void process(File file, AST ast, boolean isDelete){
+  /**
+   * @param filePath
+   * @param fileId
+   * @param ast
+   * 
+   * If isDelete is false:
+   * Saves the software units found in the given AST in database.
+   * Marks the software units found in the AST as owned by the snapshot.
+   * 
+   * If isDelete is true:
+   * Removes the software units found in the AST from the list of software 
+   * units owned by the snapshot. 
+   */
+  public void process(File file, AST ast, boolean isDelete){
 
-		SoftwareUnitDB parent = null;
-		ast.setProject(project);
+    SoftwareUnitDB parent = null;
+    ast.setProject(project);
 
-		Document doc = ast.getDocument();
-		
-		if(doc.getPackageDeclaration() != null){
+    Document doc = ast.getDocument();
 
-			PackageDeclaration pkgDecl = doc.getPackageDeclaration();
-			String pkgPath = repositoryDb.getPath()+"/"+file.getPath().
-					substring(0, file.getPath().lastIndexOf("/"));
+    if(doc.getPackageDeclaration() != null){
 
-			SoftwareUnitDB pkgUnit = getSofwareUnitDB(getUid(pkgPath), pkgDecl.getName(), SoftwareUnitType.PACKAGE,
-					0, repositoryDb, projectUnit, isDelete);
-			pkgDecl.setId(pkgUnit.getId());
-			parent = pkgUnit;	
+      PackageDeclaration pkgDecl = doc.getPackageDeclaration();
+      String pkgPath = repositoryDb.getPath()+"/"+file.getPath().
+          substring(0, file.getPath().lastIndexOf("/"));
 
-		}else{
-			parent = projectUnit;
-		}
+      SoftwareUnitDB pkgUnit = getSofwareUnitDB(getUid(pkgPath),
+          pkgDecl.getName(), SoftwareUnitType.PACKAGE,
+          0, repositoryDb, projectUnit, isDelete);
+      pkgDecl.setId(pkgUnit.getId());
+      parent = pkgUnit;	
 
-		SoftwareUnitDB docUnit = getSofwareUnitDB(file.getUid(), doc.getName(), SoftwareUnitType.FILE,
-				file.getId(), repositoryDb, parent, isDelete);
-		doc.setId(docUnit.getId());
+    }else{
+      parent = projectUnit;
+    }
 
-		if(doc.getMethods() != null){
+    SoftwareUnitDB docUnit = getSofwareUnitDB(file.getUid(), doc.getName(), 
+        SoftwareUnitType.FILE,
+        file.getId(), repositoryDb, parent, isDelete);
+    doc.setId(docUnit.getId());
 
-			for(MethodDeclaration method : doc.getMethods()){
-				
-				String methodPath = repositoryDb.getPath()+"/"+file.getPath()+"/"+method.getName();
-				SoftwareUnitDB methodUnit = getSofwareUnitDB(getUid(methodPath), method.getName(),
-						SoftwareUnitType.METHOD, file.getId(), repositoryDb, docUnit, isDelete);
-				method.setId(methodUnit.getId());
-				
-			}
+    if(doc.getMethods() != null){
 
-		}
+      for(MethodDeclaration method : doc.getMethods()){
 
-		if(doc.getTypes() != null){
-			for(TypeDeclaration type : doc.getTypes()){
+        String methodPath = repositoryDb.getPath()+"/"+file.getPath()+
+            "/"+method.getName();
+        SoftwareUnitDB methodUnit = getSofwareUnitDB(getUid(methodPath),
+            method.getName(),
+            SoftwareUnitType.METHOD, file.getId(), repositoryDb, 
+            docUnit, isDelete);
+        method.setId(methodUnit.getId());
 
-				String typePath = repositoryDb.getPath()+"/"+file.getPath()+"/"+type.getName();
+      }
 
-				SoftwareUnitDB typeUnit = getSofwareUnitDB(getUid(typePath), type.getName(), type.getType(),
-						file.getId(), repositoryDb, docUnit, isDelete);
-				type.setId(typeUnit.getId());
+    }
 
-				if(type.getType() == SoftwareUnitType.CLASS_OR_INTERFACE){
-					processClassOrInterface( (ClassOrInterfaceDeclaration) type, file.getId(),
-							typeUnit, isDelete, typePath);
-				}else if(type.getType() == SoftwareUnitType.ENUM){
-					processEnum( (EnumDeclaration) type, typeUnit, file.getId(), isDelete, typePath);
-				}
-				
-			}
-		}
-	}
+    if(doc.getTypes() != null){
+      for(TypeDeclaration type : doc.getTypes()){
+
+        String typePath = repositoryDb.getPath()+"/"+file.getPath()+
+            "/"+type.getName();
+
+        SoftwareUnitDB typeUnit = getSofwareUnitDB(getUid(typePath), 
+            type.getName(), type.getType(),
+            file.getId(), repositoryDb, docUnit, isDelete);
+        type.setId(typeUnit.getId());
+
+        if(type.getType() == SoftwareUnitType.CLASS_OR_INTERFACE){
+          processClassOrInterface( (ClassOrInterfaceDeclaration) type,
+              file.getId(),
+              typeUnit, isDelete, typePath);
+        }else if(type.getType() == SoftwareUnitType.ENUM){
+          processEnum( (EnumDeclaration) type, typeUnit, file.getId(),
+              isDelete, typePath);
+        }
+
+      }
+    }
+  }
 
 
-	// Saves fields and methods in database
-	private void processClassOrInterface(ClassOrInterfaceDeclaration type, int fileId,
-			SoftwareUnitDB typeUnit, boolean isDelete, String typePath){
+  // Saves fields and methods in database
+  private void processClassOrInterface(ClassOrInterfaceDeclaration type, 
+      int fileId, SoftwareUnitDB typeUnit, boolean isDelete, 
+      String typePath){
 
-		for(FieldDeclaration field : type.getFields()){
-			
-			String fieldPath = typePath+"/"+field.getName();
-			SoftwareUnitDB fieldUnit = getSofwareUnitDB(getUid(fieldPath), field.getName(), SoftwareUnitType.FIELD,
-					fileId, repositoryDb, typeUnit, isDelete);
-			field.setId(fieldUnit.getId());
-			
-		}
+    for(FieldDeclaration field : type.getFields()){
 
-		for(MethodDeclaration method : type.getMethods()){
-			
-			String methodPath = typePath+"/"+method.getName();
-			SoftwareUnitDB methodUnit = getSofwareUnitDB(getUid(methodPath), method.getName(), SoftwareUnitType.METHOD,
-					fileId, repositoryDb, typeUnit, isDelete);
-			method.setId(methodUnit.getId());
-			
-		}
+      String fieldPath = typePath+"/"+field.getName();
+      SoftwareUnitDB fieldUnit = getSofwareUnitDB(getUid(fieldPath), 
+          field.getName(), SoftwareUnitType.FIELD,
+          fileId, repositoryDb, typeUnit, isDelete);
+      field.setId(fieldUnit.getId());
 
-	}
+    }
 
-	// Saves enum constants in database
-	private void processEnum(EnumDeclaration type, SoftwareUnitDB enumUnit,
-			int fileId, boolean isDelete, String typePath){
+    for(MethodDeclaration method : type.getMethods()){
 
-		for(EnumConstantDeclaration constDecl : type.getEnumConsts()){
-			
-			String constPath = typePath+"/"+constDecl.getName();
-			SoftwareUnitDB constUnit = getSofwareUnitDB(getUid(constPath), constDecl.getName(), SoftwareUnitType.ENUM_CONST, fileId,
-					repositoryDb, enumUnit, isDelete);
-			constDecl.setId(constUnit.getId());
-			
-		}
+      String methodPath = typePath+"/"+method.getName();
+      SoftwareUnitDB methodUnit = getSofwareUnitDB(getUid(methodPath), 
+          method.getName(), SoftwareUnitType.METHOD,
+          fileId, repositoryDb, typeUnit, isDelete);
+      method.setId(methodUnit.getId());
 
-	}
+    }
 
-	/* if isDelete is false:
-	 * Saves the given software unit in database
-	 * Puts a software unit once time deleted into snapshoutUids again
-	 * 
-	 * if isDelete is true:
-	 * Removes a software unit from snapshotUids and put into removeUids
-	 */
-	private SoftwareUnitDB getSofwareUnitDB(String uid, String name, SoftwareUnitType type, int fileId,
-			RepositoryDB repoDb, SoftwareUnitDB parent, boolean isDelete){
+  }
 
-		if(isDelete && type == SoftwareUnitType.PACKAGE){
+  // Saves enum constants in database
+  private void processEnum(EnumDeclaration type, SoftwareUnitDB enumUnit,
+      int fileId, boolean isDelete, String typePath){
 
-			return new SoftwareUnitDB(snapshotUids.get(uid), name, type, uid);
+    for(EnumConstantDeclaration constDecl : type.getEnumConsts()){
 
-		}else if(isDelete){
-			
-			countPackageChidren(parent, true);
-			return new SoftwareUnitDB(snapshotUids.remove(uid), name, type, uid);
-			
-		}
-		
-		SoftwareUnitDB softwareUnitDB;
-		Integer id = allUids.get(uid);
+      String constPath = typePath+"/"+constDecl.getName();
+      SoftwareUnitDB constUnit = getSofwareUnitDB(getUid(constPath), 
+          constDecl.getName(), SoftwareUnitType.ENUM_CONST, fileId,
+          repositoryDb, enumUnit, isDelete);
+      constDecl.setId(constUnit.getId());
 
-		if(id != null){
+    }
 
-			softwareUnitDB = new SoftwareUnitDB(id, name, type, uid);
-			if(!snapshotUids.containsKey(uid)){
-				snapshotUids.put(uid, id);
-				countPackageChidren(parent, false);
-			}
+  }
 
-		}else{				
+  /* if isDelete is false:
+   * Saves the given software unit in database
+   * Puts a software unit once time deleted into snapshoutUids again
+   * 
+   * if isDelete is true:
+   * Removes a software unit from snapshotUids and put into removeUids
+   */
+  private SoftwareUnitDB getSofwareUnitDB(String uid, String name, 
+      SoftwareUnitType type, int fileId, RepositoryDB repoDb, 
+      SoftwareUnitDB parent, boolean isDelete){
 
-			softwareUnitDB = new SoftwareUnitDB(0, name, type, uid);
-			countPackageChidren(parent, false);
-			
-			if(fileId != 0)
-				softwareUnitDB.setFile(new FileDB(fileId));
+    if(isDelete && type == SoftwareUnitType.PACKAGE){
+      return new SoftwareUnitDB(snapshotUids.get(uid), name, type, uid);
+    }else if(isDelete){
+      countPackageChidren(parent, true);
+      return new SoftwareUnitDB(snapshotUids.remove(uid), name, type,
+          uid);
+    }
 
-			softwareUnitDB.setRepository(repoDb);
-			softwareUnitDB.setSoftwareUnit(parent);
-			softUnitDao.save(softwareUnitDB);
-			
-			allUids.put(uid, softwareUnitDB.getId());
-			snapshotUids.put(uid, softwareUnitDB.getId());
+    SoftwareUnitDB softwareUnitDB;
+    Integer id = allUids.get(uid);
 
-		}
+    if(id != null){
 
-		return softwareUnitDB;
+      softwareUnitDB = new SoftwareUnitDB(id, name, type, uid);
+      if(!snapshotUids.containsKey(uid)){
+        snapshotUids.put(uid, id);
+        countPackageChidren(parent, false);
+      }
 
-	}
+    }else{				
 
-	/* Adds or subtracts the number of package children, if a package has no children it is
-	removed from software units that appear in snapshot */  
-	private void countPackageChidren(SoftwareUnitDB softUnit, boolean isDelete){
+      softwareUnitDB = new SoftwareUnitDB(0, name, type, uid);
+      countPackageChidren(parent, false);
 
-		if(softUnit == null)
-			return;
+      if(fileId != 0)
+        softwareUnitDB.setFile(new FileDB(fileId));
 
-		if(softUnit.getType() == SoftwareUnitType.PACKAGE){
+      softwareUnitDB.setRepository(repoDb);
+      softwareUnitDB.setSoftwareUnit(parent);
+      softUnitDao.save(softwareUnitDB);
 
-			Integer qtd = pkgChildren.get(softUnit.getId());
+      allUids.put(uid, softwareUnitDB.getId());
+      snapshotUids.put(uid, softwareUnitDB.getId());
 
-			if(isDelete){
+    }
 
-				qtd--;
-				pkgChildren.put(softUnit.getId(), qtd);
-				if(qtd == 0)
-					snapshotUids.remove(softUnit.getUid());
+    return softwareUnitDB;
 
-			}else if(qtd != null)
-				pkgChildren.put(softUnit.getId(), pkgChildren.get(softUnit.getId())+1);
-			else
-				pkgChildren.put(softUnit.getId(), 1);
+  }
 
-		}
+  /* Adds or subtracts the number of package children, if a package has no 
+   * children it is removed from software units that appear in snapshot */  
+  private void countPackageChidren(SoftwareUnitDB softUnit, boolean isDelete){
 
-	}
+    if(softUnit == null)
+      return;
 
-	/**
-	 * @param commitId
-	 * Persists in database the relationship between software unit and commit.
-	 */
-	public void flushSoftwareUnits(int commitId){
+    if(softUnit.getType() == SoftwareUnitType.PACKAGE){
 
-		List<SoftwareUnitXCommitDB> list = new ArrayList<SoftwareUnitXCommitDB>();
-		for(Integer softUnitId : snapshotUids.values()){
-			SoftwareUnitXCommitPK pk = new SoftwareUnitXCommitPK(softUnitId, commitId);
-			SoftwareUnitXCommitDB elem = new SoftwareUnitXCommitDB(pk);
-			list.add(elem);
-		}
-		softUnitXCommitDAO.batchSave(list);
-		
-	}
+      Integer qtd = pkgChildren.get(softUnit.getId());
 
-	// Converts path to sha1 hash
-	private String getUid(String path){
-		return StringUtils.sha1(path);
-	}
-	
+      if(isDelete){
+
+        qtd--;
+        pkgChildren.put(softUnit.getId(), qtd);
+        if(qtd == 0)
+          snapshotUids.remove(softUnit.getUid());
+
+      }else if(qtd != null)
+        pkgChildren.put(softUnit.getId(), pkgChildren.get(
+            softUnit.getId())+1);
+      else
+        pkgChildren.put(softUnit.getId(), 1);
+    }
+
+  }
+
+  /**
+   * @param commitId
+   * Persists in database the relationship between software unit and commit.
+   */
+  public void flushSoftwareUnits(int commitId){
+    softUnitXCommitDAO.batchSave(snapshotUids.values().iterator(), commitId);
+  }
+
+  // Converts path to sha1 hash
+  private String getUid(String path){
+    return StringUtils.sha1(path);
+  }
+
 }

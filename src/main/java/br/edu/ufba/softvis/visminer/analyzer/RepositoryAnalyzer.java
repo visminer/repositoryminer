@@ -38,7 +38,8 @@ public class RepositoryAnalyzer{
 	 * This class is responsible for join all the analyzers and make the
 	 * repository analyzis.
 	*/
-	public void persist(Repository repoBusi, List<MetricUid> metrics, List<LanguageType> languages) {
+	public void persist(Repository repoBusi, List<MetricUid> metrics, 
+	    List<LanguageType> languages) {
 		
 		SCM repoSys = SCMFactory.getRepository(repoBusi.getType());
 		repoSys.open(repoBusi.getPath());
@@ -65,9 +66,11 @@ public class RepositoryAnalyzer{
 				repoBusi.getServiceType(), uid);
 		
 		repositoryDao.save(repositoryDb);
-		List<CommitDB> commitsDB = new CommitAndCommitterAnalyzer().persist(repositoryDb, repoSys, entityManager);
+		List<CommitDB> commitsDB = new CommitAndCommitterAnalyzer().persist(repositoryDb, repoSys,
+		    entityManager);
 		
-		SoftwareUnitDB softUnitDb = new SoftwareUnitDB(0, repositoryDb.getName(), SoftwareUnitType.PROJECT, repositoryDb.getUid());
+		SoftwareUnitDB softUnitDb = new SoftwareUnitDB(0, repositoryDb.getName(), 
+		    SoftwareUnitType.PROJECT, repositoryDb.getUid());
 		softUnitDb.setRepository(repositoryDb);
 		softwareUnitDao.save(softUnitDb);
 		
@@ -83,14 +86,13 @@ public class RepositoryAnalyzer{
 		new FileAnalyzer().persist(commitsDB, repoSys, entityManager);
 
 		commitsDB = null;
+		entityManager.clear();
+        entityManager.close();
 		
 		if(metrics != null && metrics.size() > 0){
 			MetricCalculator m = new MetricCalculator();
 			m.calculate(metrics, repoSys, repositoryDb, languages);
 		}
-
-		entityManager.clear();
-		entityManager.close();
 
 		repoSys.reset();
 		repoSys.close();
@@ -100,7 +102,8 @@ public class RepositoryAnalyzer{
 	/**
 	 * @param repositoryPath
 	 * @param metrics
-	 * Does not analyze the repository, only calculates a list of metrics from beginning of the repository.
+	 * Does not analyze the repository, only calculates a list of metrics from beginning of the 
+	 * repository.
 	 * @throws IOException 
 	 */
 	public void recalculateMetrics(String repositoryPath, List<MetricUid> metrics){

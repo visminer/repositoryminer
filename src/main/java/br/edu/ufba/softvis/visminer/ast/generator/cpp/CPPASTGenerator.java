@@ -45,112 +45,113 @@ import br.edu.ufba.softvis.visminer.constant.LanguageType;
  */
 
 @ASTGeneratorAnnotation(
-		language = LanguageType.CPP,
-		extensions = {"h", "cpp", "hpp"}
-		)
+    language = LanguageType.CPP,
+    extensions = {"h", "cpp", "hpp"}
+    )
 public class CPPASTGenerator implements IASTGenerator {
 
-	private Document document;
-	private ClassOrInterfaceDeclaration currClass;
+  private Document document;
+  private ClassOrInterfaceDeclaration currClass;
 
-	private List<br.edu.ufba.softvis.visminer.ast.TypeDeclaration> classes = new ArrayList<br.edu.ufba.softvis.visminer.ast.TypeDeclaration>();
-	private List<EnumDeclaration> enumerators = new ArrayList<EnumDeclaration>();
+  private List<br.edu.ufba.softvis.visminer.ast.TypeDeclaration> classes = new 
+      ArrayList<br.edu.ufba.softvis.visminer.ast.TypeDeclaration>();
 
-	private IScanner createScanner(String filePath) {
-		
-		FileContent fContent = FileContent
-				.createForExternalFileLocation(filePath);
+  private List<EnumDeclaration> enumerators = new ArrayList<EnumDeclaration>();
+  private IScanner createScanner(String filePath) {
 
-		IScanner scanner = new CPreprocessor(fContent, new ScannerInfo(),
-				ParserLanguage.CPP, null,
-				new GPPScannerExtensionConfiguration(), null);
+    FileContent fContent = FileContent
+        .createForExternalFileLocation(filePath);
 
-		return scanner;
-		
-	}
+    IScanner scanner = new CPreprocessor(fContent, new ScannerInfo(),
+        ParserLanguage.CPP, null,
+        new GPPScannerExtensionConfiguration(), null);
 
-	private String parseInclude(String rawInclude) {
-		
-		String include = "";
+    return scanner;
 
-		if (rawInclude != null) {
-			include = rawInclude.replace("#", "").replace("include", "")
-					.replace("<", "").replace(">", "").replace("\"", "");
-		}
+  }
 
-		return include;
-		
-	}
+  private String parseInclude(String rawInclude) {
 
-	public AST generate(String filePath, String source, String[] sourceFolders) {
-		
-		document = new Document();
-		document.setName(filePath);
-		document.setMethods(new ArrayList<MethodDeclaration>());
+    String include = "";
 
-		IASTTranslationUnit tu = null;
+    if (rawInclude != null) {
+      include = rawInclude.replace("#", "").replace("include", "")
+          .replace("<", "").replace(">", "").replace("\"", "");
+    }
 
-		try {
-			
-			IScanner scanner = createScanner(filePath);
-			ICPPParserExtensionConfiguration config = new ANSICPPParserExtensionConfiguration();
+    return include;
 
-			ISourceCodeParser parser = new GNUCPPSourceParser(scanner,
-					ParserMode.COMPLETE_PARSE, new CPPASTLogger(), config);
+  }
 
-			if (!parser.encounteredError()) {
-				tu = parser.parse();
-			}
-			
-		} catch (Exception e) {
-		}
+  public AST generate(String filePath, String source, String[] sourceFolders) {
 
-		if (tu == null) {
-			AST ast = new AST();
-			ast.setDocument(document);
-			return ast;
-		}
+    document = new Document();
+    document.setName(filePath);
+    document.setMethods(new ArrayList<MethodDeclaration>());
 
-		IASTPreprocessorIncludeStatement[] includes = tu.getIncludeDirectives();
-		List<ImportDeclaration> importsDecls = new ArrayList<ImportDeclaration>();
-		for (IASTPreprocessorIncludeStatement include : includes) {
-			ImportDeclaration importDecl = new ImportDeclaration();
-			importDecl.setName(parseInclude(include.getRawSignature()));
-			importDecl.setStatic(false);
-			importDecl.setOnDemand(false);
-			importsDecls.add(importDecl);
-		}
-		document.setImports(importsDecls);
+    IASTTranslationUnit tu = null;
 
-		CPPASTVisitor visitor = new CPPASTVisitor(this);
-		tu.accept(visitor);
+    try {
 
-		document.setTypes(classes);
-		document.getTypes().addAll(enumerators);
+      IScanner scanner = createScanner(filePath);
+      ICPPParserExtensionConfiguration config = new ANSICPPParserExtensionConfiguration();
 
-		AST ast = new AST();
-		ast.setDocument(document);
-		ast.setSourceCode(tu.getRawSignature());
+      ISourceCodeParser parser = new GNUCPPSourceParser(scanner,
+          ParserMode.COMPLETE_PARSE, new CPPASTLogger(), config);
 
-		return ast;
-	}
+      if (!parser.encounteredError()) {
+        tu = parser.parse();
+      }
 
-	public Document getDocument() {
-		return this.document;
-	}
+    } catch (Exception e) {
+    }
 
-	public void addType(ClassOrInterfaceDeclaration clazz) {
-		currClass = clazz;
+    if (tu == null) {
+      AST ast = new AST();
+      ast.setDocument(document);
+      return ast;
+    }
 
-		classes.add(clazz);
-	}
+    IASTPreprocessorIncludeStatement[] includes = tu.getIncludeDirectives();
+    List<ImportDeclaration> importsDecls = new ArrayList<ImportDeclaration>();
+    for (IASTPreprocessorIncludeStatement include : includes) {
+      ImportDeclaration importDecl = new ImportDeclaration();
+      importDecl.setName(parseInclude(include.getRawSignature()));
+      importDecl.setStatic(false);
+      importDecl.setOnDemand(false);
+      importsDecls.add(importDecl);
+    }
+    document.setImports(importsDecls);
 
-	public void addEnum(EnumDeclaration enumm) {
-		enumerators.add(enumm);
-	}
+    CPPASTVisitor visitor = new CPPASTVisitor(this);
+    tu.accept(visitor);
 
-	public void addMethod(MethodDeclaration method) {
-		currClass.getMethods().add(method);
-	}
+    document.setTypes(classes);
+    document.getTypes().addAll(enumerators);
+
+    AST ast = new AST();
+    ast.setDocument(document);
+    ast.setSourceCode(tu.getRawSignature());
+
+    return ast;
+  }
+
+  public Document getDocument() {
+    return this.document;
+  }
+
+  public void addType(ClassOrInterfaceDeclaration clazz) {
+    currClass = clazz;
+
+    classes.add(clazz);
+  }
+
+  public void addEnum(EnumDeclaration enumm) {
+    enumerators.add(enumm);
+  }
+
+  public void addMethod(MethodDeclaration method) {
+    currClass.getMethods().add(method);
+  }
 
 }

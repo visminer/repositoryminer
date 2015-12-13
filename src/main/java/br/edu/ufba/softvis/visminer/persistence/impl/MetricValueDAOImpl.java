@@ -13,20 +13,21 @@ import br.edu.ufba.softvis.visminer.persistence.dao.MetricValueDAO;
  * Implementation of interface {@link MetricValueDAO}
  */
 @SuppressWarnings("unchecked")
-public class MetricValueDAOImpl extends DAOImpl<MetricValueDB, MetricValuePK> implements MetricValueDAO{
+public class MetricValueDAOImpl extends DAOImpl<MetricValueDB, MetricValuePK> 
+implements MetricValueDAO{
 
-	@Override
-	public List<MetricValueDB> findBySoftwareUnitAndCommit(int softwareUnitId, int commitId) {
-		
-		EntityManager em = getEntityManager();
-		TypedQuery<MetricValueDB> query = em.createNamedQuery("MetricValueDB.findBySoftwareUnitAndCommit",
-				MetricValueDB.class);
-		query.setHint("javax.persistence.cache.storeMode", "BYPASS");
-		query.setHint("javax.persistence.cache.retrieveMode", "BYPASS");
-		query.setParameter("commitId", commitId);
-		query.setParameter("softwareUnitId", softwareUnitId);
-		return getResultList(query);
-		
-	}
+  @Override
+  public List<MetricValueDB> findByCommitAndTypeAndSoftwareUnits(int commitId,
+      int type, List<Integer> softUnitIds) {
+
+    EntityManager em = getEntityManager();
+    TypedQuery<MetricValueDB> query = em.createNamedQuery(
+        "MetricValueDB.findByCommitAndType", MetricValueDB.class);
+    query.setParameter("commitId", commitId);
+    query.setParameter("type", type);
+    query.setParameter("softUnitIds", softUnitIds);
+    return getResultList(query);
+
+  }
 
 }

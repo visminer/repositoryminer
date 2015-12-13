@@ -14,52 +14,52 @@ import br.edu.ufba.softvis.visminer.model.business.Commit;
 import br.edu.ufba.softvis.visminer.persistence.MetricPersistance;
 
 @MetricAnnotation(
-		name = "Number of Classes and Interfaces",
-		description = "Number of Classes and Interfaces is a software metric used to measure the size of a computer program"+
-				" by counting the concrete and abstract classes",
-		acronym = "NOCAI",
-		type = MetricType.SNAPSHOT,
-		uid = MetricUid.NOCAI
-	)
+    name = "Number of Classes and Interfaces",
+    description = "Number of Classes and Interfaces is a software metric used to measure the size "
+        + "of a computer program by counting the concrete and abstract classes",
+        acronym = "NOCAI",
+        type = MetricType.COMMIT,
+        uid = MetricUid.NOCAI
+    )
 public class NOCAIMetric implements IMetric{
 
-	@Override
-	public void calculate(List<AST> astList, List<Commit> commits, MetricPersistance persistence){
-		
-		Map<Integer, Integer> packageCls = new HashMap<Integer, Integer>();
-		int projectQtd = 0;
-		for(AST ast : astList){
-			
-			Document doc = ast.getDocument();
-			int id, num = 0;
+  @Override
+  public void calculate(List<AST> astList, List<Commit> commits, MetricPersistance persistence){
 
-			if(doc.getTypes() != null){
-				num += doc.getTypes().size();
-			}
-			
-			if(doc.getPackageDeclaration() != null){
-				
-				id = doc.getPackageDeclaration().getId();
-				
-				if(packageCls.containsKey(id)){
-					int aux = packageCls.get(id);
-					packageCls.put(id, aux + num);
-				}else{
-					packageCls.put(id, num);
-				}
-				
-			}
+    Map<Integer, Integer> packageCls = new HashMap<Integer, Integer>();
+    int projectQtd = 0;
+    for(AST ast : astList){
 
-			projectQtd += num;
-			
-		}
-		
-		for(Entry<Integer, Integer> entry : packageCls.entrySet()){
-			persistence.postMetricValue(entry.getKey(), String.valueOf(entry.getValue()));
-		}
-		
-		persistence.postMetricValue(persistence.getProject().getId(), String.valueOf(projectQtd));
-		
-	}
+      Document doc = ast.getDocument();
+      int id, num = 0;
+
+      if(doc.getTypes() != null){
+        num += doc.getTypes().size();
+      }
+
+      if(doc.getPackageDeclaration() != null){
+
+        id = doc.getPackageDeclaration().getId();
+
+        if(packageCls.containsKey(id)){
+          int aux = packageCls.get(id);
+          packageCls.put(id, aux + num);
+        }else{
+          packageCls.put(id, num);
+        }
+
+      }
+
+      projectQtd += num;
+
+    }
+
+    for(Entry<Integer, Integer> entry : packageCls.entrySet()){
+      persistence.postMetricValue(entry.getKey(), String.valueOf(entry.getValue()));
+    }
+
+    persistence.postMetricValue(persistence.getProject().getId(), String.valueOf(projectQtd));
+
+  }
 
 }

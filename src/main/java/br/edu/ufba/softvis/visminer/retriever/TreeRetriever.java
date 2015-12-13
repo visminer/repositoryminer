@@ -9,15 +9,15 @@ import br.edu.ufba.softvis.visminer.persistence.impl.TreeDAOImpl;
 
 public class TreeRetriever extends Retriever {
 
-	public List<Tree> findTrees(int repositoryId) {
+  public List<Tree> findTrees(int repositoryId) {
 
-		TreeDAO treeDAO = new TreeDAOImpl();
-		super.createEntityManager();
-		super.shareEntityManager(treeDAO);
+    TreeDAO treeDAO = new TreeDAOImpl();
+    super.createEntityManager();
+    super.shareEntityManager(treeDAO);
 
-		List<TreeDB> treesDb = treeDAO.findByRepository(repositoryId);
-		super.closeEntityManager();
-		return TreeDB.toBusiness(treesDb);
-	}
+    List<TreeDB> treesDb = treeDAO.findByRepository(repositoryId);
+    super.closeEntityManager();
+    return TreeDB.toBusiness(treesDb);
+  }
 
 }

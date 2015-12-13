@@ -7,31 +7,39 @@ import java.io.InputStream;
 import java.util.Properties;
 
 /**
- * @version 0.9
  * Utility class to retrieve data from a properties file.
  */
 public class PropertyReader {
 
-	private Properties properties;
-	
-	public PropertyReader(String propertiesPath){
-		
-		try {
-			this.properties = new Properties();
-			InputStream inputStream = new FileInputStream(new File(propertiesPath));
-			properties.load(inputStream);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-	}
-	
-	/**
-	 * @param property
-	 * @return The value of the property
-	 */
-	public String getProperty(String property){
-		return properties.getProperty(property);
-	}
-	
+  private Properties properties;
+
+  public PropertyReader(String propertiesPath){
+
+    try {
+      this.properties = new Properties();
+      InputStream inputStream = new FileInputStream(new File(propertiesPath));
+      properties.load(inputStream);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+
+  }
+
+  /**
+   * @param property The name of the property
+   * @param defaultValue The default value if the property does not exists
+   * @return The value of the property
+   */
+  public String getProperty(String property, String defaultValue){
+    return properties.getProperty(property, defaultValue);
+  }
+  
+  /**
+   * @param property The name of the property
+   * @return The value of the property, if the property does not exists null is returned
+   */
+  public String getProperty(String property){
+    return properties.getProperty(property, null);
+  }
+
 }

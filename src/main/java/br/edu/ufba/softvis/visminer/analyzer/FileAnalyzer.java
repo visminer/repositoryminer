@@ -20,47 +20,47 @@ import br.edu.ufba.softvis.visminer.persistence.impl.FileXCommitDAOImpl;
 
 public class FileAnalyzer{
 
-	public void persist(List<CommitDB> commitsDb, SCM repoSys, EntityManager entityManager) {
+  public void persist(List<CommitDB> commitsDb, SCM repoSys, EntityManager entityManager) {
 
-		List<FileDB> filesDb = new ArrayList<FileDB>();
-		List<FileXCommitDB> filesXCommitsDb = new ArrayList<FileXCommitDB>();
-		
-		FileXCommitDAO fileXCommitDao = new FileXCommitDAOImpl();
-		FileDAO fileDao = new FileDAOImpl();
-		
-		fileDao.setEntityManager(entityManager);
-		fileXCommitDao.setEntityManager(entityManager);
-		
-		for(CommitDB commitDb : commitsDb){
-			
-			List<FileDB> files = repoSys.getCommitedFiles(commitDb);
-			for(FileDB file : files){
-				
-				int index = filesDb.indexOf(file);
-				FileXCommitDB fxcDb = file.getFileXCommits().get(0);
-				if(index == -1){
-					filesDb.add(file);
-					file.setFileXCommits(null);
-					fxcDb.setFile(file);
-				}else{
-					FileDB fileDb = filesDb.get(index);
-					fxcDb.setFile(fileDb);
-				}
+    List<FileDB> filesDb = new ArrayList<FileDB>();
+    List<FileXCommitDB> filesXCommitsDb = new ArrayList<FileXCommitDB>();
 
-				filesXCommitsDb.add(fxcDb);
-				
-			}
-			
-		}
-		
-		fileDao.batchSave(filesDb);
-		
-		for(FileXCommitDB fxc : filesXCommitsDb){
-			fxc.getId().setFileId(fxc.getFile().getId());
-			fxc.setFile(null);
-		}
-		fileXCommitDao.batchSave(filesXCommitsDb);
-		
-	}
+    FileXCommitDAO fileXCommitDao = new FileXCommitDAOImpl();
+    FileDAO fileDao = new FileDAOImpl();
+
+    fileDao.setEntityManager(entityManager);
+    fileXCommitDao.setEntityManager(entityManager);
+
+    for(CommitDB commitDb : commitsDb){
+
+      List<FileDB> files = repoSys.getCommitedFiles(commitDb);
+      for(FileDB file : files){
+
+        int index = filesDb.indexOf(file);
+        FileXCommitDB fxcDb = file.getFileXCommits().get(0);
+        if(index == -1){
+          filesDb.add(file);
+          file.setFileXCommits(null);
+          fxcDb.setFile(file);
+        }else{
+          FileDB fileDb = filesDb.get(index);
+          fxcDb.setFile(fileDb);
+        }
+
+        filesXCommitsDb.add(fxcDb);
+
+      }
+
+    }
+
+    fileDao.batchSave(filesDb);
+
+    for(FileXCommitDB fxc : filesXCommitsDb){
+      fxc.getId().setFileId(fxc.getFile().getId());
+      fxc.setFile(null);
+    }
+    fileXCommitDao.batchSave(filesXCommitsDb);
+
+  }
 
 }

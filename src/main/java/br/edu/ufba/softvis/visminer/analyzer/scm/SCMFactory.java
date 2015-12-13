@@ -25,14 +25,12 @@ public class SCMFactory {
 	
 	//Checks if git is installed, if yes git is used, otherwise jgit is used.
 	private static SCM checkGIT(){
-		
 		try {
 			Runtime.getRuntime().exec("git --version");
 			return new GitRepository();
 		} catch (IOException e) {
 			return new JGitRepository();
 		}
-		
 	}
 	
 }

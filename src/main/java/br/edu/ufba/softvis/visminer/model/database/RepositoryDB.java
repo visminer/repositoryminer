@@ -27,306 +27,308 @@ import br.edu.ufba.softvis.visminer.model.business.Repository;
 @Entity
 @Table(name = "repository")
 @NamedQueries({
-	@NamedQuery(name = "RepositoryDB.findByUid", query = "select r from RepositoryDB r where r.uid = :uid"),
-	@NamedQuery(name = "RepositoryDB.countByUid", query = "select count(r) from RepositoryDB r where r.uid = :uid")})
+  @NamedQuery(name = "RepositoryDB.findByUid", query = "select r from RepositoryDB r where "
+      + "r.uid = :uid"),
+  @NamedQuery(name = "RepositoryDB.countByUid", query = "select count(r) from RepositoryDB r where"
+      + " r.uid = :uid")})
 public class RepositoryDB implements Serializable {
-	private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-	@Id
-	@SequenceGenerator(name = "REPOSITORY_ID_GENERATOR", sequenceName = "REPOSITORY_SEQ")
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "REPOSITORY_ID_GENERATOR")
-	@Column(unique = true, nullable = false)
-	private int id;
+  @Id
+  @SequenceGenerator(name = "REPOSITORY_ID_GENERATOR", sequenceName = "REPOSITORY_SEQ")
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "REPOSITORY_ID_GENERATOR")
+  @Column(unique = true, nullable = false)
+  private int id;
 
-	@Lob
-	private String description;
+  @Lob
+  private String description;
 
-	@Column(nullable = true, length = 100)
-	private String name;
+  @Column(nullable = true, length = 100)
+  private String name;
 
-	@Column(nullable = true, length = 100)
-	private String owner;
-	
-	@Column(nullable = false, length = 1024)
-	private String path;
+  @Column(nullable = true, length = 100)
+  private String owner;
 
-	@Column(nullable = false)
-	private int type;
+  @Column(nullable = false, length = 1024)
+  private String path;
 
-	@Column(name = "service_type", nullable = false)
-	private int serviceType;
+  @Column(nullable = false)
+  private int type;
 
-	@Column(unique = true, nullable = false, length = 40)
-	private String uid;
+  @Column(name = "service_type", nullable = false)
+  private int serviceType;
 
-	@ManyToMany(mappedBy = "repositories")
-	private List<CommitterDB> committers;
+  @Column(unique = true, nullable = false, length = 40)
+  private String uid;
 
-	// bi-directional many-to-one association to IssueDB
-	@OneToMany(mappedBy = "repository")
-	private List<IssueDB> issues;
+  @ManyToMany(mappedBy = "repositories")
+  private List<CommitterDB> committers;
 
-	// bi-directional many-to-one association to MilestoneDB
-	@OneToMany(mappedBy = "repository")
-	private List<MilestoneDB> milestones;
+  // bi-directional many-to-one association to IssueDB
+  @OneToMany(mappedBy = "repository")
+  private List<IssueDB> issues;
 
-	// bi-directional many-to-one association to SoftwareUnitDB
-	@OneToMany(mappedBy = "repository")
-	private List<SoftwareUnitDB> softwareUnits;
+  // bi-directional many-to-one association to MilestoneDB
+  @OneToMany(mappedBy = "repository")
+  private List<MilestoneDB> milestones;
 
-	// bi-directional many-to-one association to TreeDB
-	@OneToMany(mappedBy = "repository")
-	private List<TreeDB> trees;
+  // bi-directional many-to-one association to SoftwareUnitDB
+  @OneToMany(mappedBy = "repository")
+  private List<SoftwareUnitDB> softwareUnits;
 
-	public RepositoryDB() {
-	}
+  // bi-directional many-to-one association to TreeDB
+  @OneToMany(mappedBy = "repository")
+  private List<TreeDB> trees;
 
-	public RepositoryDB(int id, String description, String name, String owner,
-			String path, SCMType type,	WebSCMType serviceType,
-			String uid) {
-		
-		super();
-		this.id = id;
-		this.description = description;
-		this.name = name;
-		this.owner = owner;
-		this.path = path;
-		this.type = type != null ? type.getId() : 0;
-		this.serviceType = serviceType != null ? serviceType.getId() : 0;
-		this.uid = uid;
-		
-	}
+  public RepositoryDB() {
+  }
 
-	/**
-	 * @return the id
-	 */
-	public int getId() {
-		return id;
-	}
+  public RepositoryDB(int id, String description, String name, String owner,
+      String path, SCMType type,	WebSCMType serviceType,
+      String uid) {
 
-	/**
-	 * @param id
-	 *            the id to set
-	 */
-	public void setId(int id) {
-		this.id = id;
-	}
+    super();
+    this.id = id;
+    this.description = description;
+    this.name = name;
+    this.owner = owner;
+    this.path = path;
+    this.type = type != null ? type.getId() : 0;
+    this.serviceType = serviceType != null ? serviceType.getId() : 0;
+    this.uid = uid;
 
-	/**
-	 * @return the description
-	 */
-	public String getDescription() {
-		return description;
-	}
+  }
 
-	/**
-	 * @param description
-	 * the description to set
-	 */
-	public void setDescription(String description) {
-		this.description = description;
-	}
+  /**
+   * @return the id
+   */
+  public int getId() {
+    return id;
+  }
 
-	/**
-	 * @return the name
-	 */
-	public String getName() {
-		return name;
-	}
+  /**
+   * @param id
+   *            the id to set
+   */
+  public void setId(int id) {
+    this.id = id;
+  }
 
-	/**
-	 * @param name
-	 *            the name to set
-	 */
-	public void setName(String name) {
-		this.name = name;
-	}
+  /**
+   * @return the description
+   */
+  public String getDescription() {
+    return description;
+  }
 
-	/**
-	 * @return the owner
-	 */
-	public String getOwner() {
-		return owner;
-	}
+  /**
+   * @param description
+   * the description to set
+   */
+  public void setDescription(String description) {
+    this.description = description;
+  }
 
-	/**
-	 * @param owner the owner to set
-	 */
-	public void setOwner(String owner) {
-		this.owner = owner;
-	}
+  /**
+   * @return the name
+   */
+  public String getName() {
+    return name;
+  }
 
-	/**
-	 * @return the path
-	 */
-	public String getPath() {
-		return path;
-	}
+  /**
+   * @param name
+   *            the name to set
+   */
+  public void setName(String name) {
+    this.name = name;
+  }
 
-	/**
-	 * @param path
-	 *            the path to set
-	 */
-	public void setPath(String path) {
-		this.path = path;
-	}
+  /**
+   * @return the owner
+   */
+  public String getOwner() {
+    return owner;
+  }
 
-	/**
-	 * @return the type
-	 */
-	public SCMType getType() {
-		return SCMType.parse(type);
-	}
+  /**
+   * @param owner the owner to set
+   */
+  public void setOwner(String owner) {
+    this.owner = owner;
+  }
 
-	/**
-	 * @param type
-	 *            the type to set
-	 */
-	public void setType(SCMType type) {
-		this.type = type != null ? type.getId() : 0;
-	}
+  /**
+   * @return the path
+   */
+  public String getPath() {
+    return path;
+  }
 
-	/**
-	 * @return the serviceType
-	 */
-	public WebSCMType getServiceType() {
-		return WebSCMType.parse(serviceType);
-	}
+  /**
+   * @param path
+   *            the path to set
+   */
+  public void setPath(String path) {
+    this.path = path;
+  }
 
-	/**
-	 * @param serviceType
-	 *            the serviceType to set
-	 */
-	public void setServiceType(WebSCMType serviceType) {
-		this.serviceType = serviceType != null ? serviceType.getId() : 0;
-	}
+  /**
+   * @return the type
+   */
+  public SCMType getType() {
+    return SCMType.parse(type);
+  }
 
-	/**
-	 * @return the uid
-	 */
-	public String getUid() {
-		return uid;
-	}
+  /**
+   * @param type
+   *            the type to set
+   */
+  public void setType(SCMType type) {
+    this.type = type != null ? type.getId() : 0;
+  }
 
-	/**
-	 * @param uid
-	 *            the uid to set
-	 */
-	public void setUid(String uid) {
-		this.uid = uid;
-	}
+  /**
+   * @return the serviceType
+   */
+  public WebSCMType getServiceType() {
+    return WebSCMType.parse(serviceType);
+  }
 
-	/**
-	 * @return the committers
-	 */
-	public List<CommitterDB> getCommitters() {
-		return committers;
-	}
+  /**
+   * @param serviceType
+   *            the serviceType to set
+   */
+  public void setServiceType(WebSCMType serviceType) {
+    this.serviceType = serviceType != null ? serviceType.getId() : 0;
+  }
 
-	/**
-	 * @param committers
-	 *            the committers to set
-	 */
-	public void setCommitters(List<CommitterDB> committers) {
-		this.committers = committers;
-	}
+  /**
+   * @return the uid
+   */
+  public String getUid() {
+    return uid;
+  }
 
-	/**
-	 * @return the issues
-	 */
-	public List<IssueDB> getIssues() {
-		return issues;
-	}
+  /**
+   * @param uid
+   *            the uid to set
+   */
+  public void setUid(String uid) {
+    this.uid = uid;
+  }
 
-	/**
-	 * @param issues
-	 *            the issues to set
-	 */
-	public void setIssues(List<IssueDB> issues) {
-		this.issues = issues;
-	}
+  /**
+   * @return the committers
+   */
+  public List<CommitterDB> getCommitters() {
+    return committers;
+  }
 
-	/**
-	 * @return the milestones
-	 */
-	public List<MilestoneDB> getMilestones() {
-		return milestones;
-	}
+  /**
+   * @param committers
+   *            the committers to set
+   */
+  public void setCommitters(List<CommitterDB> committers) {
+    this.committers = committers;
+  }
 
-	/**
-	 * @param milestones
-	 *            the milestones to set
-	 */
-	public void setMilestones(List<MilestoneDB> milestones) {
-		this.milestones = milestones;
-	}
+  /**
+   * @return the issues
+   */
+  public List<IssueDB> getIssues() {
+    return issues;
+  }
 
-	/**
-	 * @return the softwareUnits
-	 */
-	public List<SoftwareUnitDB> getSoftwareUnits() {
-		return softwareUnits;
-	}
+  /**
+   * @param issues
+   *            the issues to set
+   */
+  public void setIssues(List<IssueDB> issues) {
+    this.issues = issues;
+  }
 
-	/**
-	 * @param softwareUnits
-	 *            the softwareUnits to set
-	 */
-	public void setSoftwareUnits(List<SoftwareUnitDB> softwareUnits) {
-		this.softwareUnits = softwareUnits;
-	}
+  /**
+   * @return the milestones
+   */
+  public List<MilestoneDB> getMilestones() {
+    return milestones;
+  }
 
-	/**
-	 * @return the trees
-	 */
-	public List<TreeDB> getTrees() {
-		return trees;
-	}
+  /**
+   * @param milestones
+   *            the milestones to set
+   */
+  public void setMilestones(List<MilestoneDB> milestones) {
+    this.milestones = milestones;
+  }
 
-	/**
-	 * @param trees
-	 *            the trees to set
-	 */
-	public void setTrees(List<TreeDB> trees) {
-		this.trees = trees;
-	}
+  /**
+   * @return the softwareUnits
+   */
+  public List<SoftwareUnitDB> getSoftwareUnits() {
+    return softwareUnits;
+  }
 
-	/**
-	 * @return the bizz representation of Repository
-	 */
-	public Repository toBusiness() {
-		
-		return new Repository(id, description, name, path, owner,
-				getType(), getServiceType(), uid);
-		
-	}
+  /**
+   * @param softwareUnits
+   *            the softwareUnits to set
+   */
+  public void setSoftwareUnits(List<SoftwareUnitDB> softwareUnits) {
+    this.softwareUnits = softwareUnits;
+  }
 
-	/**
-	 * Converts from DB beans to Bizz beans
-	 * 
-	 * @param repositories
-	 *            collection of RepositoryDB instances
-	 * @return collection of "Business" repositories
-	 */
-	public static List<Repository> toBusiness(List<RepositoryDB> repositories) {
-		
-		List<Repository> bizzRepos = new ArrayList<Repository>();
-		
-		if(repositories == null)
-			return bizzRepos;
-		
-		for (RepositoryDB repo : repositories) {
-			Repository repository = new Repository(repo.getId(),
-					repo.getDescription(), repo.getName(), repo.getPath(),
-					repo.getOwner(), repo.getType(), repo.getServiceType(),
-					repo.getUid());
-			repository.setTrees(TreeDB.toBusiness(repo.getTrees()));
-			repository.setCommitters(CommitterDB.toBusiness(repo.getCommitters()));
-			
-			bizzRepos.add(repository);
-		}
+  /**
+   * @return the trees
+   */
+  public List<TreeDB> getTrees() {
+    return trees;
+  }
 
-		return bizzRepos;
-	}
+  /**
+   * @param trees
+   *            the trees to set
+   */
+  public void setTrees(List<TreeDB> trees) {
+    this.trees = trees;
+  }
+
+  /**
+   * @return the bizz representation of Repository
+   */
+  public Repository toBusiness() {
+
+    return new Repository(id, description, name, path, owner,
+        getType(), getServiceType(), uid);
+
+  }
+
+  /**
+   * Converts from DB beans to Bizz beans
+   * 
+   * @param repositories
+   *            collection of RepositoryDB instances
+   * @return collection of "Business" repositories
+   */
+  public static List<Repository> toBusiness(List<RepositoryDB> repositories) {
+
+    List<Repository> bizzRepos = new ArrayList<Repository>();
+
+    if(repositories == null)
+      return bizzRepos;
+
+    for (RepositoryDB repo : repositories) {
+      Repository repository = new Repository(repo.getId(),
+          repo.getDescription(), repo.getName(), repo.getPath(),
+          repo.getOwner(), repo.getType(), repo.getServiceType(),
+          repo.getUid());
+      repository.setTrees(TreeDB.toBusiness(repo.getTrees()));
+      repository.setCommitters(CommitterDB.toBusiness(repo.getCommitters()));
+
+      bizzRepos.add(repository);
+    }
+
+    return bizzRepos;
+  }
 
 }

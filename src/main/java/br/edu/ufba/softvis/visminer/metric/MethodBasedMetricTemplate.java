@@ -13,49 +13,49 @@ import br.edu.ufba.softvis.visminer.model.business.Commit;
 import br.edu.ufba.softvis.visminer.persistence.MetricPersistance;
 
 public abstract class MethodBasedMetricTemplate  implements IMetric {
-	
-	protected List<Commit> commits;
-	protected MetricPersistance persistence;
-	protected TypeDeclaration currentType;
-	protected List<FieldDeclaration> currentFields = new ArrayList<FieldDeclaration>();
 
-	@Override
-	public void calculate(List<AST> astList, List<Commit> commits, MetricPersistance persistence){
-		
-		this.commits = commits;
-		this.persistence = persistence;
-		
-		for(AST ast : astList){
-			
-			if(ast.getDocument().getTypes() == null){
-				continue;
-			}
+  protected List<Commit> commits;
+  protected MetricPersistance persistence;
+  protected TypeDeclaration currentType;
+  protected List<FieldDeclaration> currentFields = new ArrayList<FieldDeclaration>();
 
-			for(TypeDeclaration type : ast.getDocument().getTypes()){
-				
-				ClassOrInterfaceDeclaration cls = null;
-				if(type.getType() == SoftwareUnitType.CLASS_OR_INTERFACE){
-					cls = (ClassOrInterfaceDeclaration) type;
-				}else{
-					continue;
-				}
-				
-				if(cls.getMethods() == null){
-					continue;
-				}
-				
-				if(cls.getFields()!= null)
-					currentFields = cls.getFields();
-				
-				currentType = type;
-				
-				
-				calculate(cls.getMethods());
-			}
+  @Override
+  public void calculate(List<AST> astList, List<Commit> commits, MetricPersistance persistence){
 
-		}
-	}
-	
-	public abstract void calculate(List<MethodDeclaration> methods);
+    this.commits = commits;
+    this.persistence = persistence;
+
+    for(AST ast : astList){
+
+      if(ast.getDocument().getTypes() == null){
+        continue;
+      }
+
+      for(TypeDeclaration type : ast.getDocument().getTypes()){
+
+        ClassOrInterfaceDeclaration cls = null;
+        if(type.getType() == SoftwareUnitType.CLASS_OR_INTERFACE){
+          cls = (ClassOrInterfaceDeclaration) type;
+        }else{
+          continue;
+        }
+
+        if(cls.getMethods() == null){
+          continue;
+        }
+
+        if(cls.getFields()!= null)
+          currentFields = cls.getFields();
+
+        currentType = type;
+
+
+        calculate(cls.getMethods());
+      }
+
+    }
+  }
+
+  public abstract void calculate(List<MethodDeclaration> methods);
 
 }

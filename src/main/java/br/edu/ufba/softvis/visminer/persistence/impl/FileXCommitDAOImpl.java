@@ -14,17 +14,19 @@ import br.edu.ufba.softvis.visminer.persistence.dao.FileXCommitDAO;
  */
 
 @SuppressWarnings("unchecked")
-public class FileXCommitDAOImpl extends DAOImpl<FileXCommitDB, FileXCommitPK> implements FileXCommitDAO {
+public class FileXCommitDAOImpl extends DAOImpl<FileXCommitDB, FileXCommitPK>
+implements FileXCommitDAO {
 
-	@Override
-	public List<FileXCommitDB> findByCommit(int commitId) {
-		
-		EntityManager em = getEntityManager();
-		TypedQuery<FileXCommitDB> query = em.createNamedQuery("FileXCommitDB.findByCommit", FileXCommitDB.class);
-		query.setParameter("commitId", commitId);
-		return getResultList(query);
-		
-	}
+  @Override
+  public List<FileXCommitDB> findByCommit(int commitId) {
+
+    EntityManager em = getEntityManager();
+    TypedQuery<FileXCommitDB> query = em.createNamedQuery(
+        "FileXCommitDB.findByCommit", FileXCommitDB.class);
+    query.setParameter("commitId", commitId);
+    return getResultList(query);
+
+  }
 
 
 }

@@ -13,28 +13,31 @@ import br.edu.ufba.softvis.visminer.persistence.dao.CommitterDAO;
  */
 
 @SuppressWarnings("unchecked")
-public class CommitterDAOImpl extends DAOImpl<CommitterDB, Integer> implements CommitterDAO {
+public class CommitterDAOImpl extends DAOImpl<CommitterDB, Integer>
+implements CommitterDAO {
 
-	@Override
-	public CommitterDB findByEmail(String email) {
-		
-		EntityManager em = getEntityManager();
-		TypedQuery<CommitterDB> query = em.createNamedQuery("CommitterDB.findByEmail", CommitterDB.class);
-		query.setParameter("email", email);
-		return (CommitterDB) getSingleResult(query);
-		
-	}
+  @Override
+  public CommitterDB findByEmail(String email) {
 
-	@Override
-	public List<CommitterDB> findByRepository(int repositoryId) {
-	
-		EntityManager em = getEntityManager();
-		TypedQuery<CommitterDB> query = em.createNamedQuery("CommitterDB.findByRepository", CommitterDB.class);
-		query.setHint("javax.persistence.cache.storeMode", "BYPASS");
-		query.setHint("javax.persistence.cache.retrieveMode", "BYPASS");
-		query.setParameter("repositoryId", repositoryId);
-		return getResultList(query);
-		
-	}
+    EntityManager em = getEntityManager();
+    TypedQuery<CommitterDB> query = em.createNamedQuery(
+        "CommitterDB.findByEmail", CommitterDB.class);
+    query.setParameter("email", email);
+    return (CommitterDB) getSingleResult(query);
+
+  }
+
+  @Override
+  public List<CommitterDB> findByRepository(int repositoryId) {
+
+    EntityManager em = getEntityManager();
+    TypedQuery<CommitterDB> query = em.createNamedQuery(
+        "CommitterDB.findByRepository", CommitterDB.class);
+    query.setHint("javax.persistence.cache.storeMode", "BYPASS");
+    query.setHint("javax.persistence.cache.retrieveMode", "BYPASS");
+    query.setParameter("repositoryId", repositoryId);
+    return getResultList(query);
+
+  }
 
 }

@@ -1,8 +1,8 @@
 package br.edu.ufba.softvis.visminer.test;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 
-import br.edu.ufba.softvis.visminer.config.DBConfig;
 import br.edu.ufba.softvis.visminer.constant.LanguageType;
 import br.edu.ufba.softvis.visminer.constant.MetricUid;
 import br.edu.ufba.softvis.visminer.constant.SCMType;
@@ -11,88 +11,83 @@ import br.edu.ufba.softvis.visminer.model.business.Repository;
 import br.edu.ufba.softvis.visminer.retriever.RepositoryRetriever;
 
 public class VisminerTest {
-	
-	private VisMiner visminer;
-	private Repository repository;
-	private RepositoryRetriever repoRetriever;
-	
-	private String repositoryPath = "C:\\Users\\felipe\\test-felipe\\Visminer-Test"; 
-	private static VisminerTest vt;
 
-	private VisminerTest() {
-		
-		visminer = new VisMiner();
-		configParameters();
-		repoRetriever = new RepositoryRetriever();
-		
-		if (!isRepositoryProcessed()) {
-			startRepository();
-		}
+  private static final String PROPS_FILE = "resources/test/test-db.properties";
 
-		repository = repoRetriever.retrieveByPath(repositoryPath);
-		repository.explore();
+  private static final String REPOSITORY_DESCRIPTION = "test";
+  private static final String REPOSITORY_OWNER = "test";
+  private static final String REPOSITORY_NAME = "test";
+  private static final SCMType REPOSTIROY_TYPE = SCMType.GIT;
+  private final String REPOSITORY_PATH = "C:\\Users\\felipe\\git\\java";
+  private final List<MetricUid> METRICS = Arrays.asList(MetricUid.ATFD, MetricUid.CC, MetricUid.NOCAI,
+      MetricUid.SLOC, MetricUid.TCC, MetricUid.WMC);
+  private final List<LanguageType> LANGS = Arrays.asList(LanguageType.JAVA, LanguageType.NONE);
 
-	}
+  private VisMiner visminer;
+  private Repository repository;
+  private RepositoryRetriever repoRetriever;
+  private static VisminerTest vt;
 
-	public static VisminerTest getInstance() {
+  private VisminerTest() {
 
-		if (vt == null) {
-			vt = new VisminerTest();
-		}
-		return vt;
-		
-	}
+    visminer = new VisMiner();
+    configParameters();
+    repoRetriever = new RepositoryRetriever();
 
-	public VisMiner getVisminer() {
-		return visminer;
-	}
+    if (!isRepositoryProcessed()) {
+      startRepository();
+    }
 
-	public Repository getRepository() {
-		return repository;
-	}
+    repository = repoRetriever.retrieveByPath(REPOSITORY_PATH);
+    repository.explore();
 
-	public RepositoryRetriever getRepositoryRetriever() {
-		return repoRetriever;
-	}
+  }
 
-	/*
-	 * change the parameters accordingly
-	 * */
-	private void configParameters() {
+  public static VisminerTest getInstance() {
 
-		DBConfig dbConfig = new DBConfig();
-		dbConfig.setDriver("com.mysql.jdbc.Driver");
-		dbConfig.setUrl("jdbc:mysql://localhost/visminer");
-		dbConfig.setUser("root");
-		dbConfig.setPassword("1234");
-		dbConfig.setGeneration("drop-and-create-tables");
-		dbConfig.setLogging("off");
-		visminer.setDBConfig(dbConfig);
+    if (vt == null) {
+      vt = new VisminerTest();
+    }
+    return vt;
 
-	}
+  }
 
-	private void startRepository() {
+  public VisMiner getVisminer() {
+    return visminer;
+  }
 
-		Repository repository = new Repository();
-		repository.setDescription("Repositório do Visminer");
-		repository.setOwner("visminer");
-		repository.setName("Visminer");
-		repository.setPath(repositoryPath);
-		repository.setType(SCMType.GIT);
+  public Repository getRepository() {
+    return repository;
+  }
 
-		MetricUid[] metrics = {MetricUid.ATFD, MetricUid.CC, MetricUid.NOCAI, MetricUid.SLOC, MetricUid.TCC, MetricUid.WMC};
-		LanguageType[] langs = {LanguageType.JAVA, LanguageType.NONE};
-		
-		try {
-			visminer.persistRepository(repository, Arrays.asList(metrics), Arrays.asList(langs));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+  public RepositoryRetriever getRepositoryRetriever() {
+    return repoRetriever;
+  }
 
-	}
+  private void configParameters() {
+    visminer.setDBConfig(PROPS_FILE);
+  }
 
-	private boolean isRepositoryProcessed() {
-		return visminer.checkRepository(repositoryPath);
-	}
-	
+  private void startRepository() {
+
+    Repository repository = new Repository();
+    repository.setDescription(REPOSITORY_DESCRIPTION);
+    repository.setOwner(REPOSITORY_OWNER);
+    repository.setName(REPOSITORY_NAME);
+    repository.setPath(REPOSITORY_PATH);
+    repository.setType(REPOSTIROY_TYPE);
+
+    try {
+      visminer.persistRepository(repository, METRICS,
+          LANGS);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+
+  }
+
+  private boolean isRepositoryProcessed() {
+    return visminer.checkRepository(REPOSITORY_PATH);
+  }
+
 }

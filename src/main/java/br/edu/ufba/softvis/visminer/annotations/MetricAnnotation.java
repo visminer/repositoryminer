@@ -9,10 +9,8 @@ import br.edu.ufba.softvis.visminer.constant.MetricType;
 import br.edu.ufba.softvis.visminer.constant.MetricUid;
 
 /**
- * @version 0.9
  * Annotations to define informations about metrics.
  */
-
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface MetricAnnotation {
@@ -43,7 +41,6 @@ public @interface MetricAnnotation {
 	 * @see MetricType
 	 */
 	public MetricType type();
-
 	
 	/**
 	 * @return Requisited metrics

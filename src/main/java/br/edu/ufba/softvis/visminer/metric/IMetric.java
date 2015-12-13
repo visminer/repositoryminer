@@ -11,6 +11,6 @@ import br.edu.ufba.softvis.visminer.persistence.MetricPersistance;
  */
 public interface IMetric {
 
-	public void calculate(List<AST> astList, List<Commit> commits, MetricPersistance persistence);
-	
+  public void calculate(List<AST> astList, List<Commit> commits, MetricPersistance persistence);
+
 }

@@ -14,14 +14,15 @@ import br.edu.ufba.softvis.visminer.persistence.dao.TreeDAO;
 @SuppressWarnings("unchecked")
 public class TreeDAOImpl extends DAOImpl<TreeDB, Integer> implements TreeDAO{
 
-	@Override
-	public List<TreeDB> findByRepository(int repositoryId) {
-		
-		EntityManager em = getEntityManager();
-		TypedQuery<TreeDB> query = em.createNamedQuery("TreeDB.findByRepository", TreeDB.class);
-		query.setParameter("repositoryId", repositoryId);
-		return getResultList(query);
-		
-	}
+  @Override
+  public List<TreeDB> findByRepository(int repositoryId) {
+
+    EntityManager em = getEntityManager();
+    TypedQuery<TreeDB> query = em.createNamedQuery(
+        "TreeDB.findByRepository", TreeDB.class);
+    query.setParameter("repositoryId", repositoryId);
+    return getResultList(query);
+
+  }
 
 }

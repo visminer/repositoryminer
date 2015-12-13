@@ -9,18 +9,18 @@ import br.edu.ufba.softvis.visminer.persistence.impl.CommitterDAOImpl;
 
 public class CommitterRetriever extends Retriever {
 
-	public List<Committer> findCommitters(int repositoryId) {
+  public List<Committer> findCommitters(int repositoryId) {
 
-		CommitterDAO committerDAO = new CommitterDAOImpl();
-		super.createEntityManager();
-		super.shareEntityManager(committerDAO);
+    CommitterDAO committerDAO = new CommitterDAOImpl();
+    super.createEntityManager();
+    super.shareEntityManager(committerDAO);
 
-		List<CommitterDB> committersDb = committerDAO
-				.findByRepository(repositoryId);
+    List<CommitterDB> committersDb = committerDAO
+        .findByRepository(repositoryId);
 
-		super.closeEntityManager();
-		return CommitterDB.toBusiness(committersDb);
-		
-	}
+    super.closeEntityManager();
+    return CommitterDB.toBusiness(committersDb);
+
+  }
 
 }
