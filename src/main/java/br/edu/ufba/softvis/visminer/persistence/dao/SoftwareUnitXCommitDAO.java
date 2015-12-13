@@ -1,5 +1,8 @@
 package br.edu.ufba.softvis.visminer.persistence.dao;
 
+
+import java.util.Iterator;
+
 import br.edu.ufba.softvis.visminer.model.database.SoftwareUnitXCommitDB;
 import br.edu.ufba.softvis.visminer.model.database.SoftwareUnitXCommitPK;
 
@@ -8,4 +11,6 @@ import br.edu.ufba.softvis.visminer.model.database.SoftwareUnitXCommitPK;
  */
 public interface SoftwareUnitXCommitDAO extends DAO<SoftwareUnitXCommitDB, SoftwareUnitXCommitPK> {
 
+  public void batchSave(Iterator<Integer> suIds, int commitId);
+  
 }

@@ -175,13 +175,13 @@ public class MetricCalculator{
       processAST.flushSoftwareUnits(commit.getId());
       calculationMetricsHelper(commitMetrics, snapshotMetrics, 
           commits.subList(0, i+1), commitASTs, snapshotASTs);
+      persistence.flushAllMetricValues();
 
     }
 
-    persistence.flushAllMetricValues();
-
   }	
 
+  /*
   /*
    * Verifies if field path in file is null, if it's null, get from database set field path and
    * put value into tempFilesPath map.

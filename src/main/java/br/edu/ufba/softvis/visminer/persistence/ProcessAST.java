@@ -1,8 +1,6 @@
 package br.edu.ufba.softvis.visminer.persistence;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.persistence.EntityManager;
@@ -22,8 +20,6 @@ import br.edu.ufba.softvis.visminer.model.business.File;
 import br.edu.ufba.softvis.visminer.model.database.FileDB;
 import br.edu.ufba.softvis.visminer.model.database.RepositoryDB;
 import br.edu.ufba.softvis.visminer.model.database.SoftwareUnitDB;
-import br.edu.ufba.softvis.visminer.model.database.SoftwareUnitXCommitDB;
-import br.edu.ufba.softvis.visminer.model.database.SoftwareUnitXCommitPK;
 import br.edu.ufba.softvis.visminer.persistence.dao.SoftwareUnitDAO;
 import br.edu.ufba.softvis.visminer.persistence.dao.SoftwareUnitXCommitDAO;
 import br.edu.ufba.softvis.visminer.persistence.impl.SoftwareUnitDAOImpl;
@@ -287,17 +283,7 @@ public class ProcessAST {
    * Persists in database the relationship between software unit and commit.
    */
   public void flushSoftwareUnits(int commitId){
-
-    List<SoftwareUnitXCommitDB> list = new ArrayList
-        <SoftwareUnitXCommitDB>();
-    for(Integer softUnitId : snapshotUids.values()){
-      SoftwareUnitXCommitPK pk = new SoftwareUnitXCommitPK(softUnitId,
-          commitId);
-      SoftwareUnitXCommitDB elem = new SoftwareUnitXCommitDB(pk);
-      list.add(elem);
-    }
-    softUnitXCommitDAO.batchSave(list);
-
+    softUnitXCommitDAO.batchSave(snapshotUids.values().iterator(), commitId);
   }
 
   // Converts path to sha1 hash

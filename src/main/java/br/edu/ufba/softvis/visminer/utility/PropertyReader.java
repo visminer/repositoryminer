@@ -26,11 +26,20 @@ public class PropertyReader {
   }
 
   /**
-   * @param property
+   * @param property The name of the property
+   * @param defaultValue The default value if the property does not exists
    * @return The value of the property
    */
+  public String getProperty(String property, String defaultValue){
+    return properties.getProperty(property, defaultValue);
+  }
+  
+  /**
+   * @param property The name of the property
+   * @return The value of the property, if the property does not exists null is returned
+   */
   public String getProperty(String property){
-    return properties.getProperty(property);
+    return properties.getProperty(property, null);
   }
 
 }
