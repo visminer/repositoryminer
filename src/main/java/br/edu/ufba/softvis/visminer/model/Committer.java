@@ -1,42 +1,28 @@
-package br.edu.ufba.softvis.visminer.model.business;
+package br.edu.ufba.softvis.visminer.model;
+
+import org.bson.Document;
 
 /**
- * User friendly committer bean class.
- * This class will be used for user interface.
+ * User friendly committer bean class. This class will be used for user
+ * interface.
  */
-
 public class Committer {
 
-	private int id;
 	private String email;
 	private String name;
-	
-	public Committer(){}
+
+	public Committer() {
+	}
 
 	/**
 	 * @param id
 	 * @param email
 	 * @param name
 	 */
-	public Committer(int id, String email, String name) {
+	public Committer(String email, String name) {
 		super();
-		this.id = id;
 		this.email = email;
 		this.name = name;
-	}
-
-	/**
-	 * @return the id
-	 */
-	public int getId() {
-		return id;
-	}
-
-	/**
-	 * @param id the id to set
-	 */
-	public void setId(int id) {
-		this.id = id;
 	}
 
 	/**
@@ -47,7 +33,8 @@ public class Committer {
 	}
 
 	/**
-	 * @param email the email to set
+	 * @param email
+	 *            the email to set
 	 */
 	public void setEmail(String email) {
 		this.email = email;
@@ -61,18 +48,26 @@ public class Committer {
 	}
 
 	/**
-	 * @param name the name to set
+	 * @param name
+	 *            the name to set
 	 */
 	public void setName(String name) {
 		this.name = name;
 	}
 
+	/**
+	 * @return mongo's document format of committer
+	 */
+	public Document toDocument() {
+		Document doc = new Document("email", getEmail()).append("message",
+				getName());
+
+		return doc;
+	}
+
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + id;
-		return result;
+		return email.hashCode();
 	}
 
 	@Override
@@ -86,11 +81,9 @@ public class Committer {
 		if (!(obj instanceof Committer)) {
 			return false;
 		}
+
 		Committer other = (Committer) obj;
-		if (id != other.id) {
-			return false;
-		}
-		return true;
+		return email.equals(other.getEmail());
 	}
-	
+
 }

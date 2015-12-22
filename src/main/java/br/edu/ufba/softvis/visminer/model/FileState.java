@@ -1,4 +1,4 @@
-package br.edu.ufba.softvis.visminer.model.business;
+package br.edu.ufba.softvis.visminer.model;
 
 import br.edu.ufba.softvis.visminer.constant.ChangeType;
 

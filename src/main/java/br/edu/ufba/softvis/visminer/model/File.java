@@ -1,112 +1,92 @@
-package br.edu.ufba.softvis.visminer.model.business;
+package br.edu.ufba.softvis.visminer.model;
 
-import java.util.List;
+import org.bson.Document;
+
+import br.edu.ufba.softvis.visminer.constant.ChangeType;
 
 /**
  * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
- * @version 0.9
- * User friendly file bean class.
- * This class will be used for user interface.
+ * @version 0.9 User friendly file bean class. This class will be used for user
+ *          interface.
  */
-
 public class File {
-	
-	private int id;
-	private String path;
+
 	private String uid;
+	private String path;
 	private FileState fileState;
-	private List<SoftwareUnit> softwareUnits;
-	
-	public File(){}
-	
-	/**
-	 * @param id
-	 * @param path
-	 * @param uid
-	 */
-	public File(int id, String path, String uid) {
+
+	public File() {
+		this.fileState = new FileState();
+	}
+
+	public File(String uid, String path) {
 		super();
-		this.id = id;
-		this.path = path;
+
 		this.uid = uid;
-	}
-
-	/**
-	 * @return the id
-	 */
-	public int getId() {
-		return id;
-	}
-
-	/**
-	 * @param id the id to set
-	 */
-	public void setId(int id) {
-		this.id = id;
-	}
-
-	/**
-	 * @return the path
-	 */
-	public String getPath() {
-		return path;
-	}
-
-	/**
-	 * @param path the path to set
-	 */
-	public void setPath(String path) {
 		this.path = path;
+		this.fileState = new FileState();
 	}
 
-	/**
-	 * @return the uid
-	 */
 	public String getUid() {
 		return uid;
 	}
 
-	/**
-	 * @param uid the uid to set
-	 */
 	public void setUid(String uid) {
 		this.uid = uid;
 	}
 
-	/**
-	 * @return the fileState
-	 */
+	public String getPath() {
+		return path;
+	}
+
+	public void setPath(String path) {
+		this.path = path;
+	}
+
 	public FileState getFileState() {
 		return fileState;
 	}
 
-	/**
-	 * @param fileState the fileState to set
-	 */
 	public void setFileState(FileState fileState) {
 		this.fileState = fileState;
 	}
 
-	/**
-	 * @return the softwareUnits
-	 */
-	public List<SoftwareUnit> getSoftwareUnits() {
-		return softwareUnits;
+	public ChangeType getChangeType() {
+		return fileState.getChange();
 	}
 
-	/**
-	 * @param softwareUnits the softwareUnits to set
-	 */
-	public void setSoftwareUnits(List<SoftwareUnit> softwareUnits) {
-		this.softwareUnits = softwareUnits;
+	public void setChangeType(ChangeType changeType) {
+		fileState.setChange(changeType);
+	}
+
+	public int getLinesAdded() {
+		return fileState.getLinesAdded();
+	}
+
+	public void setLinesAdded(int linesAdded) {
+		fileState.setLinesAdded(linesAdded);
+	}
+
+	public int getLinesRemoved() {
+		return fileState.getLinesRemoved();
+	}
+
+	public void setLinesRemoved(int linesRemoved) {
+		fileState.setLinesRemoved(linesRemoved);
+	}
+
+	public Document toDocument() {
+		Document doc = new Document("uid", uid).append("path", path)
+				.append("state", fileState.getChange().name())
+				.append("linesAdded", fileState.getLinesAdded())
+				.append("linesRemoved", fileState.getLinesRemoved());
+
+		return doc;
 	}
 
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + id;
-		return result;
+		return uid.hashCode();
 	}
 
 	@Override
@@ -118,10 +98,7 @@ public class File {
 		if (getClass() != obj.getClass())
 			return false;
 		File other = (File) obj;
-		if (id != other.id)
-			return false;
-		return true;
+		return (uid.equals(other.getUid()));
 	}
 
-	
 }

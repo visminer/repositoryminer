@@ -1,51 +1,56 @@
-package br.edu.ufba.softvis.visminer.model.business;
+package br.edu.ufba.softvis.visminer.model;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.bson.Document;
+
 /**
- * User friendly commit bean class.
- * This class will be used for user interface.
+ * User friendly commit bean class. This class will be used for user interface.
  */
-
 public class Commit {
+	private Repository repository;
 
-	private int id;
+	private String uid;
 	private Date date;
 	private String message;
 	private String name;
-	private List<File> commitedFiles;
+
 	private Committer committer;
-	private List<IssueCommand> commands;
-	
-	public Commit(){}
+
+	private List<File> commitedFiles;
+
+	public Commit() {
+	}
 
 	/**
-	 * @param id
+	 * @param uid
 	 * @param date
 	 * @param message
 	 * @param name
 	 */
-	public Commit(int id, Date date, String message, String name) {
+	public Commit(String uid, Date date, String message, String name) {
 		super();
-		this.id = id;
+		this.uid = uid;
 		this.date = date;
 		this.message = message;
 		this.name = name;
 	}
 
 	/**
-	 * @return the id
+	 * @return the uid
 	 */
-	public int getId() {
-		return id;
+	public String getUid() {
+		return uid;
 	}
 
 	/**
-	 * @param id the id to set
+	 * @param sha
+	 *            the uid of the commit
 	 */
-	public void setId(int id) {
-		this.id = id;
+	public void setUid(String uid) {
+		this.uid = uid;
 	}
 
 	/**
@@ -56,7 +61,8 @@ public class Commit {
 	}
 
 	/**
-	 * @param date the date to set
+	 * @param date
+	 *            the date to set
 	 */
 	public void setDate(Date date) {
 		this.date = date;
@@ -70,7 +76,8 @@ public class Commit {
 	}
 
 	/**
-	 * @param message the message to set
+	 * @param message
+	 *            the message to set
 	 */
 	public void setMessage(String message) {
 		this.message = message;
@@ -84,7 +91,8 @@ public class Commit {
 	}
 
 	/**
-	 * @param name the name to set
+	 * @param name
+	 *            the name to set
 	 */
 	public void setName(String name) {
 		this.name = name;
@@ -98,7 +106,8 @@ public class Commit {
 	}
 
 	/**
-	 * @param commitedFiles the commitedFiles to set
+	 * @param commitedFiles
+	 *            the commitedFiles to set
 	 */
 	public void setCommitedFiles(List<File> commitedFiles) {
 		this.commitedFiles = commitedFiles;
@@ -112,32 +121,31 @@ public class Commit {
 	}
 
 	/**
-	 * @param committer the committer to set
+	 * @param committer
+	 *            the committer to set
 	 */
 	public void setCommitter(Committer committer) {
 		this.committer = committer;
 	}
 
 	/**
-	 * @return the commands
+	 * @return the repository
 	 */
-	public List<IssueCommand> getCommands() {
-		return commands;
+	public Repository getRepository() {
+		return repository;
 	}
 
 	/**
-	 * @param commands the commands to set
+	 * @param repository
+	 *            the repository to set
 	 */
-	public void setCommands(List<IssueCommand> commands) {
-		this.commands = commands;
+	public void setRepository(Repository repository) {
+		this.repository = repository;
 	}
 
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + id;
-		return result;
+		return uid.hashCode();
 	}
 
 	@Override
@@ -152,10 +160,34 @@ public class Commit {
 			return false;
 		}
 		Commit other = (Commit) obj;
-		if (id != other.id) {
-			return false;
+		return uid.equals(other.getUid());
+	}
+
+	/**
+	 * @return mongo's document format of commit
+	 */
+	public Document toDocument() {
+		Document doc;
+		if (repository != null) {
+			doc = new Document("repository", getRepository().getUid()).append("uid", getUid());
+		} else {
+			doc = new Document("uid", getUid());
 		}
-		return true;
+		doc.append("date", getDate()).append("name", getName()).append("message", getMessage());
+
+		if (committer != null) {
+			doc.append("committer", committer.toDocument());
+		}
+		if (commitedFiles != null) {
+			List<Document> filesDoc = new ArrayList<Document>();
+			for (File file : commitedFiles) {
+				filesDoc.add(file.toDocument());
+			}
+
+			doc.append("files", filesDoc);
+		}
+
+		return doc;
 	}
 
 }
