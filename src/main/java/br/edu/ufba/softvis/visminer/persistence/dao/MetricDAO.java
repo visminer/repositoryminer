@@ -1,15 +1,15 @@
 package br.edu.ufba.softvis.visminer.persistence.dao;
 
-import br.edu.ufba.softvis.visminer.model.database.MetricDB;
+import java.util.List;
 
-/**
- * 
- * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
- * @version 0.9
- * Metric table DAO interface.
- * 
- */
-public interface MetricDAO extends DAO<MetricDB, Integer>{
+import org.bson.Document;
 
+import br.edu.ufba.softvis.visminer.metric.IMetric;
+
+public interface MetricDAO {
+
+	public void save(Document document);
+	
+	public List<IMetric> findByFile(String uid);
 	
 }
