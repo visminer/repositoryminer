@@ -2,20 +2,20 @@ package br.edu.ufba.softvis.visminer.ast;
 
 public class Project {
 
-	private int id;
+	private String uid;
 	private String name;
 	
 	/**
-	 * @return the id
+	 * @return the uid
 	 */
-	public int getId() {
-		return id;
+	public String getUid() {
+		return uid;
 	}
 	/**
 	 * @param id the id to set
 	 */
-	public void setId(int id) {
-		this.id = id;
+	public void setUid(String uid) {
+		this.uid = uid;
 	}
 	/**
 	 * @return the name

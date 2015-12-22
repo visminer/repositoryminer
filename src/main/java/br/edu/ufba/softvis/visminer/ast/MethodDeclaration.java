@@ -4,7 +4,7 @@ import java.util.List;
 
 public class MethodDeclaration {
 
-	private int id;
+	private String uid;
 	private String name;
 	private List<String> modifiers;
 	private String returnType;
@@ -17,14 +17,14 @@ public class MethodDeclaration {
 	/**
 	 * @return the id
 	 */
-	public int getId() {
-		return id;
+	public String getUid() {
+		return uid;
 	}
 	/**
 	 * @param id the id to set
 	 */
-	public void setId(int id) {
-		this.id = id;
+	public void setUid(String uid) {
+		this.uid = uid;
 	}
 	/**
 	 * @return the name
