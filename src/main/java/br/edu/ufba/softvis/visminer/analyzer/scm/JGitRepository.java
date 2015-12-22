@@ -1,7 +1,6 @@
 package br.edu.ufba.softvis.visminer.analyzer.scm;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -38,19 +37,16 @@ import org.eclipse.jgit.util.io.DisabledOutputStream;
 import br.edu.ufba.softvis.visminer.constant.ChangeType;
 import br.edu.ufba.softvis.visminer.constant.TreeType;
 import br.edu.ufba.softvis.visminer.error.VisMinerAPIException;
-import br.edu.ufba.softvis.visminer.model.database.CommitDB;
-import br.edu.ufba.softvis.visminer.model.database.CommitterDB;
-import br.edu.ufba.softvis.visminer.model.database.FileDB;
-import br.edu.ufba.softvis.visminer.model.database.FileXCommitDB;
-import br.edu.ufba.softvis.visminer.model.database.FileXCommitPK;
-import br.edu.ufba.softvis.visminer.model.database.TreeDB;
+import br.edu.ufba.softvis.visminer.model.Commit;
+import br.edu.ufba.softvis.visminer.model.Committer;
+import br.edu.ufba.softvis.visminer.model.File;
+import br.edu.ufba.softvis.visminer.model.Tree;
 import br.edu.ufba.softvis.visminer.utility.StringUtils;
 
 /**
- * @see SCM
- * Implementation for GIT repositories.
+ * @see SCM Implementation for GIT repositories.
  */
-public class JGitRepository implements SCM{
+public class JGitRepository implements SCM {
 
 	private Repository repository;
 	private Git git;
@@ -58,25 +54,25 @@ public class JGitRepository implements SCM{
 	private TreeWalk treeWalk;
 	private DiffFormatter diffFormatter;
 	private String vmBranch;
-	
+
 	private static final String CHARSET = "UTF-8";
 
 	// Process the repository path
-	private String processPath(String repositoryPath){
+	private String processPath(String repositoryPath) {
 
 		String path = repositoryPath.replace("\\", "/").trim();
 
-		if(path.endsWith("/.git")){
+		if (path.endsWith("/.git")) {
 			return path;
-		}else if(path.endsWith("/.git/")){
-			return path.substring(0, path.length()-1);
-		}else if(path.endsWith("/")){
+		} else if (path.endsWith("/.git/")) {
+			return path.substring(0, path.length() - 1);
+		} else if (path.endsWith("/")) {
 			return path.concat(".git");
-		}else{
+		} else {
 			return path.concat("/.git");
 		}
 
-	}	
+	}
 
 	@Override
 	public void open(String path) {
@@ -86,10 +82,10 @@ public class JGitRepository implements SCM{
 
 		try {
 
-			repository = repositoryBuilder.setGitDir(new File(processedPath))
-					.readEnvironment() //read git environment variables
-					.findGitDir()
-					.build();
+			repository = repositoryBuilder
+					.setGitDir(new java.io.File(processedPath))
+					.readEnvironment() // read git environment variables
+					.findGitDir().build();
 
 		} catch (IOException e) {
 			throw new VisMinerAPIException(e.getMessage(), e);
@@ -106,7 +102,7 @@ public class JGitRepository implements SCM{
 		diffFormatter.setDetectRenames(false);
 
 		vmBranch = "vm";
-		
+
 	}
 
 	@Override
@@ -115,38 +111,40 @@ public class JGitRepository implements SCM{
 	}
 
 	@Override
-	public List<TreeDB> getTrees(){
-
-		try{
-
-			List<TreeDB> trees = new ArrayList<TreeDB>();
+	public List<Tree> getTrees() {
+		try {
+			int id = 1;
+			
+			List<Tree> trees = new ArrayList<Tree>();
 
 			Iterable<Ref> refs = git.branchList().call();
-			for(Ref ref : refs){
-
-				if(ref.getName().equals("HEAD"))
+			for (Ref ref : refs) {
+				if (ref.getName().equals("HEAD"))
 					continue;
 
 				int i = ref.getName().lastIndexOf("/");
-				TreeDB tree = new TreeDB(0, ref.getName(), getLastCommitDate(ref.getName()), ref.getName().substring(++i),
+				Tree tree = new Tree(id, getLastCommitDate(ref.getName()), ref
+						.getName().substring(++i), ref.getName(),
 						TreeType.BRANCH);
 				trees.add(tree);
-
+				
+				id++;
 			}
 
 			refs = git.tagList().call();
-			for(Ref ref : refs){
+			for (Ref ref : refs) {
 
 				int i = ref.getName().lastIndexOf("/");
-				TreeDB tree = new TreeDB(0, ref.getName(), getLastCommitDate(ref.getName()), ref.getName().substring(++i),
-						TreeType.TAG);
+				Tree tree = new Tree(id, getLastCommitDate(ref.getName()), ref
+						.getName().substring(++i), ref.getName(), TreeType.TAG);
 				trees.add(tree);
 
+				id++;
 			}
 
 			return trees;
 
-		}catch(GitAPIException e){
+		} catch (GitAPIException e) {
 			clean(e);
 		}
 
@@ -154,12 +152,11 @@ public class JGitRepository implements SCM{
 
 	}
 
-	private Date getLastCommitDate(String treeName){
-
+	private Date getLastCommitDate(String treeName) {
 		try {
-
 			revWalk.reset();
-			RevCommit lastCommit = revWalk.parseCommit(repository.resolve(treeName));
+			RevCommit lastCommit = revWalk.parseCommit(repository
+					.resolve(treeName));
 			return lastCommit.getAuthorIdent().getWhen();
 
 		} catch (IOException e) {
@@ -167,64 +164,58 @@ public class JGitRepository implements SCM{
 		}
 
 		return null;
-
 	}
 
 	@Override
-	public List<CommitDB> getCommits(){
-
-		try{
-
+	public List<Commit> getCommits() {
+		try {
 			Iterable<RevCommit> revCommits;
 			revCommits = git.log().all().call();
-			List<CommitDB> commits = new ArrayList<CommitDB>();
+			List<Commit> commits = new ArrayList<Commit>();
 
-			for(RevCommit revCommit : revCommits){
-
+			for (RevCommit revCommit : revCommits) {
 				PersonIdent author = revCommit.getAuthorIdent();
-				CommitDB commit = new CommitDB(0, author.getWhen(), revCommit.getFullMessage(),
+				Commit commit = new Commit(revCommit.getId().getName(),
+						author.getWhen(), revCommit.getFullMessage(),
 						revCommit.getName());
-				CommitterDB committerDb = new CommitterDB(0, author.getEmailAddress(), author.getName());
-				commit.setCommitter(committerDb);
+				Committer committer = new Committer(author.getEmailAddress(),
+						author.getName());
+				commit.setCommitter(committer);
 				commits.add(commit);
-
 			}
 
 			return commits;
 
-		}catch(GitAPIException e){
+		} catch (GitAPIException e) {
 			clean(e);
-		}catch(IOException e){
+		} catch (IOException e) {
 			clean(e);
 		}
 
 		return null;
-
 	}
 
 	@Override
-	public List<CommitDB> getCommitsByTree(String treeName, TreeType type) {
-
+	public List<Commit> getCommitsByTree(String treeName, TreeType type) {
 		Iterable<RevCommit> revCommits = null;
 
-		try{
-
-			if(type == TreeType.BRANCH){
+		try {
+			if (type == TreeType.BRANCH) {
 				revCommits = getCommitsFromBranch(treeName);
-			}else if(type == TreeType.TAG){
+			} else if (type == TreeType.TAG) {
 				revCommits = getCommitsFromTag(treeName);
 			}
 
-			List<CommitDB> commits = new ArrayList<CommitDB>();
-			for(RevCommit revCommit : revCommits){
-				CommitDB commit = new CommitDB(0, revCommit.getAuthorIdent().getWhen(), revCommit.getFullMessage(),
-						revCommit.getName());
+			List<Commit> commits = new ArrayList<Commit>();
+			for (RevCommit revCommit : revCommits) {
+				Commit commit = new Commit(revCommit.getId().getName(),
+						revCommit.getAuthorIdent().getWhen(),
+						revCommit.getFullMessage(), revCommit.getName());
 				commits.add(commit);
 			}
 
 			return commits;
-
-		}catch(GitAPIException e){
+		} catch (GitAPIException e) {
 			clean(e);
 		} catch (RevisionSyntaxException e) {
 			clean(e);
@@ -239,23 +230,22 @@ public class JGitRepository implements SCM{
 		}
 
 		return null;
-
 	}
 
-	private Iterable<RevCommit> getCommitsFromTag(String treeName) throws GitAPIException, MissingObjectException, IncorrectObjectTypeException{
-
-
+	private Iterable<RevCommit> getCommitsFromTag(String treeName)
+			throws GitAPIException, MissingObjectException,
+			IncorrectObjectTypeException {
 		List<Ref> call = git.tagList().call();
 		Iterable<RevCommit> logs = null;
 
-		for(Ref ref : call){
+		for (Ref ref : call) {
 
-			if(ref.getName().equals(treeName)){
+			if (ref.getName().equals(treeName)) {
 
 				LogCommand log = git.log();
 				Ref peeledRef = repository.peel(ref);
 
-				if(peeledRef.getPeeledObjectId() != null) {
+				if (peeledRef.getPeeledObjectId() != null) {
 					log.add(peeledRef.getPeeledObjectId());
 				} else {
 					log.add(ref.getObjectId());
@@ -263,32 +253,29 @@ public class JGitRepository implements SCM{
 
 				logs = log.call();
 				return logs;
-
 			}
 		}
 
 		return null;
-
 	}
 
-	private Iterable<RevCommit> getCommitsFromBranch(String treeName) throws RevisionSyntaxException, NoHeadException, MissingObjectException, IncorrectObjectTypeException, AmbiguousObjectException, GitAPIException, IOException{
-
+	private Iterable<RevCommit> getCommitsFromBranch(String treeName)
+			throws RevisionSyntaxException, NoHeadException,
+			MissingObjectException, IncorrectObjectTypeException,
+			AmbiguousObjectException, GitAPIException, IOException {
 		Iterable<RevCommit> revCommits = git.log()
-				.add(repository.resolve(treeName))
-				.call();
+				.add(repository.resolve(treeName)).call();
 		return revCommits;
-
 	}
 
 	@Override
-	public String getSource(String commitName, String filePath){
-
+	public String getSource(String commitName, String filePath) {
 		try {
-
 			revWalk.reset();
 			ObjectReader reader = repository.newObjectReader();
 
-			RevCommit revCommit = revWalk.parseCommit(ObjectId.fromString(commitName));
+			RevCommit revCommit = revWalk.parseCommit(ObjectId
+					.fromString(commitName));
 			RevTree tree = revCommit.getTree();
 			TreeWalk treeWalk = TreeWalk.forPath(reader, filePath, tree);
 			byte[] bytes = reader.open(treeWalk.getObjectId(0)).getBytes();
@@ -307,71 +294,57 @@ public class JGitRepository implements SCM{
 		}
 
 		return "";
-
 	}
 
 	@Override
-	public List<FileDB> getCommitedFiles(CommitDB commitDB){
+	public List<File> getCommitedFiles(Commit commit) {
+		List<File> files = new ArrayList<File>();
 
-		try{
+		try {
 
 			String repoPath = getAbsolutePath();
-			RevCommit revCommit = revWalk.parseCommit(ObjectId.fromString(commitDB.getName()));
-			AnyObjectId currentCommit = repository.resolve(commitDB.getName());
-			AnyObjectId oldCommit = revCommit.getParentCount() > 0 ? 
-					repository.resolve(revCommit.getParent(0).getName()) : null;
+			RevCommit revCommit = revWalk.parseCommit(ObjectId
+					.fromString(commit.getName()));
+			AnyObjectId currentCommit = repository.resolve(commit.getName());
+			AnyObjectId oldCommit = revCommit.getParentCount() > 0 ? repository
+					.resolve(revCommit.getParent(0).getName()) : null;
 
-					List<DiffEntry> diffs = null;
-					diffs = diffFormatter.scan(oldCommit, currentCommit);
+			List<DiffEntry> diffs = null;
+			diffs = diffFormatter.scan(oldCommit, currentCommit);
 
-					List<FileDB> filesDB = new ArrayList<FileDB>();
-					for(DiffEntry entry : diffs) {
+			for (DiffEntry entry : diffs) {
 
-						RevCommit parentCommit = oldCommit == null ? null : 
-							revWalk.parseCommit(ObjectId.fromString(oldCommit.getName()));
+				RevCommit parentCommit = oldCommit == null ? null : revWalk
+						.parseCommit(ObjectId.fromString(oldCommit.getName()));
 
-						FileDB fileDB = new FileDB();
-						FileXCommitDB fxcDB = new FileXCommitDB();
+				File file = new File();
 
-						fxcDB.setId(new FileXCommitPK(0, commitDB.getId()));
+				String path = !entry.getNewPath().equals("/dev/null") ? entry
+						.getNewPath() : entry.getOldPath();
 
-						String path = !entry.getNewPath().equals("/dev/null") ? entry.getNewPath() 
-								: entry.getOldPath();
+				file.setPath(path);
+				file.setUid(StringUtils.sha1(repoPath + "/" + file.getPath()));
+				getFileChanges(path, parentCommit, revCommit, file);
 
-						fileDB.setPath(path);
-						fileDB.setUid(StringUtils.sha1(repoPath + "/" + fileDB.getPath()));
-						getFileChanges(path, parentCommit, revCommit, fxcDB);
+				if (entry.getChangeType() == org.eclipse.jgit.diff.DiffEntry.ChangeType.DELETE)
+					file.setChangeType(ChangeType.DELETE);
+				else if ((entry.getChangeType() == org.eclipse.jgit.diff.DiffEntry.ChangeType.ADD)
+						|| entry.getChangeType() == org.eclipse.jgit.diff.DiffEntry.ChangeType.COPY)
+					file.setChangeType(ChangeType.ADD);
+				else
+					file.setChangeType(ChangeType.MODIFY);
+				files.add(file);
+			}
 
-						if(entry.getChangeType() == org.eclipse.jgit.diff.DiffEntry.ChangeType.DELETE)
-							fxcDB.setChangeType(ChangeType.DELETE);
-						else if((entry.getChangeType() == org.eclipse.jgit.diff.DiffEntry.ChangeType.ADD)
-								|| entry.getChangeType() == org.eclipse.jgit.diff.DiffEntry.ChangeType.COPY)
-							fxcDB.setChangeType(ChangeType.ADD);
-						else
-							fxcDB.setChangeType(ChangeType.MODIFY);
-
-
-
-						List<FileXCommitDB> fxcList = new ArrayList<FileXCommitDB>(1);
-						fxcList.add(fxcDB);
-						fileDB.setFileXCommits(fxcList);
-						filesDB.add(fileDB);
-
-					}
-
-					return filesDB;
-
-		}catch(IOException e){
+		} catch (IOException e) {
 			clean(e);
 		}
 
-		return null;
-
+		return files;
 	}
 
 	private void getFileChanges(String path, RevCommit oldCommit,
-			RevCommit currentCommit, FileXCommitDB fxcDB){
-
+			RevCommit currentCommit, File file) {
 		ByteArrayOutputStream output = new ByteArrayOutputStream();
 		DiffFormatter formatter = new DiffFormatter(output);
 		formatter.setRepository(repository);
@@ -387,12 +360,12 @@ public class JGitRepository implements SCM{
 		Scanner scanner = new Scanner(output.toString());
 		int added = 0, removed = 0;
 
-		while(scanner.hasNextLine()){
+		while (scanner.hasNextLine()) {
 
 			String line = scanner.nextLine();
-			if(line.startsWith("+") && !line.startsWith("+++")){
+			if (line.startsWith("+") && !line.startsWith("+++")) {
 				added++;
-			}else if(line.startsWith("-") && !line.startsWith("---")){
+			} else if (line.startsWith("-") && !line.startsWith("---")) {
 				removed++;
 			}
 
@@ -400,119 +373,105 @@ public class JGitRepository implements SCM{
 
 		try {
 			output.close();
-		} catch (IOException e) {}
+		} catch (IOException e) {
+		}
 
 		formatter.close();
 		scanner.close();
 
-		fxcDB.setLinesAdded(added);
-		fxcDB.setLinesRemoved(removed);
-
+		file.setLinesAdded(added);
+		file.setLinesRemoved(removed);
 	}
 
 	@Override
-	public List<String> getRepositoryFiles(String hash){
-
-		try{
-
+	public List<String> getRepositoryFiles(String hash) {
+		try {
 			revWalk.reset();
-			RevCommit lastCommit = revWalk.parseCommit(repository.resolve(hash));
+			RevCommit lastCommit = revWalk
+					.parseCommit(repository.resolve(hash));
 
 			treeWalk.reset();
 			treeWalk.addTree(lastCommit.getTree());
 			treeWalk.setRecursive(true);
 
 			List<String> files = new ArrayList<String>();
-			while(treeWalk.next()){
+			while (treeWalk.next()) {
 				String path = treeWalk.getPathString();
 				files.add(StringUtils.sha1(path));
 			}
 
 			return files;
 
-		}catch(IOException e){
+		} catch (IOException e) {
 			clean(e);
 		}
 
 		return null;
-
 	}
 
 	@Override
-	public void checkout(String hash){
+	public void checkout(String hash) {
+		try {
 
-		try{
-
-			if(!git.status().call().isClean())
+			if (!git.status().call().isClean())
 				git.reset().setMode(ResetType.HARD).call();
-			
+
 			git.checkout().setName("master").setForce(true).call();
 			deleteVMBranch();
-			git.checkout().setCreateBranch(true).setStartPoint(hash).
-				setName(vmBranch).setForce(true).call();
-			
-		}catch(GitAPIException e){
+			git.checkout().setCreateBranch(true).setStartPoint(hash)
+					.setName(vmBranch).setForce(true).call();
+
+		} catch (GitAPIException e) {
 			clean(e);
 		}
-		
-
 	}
 
 	public void close() {
-
 		diffFormatter.close();
 		treeWalk.close();
 		revWalk.close();
 		git.close();
 		repository.close();
-
 	}
 
-	private void deleteVMBranch(){
-
-		try{
-
+	private void deleteVMBranch() {
+		try {
 			List<Ref> refs = git.branchList().call();
-			for(Ref ref : refs){
+			for (Ref ref : refs) {
 
-				if(ref.getName().endsWith(vmBranch)){
-					git.branchDelete().setBranchNames(vmBranch).setForce(true).call();
+				if (ref.getName().endsWith(vmBranch)) {
+					git.branchDelete().setBranchNames(vmBranch).setForce(true)
+							.call();
 					break;
 				}
 
 			}
 
-		}catch(GitAPIException e){
+		} catch (GitAPIException e) {
 			clean(e);
 		}
-
 	}
 
-	public void reset(){
-		
-		try{
-			
-			if(!git.status().call().isClean())
+	public void reset() {
+		try {
+			if (!git.status().call().isClean())
 				git.reset().setMode(ResetType.HARD).call();
-			
+
 			git.checkout().setName("master").setForce(true).call();
 			git.branchDelete().setBranchNames(vmBranch).setForce(true).call();
-			
-		}catch(Exception e){
+
+		} catch (Exception e) {
 			clean(e);
 		}
-
 	}
-	
-	private void clean(Throwable e){
 
+	private void clean(Throwable e) {
 		close();
 		throw new VisMinerAPIException(e.getMessage(), e);
-
 	}
 
-	protected Git getGit(){
+	protected Git getGit() {
 		return this.git;
 	}
-	
+
 }
