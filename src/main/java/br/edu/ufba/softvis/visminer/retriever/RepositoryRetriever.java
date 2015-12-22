@@ -1,10 +1,11 @@
 package br.edu.ufba.softvis.visminer.retriever;
 
 import java.util.List;
-import br.edu.ufba.softvis.visminer.model.business.Repository;
+
+import br.edu.ufba.softvis.visminer.model.Repository;
 import br.edu.ufba.softvis.visminer.model.database.RepositoryDB;
 import br.edu.ufba.softvis.visminer.persistence.dao.RepositoryDAO;
-import br.edu.ufba.softvis.visminer.persistence.impl.RepositoryDAOImpl;
+import br.edu.ufba.softvis.visminer.persistence.impl.relational.RepositoryDAOImpl;
 
 public class RepositoryRetriever extends Retriever {
 
