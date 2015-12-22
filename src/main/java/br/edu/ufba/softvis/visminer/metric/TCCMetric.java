@@ -3,13 +3,12 @@ package br.edu.ufba.softvis.visminer.metric;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bson.Document;
 
 import br.edu.ufba.softvis.visminer.annotations.MetricAnnotation;
 import br.edu.ufba.softvis.visminer.ast.FieldDeclaration;
 import br.edu.ufba.softvis.visminer.ast.MethodDeclaration;
 import br.edu.ufba.softvis.visminer.ast.Statement;
-import br.edu.ufba.softvis.visminer.constant.MetricType;
-import br.edu.ufba.softvis.visminer.constant.MetricUid;
 import br.edu.ufba.softvis.visminer.constant.NodeType;
 
 
@@ -19,17 +18,11 @@ import br.edu.ufba.softvis.visminer.constant.NodeType;
 				+ "as the relative number of directly connected methods, where "
 				+ "methods are considered to be connected when they access ,in common, "
 				+ "at least one attribute of the measured class.",
-		acronym = "TCC",
-		type = MetricType.SNAPSHOT,
-		uid = MetricUid.TCC
-	)
-
-
+		acronym = "TCC")
 public class TCCMetric extends MethodBasedMetricTemplate{
-
 	
 	@Override
-	public void calculate(List<MethodDeclaration> methods) {
+	public void calculate(List<MethodDeclaration> methods, Document document) {
 		// TODO Auto-generated method stub
 		
 		List<MethodDeclaration> methodList = filterMethods(methods);
@@ -52,13 +45,10 @@ public class TCCMetric extends MethodBasedMetricTemplate{
 			tcc = (float)ndc/npc;
 		}
 		
-		persistence.postMetricValue(currentType.getId(), String.valueOf(tcc));		
-		
+		document.append("TCC", new Document("accumulated", tcc + ""));
 	}
-	
 
 	private List<MethodDeclaration> filterMethods(List<MethodDeclaration> methods){
-		
 		List<MethodDeclaration> methodList = new ArrayList<MethodDeclaration>();
 		for(MethodDeclaration m : methods){
 			if(!(m.getModifiers().contains("abstract") || m.isConstructor()))
@@ -66,7 +56,6 @@ public class TCCMetric extends MethodBasedMetricTemplate{
 		}
 		
 		return methodList;
-		
 	}	
 	
 	private List<String> processAccessedFields(MethodDeclaration method){
