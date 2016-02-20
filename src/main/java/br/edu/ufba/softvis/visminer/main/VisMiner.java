@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 
 import br.edu.ufba.softvis.visminer.analyzer.RepositoryAnalyzer;
+import br.edu.ufba.softvis.visminer.antipattern.IAntiPattern;
 import br.edu.ufba.softvis.visminer.config.DBConfig;
 import br.edu.ufba.softvis.visminer.constant.LanguageType;
 import br.edu.ufba.softvis.visminer.constant.SCMType;
@@ -46,11 +47,11 @@ public class VisMiner {
 	 *            any metric.
 	 * @throws IOException
 	 */
-	public void mineRepository(Repository repository, SCMType type, List<IMetric> metrics,
+	public void mineRepository(Repository repository, SCMType type, List<IMetric> metrics, List<IAntiPattern> antiPatterns,
 			List<LanguageType> languages) throws IOException {
 		// languages will be used
 		RepositoryAnalyzer analyzer = new RepositoryAnalyzer();
-		analyzer.persist(repository, type, metrics, languages);
+		analyzer.persist(repository, type, metrics, antiPatterns, languages);
 	}
 
 }
