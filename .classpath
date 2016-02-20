@@ -1,20 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" output="target/classes" path="src/main/java">
+	<classpathentry excluding="br/edu/ufba/softvis/visminer/retriever/CommitRetriever.java|br/edu/ufba/softvis/visminer/retriever/CommitterRetriever.java|br/edu/ufba/softvis/visminer/retriever/MetricRetriever.java|br/edu/ufba/softvis/visminer/retriever/RepositoryRetriever.java|br/edu/ufba/softvis/visminer/retriever/Retriever.java|br/edu/ufba/softvis/visminer/retriever/SoftwareUnitRetriever.java|br/edu/ufba/softvis/visminer/retriever/TreeRetriever.java|br/edu/ufba/softvis/visminer/retriever/FileRetriever.java|br/edu/ufba/softvis/visminer/metric/NOCAIMetric.java" kind="src" output="target/classes" path="src/main/java">
 		<attributes>
 			<attribute name="optional" value="true"/>
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="src" path="src/main/examples"/>
-	<classpathentry kind="src" path="src/main/test"/>
 	<classpathentry kind="con" path="org.eclipse.m2e.MAVEN2_CLASSPATH_CONTAINER">
 		<attributes>
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="lib/org.eclipse.cdt.core_5.8.0.jar"/>
-	<classpathentry kind="lib" path="lib/mysql-connector-java-5.1.36-bin.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6">
 		<attributes>
 			<attribute name="owner.project.facets" value="java"/>
