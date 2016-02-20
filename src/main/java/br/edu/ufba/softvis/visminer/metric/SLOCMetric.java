@@ -7,6 +7,7 @@ import org.bson.Document;
 
 import br.edu.ufba.softvis.visminer.annotations.MetricAnnotation;
 import br.edu.ufba.softvis.visminer.ast.AST;
+import br.edu.ufba.softvis.visminer.ast.TypeDeclaration;
 
 @MetricAnnotation(
 		name = "Source Lines of Code",
@@ -23,13 +24,13 @@ public class SLOCMetric implements IMetric{
 	}
 
 	@Override
-	public void calculate(AST ast, Document document){
-		int sloc = count(ast.getSourceCode());
+	public void calculate(TypeDeclaration type, AST ast, Document document) {
+		int sloc = calculate(ast.getSourceCode());
 		
-		document.append("SLOC", new Document("accumulated", sloc + ""));
+		document.append("SLOC", new Document("accumulated", new Integer(sloc)));
 	}
-
-	private int count(String source){
+	
+	public int calculate(String source){
 		if(source == null || source.length() == 0)
 			return 0;
 
