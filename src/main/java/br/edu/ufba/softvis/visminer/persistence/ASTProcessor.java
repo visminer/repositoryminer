@@ -1,9 +1,11 @@
 package br.edu.ufba.softvis.visminer.persistence;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.bson.Document;
 
+import br.edu.ufba.softvis.visminer.antipattern.IAntiPattern;
 import br.edu.ufba.softvis.visminer.ast.AST;
 import br.edu.ufba.softvis.visminer.ast.TypeDeclaration;
 import br.edu.ufba.softvis.visminer.metric.IMetric;
@@ -31,7 +33,8 @@ public class ASTProcessor {
 		this.repository = repository;
 	}
 
-	public void process(File file, AST ast, List<IMetric> metrics) {
+
+	public void process(File file, AST ast, List<IMetric> metrics, List<IAntiPattern> antiPatterns) {
 		MetricDAO dao = new MetricDAOImpl();
 		Document doc = new Document();
 
@@ -46,8 +49,16 @@ public class ASTProcessor {
 
 				doc.append("file", file.getUid()).append("type", typeDoc);
 				for (IMetric metric : metrics) {
-					metric.calculate(ast, doc);
+					metric.calculate(type, ast, doc);
 				}
+				
+				List<Document> antiPatternsDoc = new ArrayList<Document>();
+				for (IAntiPattern antiPattern : antiPatterns) {
+					Document apDoc = new Document();
+					antiPattern.detect(type, ast, apDoc);
+					antiPatternsDoc.add(apDoc);
+				}
+				doc.append("antipatterns", antiPatternsDoc);
 			}
 
 			dao.save(doc);
