@@ -8,6 +8,7 @@ import javax.management.openmbean.KeyAlreadyExistsException;
 
 import br.edu.ufba.softvis.visminer.analyzer.scm.SCM;
 import br.edu.ufba.softvis.visminer.analyzer.scm.SCMFactory;
+import br.edu.ufba.softvis.visminer.antipattern.IAntiPattern;
 import br.edu.ufba.softvis.visminer.constant.LanguageType;
 import br.edu.ufba.softvis.visminer.constant.SCMType;
 import br.edu.ufba.softvis.visminer.metric.IMetric;
@@ -27,7 +28,7 @@ public class RepositoryAnalyzer {
 
 	private static final String EXCEPTION_MESSAGE = "Repository already exists in database";
 
-	public void persist(Repository repository, SCMType type, List<IMetric> metrics, List<LanguageType> languages) {
+	public void persist(Repository repository, SCMType type, List<IMetric> metrics, List<IAntiPattern> antiPatterns, List<LanguageType> languages) {
 		SCM repoSys = SCMFactory.getRepository(type);
 		repoSys.open(repository.getPath());
 
@@ -51,10 +52,12 @@ public class RepositoryAnalyzer {
 		// saving repo+tree+commit docs
 		repositoryDao.save(repository);
 		
-		if ((metrics != null) && (metrics.size() > 0)) {
-			MetricCalculator metricCalculator = new MetricCalculator();
-			metricCalculator.calculate(repository, metrics, repoSys, languages);
+		if ((metrics != null) && (metrics.size() > 0) && (antiPatterns != null) && (antiPatterns.size() > 0) ) {
+			SourceAnalyzer sourceAnalyzer = new SourceAnalyzer();
+			sourceAnalyzer.analyze(repository, metrics, antiPatterns, repoSys, languages);
 		}
+		
+		//
 
 		repoSys.reset();
 		repoSys.close();
