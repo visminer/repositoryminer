@@ -1,42 +1,39 @@
 package br.edu.ufba.softvis.visminer.persistence.impl;
 
-import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
+import java.util.List;
 
-import br.edu.ufba.softvis.visminer.model.database.RepositoryDB;
+import br.edu.ufba.softvis.visminer.model.Repository;
+import br.edu.ufba.softvis.visminer.persistence.Database;
 import br.edu.ufba.softvis.visminer.persistence.dao.RepositoryDAO;
-import br.edu.ufba.softvis.visminer.utility.StringUtils;
 
-/**
- * Implementation of interface {@link RepositoryDAO}
- */
-public class RepositoryDAOImpl extends DAOImpl<RepositoryDB, Integer> implements RepositoryDAO{
+public class RepositoryDAOImpl implements RepositoryDAO {
 
 	@Override
-	public RepositoryDB findByUid(String uid) {
-		
-		EntityManager em = getEntityManager();
-		TypedQuery<RepositoryDB> query = em.createNamedQuery("RepositoryDB.findByUid", RepositoryDB.class);
-		query.setParameter("uid", uid);
-		return (RepositoryDB) getSingleResult(query);
-		
+	public void save(Repository repo) {
+		Database.getInstance().insert("repositories", repo.toDocument());
+	}
+
+	@Override
+	public Repository find(String id) {
+		return null;
+	}
+
+	@Override
+	public List<Repository> findAll() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override
 	public boolean hasRepository(String repositoryPath) {
-		
-		String uid = StringUtils.sha1(repositoryPath.replace("\\", "/"));
-		EntityManager em = getEntityManager();
-		TypedQuery<Long> query = em.createNamedQuery("RepositoryDB.countByUid", Long.class);
-		query.setParameter("uid", uid);
-		return ( (Long) getSingleResult(query) != 0);
-		
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 	@Override
-	public RepositoryDB findByPath(String path){
-		String uid = StringUtils.sha1(path.replace("\\", "/"));
-		return findByUid(uid);
+	public Repository findByPath(String path) {
+		// TODO Auto-generated method stub
+		return null;
 	}
-	
+
 }

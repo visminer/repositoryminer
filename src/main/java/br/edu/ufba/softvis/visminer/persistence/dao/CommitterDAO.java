@@ -2,7 +2,7 @@ package br.edu.ufba.softvis.visminer.persistence.dao;
 
 import java.util.List;
 
-import br.edu.ufba.softvis.visminer.model.database.CommitterDB;
+import br.edu.ufba.softvis.visminer.model.Committer;
 
 /**
  * 
@@ -11,20 +11,20 @@ import br.edu.ufba.softvis.visminer.model.database.CommitterDB;
  * Committer table DAO interface.
  * 
  */
-public interface CommitterDAO extends DAO<CommitterDB, Integer>{
+public interface CommitterDAO extends DAO<Committer, Integer>{
 
 	/**
 	 * 
 	 * @param email
 	 * @return Committer by email.
 	 */
-	public CommitterDB findByEmail(String email);
+	public Committer findByEmail(String email);
 
 	/**
 	 * 
 	 * @param repositoryId
 	 * @return List of commits by repository.
 	 */
-	public List<CommitterDB> findByRepository(int repositoryId);
+	public List<Committer> findByRepository(int repositoryId);
 	
 }

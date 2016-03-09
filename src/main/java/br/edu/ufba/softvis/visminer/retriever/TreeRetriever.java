@@ -2,10 +2,10 @@ package br.edu.ufba.softvis.visminer.retriever;
 
 import java.util.List;
 
-import br.edu.ufba.softvis.visminer.model.business.Tree;
+import br.edu.ufba.softvis.visminer.model.Tree;
 import br.edu.ufba.softvis.visminer.model.database.TreeDB;
 import br.edu.ufba.softvis.visminer.persistence.dao.TreeDAO;
-import br.edu.ufba.softvis.visminer.persistence.impl.TreeDAOImpl;
+import br.edu.ufba.softvis.visminer.persistence.impl.relational.TreeDAOImpl;
 
 public class TreeRetriever extends Retriever {
 

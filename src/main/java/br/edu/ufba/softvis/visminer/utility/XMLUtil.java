@@ -7,15 +7,14 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.w3c.dom.Document;
 
-import br.edu.ufba.softvis.visminer.config.MetricConfig;
-
 public class XMLUtil {
 
 	public static Document getXMLDoc(String path){
 		
 		try {
-			
-			InputStream inputStream = MetricConfig.class.getResourceAsStream(path);
+			// TODO rever
+			// InputStream inputStream = MetricConfig.class.getResourceAsStream(path);
+			InputStream inputStream = null;
 			DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder docBuilder;
 			docBuilder = docBuilderFactory.newDocumentBuilder();

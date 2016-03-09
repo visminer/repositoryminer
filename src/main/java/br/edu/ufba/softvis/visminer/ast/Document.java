@@ -4,7 +4,7 @@ import java.util.List;
 
 public class Document {
 
-	private int id;
+	private String uid;
 	private String name;
 	private List<TypeDeclaration> types;
 	private List<MethodDeclaration> methods;
@@ -14,14 +14,14 @@ public class Document {
 	/**
 	 * @return the id
 	 */
-	public int getId() {
-		return id;
+	public String getUid() {
+		return uid;
 	}
 	/**
 	 * @param id the id to set
 	 */
-	public void setId(int id) {
-		this.id = id;
+	public void setUid(String uid) {
+		this.uid = uid;
 	}
 	/**
 	 * @return the name

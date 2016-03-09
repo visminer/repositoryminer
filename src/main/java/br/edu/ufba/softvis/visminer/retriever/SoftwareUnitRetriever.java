@@ -6,13 +6,13 @@ import java.util.List;
 import java.util.Map;
 
 import br.edu.ufba.softvis.visminer.constant.MetricUid;
-import br.edu.ufba.softvis.visminer.model.business.SoftwareUnit;
+import br.edu.ufba.softvis.visminer.model.SoftwareUnit;
 import br.edu.ufba.softvis.visminer.model.database.MetricValueDB;
 import br.edu.ufba.softvis.visminer.model.database.SoftwareUnitDB;
 import br.edu.ufba.softvis.visminer.persistence.dao.MetricValueDAO;
 import br.edu.ufba.softvis.visminer.persistence.dao.SoftwareUnitDAO;
-import br.edu.ufba.softvis.visminer.persistence.impl.MetricValueDAOImpl;
-import br.edu.ufba.softvis.visminer.persistence.impl.SoftwareUnitDAOImpl;
+import br.edu.ufba.softvis.visminer.persistence.impl.relational.MetricValueDAOImpl;
+import br.edu.ufba.softvis.visminer.persistence.impl.relational.SoftwareUnitDAOImpl;
 
 public class SoftwareUnitRetriever extends Retriever {
 

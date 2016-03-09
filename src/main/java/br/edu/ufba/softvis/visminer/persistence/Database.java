@@ -1,10 +1,11 @@
 package br.edu.ufba.softvis.visminer.persistence;
 
-import java.util.Map;
+import org.bson.Document;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
+import br.edu.ufba.softvis.visminer.config.DBConfig;
+
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
 
 /**
  * @author Felipe Gustavo de Souza Gomes (felipegustavo1000@gmail.com)
@@ -12,19 +13,12 @@ import javax.persistence.Persistence;
  * 
  * Management of database connection.
  */
-
 public class Database {
 
-	private final static String PERSISTENCE_UNIT = "VisminerDatabase";
-	private static EntityManagerFactory managerFactory = null;
+	private MongoDatabase mongodb = null;
+	
 	private static Database instance = null;
-	
 	private Database(){}
-	
-	/**
-	 * 
-	 * @return Database manager instance
-	 */
 	public static Database getInstance(){
 		if(instance == null){
 			instance = new Database();
@@ -32,43 +26,23 @@ public class Database {
 		return instance;
 	}
 	
-	/**
-	 * @param cfg
-	 * Opens database connection.
-	 */
-	public void open(Map<String, String> cfg){
-		managerFactory = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT, cfg);
+	public void prepare(DBConfig dbConfig){
+		mongodb = dbConfig.configDB();
 	}
 	
-	/**
-	 * Closes database connection.
-	 */
-	public void close(){
-		managerFactory.close();
+	public MongoDatabase getMongoDb() {
+		return mongodb;
 	}
 	
-	/**
-	 * 
-	 * @return Used properties to configure database connection.
-	 */
-	public Map<String, Object> getProperties(){
-		return managerFactory.getProperties();
+	public MongoCollection<Document> getDbCollection(String collectionName) {
+		MongoCollection<Document> coll = mongodb.getCollection(collectionName);
+		
+		return coll;
 	}
 	
-	/**
-	 * 
-	 * @return True if database connection was correctly configured or false otherwise.
-	 */
-	public boolean isOpen(){
-		return managerFactory.isOpen();
+	public void insert(String collection, Document document) {
+		MongoCollection<Document> coll = getDbCollection(collection);
+		
+		coll.insertOne(document);
 	}
-
-	/**
-	 * 
-	 * @return Database connection instance.
-	 */
-	public EntityManager getEntityManager(){
-		return managerFactory.createEntityManager();
-	}	
-	
 }

@@ -3,10 +3,10 @@ package br.edu.ufba.softvis.visminer.retriever;
 import java.util.ArrayList;
 import java.util.List;
 
-import br.edu.ufba.softvis.visminer.model.business.Metric;
+import br.edu.ufba.softvis.visminer.model.Metric;
 import br.edu.ufba.softvis.visminer.model.database.MetricDB;
 import br.edu.ufba.softvis.visminer.persistence.dao.MetricDAO;
-import br.edu.ufba.softvis.visminer.persistence.impl.MetricDAOImpl;
+import br.edu.ufba.softvis.visminer.persistence.impl.relational.MetricDAOImpl;
 
 public class MetricRetriever extends Retriever{
 

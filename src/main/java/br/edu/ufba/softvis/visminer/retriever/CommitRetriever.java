@@ -5,17 +5,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import br.edu.ufba.softvis.visminer.model.business.Commit;
-import br.edu.ufba.softvis.visminer.model.business.File;
-import br.edu.ufba.softvis.visminer.model.business.FileState;
+import br.edu.ufba.softvis.visminer.model.Commit;
+import br.edu.ufba.softvis.visminer.model.File;
+import br.edu.ufba.softvis.visminer.model.FileState;
 import br.edu.ufba.softvis.visminer.model.database.CommitDB;
 import br.edu.ufba.softvis.visminer.model.database.FileXCommitDB;
 import br.edu.ufba.softvis.visminer.persistence.dao.CommitDAO;
 import br.edu.ufba.softvis.visminer.persistence.dao.FileDAO;
 import br.edu.ufba.softvis.visminer.persistence.dao.FileXCommitDAO;
-import br.edu.ufba.softvis.visminer.persistence.impl.CommitDAOImpl;
-import br.edu.ufba.softvis.visminer.persistence.impl.FileDAOImpl;
-import br.edu.ufba.softvis.visminer.persistence.impl.FileXCommitDAOImpl;
+import br.edu.ufba.softvis.visminer.persistence.impl.relational.CommitDAOImpl;
+import br.edu.ufba.softvis.visminer.persistence.impl.relational.FileDAOImpl;
+import br.edu.ufba.softvis.visminer.persistence.impl.relational.FileXCommitDAOImpl;
 
 public class CommitRetriever extends Retriever {
 

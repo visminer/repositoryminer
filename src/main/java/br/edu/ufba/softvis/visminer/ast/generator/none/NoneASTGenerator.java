@@ -26,14 +26,13 @@ public class NoneASTGenerator implements IASTGenerator{
 
 	@Override
 	public AST generate(String filePath, String source, String[] sourceFolders) {
-		
 		Document doc = new Document();
 		doc.setName(filePath);
 		AST ast = new AST();
 		ast.setSourceCode(source);
 		ast.setDocument(doc);
+
 		return ast;
-		
 	}
 
 }

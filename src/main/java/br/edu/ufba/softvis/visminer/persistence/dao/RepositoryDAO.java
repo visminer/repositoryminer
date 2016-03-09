@@ -1,29 +1,23 @@
 
 package br.edu.ufba.softvis.visminer.persistence.dao;
 
-import br.edu.ufba.softvis.visminer.model.database.RepositoryDB;
+import br.edu.ufba.softvis.visminer.model.Repository;
 
 /**
  * Repository table DAO interface.
  */
-public interface RepositoryDAO extends DAO<RepositoryDB, Integer> {
-
-	/**
-	 * @param uid
-	 * @return Repository with given uid.
-	 */
-	public RepositoryDB findByUid(String uid);
+public interface RepositoryDAO extends DAO<Repository, String> {
 
 	/**
 	 * @param repositoryPath
-	 * @return True if repository was analyzed and False otherwise.
+	 * @return true if repository was analyzed
 	 */
 	public boolean hasRepository(String repositoryPath);
 
 	/**
 	 * @param path
-	 * @return Repository with given path.
+	 * @return Repository with given path
 	 */
-	public RepositoryDB findByPath(String path);
+	public Repository findByPath(String path);
 	
 }

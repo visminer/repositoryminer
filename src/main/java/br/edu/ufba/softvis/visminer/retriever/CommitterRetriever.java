@@ -2,10 +2,10 @@ package br.edu.ufba.softvis.visminer.retriever;
 
 import java.util.List;
 
-import br.edu.ufba.softvis.visminer.model.business.Committer;
+import br.edu.ufba.softvis.visminer.model.Committer;
 import br.edu.ufba.softvis.visminer.model.database.CommitterDB;
 import br.edu.ufba.softvis.visminer.persistence.dao.CommitterDAO;
-import br.edu.ufba.softvis.visminer.persistence.impl.CommitterDAOImpl;
+import br.edu.ufba.softvis.visminer.persistence.impl.relational.CommitterDAOImpl;
 
 public class CommitterRetriever extends Retriever {
 
