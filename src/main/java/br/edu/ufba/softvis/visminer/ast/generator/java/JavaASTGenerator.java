@@ -145,6 +145,7 @@ public class JavaASTGenerator implements IASTGenerator{
 
 	@SuppressWarnings("unchecked")
 	private static MethodDeclaration processMethod(org.eclipse.jdt.core.dom.MethodDeclaration methodDecl){
+
 		MethodDeclaration m = new MethodDeclaration();
 
 		m.setConstructor(methodDecl.isConstructor());
