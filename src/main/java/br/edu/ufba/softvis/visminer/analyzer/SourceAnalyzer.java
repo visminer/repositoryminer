@@ -51,7 +51,6 @@ public class SourceAnalyzer {
 		}
 	}
 
-	// TODO adicionar parametro lista de antipatterns
 	private void analyze(List<Commit> commits, List<IMetric> metrics, List<IAntiPattern> antiPatterns) {
 		int c = 1;
 		for (Commit commit : commits) {
@@ -77,7 +76,6 @@ public class SourceAnalyzer {
 		}
 	}
 
-	// TODO adicionar parametro lista de antipatterns
 	private void processAST(File file, String commitName, List<IMetric> metrics, List<IAntiPattern> antiPatterns) {
 		int index = file.getPath().lastIndexOf(".") + 1;
 		String ext = file.getPath().substring(index);
