@@ -89,7 +89,6 @@ public class GitRepository implements SCM {
 
 	private void clean(Throwable e) {
 		close();
-		// TODO tratar no altonivel (segue ou para?)
 		e.printStackTrace();
 	}
 
