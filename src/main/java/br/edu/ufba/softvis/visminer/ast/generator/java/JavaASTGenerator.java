@@ -145,7 +145,6 @@ public class JavaASTGenerator implements IASTGenerator{
 
 	@SuppressWarnings("unchecked")
 	private static MethodDeclaration processMethod(org.eclipse.jdt.core.dom.MethodDeclaration methodDecl){
-
 		MethodDeclaration m = new MethodDeclaration();
 
 		m.setConstructor(methodDecl.isConstructor());
@@ -192,6 +191,9 @@ public class JavaASTGenerator implements IASTGenerator{
 
 		if(methodDecl.getReturnType2() != null)
 			m.setReturnType(methodDecl.getReturnType2().toString());
+		
+		m.setStartPositionInSourceCode(methodDecl.getStartPosition());
+		m.setEndPositionInSourceCode(methodDecl.getStartPosition() + methodDecl.getLength());
 
 		return m;
 
