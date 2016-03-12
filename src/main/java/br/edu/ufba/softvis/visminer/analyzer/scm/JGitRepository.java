@@ -114,8 +114,7 @@ public class JGitRepository implements SCM {
 	@Override
 	public List<Tree> getTrees() {
 		try {
-			int id = 1;
-
+			
 			List<Tree> trees = new ArrayList<Tree>();
 
 			Iterable<Ref> refs = git.branchList().call();
@@ -124,22 +123,18 @@ public class JGitRepository implements SCM {
 					continue;
 
 				int i = ref.getName().lastIndexOf("/");
-				Tree tree = new Tree(id, getLastCommitDate(ref.getName()), ref.getName().substring(++i), ref.getName(),
+				Tree tree = new Tree(null, getLastCommitDate(ref.getName()), ref.getName().substring(++i), ref.getName(),
 						TreeType.BRANCH);
 				trees.add(tree);
-
-				id++;
 			}
 
 			refs = git.tagList().call();
 			for (Ref ref : refs) {
 
 				int i = ref.getName().lastIndexOf("/");
-				Tree tree = new Tree(id, getLastCommitDate(ref.getName()), ref.getName().substring(++i), ref.getName(),
+				Tree tree = new Tree(null, getLastCommitDate(ref.getName()), ref.getName().substring(++i), ref.getName(),
 						TreeType.TAG);
 				trees.add(tree);
-
-				id++;
 			}
 
 			return trees;

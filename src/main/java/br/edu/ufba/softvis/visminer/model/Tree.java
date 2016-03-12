@@ -16,7 +16,7 @@ import br.edu.ufba.softvis.visminer.constant.TreeType;
 public class Tree {
 	private Repository repository;
 
-	private int id;
+	private String uid;
 	private Date lastUpdate;
 	private String name;
 	private String fullName;
@@ -31,9 +31,9 @@ public class Tree {
 	 * @param fullName
 	 * @param type
 	 */
-	public Tree(int id, Date lastUpdate, String name, String fullName, TreeType type) {
+	public Tree(String uid, Date lastUpdate, String name, String fullName, TreeType type) {
 		super();
-		this.id = id;
+		this.uid = uid;
 		this.lastUpdate = lastUpdate;
 		this.name = name;
 		this.fullName = fullName;
@@ -43,16 +43,16 @@ public class Tree {
 	/**
 	 * @return the id
 	 */
-	public int getId() {
-		return id;
+	public String getUid() {
+		return uid;
 	}
 
 	/**
 	 * @param id
 	 *            the id to set
 	 */
-	public void setId(int id) {
-		this.id = id;
+	public void setUid(String uid) {
+		this.uid = uid;
 	}
 
 	/**
@@ -145,10 +145,7 @@ public class Tree {
 
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + id;
-		return result;
+		return uid.hashCode();
 	}
 
 	@Override
@@ -160,9 +157,7 @@ public class Tree {
 		if (getClass() != obj.getClass())
 			return false;
 		Tree other = (Tree) obj;
-		if (id != other.id)
-			return false;
-		return true;
+		return uid.equals(other.getUid());
 	}
 
 	@Override
@@ -171,8 +166,12 @@ public class Tree {
 	}
 
 	public Document toDocument() {
-		Document doc = new Document("repository", getRepository().getUid()).append("lastUpdate", getLastUpdate())
-				.append("name", getName()).append("fullName", getFullName()).append("type", getType().name());
+		Document doc = new Document("uid", getUid())            
+                .append("lastUpdate", getLastUpdate())
+                .append("name", getName())
+                .append("fullName", getFullName())
+                .append("type", getType().name())
+                .append("repository", getRepository().getUid());
 
 		if (commits != null) {
 			List<Document> commitsDoc = new ArrayList<Document>();

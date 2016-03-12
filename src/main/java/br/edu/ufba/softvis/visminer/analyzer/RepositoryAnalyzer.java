@@ -94,6 +94,8 @@ public class RepositoryAnalyzer {
 		for (Tree tree : trees) {
 			tree.setRepository(repository);
 			tree.setCommits(repoSys.getCommitsByTree(tree.getFullName(), tree.getType()));
+			String uid = StringUtils.sha1(repository.getPath()+tree.getFullName());
+			tree.setUid(uid);
 			
 			dao.save(tree);
 		}
