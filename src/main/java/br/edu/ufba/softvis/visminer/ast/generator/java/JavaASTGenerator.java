@@ -192,6 +192,9 @@ public class JavaASTGenerator implements IASTGenerator{
 
 		if(methodDecl.getReturnType2() != null)
 			m.setReturnType(methodDecl.getReturnType2().toString());
+		
+		m.setStartPositionInSourceCode(methodDecl.getStartPosition());
+		m.setEndPositionInSourceCode(methodDecl.getStartPosition() + methodDecl.getLength());
 
 		return m;
 

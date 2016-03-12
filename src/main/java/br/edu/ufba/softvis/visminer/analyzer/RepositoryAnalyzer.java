@@ -42,9 +42,6 @@ public class RepositoryAnalyzer {
 		String uid = StringUtils.sha1(path);
 		repository.setUid(uid);
 
-		// saving repo docs
-		repositoryDao.save(repository);
-
 		List<Commit> commits = sortCommits(repoSys.getCommits());
 		saveCommitedFiles(commits, repository, repoSys);
 		saveTrees(commits, repository, repoSys);
