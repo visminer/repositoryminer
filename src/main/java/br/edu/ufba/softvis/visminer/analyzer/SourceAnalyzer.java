@@ -89,7 +89,7 @@ public class SourceAnalyzer {
 			String source = repoSys.getSource(commitName, file.getPath());
 			if ((source != null) && (!source.equals(""))) {
 				AST ast = gen.generate(file.getPath(), source, sourceFolders.toArray(new String[sourceFolders.size()]));
-				astProcessor.process(file, ast, metrics, antiPatterns);
+				astProcessor.process(commitName, file, ast, metrics, antiPatterns);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
