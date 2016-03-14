@@ -34,7 +34,7 @@ public class ASTProcessor {
 	}
 
 
-	public void process(File file, AST ast, List<IMetric> metrics, List<IAntiPattern> antiPatterns) {
+	public void process(String commitName, File file, AST ast, List<IMetric> metrics, List<IAntiPattern> antiPatterns) {
 		MetricDAO dao = new MetricDAOImpl();
 		Document doc = new Document();
 
@@ -47,7 +47,9 @@ public class ASTProcessor {
 				Document typeDoc = new Document("uid", type.getUid()).append("name", type.getName()).append("type",
 						type.getType().name());
 
-				doc.append("file", file.getUid()).append("type", typeDoc);
+				doc.append("file", file.getUid())
+					.append("commit", commitName)
+				    .append("type", typeDoc);
 				for (IMetric metric : metrics) {
 					metric.calculate(type, ast, doc);
 				}
