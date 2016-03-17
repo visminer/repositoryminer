@@ -111,7 +111,7 @@ public class JavaASTGenerator implements IASTGenerator{
 
 		AST ast = new AST();
 		ast.setDocument(document);
-		ast.setSourceCode(root.toString());
+		ast.setSourceCode(source);
 
 		return ast;
 
