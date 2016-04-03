@@ -122,19 +122,23 @@ public class MethodVisitor extends ASTVisitor {
 	
 	
 	@Override
-	public boolean visit(SimpleName node) {		
+	public boolean visit(SimpleName node) {
+		boolean addStatement=true;
 		if(node.resolveBinding()!=null){
 			if(node.resolveBinding().getKind()==IBinding.VARIABLE){
 				IVariableBinding variable = (IVariableBinding)node.resolveBinding();
 				if(variable.getDeclaringClass()!=null){
 					if(variable.isField() && variable.getDeclaringClass().isFromSource()){
 						String expression = variable.getDeclaringClass().getQualifiedName()+"."+variable.getName();
-						return addStatement(NodeType.FIELD_ACCESS, expression);
+						addStatement = addStatement(NodeType.FIELD_ACCESS, expression);
 					}	
+				}else if(!variable.isField() && !variable.isEnumConstant() && !variable.isParameter()){
+					addStatement = addStatement(NodeType.VARIABLE, variable.getName());
 				}
+				addStatement(NodeType.VARIABLE_ACCESS, variable.getName());
 			}
 		}
-		return true;
+		return addStatement;
 	}
 
 	public List<Statement> getStatements() {
