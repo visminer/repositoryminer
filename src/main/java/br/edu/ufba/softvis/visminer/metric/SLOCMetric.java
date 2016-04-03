@@ -36,7 +36,8 @@ public class SLOCMetric implements IMetric{
 
 		Matcher m = pattern.matcher(source);
 
-		int i = 0;
+		//starts from 1 because the matcher doesn't count the last line (only line breaks)
+		int i = 1;
 
 		while(m.find())
 			i++;
