@@ -49,7 +49,7 @@ public class GodClass implements IAntiPattern {
 			boolean godClass = (atfd > atfdThreshold)
 					&& ((wmc > wmcThreshold) || ((tcc < tccThreshold) && (noa > noaThreshold)));
 
-			document.append("GodClass", new Boolean(godClass));
+			document.append("name", new String("God Class")).append("value", new Boolean(godClass));
 		}
 	}
 
@@ -58,5 +58,4 @@ public class GodClass implements IAntiPattern {
 
 		return godClass;
 	}
-
 }
