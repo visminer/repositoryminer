@@ -21,11 +21,12 @@ import br.edu.ufba.softvis.visminer.metric.PARMetric;
 public class LongMethod implements IAntiPattern {
 
 	private List<Document> methodsDoc;
-	private int ccThreshold;
-	private int mlocThreshold;
-	private int parThreshold;
-	private int lvarThreshold;
+	private int ccThreshold = 4;
+	private int mlocThreshold = 30;
+	private int parThreshold = 4;
+	private int lvarThreshold = 8;
 	
+	public LongMethod() {}
 	
 	public LongMethod(int ccThreshold, int mlocThreshold, int parThreshold, int lvarThreshold) {
 		this.ccThreshold = ccThreshold;
@@ -65,7 +66,6 @@ public class LongMethod implements IAntiPattern {
 		int par = parMetric.calculate(method);
 		int lvar = lvarMetric.calculate(method);
 		
-		//TODO review this formula
 		longMethod = (cc > ccThreshold && mloc > mlocThreshold && par > parThreshold && lvar > lvarThreshold);	
 		
 		return longMethod;
