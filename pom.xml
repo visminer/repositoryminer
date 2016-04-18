@@ -2,14 +2,14 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>br.edu.ufba.softvis</groupId>
-	<artifactId>visminer</artifactId>
-	<name>VisMiner</name>
-	<url>https://github.com/visminer/Visminer</url>
-	<version>0.9</version>
+	<groupId>org.repositoryminer</groupId>
+	<artifactId>repositoryminer</artifactId>
+	<name>RepositoryMiner</name>
+	<url>https://github.com/visminer/RepositoryMiner</url>
+	<version>1.0</version>
 
 	<properties>
-		<jdk-version>1.6</jdk-version>
+		<jdk-version>1.7</jdk-version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 	</properties>
@@ -19,127 +19,52 @@
 		<dependency>
 			<groupId>org.eclipse.jgit</groupId>
 			<artifactId>org.eclipse.jgit</artifactId>
-			<version>4.0.2.201509141540-r</version>
+			<version>4.2.0.201601211800-r</version>
+			<scope>compile</scope>
 		</dependency>
 
 		<dependency>
-			<groupId>org.eclipse.birt.runtime</groupId>
-			<artifactId>org.eclipse.core.resources</artifactId>
-			<version>3.9.1.v20140825-1431</version>
-		</dependency>
-
-
-		<dependency>
-			<groupId>org.eclipse.tycho</groupId>
+			<groupId>org.eclipse.jdt</groupId>
 			<artifactId>org.eclipse.jdt.core</artifactId>
-			<version>3.11.0.v20150602-1242</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.eclipse.core</groupId>
-			<artifactId>runtime</artifactId>
-			<version>3.10.0-v20140318-2214</version>
+			<version>3.10.0</version>
+			<scope>compile</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.mongodb</groupId>
-			<artifactId>mongodb-driver</artifactId>
-			<version>3.2.0-rc0</version>
+			<artifactId>mongo-java-driver</artifactId>
+			<version>3.2.2</version>
+			<scope>compile</scope>
 		</dependency>
-
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-simple</artifactId>
-			<version>1.7.12</version>
-		</dependency>
-
 
 		<dependency>
 			<groupId>org.eclipse.mylyn.github</groupId>
 			<artifactId>org.eclipse.egit.github.core</artifactId>
 			<version>2.1.5</version>
+			<scope>compile</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.12</version>
+			<scope>test</scope>
 		</dependency>
 
+		<dependency>
+			<groupId>pl.pragmatists</groupId>
+			<artifactId>JUnitParams</artifactId>
+			<version>1.0.4</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+			<version>1.7.21</version>
+			<scope>compile</scope>
+		</dependency>
 
 	</dependencies>
-
-	<build>
-
-		<finalName>VisMiner</finalName>
-
-		<plugins>
-
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-eclipse-plugin</artifactId>
-				<version>2.9</version>
-				<configuration>
-					<downloadSources>true</downloadSources>
-					<downloadJavadocs>false</downloadJavadocs>
-				</configuration>
-			</plugin>
-
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.3.2</version>
-				<configuration>
-					<source>${jdk.version}</source>
-					<target>${jdk.version}</target>
-				</configuration>
-			</plugin>
-
-			<!-- This plugin saves dependencies in a separated folder -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<version>2.5.1</version>
-				<executions>
-					<execution>
-						<id>copy-dependencies</id>
-						<phase>package</phase>
-						<goals>
-							<goal>copy-dependencies</goal>
-						</goals>
-						<configuration>
-							<includeScope>runtime</includeScope>
-							<outputDirectory>${project.build.directory}/dependency-jars/</outputDirectory>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-
-			<!-- This plugin creates a uber jar(or fat jar), including selected dependencies 
-				in a single jar -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-shade-plugin</artifactId>
-				<version>2.4.1</version>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>shade</goal>
-						</goals>
-						<configuration>
-							<artifactSet>
-								<excludes>
-									<exclude>junit:junit</exclude>
-								</excludes>
-							</artifactSet>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-
-		</plugins>
-
-	</build>
 
 </project>
