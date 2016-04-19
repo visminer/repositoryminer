@@ -9,6 +9,10 @@ public class ClassOrInterfaceDeclaration extends TypeDeclaration{
 	private List<FieldDeclaration> fields;
 	
 	
+	public ClassOrInterfaceDeclaration(){
+		this.setType(SoftwareUnitType.CLASS_OR_INTERFACE);
+	}
+
 	/**
 	 * @return the isInterface
 	 */

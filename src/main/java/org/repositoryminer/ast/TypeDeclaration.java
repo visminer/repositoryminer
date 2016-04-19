@@ -4,6 +4,7 @@ public class TypeDeclaration {
 
 	private String uid;
 	private String name;
+	private SoftwareUnitType type;
 
 	/**
 	 * @return the id
@@ -28,6 +29,18 @@ public class TypeDeclaration {
 	 */
 	public void setName(String name) {
 		this.name = name;
+	}
+	/**
+	 * @return the type
+	 */
+	public SoftwareUnitType getType() {
+		return type;
+	}
+	/**
+	 * @param type the type to set
+	 */
+	public void setType(SoftwareUnitType type) {
+		this.type = type;
 	}
 
 }

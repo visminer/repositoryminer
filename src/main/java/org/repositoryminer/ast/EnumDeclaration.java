@@ -6,6 +6,10 @@ public class EnumDeclaration extends TypeDeclaration {
 
 	private List<EnumConstantDeclaration> enumConsts;
 	
+	public EnumDeclaration(){
+		this.setType(SoftwareUnitType.ENUM);
+	}
+	
 	/**
 	 * @return the enumConsts
 	 */

@@ -4,19 +4,19 @@ public enum SCMType {
 
 	GIT("GIT");
 
-	private String key;
+	private String id;
 
-	private SCMType(String key) {
-		this.key = key;
+	private SCMType(String id) {
+		this.id = id;
 	}
 
-	public String getKey() {
-		return key;
+	public String getId() {
+		return id;
 	}
 
-	public static SCMType parse(String key) {
+	public static SCMType parse(String id) {
 		for (SCMType st : SCMType.values()) {
-			if (st.getKey().equals(key))
+			if (st.getId().equals(id))
 				return st;
 		}
 		return null;

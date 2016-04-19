@@ -4,19 +4,19 @@ public enum ReferenceType {
 
 	BRANCH("BRANCH"), TAG("TAG");
 
-	private String key;
+	private String id;
 
-	private ReferenceType(String key) {
-		this.key = key;
+	private ReferenceType(String id) {
+		this.id = id;
 	}
 
-	public String getKey(){
-		return key;
+	public String getId(){
+		return id;
 	}
 	
-	public static ReferenceType parse(String key) {
+	public static ReferenceType parse(String id) {
 		for(ReferenceType rt : ReferenceType.values()){
-			if(rt.getKey().equals(key))
+			if(rt.getId().equals(id))
 				return rt;
 		}
 		return null;

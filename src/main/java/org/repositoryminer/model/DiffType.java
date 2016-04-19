@@ -4,19 +4,19 @@ public enum DiffType {
 
 	ADD("ADD"), COPY("COPY"), MODIFY("MODIFY"), RENAME("RENAME"), DELETE("DELETE");
 
-	private String key;
+	private String id;
 
-	private DiffType(String key) {
-		this.key = key;
+	private DiffType(String id) {
+		this.id = id;
 	}
 
-	public String getKey() {
-		return key;
+	public String getId() {
+		return id;
 	}
 
-	public static DiffType parse(String key) {
+	public static DiffType parse(String id) {
 		for (DiffType dt : DiffType.values()) {
-			if (dt.getKey().equals(key))
+			if (dt.getId().equals(id))
 				return dt;
 		}
 		return null;

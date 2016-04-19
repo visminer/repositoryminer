@@ -24,7 +24,7 @@ public class Diff {
 		for(Diff d : diffs){
 			BasicDBObject obj = new BasicDBObject();
 			obj.append("new_path", d.getNewPath()).append("old_path", d.getOldPath()).append("lines_added", d.getLinesAdded()).
-			append("lines_removed", d.getLinesRemoved()).append("type", d.getType().getKey());
+			append("lines_removed", d.getLinesRemoved()).append("type", d.getType().getId());
 			list.add(obj);
 		}
 		return list;

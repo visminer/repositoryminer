@@ -11,21 +11,18 @@ public class Statement {
 	public NodeType getNodeType() {
 		return nodeType;
 	}
-	
 	/**
 	 * @param nodeType the nodeType to set
 	 */
 	public void setNodeType(NodeType nodeType) {
 		this.nodeType = nodeType;
 	}
-	
 	/**
 	 * @return the expression
 	 */
 	public String getExpression() {
 		return expression;
 	}
-	
 	/**
 	 * @param expression the expression to set
 	 */
@@ -33,4 +30,5 @@ public class Statement {
 		this.expression = expression;
 	}
 
+	
 }
