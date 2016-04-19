@@ -5,12 +5,12 @@ import java.util.List;
 import org.bson.Document;
 import org.repositoryminer.ast.AST;
 import org.repositoryminer.ast.MethodDeclaration;
-import org.repositoryminer.ast.TypeDeclaration;
+import org.repositoryminer.ast.AbstractTypeDeclaration;
 
 public class WMCMetric extends MethodBasedMetricTemplate{
 
 	@Override
-	public void calculate(TypeDeclaration type, List<MethodDeclaration> methods, AST ast, Document document) {
+	public void calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast, Document document) {
 		int wmc = calculate(methods);
 
 		document.append("WMC", new Document("accumulated", new Integer(wmc)));

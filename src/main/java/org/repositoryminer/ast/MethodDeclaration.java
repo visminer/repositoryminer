@@ -4,7 +4,6 @@ import java.util.List;
 
 public class MethodDeclaration {
 
-	private String uid;
 	private String name;
 	private List<String> modifiers;
 	private String returnType;
@@ -15,21 +14,6 @@ public class MethodDeclaration {
 	private boolean isConstructor;
 	private boolean isVarargs;
 	private List<String> thrownsExceptions;
-
-	/**
-	 * @return the id
-	 */
-	public String getUid() {
-		return uid;
-	}
-
-	/**
-	 * @param id
-	 *            the id to set
-	 */
-	public void setUid(String uid) {
-		this.uid = uid;
-	}
 
 	/**
 	 * @return the name

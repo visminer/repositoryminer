@@ -5,10 +5,10 @@ import java.util.List;
 
 import org.bson.Document;
 import org.repositoryminer.ast.AST;
-import org.repositoryminer.ast.ClassOrInterfaceDeclaration;
-import org.repositoryminer.ast.MethodDeclaration;
-import org.repositoryminer.ast.SoftwareUnitType;
+import org.repositoryminer.ast.DeclarationType;
 import org.repositoryminer.ast.TypeDeclaration;
+import org.repositoryminer.ast.MethodDeclaration;
+import org.repositoryminer.ast.AbstractTypeDeclaration;
 import org.repositoryminer.metric.CCMetric;
 
 public class ComplexMethod implements IAntiPattern {
@@ -22,9 +22,9 @@ public class ComplexMethod implements IAntiPattern {
 	}
 
 	@Override
-	public void detect(TypeDeclaration type, AST ast, Document document) {
-		if (type.getType() == SoftwareUnitType.CLASS_OR_INTERFACE) {
-			ClassOrInterfaceDeclaration cls = (ClassOrInterfaceDeclaration) type;
+	public void detect(AbstractTypeDeclaration type, AST ast, Document document) {
+		if (type.getType() == DeclarationType.CLASS_OR_INTERFACE) {
+			TypeDeclaration cls = (TypeDeclaration) type;
 			
 			methodsDoc = new ArrayList<Document>();
 

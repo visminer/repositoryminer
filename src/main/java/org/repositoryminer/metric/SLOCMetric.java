@@ -5,7 +5,7 @@ import java.util.regex.Pattern;
 
 import org.bson.Document;
 import org.repositoryminer.ast.AST;
-import org.repositoryminer.ast.TypeDeclaration;
+import org.repositoryminer.ast.AbstractTypeDeclaration;
 
 public class SLOCMetric implements IMetric{
 
@@ -16,7 +16,7 @@ public class SLOCMetric implements IMetric{
 	}
 
 	@Override
-	public void calculate(TypeDeclaration type, AST ast, Document document) {
+	public void calculate(AbstractTypeDeclaration type, AST ast, Document document) {
 		int sloc = calculate(ast.getSourceCode());
 		
 		document.append("SLOC", new Document("accumulated", new Integer(sloc)));

@@ -1,46 +1,57 @@
 package org.repositoryminer.ast;
 
-public class TypeDeclaration {
+import java.util.List;
 
-	private String uid;
-	private String name;
-	private SoftwareUnitType type;
+public class TypeDeclaration extends AbstractTypeDeclaration{
 
-	/**
-	 * @return the id
-	 */
-	public String getUid() {
-		return uid;
+	private boolean isInterface;
+	private List<MethodDeclaration> methods;
+	private List<FieldDeclaration> fields;
+	
+	public TypeDeclaration() {
+		setType(DeclarationType.CLASS_OR_INTERFACE);
 	}
+	
 	/**
-	 * @param id the id to set
+	 * @return the isInterface
 	 */
-	public void setUid(String uid) {
-		this.uid = uid;
-	}
-	/**
-	 * @return the name
-	 */
-	public String getName() {
-		return name;
-	}
-	/**
-	 * @param name the name to set
-	 */
-	public void setName(String name) {
-		this.name = name;
-	}
-	/**
-	 * @return the type
-	 */
-	public SoftwareUnitType getType() {
-		return type;
-	}
-	/**
-	 * @param type the type to set
-	 */
-	public void setType(SoftwareUnitType type) {
-		this.type = type;
+	public boolean isInterface() {
+		return isInterface;
 	}
 
+	/**
+	 * @param isInterface the isInterface to set
+	 */
+	public void setInterface(boolean isInterface) {
+		this.isInterface = isInterface;
+	}
+
+	/**
+	 * @return the methods
+	 */
+	public List<MethodDeclaration> getMethods() {
+		return methods;
+	}
+
+	/**
+	 * @param methods the methods to set
+	 */
+	public void setMethods(List<MethodDeclaration> methods) {
+		this.methods = methods;
+	}
+
+	/**
+	 * @return the fields
+	 */
+	public List<FieldDeclaration> getFields() {
+		return fields;
+	}
+
+	/**
+	 * @param fields the fields to set
+	 */
+	public void setFields(List<FieldDeclaration> fields) {
+		this.fields = fields;
+	}
+	
 }

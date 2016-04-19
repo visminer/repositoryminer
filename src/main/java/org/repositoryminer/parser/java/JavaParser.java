@@ -9,43 +9,39 @@ import java.util.Set;
 
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jdt.core.dom.EnumDeclaration;
 import org.eclipse.jdt.core.dom.Modifier.ModifierKeyword;
 import org.repositoryminer.ast.AST;
-import org.repositoryminer.ast.ClassOrInterfaceDeclaration;
+import org.repositoryminer.ast.TypeDeclaration;
 import org.repositoryminer.ast.Document;
-import org.repositoryminer.ast.EnumConstantDeclaration;
 import org.repositoryminer.ast.FieldDeclaration;
 import org.repositoryminer.ast.ImportDeclaration;
 import org.repositoryminer.ast.MethodDeclaration;
-import org.repositoryminer.ast.PackageDeclaration;
 import org.repositoryminer.ast.ParameterDeclaration;
 import org.repositoryminer.parser.IParser;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.Type;
-import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
 /**
  * Java AST generator
  * 
- * This class have the job to create an abstract AST upon Java source code.
- * The underlining API is the JDT, the same used by Eclipse IDE.
+ * This class have the job to create an abstract AST upon Java source code. The
+ * underlining API is the JDT, the same used by Eclipse IDE.
  * 
  * The extensions accepted for this generator are: java
  * 
  */
 
-public class JavaParser implements IParser{
+public class JavaParser implements IParser {
 
 	private List<String> sourceFolders;
 	private Set<String> extensions;
-	
+
 	public JavaParser() {
 		extensions = new HashSet<String>(1);
 		extensions.add("java");
 	}
-	
+
 	@Override
 	public Set<String> getExtensions() {
 		return extensions;
@@ -53,7 +49,7 @@ public class JavaParser implements IParser{
 
 	@Override
 	public void setSourceFolders(String repositoryPath) {
-		
+
 		sourceFolders = new ArrayList<String>();
 		java.io.File directory = new java.io.File(repositoryPath);
 
@@ -69,14 +65,15 @@ public class JavaParser implements IParser{
 				setSourceFolders(file.getAbsolutePath());
 			}
 		}
-		
+
 	}
-	
+
 	private boolean validateSourceFolder(java.io.File f) {
-		
+
 		java.io.File[] fList = f.listFiles(new FileFilter() {
 			public boolean accept(java.io.File file) {
-				return (file.isDirectory() && !file.isHidden()) || file.getName().endsWith(".java");
+				return (file.isDirectory() && !file.isHidden())
+						|| file.getName().endsWith(".java");
 			}
 		});
 
@@ -91,53 +88,54 @@ public class JavaParser implements IParser{
 			}
 		}
 		return false;
-		
+
 	}
-	
-	public AST generate(String filePath, String source){
-		
-		Document document = new  Document();
+
+	public AST generate(String filePath, String source) {
+
+		Document document = new Document();
 		document.setName(filePath);
 
-		ASTParser parser = ASTParser.newParser(org.eclipse.jdt.core.dom.AST.JLS8);
+		ASTParser parser = ASTParser
+				.newParser(org.eclipse.jdt.core.dom.AST.JLS8);
 		parser.setSource(source.toCharArray());
 		parser.setResolveBindings(true);
 		parser.setKind(ASTParser.K_COMPILATION_UNIT);
-		parser.setBindingsRecovery(true);		
+		parser.setBindingsRecovery(true);
 		parser.setUnitName(filePath.substring(filePath.lastIndexOf("/") + 1));
 
-		String[] classpath = {System.getProperty("java.home").replace("\\", "/")+"/lib/rt.jar"};
+		String[] classpath = { System.getProperty("java.home").replace("\\",
+				"/")
+				+ "/lib/rt.jar" };
 		String[] encoding = new String[sourceFolders.size()];
-		Arrays.fill(encoding, "UTF-8");		
+		Arrays.fill(encoding, "UTF-8");
 
-		parser.setEnvironment(classpath, (String[])sourceFolders.toArray(), encoding, true);
+		parser.setEnvironment(classpath, (String[]) sourceFolders.toArray(),
+				encoding, true);
 		CompilationUnit root = null;
 
-		try{
+		try {
 			root = (CompilationUnit) parser.createAST(null);
-		}catch(IllegalStateException e){
-			
+		} catch (IllegalStateException e) {
+
 			parser.setSource(source.toCharArray());
 			parser.setKind(ASTParser.K_COMPILATION_UNIT);
 			parser.setResolveBindings(false);
 			parser.setBindingsRecovery(false);
 			parser.setEnvironment(null, null, null, false);
-			
+
 			root = (CompilationUnit) parser.createAST(null);
-			
+
 		}
 
-		String pkgName = null;
-		if(root.getPackage() != null){
-			PackageDeclaration pkgDecl = new PackageDeclaration();
-			pkgDecl.setName(root.getPackage().getName().getFullyQualifiedName());
-			document.setPackageDeclaration(pkgDecl);
-			pkgName = pkgDecl.getName();
-		}
+		if (root.getPackage() != null)
+			document.setPackageDeclaration(root.getPackage().getName()
+					.getFullyQualifiedName());
 
 		List<ImportDeclaration> importsDecls = new ArrayList<ImportDeclaration>();
-		for(int i = 0; i < root.imports().size(); i++){
-			org.eclipse.jdt.core.dom.ImportDeclaration importAux = (org.eclipse.jdt.core.dom.ImportDeclaration) root.imports().get(i);
+		for (int i = 0; i < root.imports().size(); i++) {
+			org.eclipse.jdt.core.dom.ImportDeclaration importAux = (org.eclipse.jdt.core.dom.ImportDeclaration) root
+					.imports().get(i);
 			ImportDeclaration importDecl = new ImportDeclaration();
 			importDecl.setName(importAux.getName().getFullyQualifiedName());
 			importDecl.setStatic(importAux.isStatic());
@@ -146,16 +144,13 @@ public class JavaParser implements IParser{
 		}
 		document.setImports(importsDecls);
 
-		List<org.repositoryminer.ast.TypeDeclaration> typesDecls = new ArrayList<org.repositoryminer.ast.TypeDeclaration>();
-		for(int i = 0; i < root.types().size(); i++){
+		List<org.repositoryminer.ast.AbstractTypeDeclaration> typesDecls = new ArrayList<org.repositoryminer.ast.AbstractTypeDeclaration>();
+		for (int i = 0; i < root.types().size(); i++) {
 
 			Object obj = root.types().get(i);
-			if(obj instanceof TypeDeclaration){
-				TypeDeclaration typeAux = (TypeDeclaration) obj;
-				typesDecls.add(processType(typeAux, pkgName));
-			}else if(obj instanceof EnumDeclaration){
-				EnumDeclaration enumAux = (EnumDeclaration) obj;
-				typesDecls.add(processEnum(enumAux, pkgName));
+			if (obj instanceof TypeDeclaration) {
+				org.eclipse.jdt.core.dom.TypeDeclaration typeAux = (org.eclipse.jdt.core.dom.TypeDeclaration) obj;
+				typesDecls.add(processType(typeAux));
 			}
 
 		}
@@ -169,24 +164,23 @@ public class JavaParser implements IParser{
 
 	}
 
-	private static org.repositoryminer.ast.TypeDeclaration processType(TypeDeclaration type, String pkgName){
+	private static org.repositoryminer.ast.AbstractTypeDeclaration processType(
+			org.eclipse.jdt.core.dom.TypeDeclaration type) {
 
-		ClassOrInterfaceDeclaration clsDecl = new ClassOrInterfaceDeclaration();
+		TypeDeclaration clsDecl = new TypeDeclaration();
 		clsDecl.setInterface(type.isInterface());
 
-		if(pkgName != null)
-			clsDecl.setName(pkgName+".");
-
-		clsDecl.setName(clsDecl.getName() + type.getName().getFullyQualifiedName());
+		clsDecl.setName(type.getName().getFullyQualifiedName());
 
 		List<FieldDeclaration> fields = new ArrayList<FieldDeclaration>();
-		for(org.eclipse.jdt.core.dom.FieldDeclaration field : type.getFields()){
+		for (org.eclipse.jdt.core.dom.FieldDeclaration field : type.getFields()) {
 			fields.add(processField(field));
 		}
 		clsDecl.setFields(fields);
 
 		List<MethodDeclaration> methods = new ArrayList<MethodDeclaration>();
-		for(org.eclipse.jdt.core.dom.MethodDeclaration methodDecl : type.getMethods()){
+		for (org.eclipse.jdt.core.dom.MethodDeclaration methodDecl : type
+				.getMethods()) {
 			methods.add(processMethod(methodDecl));
 		}
 		clsDecl.setMethods(methods);
@@ -196,7 +190,8 @@ public class JavaParser implements IParser{
 	}
 
 	@SuppressWarnings("unchecked")
-	private static MethodDeclaration processMethod(org.eclipse.jdt.core.dom.MethodDeclaration methodDecl){
+	private static MethodDeclaration processMethod(
+			org.eclipse.jdt.core.dom.MethodDeclaration methodDecl) {
 
 		MethodDeclaration m = new MethodDeclaration();
 
@@ -206,19 +201,21 @@ public class JavaParser implements IParser{
 		StringBuilder builder = null;
 
 		builder = new StringBuilder();
-		builder.append(methodDecl.getName().getFullyQualifiedName()).append("(");
+		builder.append(methodDecl.getName().getFullyQualifiedName())
+				.append("(");
 
 		List<ParameterDeclaration> params = new ArrayList<ParameterDeclaration>();
-		for(SingleVariableDeclaration var : (List<SingleVariableDeclaration>) methodDecl.parameters()){
+		for (SingleVariableDeclaration var : (List<SingleVariableDeclaration>) methodDecl
+				.parameters()) {
 			ParameterDeclaration param = new ParameterDeclaration();
 			param.setName(var.getName().getFullyQualifiedName());
 			param.setType(var.getType().toString());
 			params.add(param);
-			builder.append(param.getType()+" "+param.getName()+",");
+			builder.append(param.getType() + " " + param.getName() + ",");
 		}
 
-		if(builder.substring(builder.length()-1).equals(","))
-			builder.replace(builder.length()-1, builder.length(), ")");
+		if (builder.substring(builder.length() - 1).equals(","))
+			builder.replace(builder.length() - 1, builder.length(), ")");
 		else
 			builder.append(")");
 
@@ -227,13 +224,13 @@ public class JavaParser implements IParser{
 
 		List<String> throwsList = new ArrayList<String>();
 		List<Type> types = methodDecl.thrownExceptionTypes();
-		for(Type type : types){
+		for (Type type : types) {
 			throwsList.add(type.toString());
 		}
 		m.setThrownsExceptions(throwsList);
 
 		List<String> modifiers = new ArrayList<String>();
-		for(Object modifier : methodDecl.modifiers()){
+		for (Object modifier : methodDecl.modifiers()) {
 			modifiers.add(modifier.toString());
 		}
 		m.setModifiers(modifiers);
@@ -242,52 +239,35 @@ public class JavaParser implements IParser{
 		methodDecl.accept(visitor);
 		m.setStatements(visitor.getStatements());
 
-		if(methodDecl.getReturnType2() != null)
+		if (methodDecl.getReturnType2() != null)
 			m.setReturnType(methodDecl.getReturnType2().toString());
-		
+
 		m.setStartPositionInSourceCode(methodDecl.getStartPosition());
-		m.setEndPositionInSourceCode(methodDecl.getStartPosition() + methodDecl.getLength());
+		m.setEndPositionInSourceCode(methodDecl.getStartPosition()
+				+ methodDecl.getLength());
 
 		return m;
 
 	}
 
 	@SuppressWarnings("unchecked")
-	private static FieldDeclaration processField(org.eclipse.jdt.core.dom.FieldDeclaration field){
+	private static FieldDeclaration processField(
+			org.eclipse.jdt.core.dom.FieldDeclaration field) {
 
-		FieldDeclaration fieldDecl = new FieldDeclaration();		
+		FieldDeclaration fieldDecl = new FieldDeclaration();
 		fieldDecl.setType(field.getType().toString());
 
-		for(VariableDeclarationFragment vdf : (List<VariableDeclarationFragment>)field.fragments())
+		for (VariableDeclarationFragment vdf : (List<VariableDeclarationFragment>) field
+				.fragments())
 			fieldDecl.setName(vdf.getName().getIdentifier());
 
-		ModifierKeyword modifier = ModifierKeyword.fromFlagValue(field.getModifiers());
-		if(modifier!=null)
+		ModifierKeyword modifier = ModifierKeyword.fromFlagValue(field
+				.getModifiers());
+		if (modifier != null)
 			fieldDecl.setModifier(modifier.toString());
 
 		return fieldDecl;
 
-	}
-
-	private static org.repositoryminer.ast.EnumDeclaration processEnum(EnumDeclaration enumType, String pkgName){
-
-		org.repositoryminer.ast.EnumDeclaration enumDecl = new org.repositoryminer.ast.EnumDeclaration();
-
-		if(pkgName != null)
-			enumDecl.setName(pkgName+".");
-
-		enumDecl.setName(enumDecl.getName() + enumType.getName().getFullyQualifiedName());
-
-		List<EnumConstantDeclaration> constsDecls = new ArrayList<EnumConstantDeclaration>();
-		for(Object elem : enumType.enumConstants()){
-			org.eclipse.jdt.core.dom.EnumConstantDeclaration constEnum = (org.eclipse.jdt.core.dom.EnumConstantDeclaration) elem;
-			EnumConstantDeclaration constDecl = new EnumConstantDeclaration();
-			constDecl.setName(enumDecl.getName() + "." + constEnum.getName().getFullyQualifiedName());
-			constsDecls.add(constDecl);
-		}
-		enumDecl.setEnumConsts(constsDecls);
-
-		return enumDecl;
 	}
 
 }

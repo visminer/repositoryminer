@@ -9,18 +9,18 @@ import org.repositoryminer.ast.FieldDeclaration;
 import org.repositoryminer.ast.MethodDeclaration;
 import org.repositoryminer.ast.NodeType;
 import org.repositoryminer.ast.Statement;
-import org.repositoryminer.ast.TypeDeclaration;
+import org.repositoryminer.ast.AbstractTypeDeclaration;
 
 public class TCCMetric extends MethodBasedMetricTemplate {
 
 	@Override
-	public void calculate(TypeDeclaration type, List<MethodDeclaration> methods, AST ast, Document document) {
+	public void calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast, Document document) {
 		float tcc = calculate(type, methods);
 		
 		document.append("TCC", new Document("accumulated", new Float(tcc)));
 	}
 
-	public float calculate(TypeDeclaration type, List<MethodDeclaration> methods) {
+	public float calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods) {
 		List<MethodDeclaration> methodList = filterMethods(methods);
 		int n = methodList.size();
 		int npc = (n * (n - 1)) / 2; // Number of possible connected methods
@@ -54,7 +54,7 @@ public class TCCMetric extends MethodBasedMetricTemplate {
 		return methodList;
 	}
 
-	private List<String> processAccessedFields(TypeDeclaration currType, MethodDeclaration method) {
+	private List<String> processAccessedFields(AbstractTypeDeclaration currType, MethodDeclaration method) {
 
 		List<String> accessedFields = new ArrayList<String>();
 

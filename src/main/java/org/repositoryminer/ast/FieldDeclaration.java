@@ -2,18 +2,9 @@ package org.repositoryminer.ast;
 
 public class FieldDeclaration {
 
-	private String uid;
 	private String name;
 	private String type;
 	private String modifier;
-
-	public String getUid() {
-		return uid;
-	}
-
-	public void setUid(String uid) {
-		this.uid = uid;
-	}
 
 	public String getName() {
 		return name;
