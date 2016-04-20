@@ -31,7 +31,7 @@ public class Repository {
 	public Document toDocument() {
 		Document doc = new Document();
 		doc.append("_id", id).append("name", name).append("description", description).append("path", path)
-				.append("scm", scm.getId()).append("contributors", Contributor.toDBList(contributors));
+				.append("scm", scm.toString()).append("contributors", Contributor.toDBList(contributors));
 		return doc;
 	}
 

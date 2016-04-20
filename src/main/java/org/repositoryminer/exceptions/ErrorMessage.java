@@ -3,7 +3,6 @@ package org.repositoryminer.exceptions;
 public enum ErrorMessage {
 
 	AST_GENERATOR_FACTORY_ERROR("It was impossible to create an instance of an ASTGenerator."),
-	
 	GIT_BRANCH_LIST_ERROR("GIT - It was impossible to list the branches."), 
 	GIT_TAG_LIST_ERROR("GIT - It was impossible to list the tags."),
 	GIT_LOG_COMMIT_ERROR("GIT - It was impossible to list the commits."),

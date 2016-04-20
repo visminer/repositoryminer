@@ -47,7 +47,6 @@ public interface SCM {
 	public List<Commit> getCommits(int skip, int maxCount);
 	
 	/**
-	 * 
 	 * @param fullName
 	 * @param type
 	 * @return A list of commits names in the reference.

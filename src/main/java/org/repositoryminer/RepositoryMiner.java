@@ -22,15 +22,6 @@ import org.repositoryminer.utility.HashHandler;
 public class RepositoryMiner {
 
 	private List<SCMRepository> repositories = null;
-	private int commitThreshold = 3000;
-
-	public int getCommitThreshold() {
-		return commitThreshold;
-	}
-
-	public void setCommitThreshold(int commitThreshold) {
-		this.commitThreshold = commitThreshold;
-	}
 
 	public RepositoryMiner setRepositories(SCMRepository... repositories) {
 		this.repositories = Arrays.asList(repositories);
@@ -70,9 +61,9 @@ public class RepositoryMiner {
 			Set<Contributor> contributors = new HashSet<Contributor>();
 			CommitDocumentHandler commitHandler = new CommitDocumentHandler();
 			while(true) {
-				List<Commit> commits = scm.getCommits(skip, commitThreshold);
+				List<Commit> commits = scm.getCommits(skip, repository.getCommitThreshold());
 				if(commits.size() == 0) break;
-				skip += commitThreshold;
+				skip += repository.getCommitThreshold();
 				
 				List<Document> docs = new ArrayList<Document>();
 				for(Commit c : commits){

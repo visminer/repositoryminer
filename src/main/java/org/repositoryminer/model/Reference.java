@@ -23,7 +23,7 @@ public class Reference {
 	public Document toDocument() {
 		Document doc = new Document();
 		doc.append("_id", id).append("repository", repository).append("name", name).append("full_name", fullName).
-		append("type", type.getId()).append("commits", commits);
+		append("type", type.toString()).append("commits", commits);
 		return doc;
 	}
 	

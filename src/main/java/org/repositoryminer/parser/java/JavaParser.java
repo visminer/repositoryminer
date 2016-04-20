@@ -146,13 +146,11 @@ public class JavaParser implements IParser {
 
 		List<org.repositoryminer.ast.AbstractTypeDeclaration> typesDecls = new ArrayList<org.repositoryminer.ast.AbstractTypeDeclaration>();
 		for (int i = 0; i < root.types().size(); i++) {
-
 			Object obj = root.types().get(i);
 			if (obj instanceof TypeDeclaration) {
 				org.eclipse.jdt.core.dom.TypeDeclaration typeAux = (org.eclipse.jdt.core.dom.TypeDeclaration) obj;
 				typesDecls.add(processType(typeAux));
 			}
-
 		}
 		document.setTypes(typesDecls);
 
