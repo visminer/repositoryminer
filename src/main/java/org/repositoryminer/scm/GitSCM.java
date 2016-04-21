@@ -254,7 +254,17 @@ public class GitSCM implements SCM {
 
 			RevCommit parentCommit = oldCommit == null ? null
 					: revWalk.parseCommit(ObjectId.fromString(oldCommit.getName()));
-			String path = !entry.getNewPath().equals("/dev/null") ? entry.getNewPath() : entry.getOldPath();
+			
+			String path;
+			String oldPath;
+			if(!entry.getNewPath().equals("/dev/null")){
+				path = entry.getNewPath();
+				oldPath = absolutePath+"/"+entry.getOldPath();
+			}else{
+				path = entry.getOldPath();
+				oldPath = null;
+			}
+			
 			int[] lines = getLinesAddedAndDeleted(path, parentCommit, revCommit);
 			DiffType type = null;
 
@@ -276,8 +286,8 @@ public class GitSCM implements SCM {
 				break;
 			}
 
-			String oldPath = type == DiffType.RENAME ? entry.getOldPath() : null;
-			Diff change = new Diff(path, oldPath, lines[0], lines[1], type);
+			path = absolutePath+"/"+path;
+			Diff change = new Diff(path, oldPath, HashHandler.SHA1(path), lines[0], lines[1], type);
 			changes.add(change);
 		}
 		return changes;
