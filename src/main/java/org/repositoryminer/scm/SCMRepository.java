@@ -14,7 +14,7 @@ public class SCMRepository {
 	private String name;
 	private String description;
 	private SCMType scm;
-	private int commitThreshold = 5000;
+	private int commitThreshold = 3000;
 	private String charset = "UTF-8";
 	private int binaryThreshold = 2048;
 	private List<IParser> parsers;

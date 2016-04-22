@@ -71,6 +71,8 @@ public class RepositoryMiner {
 			while(true) {
 				List<Commit> commits = scm.getCommits(skip, repository.getCommitThreshold());
 				List<Document> docs = new ArrayList<Document>();
+				if(commits.size() == 0) break;
+				
 				for(Commit c : commits){
 					docs.add(c.toDocument());
 					contributors.add(c.getCommitter());
@@ -80,10 +82,7 @@ public class RepositoryMiner {
 				if(sourceAnalyzer != null)
 					sourceAnalyzer.analyze(commits);
 				
-				if(repository.getCommitThreshold() == 0) 
-					break;
-				
-				if(commits.size() == 0) break;
+				if(repository.getCommitThreshold() == 0) break;
 				skip += repository.getCommitThreshold();
 			}
 
