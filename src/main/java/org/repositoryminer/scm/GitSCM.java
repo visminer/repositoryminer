@@ -60,13 +60,13 @@ public class GitSCM implements SCM {
 	private String repoId;
 
 	@Override
-	public void open(String repositoryPath) {
+	public void open(String repositoryPath, int binaryThreshold) {
 		FileRepositoryBuilder repositoryBuilder = new FileRepositoryBuilder();
 		try {
 			repository = repositoryBuilder.setGitDir(new java.io.File(repositoryPath)).readEnvironment().findGitDir()
 					.build();
 		} catch (IOException e) {
-			throw new VisMinerAPIException(e.getMessage(), e);
+			throw new VisMinerAPIException(ErrorMessage.GIT_REPOSITORY_IOERROR.toString(), e);
 		}
 
 		git = new Git(repository);
@@ -76,9 +76,11 @@ public class GitSCM implements SCM {
 		diffFormatter = new DiffFormatter(DisabledOutputStream.INSTANCE);
 		diffFormatter.setRepository(repository);
 		diffFormatter.setContext(0);
-		diffFormatter.setBinaryFileThreshold(2048); // 2MB
 		diffFormatter.setDiffComparator(RawTextComparator.DEFAULT);
 		diffFormatter.setDetectRenames(true);
+
+		if (binaryThreshold != 0)
+			diffFormatter.setBinaryFileThreshold(binaryThreshold);
 
 		absolutePath = repository.getWorkTree().getAbsolutePath().replace("\\", "/");
 		repoId = HashHandler.SHA1(absolutePath);
@@ -135,7 +137,10 @@ public class GitSCM implements SCM {
 	public List<Commit> getCommits(int skip, int maxCount) {
 		Iterable<RevCommit> revCommits = null;
 		try {
-			revCommits = git.log().all().setSkip(skip).setMaxCount(maxCount).call();
+			if(maxCount != 0)
+				revCommits = git.log().all().setSkip(skip).setMaxCount(maxCount).call();
+			else
+				revCommits = git.log().all().call();
 		} catch (GitAPIException | IOException e) {
 			errorHandler(ErrorMessage.GIT_LOG_COMMIT_ERROR.toString(), e);
 		}
@@ -162,8 +167,8 @@ public class GitSCM implements SCM {
 				errorHandler(ErrorMessage.GIT_RETRIEVE_CHANGES_ERROR.toString(), e);
 			}
 
-			Commit c = new Commit(revCommit.getName(), revCommit.getShortMessage(), revCommit.getFullMessage(),
-					author.getWhen(), committer.getWhen(), repoId, parents, myAuthor, myCommitter, changes);
+			Commit c = new Commit(revCommit.getName(), revCommit.getFullMessage(), author.getWhen(),
+					committer.getWhen(), repoId, parents, myAuthor, myCommitter, changes);
 			commits.add(c);
 
 		}
@@ -254,17 +259,17 @@ public class GitSCM implements SCM {
 
 			RevCommit parentCommit = oldCommit == null ? null
 					: revWalk.parseCommit(ObjectId.fromString(oldCommit.getName()));
-			
+
 			String path;
 			String oldPath;
-			if(!entry.getNewPath().equals("/dev/null")){
+			if (!entry.getNewPath().equals("/dev/null")) {
 				path = entry.getNewPath();
-				oldPath = absolutePath+"/"+entry.getOldPath();
-			}else{
+				oldPath = absolutePath + "/" + entry.getOldPath();
+			} else {
 				path = entry.getOldPath();
 				oldPath = null;
 			}
-			
+
 			int[] lines = getLinesAddedAndDeleted(path, parentCommit, revCommit);
 			DiffType type = null;
 
@@ -286,7 +291,7 @@ public class GitSCM implements SCM {
 				break;
 			}
 
-			path = absolutePath+"/"+path;
+			path = absolutePath + "/" + path;
 			Diff change = new Diff(path, oldPath, HashHandler.SHA1(path), lines[0], lines[1], type);
 			changes.add(change);
 		}

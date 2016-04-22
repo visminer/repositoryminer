@@ -22,9 +22,10 @@ public interface SCM {
 	
 	/**
 	 * @param repositoryPath
+	 * @param binaryThreshold
 	 * Initializes the repository analysis.
 	 */
-	public void open(String repositoryPath);
+	public void open(String repositoryPath, int binaryThreshold);
 	
 	/**
 	 * @return The absolute path of the repository.

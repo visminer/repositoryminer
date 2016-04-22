@@ -25,4 +25,10 @@ public interface IParser {
 	 */
 	public AST generate(String filePath, String source);
 	
+	/**
+	 * @param charset
+	 * Just use this method to get the project charset from a lower layer.
+	 */
+	public void setCharSet(String charset);
+	
 }

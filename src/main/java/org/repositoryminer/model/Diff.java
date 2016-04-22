@@ -1,9 +1,9 @@
 package org.repositoryminer.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import com.mongodb.BasicDBList;
-import com.mongodb.BasicDBObject;
+import org.bson.Document;
 
 /**
  * This class represents the "change" object in the database. This class
@@ -21,14 +21,14 @@ public class Diff {
 	public Diff() {
 	}
 
-	public static BasicDBList toDBList(List<Diff> diffs) {
-		BasicDBList list = new BasicDBList();
+	public static List<Document> toDocumentList(List<Diff> diffs) {
+		List<Document> list = new ArrayList<Document>();
 		for (Diff d : diffs) {
-			BasicDBObject obj = new BasicDBObject();
-			obj.append("path", d.getPath()).append("old_path", d.getOldPath()).append("hash", d.getHash())
+			Document doc = new Document();
+			doc.append("path", d.getPath()).append("old_path", d.getOldPath()).append("hash", d.getHash())
 					.append("lines_added", d.getLinesAdded()).append("lines_removed", d.getLinesRemoved())
 					.append("type", d.getType().toString());
-			list.add(obj);
+			list.add(doc);
 		}
 		return list;
 	}

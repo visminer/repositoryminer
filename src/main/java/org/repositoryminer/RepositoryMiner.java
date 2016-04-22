@@ -1,5 +1,6 @@
 package org.repositoryminer;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -7,6 +8,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.bson.Document;
+import org.repositoryminer.analyzer.SourceAnalyzer;
 import org.repositoryminer.model.Commit;
 import org.repositoryminer.model.Contributor;
 import org.repositoryminer.model.Reference;
@@ -32,51 +34,63 @@ public class RepositoryMiner {
 		this.repositories = repositories;
 		return this;
 	}
-	
+
 	public List<SCMRepository> getRepositories(){
 		return repositories;
 	}
-	
-	public void mine() {
+
+	public void mine() throws UnsupportedEncodingException {
 		for(SCMRepository repository : repositories){
 			SCM scm = SCMFactory.getSCM(repository.getScm());
-			scm.open(repository.getPath());
-			
+			scm.open(repository.getPath(), repository.getBinaryThreshold());
+
 			String absPath = scm.getAbsolutePath();
 			String id = HashHandler.SHA1(absPath);
-			
+
 			Repository r = new Repository(repository);
 			r.setId(id);
 			r.setPath(absPath);
-			
+
 			ReferenceDocumentHandler refHandler = new ReferenceDocumentHandler();
 			List<Reference> refs = scm.getReferences();
 			for(Reference ref : refs){
 				ref.setCommits(scm.getReferenceCommits(ref.getFullName(), ref.getType()));
-				refHandler.inser(ref.toDocument());
+				refHandler.insert(ref.toDocument());
 				ref.setCommits(null);
 			}
-			
+
 			int skip = 0;
 			Set<Contributor> contributors = new HashSet<Contributor>();
 			CommitDocumentHandler commitHandler = new CommitDocumentHandler();
+
+			SourceAnalyzer sourceAnalyzer = null;
+			if(repository.getMetrics() != null || repository.getAntiPatterns() != null){
+				sourceAnalyzer = new SourceAnalyzer(repository, scm, id, absPath);
+			}
+
 			while(true) {
 				List<Commit> commits = scm.getCommits(skip, repository.getCommitThreshold());
-				if(commits.size() == 0) break;
-				skip += repository.getCommitThreshold();
-				
 				List<Document> docs = new ArrayList<Document>();
 				for(Commit c : commits){
 					docs.add(c.toDocument());
 					contributors.add(c.getCommitter());
 				}
+				
 				commitHandler.insertMany(docs);
+				if(sourceAnalyzer != null)
+					sourceAnalyzer.analyze(commits);
+				
+				if(repository.getCommitThreshold() == 0) 
+					break;
+				
+				if(commits.size() == 0) break;
+				skip += repository.getCommitThreshold();
 			}
-			
+
 			RepositoryDocumentHandler repoHandler = new RepositoryDocumentHandler();
 			r.setContributors(new ArrayList<Contributor>(contributors));
-			repoHandler.inser(r.toDocument());
-			
+			repoHandler.insert(r.toDocument());
+
 			scm.close();
 		}
 	}

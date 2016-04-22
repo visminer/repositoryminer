@@ -26,11 +26,10 @@ import org.eclipse.jdt.core.dom.WhileStatement;
 import org.repositoryminer.ast.NodeType;
 import org.repositoryminer.ast.Statement;
 
-
 public class MethodVisitor extends ASTVisitor {
 
 	private List<Statement> statements = new ArrayList<Statement>();
-	
+
 	@Override
 	public boolean visit(BreakStatement node) {
 		return addStatement(NodeType.BREAK, null);
@@ -58,13 +57,14 @@ public class MethodVisitor extends ASTVisitor {
 
 	@Override
 	public boolean visit(ForStatement node) {
-		return addStatement(NodeType.FOR, node.getExpression().toString());
+		String expression = node.getExpression() != null ? node.getExpression().toString() : "";
+		return addStatement(NodeType.FOR, expression);
 	}
 
 	@Override
 	public boolean visit(IfStatement node) {
 		addStatement(NodeType.IF, node.getExpression().toString());
-		if(node.getElseStatement() != null)
+		if (node.getElseStatement() != null)
 			addStatement(NodeType.ELSE, null);
 		return true;
 	}
@@ -76,11 +76,11 @@ public class MethodVisitor extends ASTVisitor {
 
 	@Override
 	public boolean visit(SwitchCase node) {
-		if(node.isDefault())
+		if (node.isDefault())
 			return addStatement(NodeType.SWITCH_DEFAULT, null);
 		else
 			return addStatement(NodeType.SWITCH_CASE, node.getExpression().toString());
-			
+
 	}
 
 	@Override
@@ -91,7 +91,7 @@ public class MethodVisitor extends ASTVisitor {
 	@Override
 	public boolean visit(TryStatement node) {
 		addStatement(NodeType.TRY, null);
-		if(node.getFinally() != null)
+		if (node.getFinally() != null)
 			addStatement(NodeType.FINALLY, null);
 		return true;
 	}
@@ -103,34 +103,33 @@ public class MethodVisitor extends ASTVisitor {
 
 	@Override
 	public boolean visit(ExpressionStatement node) {
-		if(node.getNodeType() == ASTNode.CONDITIONAL_EXPRESSION)
+		if (node.getNodeType() == ASTNode.CONDITIONAL_EXPRESSION)
 			return addStatement(NodeType.CONDITIONAL_EXPRESSION, node.getExpression().toString());
 		return true;
 	}
-	
+
 	@Override
 	public boolean visit(MethodInvocation node) {
-		if(node.resolveMethodBinding()!=null){
-			ITypeBinding type=node.resolveMethodBinding().getDeclaringClass();
-			if(type.isFromSource()){
-				String expression = type.getQualifiedName()+"."+node.resolveMethodBinding().getName();
+		if (node.resolveMethodBinding() != null) {
+			ITypeBinding type = node.resolveMethodBinding().getDeclaringClass();
+			if (type.isFromSource()) {
+				String expression = type.getQualifiedName() + "." + node.resolveMethodBinding().getName();
 				return addStatement(NodeType.METHOD_INVOCATION, expression);
 			}
 		}
-		return true;		
+		return true;
 	}
-	
-	
+
 	@Override
-	public boolean visit(SimpleName node) {		
-		if(node.resolveBinding()!=null){
-			if(node.resolveBinding().getKind()==IBinding.VARIABLE){
-				IVariableBinding variable = (IVariableBinding)node.resolveBinding();
-				if(variable.getDeclaringClass()!=null){
-					if(variable.isField() && variable.getDeclaringClass().isFromSource()){
-						String expression = variable.getDeclaringClass().getQualifiedName()+"."+variable.getName();
+	public boolean visit(SimpleName node) {
+		if (node.resolveBinding() != null) {
+			if (node.resolveBinding().getKind() == IBinding.VARIABLE) {
+				IVariableBinding variable = (IVariableBinding) node.resolveBinding();
+				if (variable.getDeclaringClass() != null) {
+					if (variable.isField() && variable.getDeclaringClass().isFromSource()) {
+						String expression = variable.getDeclaringClass().getQualifiedName() + "." + variable.getName();
 						return addStatement(NodeType.FIELD_ACCESS, expression);
-					}	
+					}
 				}
 			}
 		}
@@ -140,13 +139,13 @@ public class MethodVisitor extends ASTVisitor {
 	public List<Statement> getStatements() {
 		return statements;
 	}
-	
-	private boolean addStatement(NodeType type, String expression){
+
+	private boolean addStatement(NodeType type, String expression) {
 		Statement stmt = new Statement();
 		stmt.setNodeType(type);
 		stmt.setExpression(expression);
 		statements.add(stmt);
 		return true;
 	}
-	
+
 }

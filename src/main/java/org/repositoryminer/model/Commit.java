@@ -12,8 +12,7 @@ import org.bson.Document;
 public class Commit {
 
 	private String id;
-	private String shortMessage;
-	private String fullMessage;
+	private String message;
 	private Date authoredDate;
 	private Date commitDate;
 	private String repository;
@@ -27,19 +26,18 @@ public class Commit {
 
 	public Document toDocument() {
 		Document doc = new Document();
-		doc.append("_id", id).append("short_message", shortMessage).append("full_message", fullMessage).
-		append("authored_date", authoredDate).append("commit_date", commitDate).append("repository", repository).
-		append("parents", parents).append("author", author.toDBObject()).append("committer", committer.toDBObject()).
-		append("diffs", Diff.toDBList(diffs));
+		doc.append("_id", id).append("message", message).append("authored_date", authoredDate)
+				.append("commit_date", commitDate).append("repository", repository).append("parents", parents)
+				.append("author", author.toDocument()).append("committer", committer.toDocument())
+				.append("diffs", Diff.toDocumentList(diffs));
 		return doc;
 	}
 
-	public Commit(String id, String shortMessage, String fullMessage, Date authoredDate, Date commitDate,
-			String repository, List<String> parents, Contributor author, Contributor committer, List<Diff> diffs) {
+	public Commit(String id, String message, Date authoredDate, Date commitDate, String repository,
+			List<String> parents, Contributor author, Contributor committer, List<Diff> diffs) {
 		super();
 		this.id = id;
-		this.shortMessage = shortMessage;
-		this.fullMessage = fullMessage;
+		this.message = message;
 		this.authoredDate = authoredDate;
 		this.commitDate = commitDate;
 		this.repository = repository;
@@ -65,33 +63,18 @@ public class Commit {
 	}
 
 	/**
-	 * @return the shortMessage
+	 * @return the message
 	 */
-	public String getShortMessage() {
-		return shortMessage;
+	public String getMessage() {
+		return message;
 	}
 
 	/**
-	 * @param shortMessage
-	 *            the shortMessage to set
+	 * @param message
+	 *            the message to set
 	 */
-	public void setShortMessage(String shortMessage) {
-		this.shortMessage = shortMessage;
-	}
-
-	/**
-	 * @return the fullMessage
-	 */
-	public String getFullMessage() {
-		return fullMessage;
-	}
-
-	/**
-	 * @param fullMessage
-	 *            the fullMessage to set
-	 */
-	public void setFullMessage(String fullMessage) {
-		this.fullMessage = fullMessage;
+	public void setMessage(String message) {
+		this.message = message;
 	}
 
 	/**

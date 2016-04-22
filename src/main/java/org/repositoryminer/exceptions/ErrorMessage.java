@@ -12,6 +12,7 @@ public enum ErrorMessage {
 	GIT_BRANCH_COMMITS_ERROR("GIT - It was impossible to retrieve the commits of a branch."),
 	GIT_TAG_COMMITS_ERROR("GIT - It was impossible to retrieve the commits of a tag."),
 	GIT_RETRIEVE_DATA_ERROR("GIT - It was impossible to retrieve the data from a file."),
+	GIT_REPOSITORY_IOERROR("GIT - It was impossible to analyze the repository."),
 	SCM_NOT_FOUND("Not found SCM system."),
 	DUPLICATE_REPOSITORY("Repository already exists in database.");
 	

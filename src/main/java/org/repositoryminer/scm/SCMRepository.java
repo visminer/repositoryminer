@@ -1,5 +1,6 @@
 package org.repositoryminer.scm;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.repositoryminer.antipattern.IAntiPattern;
@@ -13,14 +14,15 @@ public class SCMRepository {
 	private String name;
 	private String description;
 	private SCMType scm;
-	private int commitThreshold = 3000;
+	private int commitThreshold = 5000;
 	private String charset = "UTF-8";
 	private int binaryThreshold = 2048;
-	private List<IParser> parser;
+	private List<IParser> parsers;
 	private List<IMetric> metrics;
 	private List<IAntiPattern> antiPatterns;
-	private boolean allowTextFiles;
-	private List<String> allowedExtensions;
+	// TODO : Should I use this?
+	//private boolean allowTextFiles;
+	//private List<String> allowedExtensions;
 
 	public SCMRepository() {
 	}
@@ -33,6 +35,20 @@ public class SCMRepository {
 		this.scm = scm;
 	}
 
+	public SCMRepository setParsers(IParser... parsers){
+		this.parsers = Arrays.asList(parsers);
+		return this;
+	}
+	public SCMRepository setMetrics(IMetric... metrics){
+		this.metrics = Arrays.asList(metrics);
+		return this;
+	}
+	
+	public SCMRepository setAntiPatterns(IAntiPattern... antiPatterns){
+		this.antiPatterns = Arrays.asList(antiPatterns);
+		return this;
+	}
+	
 	/**
 	 * @return the path
 	 */
@@ -44,8 +60,9 @@ public class SCMRepository {
 	 * @param path
 	 *            the path to set
 	 */
-	public void setPath(String path) {
+	public SCMRepository setPath(String path) {
 		this.path = path;
+		return this;
 	}
 
 	/**
@@ -59,8 +76,9 @@ public class SCMRepository {
 	 * @param name
 	 *            the name to set
 	 */
-	public void setName(String name) {
+	public SCMRepository setName(String name) {
 		this.name = name;
+		return this;
 	}
 
 	/**
@@ -74,8 +92,9 @@ public class SCMRepository {
 	 * @param description
 	 *            the description to set
 	 */
-	public void setDescription(String description) {
+	public SCMRepository setDescription(String description) {
 		this.description = description;
+		return this;
 	}
 
 	/**
@@ -89,8 +108,9 @@ public class SCMRepository {
 	 * @param scm
 	 *            the scm to set
 	 */
-	public void setScm(SCMType scm) {
+	public SCMRepository setScm(SCMType scm) {
 		this.scm = scm;
+		return this;
 	}
 
 	/**
@@ -104,8 +124,9 @@ public class SCMRepository {
 	 * @param commitThreshold
 	 *            the commitThreshold to set
 	 */
-	public void setCommitThreshold(int commitThreshold) {
+	public SCMRepository setCommitThreshold(int commitThreshold) {
 		this.commitThreshold = commitThreshold;
+		return this;
 	}
 
 	/**
@@ -119,8 +140,9 @@ public class SCMRepository {
 	 * @param charset
 	 *            the charset to set
 	 */
-	public void setCharset(String charset) {
+	public SCMRepository setCharset(String charset) {
 		this.charset = charset;
+		return this;
 	}
 
 	/**
@@ -134,23 +156,25 @@ public class SCMRepository {
 	 * @param binaryThreshold
 	 *            the binaryThreshold to set
 	 */
-	public void setBinaryThreshold(int binaryThreshold) {
+	public SCMRepository setBinaryThreshold(int binaryThreshold) {
 		this.binaryThreshold = binaryThreshold;
+		return this;
 	}
 
 	/**
-	 * @return the parser
+	 * @return the parsers
 	 */
-	public List<IParser> getParser() {
-		return parser;
+	public List<IParser> getParsers() {
+		return parsers;
 	}
 
 	/**
-	 * @param parser
-	 *            the parser to set
+	 * @param parsers
+	 *            the parsers to set
 	 */
-	public void setParser(List<IParser> parser) {
-		this.parser = parser;
+	public SCMRepository setParsers(List<IParser> parsers) {
+		this.parsers = parsers;
+		return this;
 	}
 
 	/**
@@ -164,8 +188,9 @@ public class SCMRepository {
 	 * @param metrics
 	 *            the metrics to set
 	 */
-	public void setMetrics(List<IMetric> metrics) {
+	public SCMRepository setMetrics(List<IMetric> metrics) {
 		this.metrics = metrics;
+		return this;
 	}
 
 	/**
@@ -179,38 +204,9 @@ public class SCMRepository {
 	 * @param antiPatterns
 	 *            the antiPatterns to set
 	 */
-	public void setAntiPatterns(List<IAntiPattern> antiPatterns) {
+	public SCMRepository setAntiPatterns(List<IAntiPattern> antiPatterns) {
 		this.antiPatterns = antiPatterns;
+		return this;
 	}
-
-	/**
-	 * @return the allowTextFiles
-	 */
-	public boolean isAllowTextFiles() {
-		return allowTextFiles;
-	}
-
-	/**
-	 * @param allowTextFiles
-	 *            the allowTextFiles to set
-	 */
-	public void setAllowTextFiles(boolean allowTextFiles) {
-		this.allowTextFiles = allowTextFiles;
-	}
-
-	/**
-	 * @return the allowedExtensions
-	 */
-	public List<String> getAllowedExtensions() {
-		return allowedExtensions;
-	}
-
-	/**
-	 * @param allowedExtensions
-	 *            the allowedExtensions to set
-	 */
-	public void setAllowedExtensions(List<String> allowedExtensions) {
-		this.allowedExtensions = allowedExtensions;
-	}
-
+	
 }

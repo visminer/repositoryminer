@@ -25,24 +25,34 @@ public class SourceAnalyzer {
 	private SCMRepository repository;
 	private Map<String, IParser> parserMap;
 	private String repositoryId;
+	private String repositoryPath;
 	private CommitAnalysisDocumentHandler persistence;
 
-	public SourceAnalyzer(SCMRepository repository, SCM scm, String repositoryId) {
+	public SourceAnalyzer(SCMRepository repository, SCM scm, String repositoryId, String repositoryPath) {
 		this.scm = scm;
 		this.repository = repository;
 		this.repositoryId = repositoryId;
+		this.repositoryPath = repositoryPath;
 		this.persistence = new CommitAnalysisDocumentHandler();
 
 		parserMap = new HashMap<String, IParser>();
-		for (IParser parser : repository.getParser())
+		for (IParser parser : repository.getParsers()){
+			parser.setCharSet(repository.getCharset());
 			for (String ext : parser.getExtensions())
 				parserMap.put(ext, parser);
+		}
 	}
 
-	public void analyze(Commit commit) throws UnsupportedEncodingException {
-		scm.checkout(commit.getId());
-		for (Diff diff : commit.getDiffs())
-			processAST(diff.getPath(), diff.getHash(), commit.getId());
+	public void analyze(List<Commit> commits) throws UnsupportedEncodingException {
+		for (Commit commit : commits) {
+			scm.checkout(commit.getId());
+
+			for (IParser parser : repository.getParsers())
+				parser.setSourceFolders(repositoryPath);
+
+			for (Diff diff : commit.getDiffs()) 
+				processAST(diff.getPath(), diff.getHash(), commit.getId());
+		}
 	}
 
 	private void processAST(String file, String fileHash, String commit) throws UnsupportedEncodingException {
@@ -53,7 +63,7 @@ public class SourceAnalyzer {
 		if (parser == null)
 			return;
 
-		byte[] data = scm.getData(commit, file);
+		byte[] data = scm.getData(commit, file.replaceFirst(repositoryPath + "/", ""));
 		if (data == null)
 			return;
 
@@ -78,26 +88,31 @@ public class SourceAnalyzer {
 			typeDoc.append("name", type.getName()).append("declaration", type.getType().toString()).append("hash",
 					HashHandler.SHA1(typeHash));
 
-			List<Document> metricsDoc = new ArrayList<Document>();
-			for (IMetric metric : repository.getMetrics()) {
-				Document mDoc = new Document();
-				metric.calculate(type, ast, mDoc);
-				metricsDoc.add(mDoc);
+			if (repository.getMetrics() != null) {
+				List<Document> metricsDoc = new ArrayList<Document>();
+				for (IMetric metric : repository.getMetrics()) {
+					Document mDoc = new Document();
+					metric.calculate(type, ast, mDoc);
+					metricsDoc.add(mDoc);
+				}
+				typeDoc.append("metrics", metricsDoc);
 			}
-			typeDoc.append("metrics", metricsDoc);
 
-			List<Document> antiPatternsDoc = new ArrayList<Document>();
-			for (IAntiPattern antiPattern : repository.getAntiPatterns()) {
-				Document apDoc = new Document();
-				antiPattern.detect(type, ast, apDoc);
-				antiPatternsDoc.add(apDoc);
+			if (repository.getAntiPatterns() != null) {
+				List<Document> antiPatternsDoc = new ArrayList<Document>();
+				for (IAntiPattern antiPattern : repository.getAntiPatterns()) {
+					Document apDoc = new Document();
+					antiPattern.detect(type, ast, apDoc);
+					antiPatternsDoc.add(apDoc);
+				}
+				typeDoc.append("antipatterns", antiPatternsDoc);
 			}
-			typeDoc.append("antipatterns", antiPatternsDoc);
+
 			abstractTypeDocs.add(typeDoc);
 		}
 
 		doc.append("abstract_types", abstractTypeDocs);
-		persistence.inser(doc);
+		persistence.insert(doc);
 	}
 
 }

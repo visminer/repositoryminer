@@ -16,7 +16,7 @@ public class DocumentHandler {
 
 	protected MongoCollection<Document> collection = null;
 
-	public void inser(Document document) {
+	public void insert(Document document) {
 		collection.insertOne(document);
 	}
 

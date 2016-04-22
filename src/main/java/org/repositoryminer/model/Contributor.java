@@ -1,9 +1,9 @@
 package org.repositoryminer.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import com.mongodb.BasicDBList;
-import com.mongodb.BasicDBObject;
+import org.bson.Document;
 
 /**
  * This class represents the "personIdent" object in the database. This class
@@ -23,16 +23,16 @@ public class Contributor {
 		this.email = email;
 	}
 
-	public BasicDBObject toDBObject() {
-		BasicDBObject obj = new BasicDBObject();
-		obj.append("name", name).append("email", "email");
-		return obj;
+	public Document toDocument() {
+		Document doc = new Document();
+		doc.append("name", name).append("email", "email");
+		return doc;
 	}
 
-	public static BasicDBList toDBList(List<Contributor> contributors) {
-		BasicDBList list = new BasicDBList();
+	public static List<Document> toDocumentList(List<Contributor> contributors) {
+		List<Document> list = new ArrayList<Document>();
 		for (Contributor c : contributors) {
-			list.add(c.toDBObject());
+			list.add(c.toDocument());
 		}
 		return list;
 	}
