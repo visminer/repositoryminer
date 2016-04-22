@@ -25,7 +25,7 @@ public class Contributor {
 
 	public Document toDocument() {
 		Document doc = new Document();
-		doc.append("name", name).append("email", "email");
+		doc.append("name", name).append("email", email);
 		return doc;
 	}
 
