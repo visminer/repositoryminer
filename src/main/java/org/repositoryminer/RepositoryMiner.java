@@ -64,7 +64,7 @@ public class RepositoryMiner {
 			CommitDocumentHandler commitHandler = new CommitDocumentHandler();
 
 			SourceAnalyzer sourceAnalyzer = null;
-			if(repository.getMetrics() != null || repository.getAntiPatterns() != null){
+			if(repository.getMetrics() != null || repository.getCodeSmells() != null){
 				sourceAnalyzer = new SourceAnalyzer(repository, scm, id, absPath);
 			}
 
