@@ -3,7 +3,7 @@ package org.repositoryminer.scm;
 import java.util.Arrays;
 import java.util.List;
 
-import org.repositoryminer.antipattern.IAntiPattern;
+import org.repositoryminer.codesmell.ICodeSmell;
 import org.repositoryminer.metric.IMetric;
 import org.repositoryminer.model.SCMType;
 import org.repositoryminer.parser.IParser;
@@ -19,7 +19,7 @@ public class SCMRepository {
 	private int binaryThreshold = 2048;
 	private List<IParser> parsers;
 	private List<IMetric> metrics;
-	private List<IAntiPattern> antiPatterns;
+	private List<ICodeSmell> codeSmells;
 	// TODO : Should I use this?
 	//private boolean allowTextFiles;
 	//private List<String> allowedExtensions;
@@ -44,8 +44,8 @@ public class SCMRepository {
 		return this;
 	}
 	
-	public SCMRepository setAntiPatterns(IAntiPattern... antiPatterns){
-		this.antiPatterns = Arrays.asList(antiPatterns);
+	public SCMRepository setCodeSmells(ICodeSmell... codeSmells){
+		this.codeSmells = Arrays.asList(codeSmells);
 		return this;
 	}
 	
@@ -196,16 +196,16 @@ public class SCMRepository {
 	/**
 	 * @return the antiPatterns
 	 */
-	public List<IAntiPattern> getAntiPatterns() {
-		return antiPatterns;
+	public List<ICodeSmell> getCodeSmells() {
+		return codeSmells;
 	}
 
 	/**
 	 * @param antiPatterns
 	 *            the antiPatterns to set
 	 */
-	public SCMRepository setAntiPatterns(List<IAntiPattern> antiPatterns) {
-		this.antiPatterns = antiPatterns;
+	public SCMRepository setCodeSmells(List<ICodeSmell> codeSmells) {
+		this.codeSmells = codeSmells;
 		return this;
 	}
 	
