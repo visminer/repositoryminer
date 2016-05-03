@@ -14,6 +14,7 @@ public class MethodDeclaration {
 	private boolean isConstructor;
 	private boolean isVarargs;
 	private List<String> thrownsExceptions;
+	private int maxNesting;
 
 	/**
 	 * @return the name
@@ -166,6 +167,22 @@ public class MethodDeclaration {
 	 */
 	public void setEndPositionInSourceCode(int endPositionInSourceCode) {
 		this.endPositionInSourceCode = endPositionInSourceCode;
+	}
+	
+
+	/**
+	 * @param maxNesting
+	 *            the max nesting of statements within the method
+	 */
+	public void setMaxNesting(int maxNesting) {
+		this.maxNesting = maxNesting;
+	}
+
+	/**
+	 * @return the max nesting of statements within the method
+	 */
+	public int getMaxNesting() {
+		return maxNesting;
 	}
 
 }
