@@ -7,9 +7,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.bson.Document;
-import org.repositoryminer.antipattern.IAntiPattern;
 import org.repositoryminer.ast.AST;
 import org.repositoryminer.ast.AbstractTypeDeclaration;
+import org.repositoryminer.codesmell.ICodeSmell;
 import org.repositoryminer.metric.IMetric;
 import org.repositoryminer.model.Commit;
 import org.repositoryminer.model.Diff;
@@ -98,14 +98,14 @@ public class SourceAnalyzer {
 				typeDoc.append("metrics", metricsDoc);
 			}
 
-			if (repository.getAntiPatterns() != null) {
-				List<Document> antiPatternsDoc = new ArrayList<Document>();
-				for (IAntiPattern antiPattern : repository.getAntiPatterns()) {
+			if (repository.getCodeSmells() != null) {
+				List<Document> codeSmellsDoc = new ArrayList<Document>();
+				for (ICodeSmell codeSmell : repository.getCodeSmells()) {
 					Document apDoc = new Document();
-					antiPattern.detect(type, ast, apDoc);
-					antiPatternsDoc.add(apDoc);
+					codeSmell.detect(type, ast, apDoc);
+					codeSmellsDoc.add(apDoc);
 				}
-				typeDoc.append("antipatterns", antiPatternsDoc);
+				typeDoc.append("codesmells", codeSmellsDoc);
 			}
 
 			abstractTypeDocs.add(typeDoc);
