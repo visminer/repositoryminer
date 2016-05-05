@@ -74,7 +74,7 @@ public class CommitAnalysisDocumentHandler extends DocumentHandler{
 		}
 		return Collections.emptyList();
 	}
-	
+		
 	public void updateDesignDebtStatus(String fileHash, String idCommit, int status) {
 		updateDebtStatus(fileHash, idCommit, status, 0);
 	}

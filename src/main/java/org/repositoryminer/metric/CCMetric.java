@@ -19,7 +19,7 @@ public class CCMetric extends MethodBasedMetricTemplate {
 		methodsDoc = new ArrayList<Document>();
 
 		int ccClass = calculate(methods);
-		document.append("CC", new Document("accumulated", new Integer(ccClass)).append("methods", methodsDoc));
+		document.append("name", new String("CC")).append("accumulated", new Integer(ccClass)).append("methods", methodsDoc);
 	}
 
 	// for classes

@@ -31,7 +31,7 @@ public class MLOCMetric extends MethodBasedMetricTemplate {
 			methodsDoc.add(new Document("method", method.getName()).append("value", new Integer(mloc)));
 		}
 		
-		document.append("MLOC", new Document("accumulated", new Integer(accumulated)).append("methods", methodsDoc));
+		document.append("name", new String("MLOC")).append("accumulated", new Integer(accumulated)).append("methods", methodsDoc);
 	}
 	
 	

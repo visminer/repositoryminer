@@ -26,7 +26,7 @@ public class LVARMetric extends MethodBasedMetricTemplate {
 			methodsDoc.add(new Document("method", method.getName()).append("value", new Integer(lvar)));
 		}
 		
-		document.append("LVAR", new Document("accumulated", new Integer(accumulated)).append("methods", methodsDoc));
+		document.append("name", new String("LVAR")).append("accumulated", new Integer(accumulated)).append("methods", methodsDoc);
 	}
 	
 	public int calculate(MethodDeclaration method){
