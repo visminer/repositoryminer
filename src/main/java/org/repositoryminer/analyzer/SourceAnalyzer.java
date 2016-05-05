@@ -17,6 +17,7 @@ import org.repositoryminer.parser.IParser;
 import org.repositoryminer.persistence.handler.CommitAnalysisDocumentHandler;
 import org.repositoryminer.scm.SCM;
 import org.repositoryminer.scm.SCMRepository;
+import org.repositoryminer.technicaldebt.ITechnicalDebt;
 import org.repositoryminer.utility.HashHandler;
 
 public class SourceAnalyzer {
@@ -51,11 +52,11 @@ public class SourceAnalyzer {
 				parser.setSourceFolders(repositoryPath);
 
 			for (Diff diff : commit.getDiffs()) 
-				processAST(diff.getPath(), diff.getHash(), commit.getId());
+				processAST(diff.getPath(), diff.getHash(), commit);
 		}
 	}
 
-	private void processAST(String file, String fileHash, String commit) throws UnsupportedEncodingException {
+	private void processAST(String file, String fileHash, Commit commit) throws UnsupportedEncodingException {
 		int index = file.lastIndexOf(".") + 1;
 		String ext = file.substring(index);
 
@@ -63,7 +64,7 @@ public class SourceAnalyzer {
 		if (parser == null)
 			return;
 
-		byte[] data = scm.getData(commit, file.replaceFirst(repositoryPath + "/", ""));
+		byte[] data = scm.getData(commit.getId(), file.replaceFirst(repositoryPath + "/", ""));
 		if (data == null)
 			return;
 
@@ -72,9 +73,10 @@ public class SourceAnalyzer {
 		process(commit, file, fileHash, ast);
 	}
 
-	private void process(String commit, String file, String hash, AST ast) {
+	private void process(Commit commit, String file, String hash, AST ast) {
 		Document doc = new Document();
-		doc.append("commit", commit);
+		doc.append("commit", commit.getId());
+		doc.append("commit_date", commit.getCommitDate());
 		doc.append("file", file);
 		doc.append("repository", repositoryId);
 		doc.append("file_hash", hash);
@@ -88,31 +90,56 @@ public class SourceAnalyzer {
 			typeDoc.append("name", type.getName()).append("declaration", type.getType().toString()).append("hash",
 					HashHandler.SHA1(typeHash));
 
-			if (repository.getMetrics() != null) {
-				List<Document> metricsDoc = new ArrayList<Document>();
-				for (IMetric metric : repository.getMetrics()) {
-					Document mDoc = new Document();
-					metric.calculate(type, ast, mDoc);
-					metricsDoc.add(mDoc);
-				}
-				typeDoc.append("metrics", metricsDoc);
-			}
+			processMetrics(ast, type, typeDoc);		
 
-			if (repository.getCodeSmells() != null) {
-				List<Document> codeSmellsDoc = new ArrayList<Document>();
-				for (ICodeSmell codeSmell : repository.getCodeSmells()) {
-					Document apDoc = new Document();
-					codeSmell.detect(type, ast, apDoc);
-					codeSmellsDoc.add(apDoc);
-				}
-				typeDoc.append("codesmells", codeSmellsDoc);
-			}
-
+			List<Document> codeSmellsDoc = new ArrayList<Document>();
+			processCodeSmells(codeSmellsDoc ,ast, type, typeDoc);
+			
+			processTechnicalDebts(codeSmellsDoc, ast, type, typeDoc);
+			
 			abstractTypeDocs.add(typeDoc);
 		}
 
 		doc.append("abstract_types", abstractTypeDocs);
 		persistence.insert(doc);
 	}
-
+	
+	private void processMetrics(AST ast, AbstractTypeDeclaration type, Document typeDoc) {
+		if (repository.getMetrics() != null) {
+			List<Document> metricsDoc = new ArrayList<Document>();
+			for (IMetric metric : repository.getMetrics()) {
+				Document mDoc = new Document();
+				metric.calculate(type, ast, mDoc);
+				metricsDoc.add(mDoc);
+			}
+			typeDoc.append("metrics", metricsDoc);
+		}		
+	}
+	
+	private void processCodeSmells(List<Document> codeSmellsDoc, AST ast, AbstractTypeDeclaration type, Document typeDoc) {
+		if (repository.getCodeSmells() != null) {
+			for (ICodeSmell codeSmell : repository.getCodeSmells()) {
+				Document apDoc = new Document();
+				codeSmell.detect(type, ast, apDoc);
+				codeSmellsDoc.add(apDoc);
+			}
+			typeDoc.append("codesmells", codeSmellsDoc);
+		}
+	}
+	
+	private void processTechnicalDebts(List<Document> codeSmellsDoc, AST ast, AbstractTypeDeclaration type, Document typeDoc) {
+		if (repository.getTechnicalDebts() != null) {
+			if (codeSmellsDoc.isEmpty()) {
+				processCodeSmells(codeSmellsDoc, ast, type, typeDoc);
+			}
+			
+			List<Document> technicalDebtsDoc = new ArrayList<Document>();
+			for (ITechnicalDebt td : repository.getTechnicalDebts()) {
+				Document tdDoc = new Document();
+				td.detect(type, ast, codeSmellsDoc, tdDoc);
+				technicalDebtsDoc.add(tdDoc);
+			}
+			typeDoc.append("technicaldebts", technicalDebtsDoc);
+		}
+	}
 }
