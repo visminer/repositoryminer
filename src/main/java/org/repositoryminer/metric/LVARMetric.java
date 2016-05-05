@@ -18,13 +18,15 @@ public class LVARMetric extends MethodBasedMetricTemplate {
 	public void calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast, Document document) {
 		
 		methodsDoc = new ArrayList<Document>();
+		int accumulated = 0;
 		
 		for(MethodDeclaration method : methods){
 			int lvar = calculate(method);
+			accumulated += lvar;
 			methodsDoc.add(new Document("method", method.getName()).append("value", new Integer(lvar)));
 		}
 		
-		document.append("LVAR", new Document("methods", methodsDoc));
+		document.append("LVAR", new Document("accumulated", new Integer(accumulated)).append("methods", methodsDoc));
 	}
 	
 	public int calculate(MethodDeclaration method){

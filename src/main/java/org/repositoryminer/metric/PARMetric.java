@@ -15,13 +15,15 @@ public class PARMetric extends MethodBasedMetricTemplate {
 	@Override
 	public void calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast, Document document) {
 		methodsDoc = new ArrayList<Document>();
+		int accumulated = 0;
 		
 		for(MethodDeclaration method : methods){
 			int par = calculate(method);
+			accumulated += par;
 			methodsDoc.add(new Document("method", method.getName()).append("value", new Integer(par)));
 		}
 		
-		document.append("PAR", new Document("methods", methodsDoc));
+		document.append("PAR", new Document("accumulated", new Integer(accumulated)).append("methods", methodsDoc));
 
 	}
 	

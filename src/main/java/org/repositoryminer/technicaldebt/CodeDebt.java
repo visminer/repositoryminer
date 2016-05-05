@@ -4,8 +4,8 @@ import java.util.List;
 
 import org.bson.Document;
 import org.repositoryminer.ast.AST;
+import org.repositoryminer.ast.AbstractTypeDeclaration;
 import org.repositoryminer.ast.DeclarationType;
-import org.repositoryminer.ast.TypeDeclaration;
 
 public class CodeDebt implements ITechnicalDebt {
 	
@@ -14,7 +14,7 @@ public class CodeDebt implements ITechnicalDebt {
 	}
 
 	@Override
-	public void detect(TypeDeclaration type, AST ast, List<Document> codeSmells, Document document) {
+	public void detect(AbstractTypeDeclaration type, AST ast, List<Document> codeSmells, Document document) {
 		if (type.getType() == DeclarationType.CLASS_OR_INTERFACE) {
 			
 			boolean isCodeDebt = false;

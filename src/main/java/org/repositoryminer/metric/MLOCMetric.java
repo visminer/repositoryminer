@@ -23,13 +23,15 @@ public class MLOCMetric extends MethodBasedMetricTemplate {
 	public void calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast, Document document) {
 		
 		methodsDoc = new ArrayList<Document>();
+		int accumulated = 0;
 		
 		for(MethodDeclaration method : methods){
 			int mloc = calculate(method, ast);
+			accumulated += mloc;
 			methodsDoc.add(new Document("method", method.getName()).append("value", new Integer(mloc)));
 		}
 		
-		document.append("MLOC", new Document("methods", methodsDoc));
+		document.append("MLOC", new Document("accumulated", new Integer(accumulated)).append("methods", methodsDoc));
 	}
 	
 	
