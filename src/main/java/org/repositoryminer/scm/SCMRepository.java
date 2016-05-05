@@ -7,6 +7,7 @@ import org.repositoryminer.codesmell.ICodeSmell;
 import org.repositoryminer.metric.IMetric;
 import org.repositoryminer.model.SCMType;
 import org.repositoryminer.parser.IParser;
+import org.repositoryminer.technicaldebt.ITechnicalDebt;
 
 public class SCMRepository {
 
@@ -20,6 +21,7 @@ public class SCMRepository {
 	private List<IParser> parsers;
 	private List<IMetric> metrics;
 	private List<ICodeSmell> codeSmells;
+	private List<ITechnicalDebt> technicalDebts;
 	// TODO : Should I use this?
 	//private boolean allowTextFiles;
 	//private List<String> allowedExtensions;
@@ -46,6 +48,11 @@ public class SCMRepository {
 	
 	public SCMRepository setCodeSmells(ICodeSmell... codeSmells){
 		this.codeSmells = Arrays.asList(codeSmells);
+		return this;
+	}
+	
+	public SCMRepository setTechnicalDebts(ITechnicalDebt... technicalDebts) {
+		this.technicalDebts = Arrays.asList(technicalDebts);
 		return this;
 	}
 	
@@ -194,18 +201,34 @@ public class SCMRepository {
 	}
 
 	/**
-	 * @return the antiPatterns
+	 * @return the codeSmells
 	 */
 	public List<ICodeSmell> getCodeSmells() {
 		return codeSmells;
 	}
 
 	/**
-	 * @param antiPatterns
+	 * @param codeSmells
 	 *            the antiPatterns to set
 	 */
 	public SCMRepository setCodeSmells(List<ICodeSmell> codeSmells) {
 		this.codeSmells = codeSmells;
+		return this;
+	}
+	
+	/**
+	 * @return the technicalDebts
+	 */
+	public List<ITechnicalDebt> getTechnicalDebts() {
+		return technicalDebts;
+	}
+
+	/**
+	 * @param technicalDebts
+	 *            the technicalDebts to set
+	 */
+	public SCMRepository setTechnicalDebts(List<ITechnicalDebt> technicalDebts) {
+		this.technicalDebts = technicalDebts;
 		return this;
 	}
 	
