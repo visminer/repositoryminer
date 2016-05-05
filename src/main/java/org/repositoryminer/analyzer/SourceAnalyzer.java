@@ -52,11 +52,11 @@ public class SourceAnalyzer {
 				parser.setSourceFolders(repositoryPath);
 
 			for (Diff diff : commit.getDiffs()) 
-				processAST(diff.getPath(), diff.getHash(), commit.getId());
+				processAST(diff.getPath(), diff.getHash(), commit);
 		}
 	}
 
-	private void processAST(String file, String fileHash, String commit) throws UnsupportedEncodingException {
+	private void processAST(String file, String fileHash, Commit commit) throws UnsupportedEncodingException {
 		int index = file.lastIndexOf(".") + 1;
 		String ext = file.substring(index);
 
@@ -64,7 +64,7 @@ public class SourceAnalyzer {
 		if (parser == null)
 			return;
 
-		byte[] data = scm.getData(commit, file.replaceFirst(repositoryPath + "/", ""));
+		byte[] data = scm.getData(commit.getId(), file.replaceFirst(repositoryPath + "/", ""));
 		if (data == null)
 			return;
 
@@ -73,9 +73,10 @@ public class SourceAnalyzer {
 		process(commit, file, fileHash, ast);
 	}
 
-	private void process(String commit, String file, String hash, AST ast) {
+	private void process(Commit commit, String file, String hash, AST ast) {
 		Document doc = new Document();
-		doc.append("commit", commit);
+		doc.append("commit", commit.getId());
+		doc.append("commit_date", commit.getCommitDate());
 		doc.append("file", file);
 		doc.append("repository", repositoryId);
 		doc.append("file_hash", hash);
