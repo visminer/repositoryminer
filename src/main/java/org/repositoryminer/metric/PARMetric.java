@@ -22,9 +22,8 @@ public class PARMetric extends MethodBasedMetricTemplate {
 			accumulated += par;
 			methodsDoc.add(new Document("method", method.getName()).append("value", new Integer(par)));
 		}
-		
-		document.append("PAR", new Document("accumulated", new Integer(accumulated)).append("methods", methodsDoc));
-
+	
+		document.append("name", new String("PAR")).append("accumulated", new Integer(accumulated)).append("methods", methodsDoc);
 	}
 	
 	public int calculate(MethodDeclaration method){

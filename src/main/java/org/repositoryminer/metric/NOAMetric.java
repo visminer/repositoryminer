@@ -16,8 +16,7 @@ public class NOAMetric implements IMetric {
 			Document document) {
 		if (DeclarationType.CLASS_OR_INTERFACE == type.getType()) {
 			TypeDeclaration cls = (TypeDeclaration) type;
-			document.append("NOA", new Document("accumulated", new Integer(
-					calculate(cls.getFields()))));
+			document.append("name", new String("NOA")).append("accumulated", new Integer(calculate(cls.getFields())));
 		}
 	}
 

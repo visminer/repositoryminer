@@ -21,7 +21,7 @@ public class ATFDMetric extends MethodBasedMetricTemplate {
 		methodsDoc = new ArrayList<Document>();
 
 		int atfdClass = calculate(type, methods, true);
-		document.append("ATFD", new Document("accumulated", new Integer(atfdClass)).append("methods", methodsDoc));
+		document.append("name", new String("ATFD")).append("accumulated", new Integer(atfdClass)).append("methods", methodsDoc);
 	}
 
 	public int calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, boolean calculateByMethod) {
