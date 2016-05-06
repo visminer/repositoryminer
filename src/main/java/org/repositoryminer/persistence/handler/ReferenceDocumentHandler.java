@@ -32,6 +32,22 @@ public class ReferenceDocumentHandler extends DocumentHandler{
 		BasicDBObject query = getTreesByTypeAndRepository(idRepository, ReferenceType.TAG);		
 		return findMany(query, null);
 	}
+	
+	public Document getMaster(String idRepository) {
+		BasicDBObject andQuery = new BasicDBObject();
+		List<BasicDBObject> conditions = new ArrayList<BasicDBObject>();
+
+		conditions.add(new BasicDBObject("repository", idRepository));
+		conditions.add(new BasicDBObject("name", "master"));
+		andQuery.put("$and", conditions);
+		return findOne(andQuery, null);
+	}
+	
+	public List<Document> getTagsAndMasterByRepository(String idRepository) {
+		List<Document> documents = getTagsByRepository(idRepository);
+		documents.add(getMaster(idRepository));
+		return documents;
+	}
 
 	private BasicDBObject getTreesByTypeAndRepository(String repository, ReferenceType type) {
 		BasicDBObject andQuery = new BasicDBObject();

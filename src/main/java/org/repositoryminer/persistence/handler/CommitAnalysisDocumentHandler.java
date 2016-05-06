@@ -150,5 +150,24 @@ public class CommitAnalysisDocumentHandler extends DocumentHandler{
 		for (Document tree : trees) {
 			confirmAllDebtsByTag(tree.getString("_id"));
 		}
-	}		
+	}	
+	
+	@SuppressWarnings("unchecked")
+	public HashMap<Document, Document> getTypeTimeline(String idRepository, String fileHash) {
+		ReferenceDocumentHandler referenceHandler = new ReferenceDocumentHandler();
+		List<Document> tags = referenceHandler.getTagsAndMasterByRepository(idRepository);
+		HashMap<Document, Document> timeline = new HashMap<>();
+		
+		for (Document tag : tags) {
+			for (String commitId : (ArrayList<String>) tag.get("commits")) {
+				Document type = getOneClassById(fileHash, commitId);
+				if (type != null) {
+					timeline.put(tag, type);
+					break;
+				}
+			}		
+		}		
+		
+		return timeline;		
+	}
 }
