@@ -16,12 +16,12 @@ public class DesignDebt implements ITechnicalDebt {
 			
 			boolean isDesignDebt = false;
 			for (Document antiPattern : antiPatterns) {
-				if (antiPattern.containsKey("GodClass")) {
-					if (antiPattern.getBoolean("GodClass")) {
+				if (antiPattern.containsValue("God Class")) {
+					if (antiPattern.getBoolean("value")) {
 						isDesignDebt = true;
 					}					
 				}
-				if (antiPattern.containsKey("LongMethod")) {
+				if (antiPattern.containsValue("Long Method")) {
 					List<Document> methods = ((List<Document>) antiPattern.get("methods"));
 					for (Document method : methods) {
 						if (method.getBoolean("value")) {

@@ -19,8 +19,8 @@ public class CodeDebt implements ITechnicalDebt {
 			
 			boolean isCodeDebt = false;
 			for (Document codeSmell : codeSmells) {
-				if (codeSmell.containsKey("GodClass")) {
-					if (codeSmell.getBoolean("GodClass")) {
+				if (codeSmell.containsValue("God Class")) {
+					if (codeSmell.getBoolean("value")) {
 						isCodeDebt = true;
 					}					
 				}
