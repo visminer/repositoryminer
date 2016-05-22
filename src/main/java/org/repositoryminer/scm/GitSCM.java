@@ -263,7 +263,6 @@ public class GitSCM implements SCM {
 			String path = entry.getNewPath();
 			String oldPath = null;
 
-			int[] lines = getLinesAddedAndDeleted(path, parentCommit, revCommit);
 			DiffType type = null;
 
 			switch (entry.getChangeType()) {
@@ -276,6 +275,8 @@ public class GitSCM implements SCM {
 				break;
 			case DELETE:
 				type = DiffType.DELETE;
+				oldPath = absolutePath+"/"+entry.getOldPath();
+				path = entry.getOldPath();
 				break;
 			case MODIFY:
 				type = DiffType.MODIFY;
@@ -287,6 +288,7 @@ public class GitSCM implements SCM {
 			}
 
 			path = absolutePath + "/" + path;
+			int[] lines = getLinesAddedAndDeleted(path, parentCommit, revCommit);
 			Diff change = new Diff(path, oldPath, HashHandler.SHA1(path), lines[0], lines[1], type);
 			changes.add(change);
 		}
