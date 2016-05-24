@@ -48,7 +48,7 @@ import org.slf4j.LoggerFactory;
  */
 public class GitSCM implements SCM {
 
-	private static final String VM_BRANCH = "VM-c1b31321c0";
+	private static final String RM_BRANCH = "RM-c1b31321c0";
 	private static final Logger LOGGER = LoggerFactory.getLogger(GitSCM.class);
 
 	private Repository repository;
@@ -137,7 +137,7 @@ public class GitSCM implements SCM {
 	public List<Commit> getCommits(int skip, int maxCount) {
 		Iterable<RevCommit> revCommits = null;
 		try {
-			if(maxCount != 0)
+			if (maxCount != 0)
 				revCommits = git.log().all().setSkip(skip).setMaxCount(maxCount).call();
 			else
 				revCommits = git.log().all().call();
@@ -232,7 +232,7 @@ public class GitSCM implements SCM {
 				git.reset().setMode(ResetType.HARD).call();
 
 			makeCheckout("master", false);
-			git.branchDelete().setBranchNames(VM_BRANCH).setForce(true).call();
+			git.branchDelete().setBranchNames(RM_BRANCH).setForce(true).call();
 
 		} catch (NoWorkTreeException | GitAPIException e) {
 			errorHandler(ErrorMessage.GIT_RESET_ERROR.toString(), e);
@@ -260,35 +260,47 @@ public class GitSCM implements SCM {
 			RevCommit parentCommit = oldCommit == null ? null
 					: revWalk.parseCommit(ObjectId.fromString(oldCommit.getName()));
 
-			String path = entry.getNewPath();
-			String oldPath = null;
+			String path = null; // file path of the current commit
+			String oldPath = null; // file path of the previous commit
 
 			DiffType type = null;
 
 			switch (entry.getChangeType()) {
+
 			case ADD:
+				path = absolutePath + "/" + entry.getNewPath();
 				type = DiffType.ADD;
 				break;
+
 			case COPY:
+				path = absolutePath + "/" + entry.getNewPath();
+				oldPath = absolutePath + "/" + entry.getOldPath();
 				type = DiffType.COPY;
-				oldPath = absolutePath+"/"+entry.getOldPath();
 				break;
+
 			case DELETE:
+				oldPath = absolutePath + "/" + entry.getOldPath();
 				type = DiffType.DELETE;
-				oldPath = absolutePath+"/"+entry.getOldPath();
-				path = entry.getOldPath();
 				break;
+
 			case MODIFY:
+				path = absolutePath + "/" + entry.getNewPath();
 				type = DiffType.MODIFY;
 				break;
+
 			case RENAME:
+				path = absolutePath + "/" + entry.getNewPath();
+				oldPath = absolutePath + "/" + entry.getOldPath();
 				type = DiffType.RENAME;
-				oldPath = absolutePath+"/"+entry.getOldPath();
 				break;
+
 			}
 
-			path = absolutePath + "/" + path;
-			int[] lines = getLinesAddedAndDeleted(path, parentCommit, revCommit);
+			int[] lines = { 0, 0 };
+			if (type == DiffType.ADD || type == DiffType.MODIFY) {
+				lines = getLinesAddedAndDeleted(path, parentCommit, revCommit);
+			}
+
 			Diff change = new Diff(path, oldPath, HashHandler.SHA1(path), lines[0], lines[1], type);
 			changes.add(change);
 		}
@@ -327,7 +339,7 @@ public class GitSCM implements SCM {
 	private void makeCheckout(String hash, boolean create) {
 		try {
 			if (create)
-				Runtime.getRuntime().exec("git checkout -f -b " + VM_BRANCH + " " + hash, null,
+				Runtime.getRuntime().exec("git checkout -f -b " + RM_BRANCH + " " + hash, null,
 						new java.io.File(absolutePath));
 			else
 				Runtime.getRuntime().exec("git checkout -f " + hash, null, new java.io.File(absolutePath));
