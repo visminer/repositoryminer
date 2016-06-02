@@ -51,8 +51,9 @@ public class SourceAnalyzer {
 			for (IParser parser : repository.getParsers())
 				parser.setSourceFolders(repositoryPath);
 
-			for (Diff diff : commit.getDiffs()) 
-				processAST(diff.getPath(), diff.getHash(), commit);
+			for (Diff diff : commit.getDiffs())
+				if(diff.getPath()!=null && diff.getHash()!=null)
+					processAST(diff.getPath(), diff.getHash(), commit);
 		}
 	}
 
@@ -76,6 +77,7 @@ public class SourceAnalyzer {
 	private void process(Commit commit, String file, String hash, AST ast) {
 		Document doc = new Document();
 		doc.append("commit", commit.getId());
+		doc.append("package", ast.getDocument().getPackageDeclaration());
 		doc.append("commit_date", commit.getCommitDate());
 		doc.append("file", file);
 		doc.append("repository", repositoryId);

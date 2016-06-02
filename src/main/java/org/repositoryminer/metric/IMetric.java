@@ -10,5 +10,5 @@ import org.repositoryminer.ast.AbstractTypeDeclaration;
 public interface IMetric {
 
 	public void calculate(AbstractTypeDeclaration type, AST ast, Document document);
-
+	
 }

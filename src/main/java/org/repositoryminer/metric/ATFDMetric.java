@@ -7,15 +7,15 @@ import java.util.Set;
 
 import org.bson.Document;
 import org.repositoryminer.ast.AST;
+import org.repositoryminer.ast.AbstractTypeDeclaration;
 import org.repositoryminer.ast.MethodDeclaration;
 import org.repositoryminer.ast.NodeType;
 import org.repositoryminer.ast.Statement;
-import org.repositoryminer.ast.AbstractTypeDeclaration;
 
 public class ATFDMetric extends MethodBasedMetricTemplate {
 
 	private List<Document> methodsDoc;
-
+	
 	@Override
 	public void calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast, Document document) {
 		methodsDoc = new ArrayList<Document>();
@@ -23,19 +23,20 @@ public class ATFDMetric extends MethodBasedMetricTemplate {
 		int atfdClass = calculate(type, methods, true);
 		document.append("name", new String("ATFD")).append("accumulated", new Integer(atfdClass)).append("methods", methodsDoc);
 	}
-
-	public int calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, boolean calculateByMethod) {
+	
+	public int calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, boolean calculateByMethod){
 		int atfdClass = 0;
 
 		for (MethodDeclaration mDeclaration : methods) {
 			int atfdMethod = countForeignAccessedFields(type, mDeclaration);
-
+			
 			atfdClass += atfdMethod;
-			if (calculateByMethod) {
+			if (calculateByMethod) 
+			{
 				methodsDoc.add(new Document("method", mDeclaration.getName()).append("value", new Integer(atfdMethod)));
 			}
 		}
-
+		
 		return atfdClass;
 	}
 
@@ -43,15 +44,12 @@ public class ATFDMetric extends MethodBasedMetricTemplate {
 		Set<String> accessedFields = new HashSet<String>();
 
 		for (Statement stm : method.getStatements()) {
-			
 			if (stm.getNodeType().equals(NodeType.FIELD_ACCESS)) {
 				String exp = stm.getExpression();
 				String type = exp.substring(0, exp.lastIndexOf("."));
 				if (!currType.getName().equals(type))
 					accessedFields.add(exp.toLowerCase());
-				
 			} else if (stm.getNodeType().equals(NodeType.METHOD_INVOCATION)) {
-				
 				String exp = stm.getExpression();
 				String type = exp.substring(0, exp.lastIndexOf("."));
 				String methodInv = exp.substring(exp.lastIndexOf(".") + 1);
@@ -61,7 +59,6 @@ public class ATFDMetric extends MethodBasedMetricTemplate {
 					} else if (methodInv.startsWith("is") && methodInv.length() > 2)
 						accessedFields.add((type + "." + methodInv.substring(2)).toLowerCase());
 				}
-				
 			}
 
 		}

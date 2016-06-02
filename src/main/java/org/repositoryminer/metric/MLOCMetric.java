@@ -7,8 +7,8 @@ import java.util.regex.Pattern;
 
 import org.bson.Document;
 import org.repositoryminer.ast.AST;
-import org.repositoryminer.ast.MethodDeclaration;
 import org.repositoryminer.ast.AbstractTypeDeclaration;
+import org.repositoryminer.ast.MethodDeclaration;
 
 public class MLOCMetric extends MethodBasedMetricTemplate {
 	
@@ -23,15 +23,13 @@ public class MLOCMetric extends MethodBasedMetricTemplate {
 	public void calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast, Document document) {
 		
 		methodsDoc = new ArrayList<Document>();
-		int accumulated = 0;
 		
 		for(MethodDeclaration method : methods){
 			int mloc = calculate(method, ast);
-			accumulated += mloc;
 			methodsDoc.add(new Document("method", method.getName()).append("value", new Integer(mloc)));
 		}
 		
-		document.append("name", new String("MLOC")).append("accumulated", new Integer(accumulated)).append("methods", methodsDoc);
+		document.append("name", new String("MLOC")).append("methods", methodsDoc);
 	}
 	
 	

@@ -23,6 +23,7 @@ public class MaxNestingMetric extends MethodBasedMetricTemplate {
 		}
 
 		document.append("name", new String("MAXNESTING")).append("methods", methodsDoc);
+
 	}
 	
 	public int calculate(MethodDeclaration method){
