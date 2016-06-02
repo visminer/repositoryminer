@@ -5,8 +5,8 @@ import java.util.List;
 
 import org.bson.Document;
 import org.repositoryminer.ast.AST;
-import org.repositoryminer.ast.MethodDeclaration;
 import org.repositoryminer.ast.AbstractTypeDeclaration;
+import org.repositoryminer.ast.MethodDeclaration;
 
 public class PARMetric extends MethodBasedMetricTemplate {
 
@@ -15,15 +15,14 @@ public class PARMetric extends MethodBasedMetricTemplate {
 	@Override
 	public void calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast, Document document) {
 		methodsDoc = new ArrayList<Document>();
-		int accumulated = 0;
 		
 		for(MethodDeclaration method : methods){
 			int par = calculate(method);
-			accumulated += par;
 			methodsDoc.add(new Document("method", method.getName()).append("value", new Integer(par)));
 		}
-	
-		document.append("name", new String("PAR")).append("accumulated", new Integer(accumulated)).append("methods", methodsDoc);
+		
+		document.append("name", new String("PAR")).append("methods", methodsDoc);
+
 	}
 	
 	public int calculate(MethodDeclaration method){
