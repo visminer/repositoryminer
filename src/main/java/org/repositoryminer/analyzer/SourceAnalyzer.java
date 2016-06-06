@@ -77,6 +77,7 @@ public class SourceAnalyzer {
 		Document doc = new Document();
 		doc.append("commit", commit.getId());
 		doc.append("commit_date", commit.getCommitDate());
+		doc.append("package", ast.getDocument().getPackageDeclaration());
 		doc.append("file", file);
 		doc.append("repository", repositoryId);
 		doc.append("file_hash", hash);

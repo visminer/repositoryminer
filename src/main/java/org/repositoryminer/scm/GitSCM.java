@@ -103,7 +103,6 @@ public class GitSCM implements SCM {
 		}
 
 		for (Ref b : branches) {
-
 			if (b.getName().equals("HEAD"))
 				continue;
 
@@ -111,7 +110,6 @@ public class GitSCM implements SCM {
 			String id = HashHandler.SHA1(absolutePath + "/" + b.getName());
 			Reference r = new Reference(id, repoId, b.getName().substring(i), b.getName(), ReferenceType.BRANCH);
 			refs.add(r);
-
 		}
 
 		Iterable<Ref> tags = null;
@@ -122,12 +120,10 @@ public class GitSCM implements SCM {
 		}
 
 		for (Ref t : tags) {
-
 			int i = t.getName().lastIndexOf("/") + 1;
 			String id = HashHandler.SHA1(absolutePath + "/" + t.getName());
 			Reference r = new Reference(id, repoId, t.getName().substring(i), t.getName(), ReferenceType.TAG);
 			refs.add(r);
-
 		}
 
 		return refs;
@@ -148,7 +144,6 @@ public class GitSCM implements SCM {
 		List<Commit> commits = new ArrayList<Commit>();
 
 		for (RevCommit revCommit : revCommits) {
-
 			PersonIdent author = revCommit.getAuthorIdent();
 			PersonIdent committer = revCommit.getCommitterIdent();
 
@@ -170,7 +165,6 @@ public class GitSCM implements SCM {
 			Commit c = new Commit(revCommit.getName(), revCommit.getFullMessage(), author.getWhen(),
 					committer.getWhen(), repoId, parents, myAuthor, myCommitter, changes);
 			commits.add(c);
-
 		}
 		return commits;
 	}
@@ -279,7 +273,7 @@ public class GitSCM implements SCM {
 				break;
 
 			case DELETE:
-				oldPath = absolutePath + "/" + entry.getOldPath();
+				path = absolutePath + "/" + entry.getOldPath();
 				type = DiffType.DELETE;
 				break;
 
@@ -293,14 +287,9 @@ public class GitSCM implements SCM {
 				oldPath = absolutePath + "/" + entry.getOldPath();
 				type = DiffType.RENAME;
 				break;
-
 			}
 
-			int[] lines = { 0, 0 };
-			if (type == DiffType.ADD || type == DiffType.MODIFY) {
-				lines = getLinesAddedAndDeleted(path, parentCommit, revCommit);
-			}
-
+			int[] lines = getLinesAddedAndDeleted(path, parentCommit, revCommit);
 			Diff change = new Diff(path, oldPath, HashHandler.SHA1(path), lines[0], lines[1], type);
 			changes.add(change);
 		}
