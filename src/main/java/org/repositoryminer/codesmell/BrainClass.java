@@ -11,20 +11,32 @@ import org.repositoryminer.metric.TCCMetric;
 import org.repositoryminer.metric.WMCMetric;
 
 public class BrainClass implements ICodeSmell {
+	
+	private int wmcThreshold = 47;
+	private float tccThreshold = 0.5f;
+	private int nbmThreshold = 1;
+	private int slocThreshold = 197;
+	
+	public BrainClass() {}
+	
+	public BrainClass(int wmcThreshold, float tccThreshold, int nbmThreshold, int slocThreshold) {
+		this.wmcThreshold = wmcThreshold;
+		this.tccThreshold = tccThreshold;
+		this.nbmThreshold = nbmThreshold;
+		this.slocThreshold = slocThreshold;
+	}
 
 	@Override
 	public void detect(AbstractTypeDeclaration type, AST ast, Document document) {
 		if (type.getType() == DeclarationType.CLASS_OR_INTERFACE) {
 			TypeDeclaration cls = (TypeDeclaration) type;
-		
 			boolean brainClass = detect(ast, type, cls);
 			document.append("name", new String("Brain Class")).append("value", new Boolean(brainClass));
 		}
 	}
-	
+
 	public boolean detect(AST ast, AbstractTypeDeclaration type, TypeDeclaration cls){
 		boolean brainClass  = false;
-		
 		WMCMetric wmcMetric = new WMCMetric();
 		GodClass godClass = new GodClass();
 		BrainMethod brainMethod = new BrainMethod();
@@ -42,10 +54,10 @@ public class BrainClass implements ICodeSmell {
 				nbm++;
 		}
 		
-		brainClass = isGodClass && (wmc >=47 && tcc < 0.5) && ((nbm > 1 && sloc >= 197) || (nbm == 1 && sloc >= (2*197) && wmc >= (2*47) ));
+		brainClass = isGodClass && (wmc >=wmcThreshold && tcc < tccThreshold) && 
+					((nbm > nbmThreshold && sloc >= slocThreshold) || (nbm == nbmThreshold && sloc >= (2*slocThreshold) && wmc >= (2*wmcThreshold) ));
 		
 		return brainClass;
 	}
-	
 
 }
