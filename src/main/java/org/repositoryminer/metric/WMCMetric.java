@@ -12,7 +12,7 @@ public class WMCMetric extends MethodBasedMetricTemplate{
 	@Override
 	public void calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast, Document document) {
 		int wmc = calculate(methods);
-		document.append("name", new String("WMC")).append("accumulated", new Integer(wmc));
+		document.append("name", WMC).append("accumulated", new Integer(wmc));
 	}
 	
 	public int calculate(List<MethodDeclaration> methods){

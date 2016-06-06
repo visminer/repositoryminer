@@ -24,7 +24,7 @@ public class NOAVMetric extends MethodBasedMetricTemplate {
 			methodsDoc.add(new Document("method", method.getName()).append("value", new Integer(noav)));
 		}
 		
-		document.append("name", new String("NOAV")).append("methods", methodsDoc);
+		document.append("name", NOAV).append("methods", methodsDoc);
 	}
 	
 	public int calculate(MethodDeclaration method){

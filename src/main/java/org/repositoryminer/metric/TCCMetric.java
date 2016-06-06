@@ -16,7 +16,7 @@ public class TCCMetric extends MethodBasedMetricTemplate {
 	@Override
 	public void calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast, Document document) {
 		float tcc = calculate(type, methods);
-		document.append("name", new String("TCC")).append("accumulated", new Float(tcc));
+		document.append("name", TCC).append("accumulated", new Float(tcc));
 	}
 
 	public float calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods) {
@@ -33,13 +33,10 @@ public class TCCMetric extends MethodBasedMetricTemplate {
 					ndc++;
 			}
 		}
-
 		float tcc = 0;
-
 		if (npc > 0) {
 			tcc = (float) ndc / npc;
 		}
-
 		return tcc;
 	}
 
@@ -49,14 +46,11 @@ public class TCCMetric extends MethodBasedMetricTemplate {
 			if (!(m.getModifiers().contains("abstract") || m.isConstructor()))
 				methodList.add(m);
 		}
-
 		return methodList;
 	}
 
 	private List<String> processAccessedFields(AbstractTypeDeclaration currType, MethodDeclaration method) {
-
 		List<String> accessedFields = new ArrayList<String>();
-
 		for (Statement stm : method.getStatements()) {
 			if (stm.getNodeType().equals(NodeType.FIELD_ACCESS)) {
 				String exp = stm.getExpression();
@@ -78,23 +72,18 @@ public class TCCMetric extends MethodBasedMetricTemplate {
 				}
 			}
 		}
-
 		return accessedFields;
-
 	}
 
 	private boolean isConnected(List<String> method1, List<String> method2) {
-
 		for (String field : method1) {
 			if (method2.contains(field))
 				return true;
 		}
-
 		return false;
 	}
 
 	private boolean isGetterOrSetter(String methodInv) {
-
 		if ((methodInv.startsWith("get") || methodInv.startsWith("set")) && methodInv.length() > 3) {
 			for (FieldDeclaration fd : currentFields) {
 				String field = methodInv.substring(3);
@@ -105,7 +94,6 @@ public class TCCMetric extends MethodBasedMetricTemplate {
 			}
 
 		}
-
 		return false;
 	}
 
