@@ -13,9 +13,11 @@ import org.repositoryminer.model.Commit;
 import org.repositoryminer.model.Contributor;
 import org.repositoryminer.model.Reference;
 import org.repositoryminer.model.Repository;
+import org.repositoryminer.model.WorkingDirectory;
 import org.repositoryminer.persistence.handler.CommitDocumentHandler;
 import org.repositoryminer.persistence.handler.ReferenceDocumentHandler;
 import org.repositoryminer.persistence.handler.RepositoryDocumentHandler;
+import org.repositoryminer.persistence.handler.WorkingDirectoryDocumentHandler;
 import org.repositoryminer.scm.SCM;
 import org.repositoryminer.scm.SCMFactory;
 import org.repositoryminer.scm.SCMRepository;
@@ -35,12 +37,12 @@ public class RepositoryMiner {
 		return this;
 	}
 
-	public List<SCMRepository> getRepositories(){
+	public List<SCMRepository> getRepositories() {
 		return repositories;
 	}
 
 	public void mine() throws UnsupportedEncodingException {
-		for(SCMRepository repository : repositories){
+		for (SCMRepository repository : repositories) {
 			SCM scm = SCMFactory.getSCM(repository.getScm());
 			scm.open(repository.getPath(), repository.getBinaryThreshold());
 
@@ -50,10 +52,13 @@ public class RepositoryMiner {
 			Repository r = new Repository(repository);
 			r.setId(id);
 			r.setPath(absPath);
-
+			
+			WorkingDirectory wd = new WorkingDirectory(id);
+			WorkingDirectoryDocumentHandler wdHandler = new WorkingDirectoryDocumentHandler();
+			
 			ReferenceDocumentHandler refHandler = new ReferenceDocumentHandler();
 			List<Reference> refs = scm.getReferences();
-			for(Reference ref : refs){
+			for (Reference ref : refs) {
 				ref.setCommits(scm.getReferenceCommits(ref.getFullName(), ref.getType()));
 				refHandler.insert(ref.toDocument());
 				ref.setCommits(null);
@@ -64,25 +69,31 @@ public class RepositoryMiner {
 			CommitDocumentHandler commitHandler = new CommitDocumentHandler();
 
 			SourceAnalyzer sourceAnalyzer = null;
-			if(repository.getMetrics() != null || repository.getCodeSmells() != null || repository.getTechnicalDebts() != null){
+			if (repository.getMetrics() != null || repository.getCodeSmells() != null
+					|| repository.getTechnicalDebts() != null) {
 				sourceAnalyzer = new SourceAnalyzer(repository, scm, id, absPath);
 			}
 
-			while(true) {
+			while (true) {
 				List<Commit> commits = scm.getCommits(skip, repository.getCommitThreshold());
 				List<Document> docs = new ArrayList<Document>();
-				if(commits.size() == 0) break;
-				
-				for(Commit c : commits){
+				if (commits.size() == 0)
+					break;
+
+				for (Commit c : commits) {
 					docs.add(c.toDocument());
 					contributors.add(c.getCommitter());
+					wd.setCheckout(c.getId());
+					wd.processDiff(c.getDiffs());
+					wdHandler.insert(wd.toDocument());
 				}
-				
+
 				commitHandler.insertMany(docs);
-				if(sourceAnalyzer != null)
+				if (sourceAnalyzer != null)
 					sourceAnalyzer.analyze(commits);
-				
-				if(repository.getCommitThreshold() == 0) break;
+
+				if (repository.getCommitThreshold() == 0)
+					break;
 				skip += repository.getCommitThreshold();
 			}
 

@@ -258,7 +258,7 @@ public class GitSCM implements SCM {
 			String oldPath = null; // file path of the previous commit
 
 			DiffType type = null;
-
+			
 			switch (entry.getChangeType()) {
 
 			case ADD:
@@ -287,6 +287,7 @@ public class GitSCM implements SCM {
 				oldPath = absolutePath + "/" + entry.getOldPath();
 				type = DiffType.RENAME;
 				break;
+				
 			}
 
 			int[] lines = getLinesAddedAndDeleted(path, parentCommit, revCommit);

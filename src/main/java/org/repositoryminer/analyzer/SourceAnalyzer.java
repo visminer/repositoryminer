@@ -86,18 +86,14 @@ public class SourceAnalyzer {
 		List<Document> abstractTypeDocs = new ArrayList<Document>();
 		for (AbstractTypeDeclaration type : types) {
 			Document typeDoc = new Document();
-
 			String typeHash = file + "/" + type.getName();
 			typeDoc.append("name", type.getName()).append("declaration", type.getType().toString()).append("hash",
 					HashHandler.SHA1(typeHash));
-
 			processMetrics(ast, type, typeDoc);		
 
 			List<Document> codeSmellsDoc = new ArrayList<Document>();
 			processCodeSmells(codeSmellsDoc ,ast, type, typeDoc);
-			
 			processTechnicalDebts(codeSmellsDoc, ast, type, typeDoc);
-			
 			abstractTypeDocs.add(typeDoc);
 		}
 
