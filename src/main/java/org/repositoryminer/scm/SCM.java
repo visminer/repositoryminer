@@ -2,9 +2,8 @@ package org.repositoryminer.scm;
 
 import java.util.List;
 
-import org.repositoryminer.model.Commit;
-import org.repositoryminer.model.Reference;
-import org.repositoryminer.model.ReferenceType;
+import org.repositoryminer.persistence.model.Commit;
+import org.repositoryminer.persistence.model.Reference;
 
 /**
  * Interface that define what is needed to support a repository.

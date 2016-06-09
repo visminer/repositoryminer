@@ -1,7 +1,6 @@
 package org.repositoryminer.scm;
 
 import org.repositoryminer.exceptions.ErrorMessage;
-import org.repositoryminer.model.SCMType;
 
 public class SCMFactory {
 

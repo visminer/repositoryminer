@@ -1,9 +1,9 @@
-package org.repositoryminer.model;
+package org.repositoryminer.persistence.model;
 
-import static org.repositoryminer.model.DiffType.ADD;
-import static org.repositoryminer.model.DiffType.COPY;
-import static org.repositoryminer.model.DiffType.DELETE;
-import static org.repositoryminer.model.DiffType.MODIFY;
+import static org.repositoryminer.scm.DiffType.ADD;
+import static org.repositoryminer.scm.DiffType.COPY;
+import static org.repositoryminer.scm.DiffType.DELETE;
+import static org.repositoryminer.scm.DiffType.MODIFY;
 
 import java.util.ArrayList;
 import java.util.HashMap;

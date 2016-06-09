@@ -1,4 +1,4 @@
-package org.repositoryminer;
+package org.repositoryminer.mining;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -8,19 +8,17 @@ import java.util.List;
 import java.util.Set;
 
 import org.bson.Document;
-import org.repositoryminer.analyzer.SourceAnalyzer;
-import org.repositoryminer.model.Commit;
-import org.repositoryminer.model.Contributor;
-import org.repositoryminer.model.Reference;
-import org.repositoryminer.model.Repository;
-import org.repositoryminer.model.WorkingDirectory;
 import org.repositoryminer.persistence.handler.CommitDocumentHandler;
 import org.repositoryminer.persistence.handler.ReferenceDocumentHandler;
 import org.repositoryminer.persistence.handler.RepositoryDocumentHandler;
 import org.repositoryminer.persistence.handler.WorkingDirectoryDocumentHandler;
+import org.repositoryminer.persistence.model.Commit;
+import org.repositoryminer.persistence.model.Contributor;
+import org.repositoryminer.persistence.model.Reference;
+import org.repositoryminer.persistence.model.Repository;
+import org.repositoryminer.persistence.model.WorkingDirectory;
 import org.repositoryminer.scm.SCM;
 import org.repositoryminer.scm.SCMFactory;
-import org.repositoryminer.scm.SCMRepository;
 import org.repositoryminer.utility.HashHandler;
 
 public class RepositoryMiner {

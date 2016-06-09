@@ -1,9 +1,10 @@
-package org.repositoryminer.model;
+package org.repositoryminer.persistence.model;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.bson.Document;
+import org.repositoryminer.scm.DiffType;
 
 /**
  * This class represents the "change" object in the database. This class

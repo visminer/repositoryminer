@@ -7,10 +7,10 @@ import java.util.Set;
 
 import org.bson.Document;
 import org.repositoryminer.ast.AST;
-import org.repositoryminer.ast.MethodDeclaration;
-import org.repositoryminer.ast.NodeType;
-import org.repositoryminer.ast.Statement;
 import org.repositoryminer.ast.AbstractTypeDeclaration;
+import org.repositoryminer.ast.MethodDeclaration;
+import org.repositoryminer.ast.Statement;
+import org.repositoryminer.ast.Statement.NodeType;
 
 public class ATFDMetric extends MethodBasedMetricTemplate {
 

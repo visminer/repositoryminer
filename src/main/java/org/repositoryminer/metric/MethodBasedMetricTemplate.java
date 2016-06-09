@@ -5,11 +5,11 @@ import java.util.List;
 
 import org.bson.Document;
 import org.repositoryminer.ast.AST;
-import org.repositoryminer.ast.DeclarationType;
 import org.repositoryminer.ast.TypeDeclaration;
 import org.repositoryminer.ast.FieldDeclaration;
 import org.repositoryminer.ast.MethodDeclaration;
 import org.repositoryminer.ast.AbstractTypeDeclaration;
+import org.repositoryminer.ast.AbstractTypeDeclaration.Archetype;
 
 public abstract class MethodBasedMetricTemplate implements IMetric {
 
@@ -19,7 +19,7 @@ public abstract class MethodBasedMetricTemplate implements IMetric {
 	public void calculate(AbstractTypeDeclaration type, AST ast,
 			Document document) {
 		TypeDeclaration cls = null;
-		if (type.getType() == DeclarationType.CLASS_OR_INTERFACE) {
+		if (type.getArchetype() == Archetype.CLASS_OR_INTERFACE) {
 			cls = (TypeDeclaration) type;
 
 			if (cls.getMethods() != null) {

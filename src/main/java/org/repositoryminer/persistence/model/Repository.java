@@ -1,8 +1,9 @@
-package org.repositoryminer.model;
+package org.repositoryminer.persistence.model;
 
 import java.util.List;
 
 import org.bson.Document;
+import org.repositoryminer.scm.SCMType;
 
 /**
  * This class represents the "repository" object in the database. This class
@@ -20,7 +21,7 @@ public class Repository {
 	public Repository() {
 	}
 
-	public Repository(org.repositoryminer.scm.SCMRepository repo) {
+	public Repository(org.repositoryminer.mining.SCMRepository repo) {
 		super();
 		this.name = repo.getName();
 		this.description = repo.getDescription();

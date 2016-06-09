@@ -5,11 +5,11 @@ import java.util.List;
 
 import org.bson.Document;
 import org.repositoryminer.ast.AST;
+import org.repositoryminer.ast.AbstractTypeDeclaration;
 import org.repositoryminer.ast.FieldDeclaration;
 import org.repositoryminer.ast.MethodDeclaration;
-import org.repositoryminer.ast.NodeType;
 import org.repositoryminer.ast.Statement;
-import org.repositoryminer.ast.AbstractTypeDeclaration;
+import org.repositoryminer.ast.Statement.NodeType;
 
 public class TCCMetric extends MethodBasedMetricTemplate {
 

@@ -5,14 +5,14 @@ import java.util.List;
 import org.bson.Document;
 import org.repositoryminer.ast.AST;
 import org.repositoryminer.ast.AbstractTypeDeclaration;
-import org.repositoryminer.ast.DeclarationType;
+import org.repositoryminer.ast.AbstractTypeDeclaration.Archetype;
 
 public class DesignDebt implements ITechnicalDebt {
 	
 	@SuppressWarnings("unchecked")
 	@Override
 	public void detect(AbstractTypeDeclaration type, AST ast, List<Document> antiPatterns, Document document) {
-		if (type.getType() == DeclarationType.CLASS_OR_INTERFACE) {
+		if (type.getArchetype() == Archetype.CLASS_OR_INTERFACE) {
 			
 			boolean isDesignDebt = false;
 			for (Document antiPattern : antiPatterns) {

@@ -1,12 +1,12 @@
-package org.repositoryminer.scm;
+package org.repositoryminer.mining;
 
 import java.util.Arrays;
 import java.util.List;
 
 import org.repositoryminer.codesmell.ICodeSmell;
 import org.repositoryminer.metric.IMetric;
-import org.repositoryminer.model.SCMType;
 import org.repositoryminer.parser.IParser;
+import org.repositoryminer.scm.SCMType;
 import org.repositoryminer.technicaldebt.ITechnicalDebt;
 
 public class SCMRepository {
@@ -22,7 +22,7 @@ public class SCMRepository {
 	private List<IMetric> metrics;
 	private List<ICodeSmell> codeSmells;
 	private List<ITechnicalDebt> technicalDebts;
-	// TODO : Should I use this?
+	// TODO : To implement
 	//private boolean allowTextFiles;
 	//private List<String> allowedExtensions;
 
