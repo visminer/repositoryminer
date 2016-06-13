@@ -9,7 +9,7 @@ public class TypeDeclaration extends AbstractTypeDeclaration{
 	private List<FieldDeclaration> fields;
 	
 	public TypeDeclaration() {
-		setType(DeclarationType.CLASS_OR_INTERFACE);
+		setArchetype(Archetype.CLASS_OR_INTERFACE);
 	}
 	
 	/**

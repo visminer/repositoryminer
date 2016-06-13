@@ -33,12 +33,10 @@ import org.eclipse.jgit.treewalk.filter.PathFilter;
 import org.eclipse.jgit.util.io.DisabledOutputStream;
 import org.repositoryminer.exceptions.ErrorMessage;
 import org.repositoryminer.exceptions.VisMinerAPIException;
-import org.repositoryminer.model.Commit;
-import org.repositoryminer.model.Contributor;
-import org.repositoryminer.model.Diff;
-import org.repositoryminer.model.DiffType;
-import org.repositoryminer.model.Reference;
-import org.repositoryminer.model.ReferenceType;
+import org.repositoryminer.persistence.model.Commit;
+import org.repositoryminer.persistence.model.Contributor;
+import org.repositoryminer.persistence.model.Diff;
+import org.repositoryminer.persistence.model.Reference;
 import org.repositoryminer.utility.HashHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -258,7 +256,7 @@ public class GitSCM implements SCM {
 			String oldPath = null; // file path of the previous commit
 
 			DiffType type = null;
-
+			
 			switch (entry.getChangeType()) {
 
 			case ADD:
@@ -287,6 +285,7 @@ public class GitSCM implements SCM {
 				oldPath = absolutePath + "/" + entry.getOldPath();
 				type = DiffType.RENAME;
 				break;
+				
 			}
 
 			int[] lines = getLinesAddedAndDeleted(path, parentCommit, revCommit);

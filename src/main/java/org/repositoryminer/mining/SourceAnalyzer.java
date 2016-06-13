@@ -1,4 +1,4 @@
-package org.repositoryminer.analyzer;
+package org.repositoryminer.mining;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -11,12 +11,11 @@ import org.repositoryminer.ast.AST;
 import org.repositoryminer.ast.AbstractTypeDeclaration;
 import org.repositoryminer.codesmell.ICodeSmell;
 import org.repositoryminer.metric.IMetric;
-import org.repositoryminer.model.Commit;
-import org.repositoryminer.model.Diff;
 import org.repositoryminer.parser.IParser;
 import org.repositoryminer.persistence.handler.CommitAnalysisDocumentHandler;
+import org.repositoryminer.persistence.model.Commit;
+import org.repositoryminer.persistence.model.Diff;
 import org.repositoryminer.scm.SCM;
-import org.repositoryminer.scm.SCMRepository;
 import org.repositoryminer.technicaldebt.ITechnicalDebt;
 import org.repositoryminer.utility.HashHandler;
 
@@ -86,18 +85,14 @@ public class SourceAnalyzer {
 		List<Document> abstractTypeDocs = new ArrayList<Document>();
 		for (AbstractTypeDeclaration type : types) {
 			Document typeDoc = new Document();
-
 			String typeHash = file + "/" + type.getName();
-			typeDoc.append("name", type.getName()).append("declaration", type.getType().toString()).append("hash",
+			typeDoc.append("name", type.getName()).append("declaration", type.getArchetype().toString()).append("hash",
 					HashHandler.SHA1(typeHash));
-
 			processMetrics(ast, type, typeDoc);		
 
 			List<Document> codeSmellsDoc = new ArrayList<Document>();
 			processCodeSmells(codeSmellsDoc ,ast, type, typeDoc);
-			
 			processTechnicalDebts(codeSmellsDoc, ast, type, typeDoc);
-			
 			abstractTypeDocs.add(typeDoc);
 		}
 

@@ -5,10 +5,10 @@ import java.util.List;
 
 import org.bson.Document;
 import org.repositoryminer.ast.AST;
-import org.repositoryminer.ast.MethodDeclaration;
-import org.repositoryminer.ast.NodeType;
-import org.repositoryminer.ast.Statement;
 import org.repositoryminer.ast.AbstractTypeDeclaration;
+import org.repositoryminer.ast.MethodDeclaration;
+import org.repositoryminer.ast.Statement;
+import org.repositoryminer.ast.Statement.NodeType;
 
 public class NOAVMetric extends MethodBasedMetricTemplate {
 	
@@ -24,7 +24,7 @@ public class NOAVMetric extends MethodBasedMetricTemplate {
 			methodsDoc.add(new Document("method", method.getName()).append("value", new Integer(noav)));
 		}
 		
-		document.append("name", new String("NOAV")).append("methods", methodsDoc);
+		document.append("name", NOAV).append("methods", methodsDoc);
 	}
 	
 	public int calculate(MethodDeclaration method){

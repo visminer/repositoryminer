@@ -5,10 +5,10 @@ import java.util.List;
 
 import org.bson.Document;
 import org.repositoryminer.ast.AST;
-import org.repositoryminer.ast.MethodDeclaration;
-import org.repositoryminer.ast.NodeType;
-import org.repositoryminer.ast.Statement;
 import org.repositoryminer.ast.AbstractTypeDeclaration;
+import org.repositoryminer.ast.MethodDeclaration;
+import org.repositoryminer.ast.Statement;
+import org.repositoryminer.ast.Statement.NodeType;
 
 public class LVARMetric extends MethodBasedMetricTemplate {
 
@@ -26,7 +26,7 @@ public class LVARMetric extends MethodBasedMetricTemplate {
 			methodsDoc.add(new Document("method", method.getName()).append("value", new Integer(lvar)));
 		}
 		
-		document.append("name", new String("LVAR")).append("accumulated", new Integer(accumulated)).append("methods", methodsDoc);
+		document.append("name", LVAR).append("accumulated", new Integer(accumulated)).append("methods", methodsDoc);
 	}
 	
 	public int calculate(MethodDeclaration method){

@@ -7,7 +7,7 @@ import org.repositoryminer.ast.AbstractTypeDeclaration;
 /**
  * Metrics calculations definition.
  */
-public interface IMetric {
+public interface IMetric extends MetricIds {
 
 	public void calculate(AbstractTypeDeclaration type, AST ast, Document document);
 

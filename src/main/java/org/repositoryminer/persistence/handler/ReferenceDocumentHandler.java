@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bson.Document;
-import org.repositoryminer.model.ReferenceType;
 import org.repositoryminer.persistence.Connection;
+import org.repositoryminer.scm.ReferenceType;
 
 import com.mongodb.BasicDBObject;
 

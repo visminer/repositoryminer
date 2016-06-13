@@ -1,4 +1,4 @@
-package org.repositoryminer.model;
+package org.repositoryminer.persistence.model;
 
 import java.util.Date;
 import java.util.List;

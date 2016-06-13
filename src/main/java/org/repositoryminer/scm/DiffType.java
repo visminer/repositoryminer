@@ -1,4 +1,4 @@
-package org.repositoryminer.model;
+package org.repositoryminer.scm;
 
 public enum DiffType {
 

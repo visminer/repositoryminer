@@ -7,10 +7,10 @@ import java.util.Set;
 
 import org.bson.Document;
 import org.repositoryminer.ast.AST;
-import org.repositoryminer.ast.MethodDeclaration;
-import org.repositoryminer.ast.NodeType;
-import org.repositoryminer.ast.Statement;
 import org.repositoryminer.ast.AbstractTypeDeclaration;
+import org.repositoryminer.ast.MethodDeclaration;
+import org.repositoryminer.ast.Statement;
+import org.repositoryminer.ast.Statement.NodeType;
 
 public class ATFDMetric extends MethodBasedMetricTemplate {
 
@@ -21,7 +21,7 @@ public class ATFDMetric extends MethodBasedMetricTemplate {
 		methodsDoc = new ArrayList<Document>();
 
 		int atfdClass = calculate(type, methods, true);
-		document.append("name", new String("ATFD")).append("accumulated", new Integer(atfdClass)).append("methods", methodsDoc);
+		document.append("name", ATFD).append("accumulated", new Integer(atfdClass)).append("methods", methodsDoc);
 	}
 
 	public int calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, boolean calculateByMethod) {

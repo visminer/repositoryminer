@@ -1,8 +1,9 @@
-package org.repositoryminer.model;
+package org.repositoryminer.persistence.model;
 
 import java.util.List;
 
 import org.bson.Document;
+import org.repositoryminer.scm.ReferenceType;
 
 
 /**

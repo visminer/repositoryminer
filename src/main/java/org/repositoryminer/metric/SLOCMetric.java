@@ -19,7 +19,7 @@ public class SLOCMetric implements IMetric{
 	public void calculate(AbstractTypeDeclaration type, AST ast, Document document) {
 		int sloc = calculate(ast.getSourceCode());
 		
-		document.append("name", new String("SLOC")).append("accumulated", new Integer(sloc));
+		document.append("name", SLOC).append("accumulated", new Integer(sloc));
 	}
 	
 	public int calculate(String source){

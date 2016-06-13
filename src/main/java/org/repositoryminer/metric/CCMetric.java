@@ -5,10 +5,10 @@ import java.util.List;
 
 import org.bson.Document;
 import org.repositoryminer.ast.AST;
-import org.repositoryminer.ast.MethodDeclaration;
-import org.repositoryminer.ast.NodeType;
-import org.repositoryminer.ast.Statement;
 import org.repositoryminer.ast.AbstractTypeDeclaration;
+import org.repositoryminer.ast.MethodDeclaration;
+import org.repositoryminer.ast.Statement;
+import org.repositoryminer.ast.Statement.NodeType;
 
 public class CCMetric extends MethodBasedMetricTemplate {
 
@@ -19,7 +19,7 @@ public class CCMetric extends MethodBasedMetricTemplate {
 		methodsDoc = new ArrayList<Document>();
 
 		int ccClass = calculate(methods);
-		document.append("name", new String("CC")).append("accumulated", new Integer(ccClass)).append("methods", methodsDoc);
+		document.append("name", CC).append("accumulated", new Integer(ccClass)).append("methods", methodsDoc);
 	}
 
 	// for classes

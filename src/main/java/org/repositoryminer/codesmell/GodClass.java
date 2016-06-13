@@ -3,7 +3,7 @@ package org.repositoryminer.codesmell;
 import org.bson.Document;
 import org.repositoryminer.ast.AST;
 import org.repositoryminer.ast.AbstractTypeDeclaration;
-import org.repositoryminer.ast.DeclarationType;
+import org.repositoryminer.ast.AbstractTypeDeclaration.Archetype;
 import org.repositoryminer.ast.TypeDeclaration;
 import org.repositoryminer.metric.ATFDMetric;
 import org.repositoryminer.metric.NOAMetric;
@@ -31,7 +31,7 @@ public class GodClass implements ICodeSmell {
 
 	@Override
 	public void detect(AbstractTypeDeclaration type, AST ast, Document document) {
-		if (type.getType() == DeclarationType.CLASS_OR_INTERFACE) {
+		if (type.getArchetype() == Archetype.CLASS_OR_INTERFACE) {
 			TypeDeclaration cls = (TypeDeclaration) type;
 
 			boolean godClass = detect(type, cls);

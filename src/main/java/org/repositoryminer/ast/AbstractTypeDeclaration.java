@@ -2,21 +2,25 @@ package org.repositoryminer.ast;
 
 public class AbstractTypeDeclaration {
 
-	private DeclarationType type;
+	public enum Archetype {
+		CLASS_OR_INTERFACE, ENUM, ANNOTATION;
+	}
+	
+	private Archetype archetype;
 	private String name;
 
 	/**
-	 * @return the type
+	 * @return the archetype
 	 */
-	public DeclarationType getType() {
-		return type;
+	public Archetype getArchetype() {
+		return archetype;
 	}
 
 	/**
-	 * @param type the type to set
+	 * @param archetype the archetype to set
 	 */
-	public void setType(DeclarationType type) {
-		this.type = type;
+	public void setArchetype(Archetype archetype) {
+		this.archetype = archetype;
 	}
 
 	/**
