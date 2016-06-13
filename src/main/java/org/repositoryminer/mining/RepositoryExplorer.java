@@ -16,7 +16,8 @@ public class RepositoryExplorer {
 		File repoFolder = new File(path);
 		String canonicalPath = repoFolder.getCanonicalPath();
 		
-		String id = HashHandler.SHA1(canonicalPath);
+		String id = HashHandler.SHA1(canonicalPath.replace("\\", "/"));
+		
 		RepositoryDocumentHandler repoDocHandler = new RepositoryDocumentHandler();
 		Repository repository = new Repository(repoDocHandler.findById(id, null));
 		

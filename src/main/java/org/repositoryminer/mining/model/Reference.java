@@ -32,8 +32,8 @@ public class Reference {
 		for (Document doc : refsDocs) {
 			if (ReferenceType.valueOf(doc.getString("type")) == type) {
 				List<String> commits = new ArrayList<String>();
-				for (Document o : (List<Document>) doc.get("commits")) {
-					commits.add(o.toString());
+				for (String o : (List<String>) doc.get("commits")) {
+					commits.add(o);
 				}
 				
 				Reference r = new Reference(doc.getString("_id"), doc.getString("name"), 
