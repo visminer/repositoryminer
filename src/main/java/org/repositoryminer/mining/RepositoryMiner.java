@@ -81,7 +81,7 @@ public class RepositoryMiner {
 				for (Commit c : commits) {
 					docs.add(c.toDocument());
 					contributors.add(c.getCommitter());
-					wd.setCheckout(c.getId());
+					wd.setId(c.getId());
 					wd.processDiff(c.getDiffs());
 					wdHandler.insert(wd.toDocument());
 				}

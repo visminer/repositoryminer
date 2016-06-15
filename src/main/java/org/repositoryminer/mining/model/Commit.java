@@ -1,7 +1,10 @@
 package org.repositoryminer.mining.model;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import org.bson.Document;
 
 public class Commit {
 
@@ -14,6 +17,39 @@ public class Commit {
 	private Contributor committer;
 	private List<Diff> diffs;
 	
+	@SuppressWarnings("unchecked")
+	public static List<Commit> parseDocuments(List<Document> commitsDocs) {
+		List<Commit> commits = new ArrayList<Commit>();
+		for (Document doc : commitsDocs) {
+			List<String> parents = new ArrayList<String>();
+			for (String p : (List<String>) doc.get("parents")) {
+				parents.add(p);
+			}
+			Commit c = new Commit(doc.getString("_id"), doc.getString("message"), 
+					doc.getDate("authored_date"), doc.getDate("commit_date"), parents,
+					Contributor.parseDocument((Document) doc.get("author")), 
+					Contributor.parseDocument((Document) doc.get("committer")),
+					Diff.parseDocuments((List<Document>) doc.get("diffs")));
+			commits.add(c);
+		}
+		return commits;
+	}
+	
+	public Commit() {}
+	
+	public Commit(String id, String message, Date authoredDate, Date commitDate, List<String> parents,
+			Contributor author, Contributor committer, List<Diff> diffs) {
+		super();
+		this.id = id;
+		this.message = message;
+		this.authoredDate = authoredDate;
+		this.commitDate = commitDate;
+		this.parents = parents;
+		this.author = author;
+		this.committer = committer;
+		this.diffs = diffs;
+	}
+
 	/**
 	 * @return the id
 	 */

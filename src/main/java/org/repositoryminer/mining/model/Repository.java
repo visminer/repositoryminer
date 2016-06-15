@@ -1,10 +1,10 @@
 package org.repositoryminer.mining.model;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.bson.Document;
-import org.repositoryminer.scm.ReferenceType;
 import org.repositoryminer.scm.SCMType;
 
 public class Repository {
@@ -25,6 +25,15 @@ public class Repository {
 	public Repository() {}
 
 	@SuppressWarnings("unchecked")
+	public static Map<String, String> parseWorkingDirectory(Document doc) {
+		Map<String, String> wd = new HashMap<String, String>();
+		for (Document d : (List<Document>) doc.get("files")) {
+			wd.put(d.getString("file"), d.getString("checkout"));
+		}
+		return wd;
+	}
+	
+	@SuppressWarnings("unchecked")
 	public Repository(Document doc) {
 		this.id = doc.getString("_id");
 		this.name = doc.getString("name");
@@ -32,12 +41,6 @@ public class Repository {
 		this.path = doc.getString("path");
 		this.scm = SCMType.valueOf(doc.getString("scm"));
 		this.contributors = Contributor.parseDocuments((List<Document>) doc.get("contributors"));
-	}
-
-	public void parserReferenceDocs(List<Document> refsDocs) {
-		this.branches = Reference.parserReferences(refsDocs, ReferenceType.BRANCH);
-		this.tags = Reference.parserReferences(refsDocs, ReferenceType.TAG);
-		this.currentReference = Reference.getMaster(this.branches);
 	}
 
 	/**
@@ -163,14 +166,22 @@ public class Repository {
 	/**
 	 * @return the currentCommit
 	 */
-	public int getCurrentCommit() {
-		return currentCommit;
+	public Commit getCurrentCommit() {
+		return commits.get(currentCommit);
 	}
 	/**
 	 * @param currentCommit the currentCommit to set
 	 */
-	public void setCurrentCommit(int currentCommit) {
-		this.currentCommit = currentCommit;
+	public boolean setCurrentCommit(Commit currentCommit) {
+		if (commits != null) {
+			int i = commits.indexOf(currentCommit);
+			if (i >= 0) {
+				this.currentCommit = i;
+				return true;
+			}
+			return false;
+		}
+		return false;
 	}
 	/**
 	 * @return the currentReference

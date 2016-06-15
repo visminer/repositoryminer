@@ -28,6 +28,12 @@ public class CommitDocumentHandler extends DocumentHandler {
 		return findMany(whereClause, null);
 	}
 
+	public List<Document> getAllByIds(List<String> ids) {
+		BasicDBObject whereClause = new BasicDBObject();
+		whereClause.put("_id", new BasicDBObject("$in", ids));
+		return findMany(whereClause, null);
+	}
+	
 	@SuppressWarnings("unchecked")
 	public List<Document> getAllDiffs(String id) {
 		Bson projection = fields(include("diffs"), excludeId());

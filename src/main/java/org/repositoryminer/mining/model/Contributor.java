@@ -26,6 +26,11 @@ public class Contributor {
 		return contributors;
 	}
 	
+	protected static Contributor parseDocument(Document doc) {
+		Contributor c = new Contributor(doc.getString("name"), doc.getString("email"));
+		return c;
+	}
+	
 	/**
 	 * @return the name
 	 */

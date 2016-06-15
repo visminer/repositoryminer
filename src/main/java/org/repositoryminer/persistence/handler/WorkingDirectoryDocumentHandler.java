@@ -9,5 +9,5 @@ public class WorkingDirectoryDocumentHandler extends DocumentHandler{
 	public WorkingDirectoryDocumentHandler() {
 		super.collection = Connection.getInstance().getCollection(COLLECTION_NAME);
 	}
-		
+	
 }

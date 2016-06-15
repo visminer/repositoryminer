@@ -30,6 +30,10 @@ public class DocumentHandler {
 		return findOne(whereClause, projection);
 	}
 	
+	public Document findById(String id){
+		return findById(id, null);
+	}
+	
 	public Document findOne(BasicDBObject whereClause, Bson projection) {
 		Document doc = collection.find(whereClause).projection(projection).first();
 		return doc;
