@@ -30,6 +30,22 @@ public class Repository {
 		RepositoryExplorer.mineRepository(this);
 	}
 	
+	public Document getMetrics(String file, String commit) {
+		return RepositoryExplorer.getMetricMeasures(file, commit);
+	}
+	
+	public Document getCodeSmells(String file, String commit) {
+		return RepositoryExplorer.getCodeSmellsMeasures(file, commit);
+	}
+	
+	public Document getTechnicalDebtss(String file, String commit) {
+		return RepositoryExplorer.getTechnicalDebtsMeasures(file, commit);
+	}
+	
+	public Document getMeasures(String file, String commit) {
+		return RepositoryExplorer.getAllMeasures(file, commit);
+	}
+	
 	public void lastCommit() {
 		currentCommit = commits.size() - 1;
 		RepositoryExplorer.mineCurrentCommit(this);

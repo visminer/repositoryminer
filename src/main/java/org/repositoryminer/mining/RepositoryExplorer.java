@@ -8,6 +8,7 @@ import org.bson.Document;
 import org.repositoryminer.mining.model.Commit;
 import org.repositoryminer.mining.model.Reference;
 import org.repositoryminer.mining.model.Repository;
+import org.repositoryminer.persistence.handler.CommitAnalysisDocumentHandler;
 import org.repositoryminer.persistence.handler.CommitDocumentHandler;
 import org.repositoryminer.persistence.handler.ReferenceDocumentHandler;
 import org.repositoryminer.persistence.handler.RepositoryDocumentHandler;
@@ -27,7 +28,7 @@ public class RepositoryExplorer {
 		Repository.initRepository(repoDocHandler.findById(id, null), repository);
 		
 		ReferenceDocumentHandler refsDocHandler = new ReferenceDocumentHandler();
-		List<Document> refsDocs = refsDocHandler.getAllByRepository(id);
+		List<Document> refsDocs = refsDocHandler.getByRepository(id);
 		repository.setBranches(Reference.parseDocuments(refsDocs, ReferenceType.BRANCH));
 		repository.setTags(Reference.parseDocuments(refsDocs, ReferenceType.TAG));
 		repository.setCurrentReference(Reference.getMaster(repository.getBranches()));
@@ -50,6 +51,28 @@ public class RepositoryExplorer {
 		mineCurrentCommit(repository);
 	}
 	
+	public static Document getAllMeasures(String file, String commit) {
+		CommitAnalysisDocumentHandler docHandler = new CommitAnalysisDocumentHandler();
+		String fileHash = HashHandler.SHA1(file);
+		return docHandler.getAllMeasures(fileHash, commit);
+	}
 	
+	public static Document getMetricMeasures(String file, String commit) {
+		CommitAnalysisDocumentHandler docHandler = new CommitAnalysisDocumentHandler();
+		String fileHash = HashHandler.SHA1(file);
+		return docHandler.getMetricsMeasures(fileHash, commit);
+	}
+	
+	public static Document getCodeSmellsMeasures(String file, String commit) {
+		CommitAnalysisDocumentHandler docHandler = new CommitAnalysisDocumentHandler();
+		String fileHash = HashHandler.SHA1(file);
+		return docHandler.getCodeSmellsMeasures(fileHash, commit);
+	}
+	
+	public static Document getTechnicalDebtsMeasures(String file, String commit) {
+		CommitAnalysisDocumentHandler docHandler = new CommitAnalysisDocumentHandler();
+		String fileHash = HashHandler.SHA1(file);
+		return docHandler.getTechnicalDebtsMeasures(fileHash, commit);
+	}
 	
 }
