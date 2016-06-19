@@ -17,7 +17,6 @@ public class WorkingDirectory {
 
 	private String id;
 	private String repository;
-	private String checkout;
 	private Map<String, String> files;
 	
 	public WorkingDirectory() {}
@@ -30,19 +29,19 @@ public class WorkingDirectory {
 	public void processDiff(List<Diff> diffs) {
 		for (Diff d : diffs) {
 			if (d.getType() == ADD || d.getType() == MODIFY || d.getType() == COPY) {
-				files.put(d.getPath(), checkout);
+				files.put(d.getPath(), id);
 			} else if(d.getType() == DELETE) {
 				files.remove(d.getPath());
 			} else { // d.getType() == RENAME
 				files.remove(d.getOldPath());
-				files.put(d.getPath(), checkout);
+				files.put(d.getPath(), id);
 			}
 		}
 	}
 
 	public Document toDocument() {
 		Document doc = new Document();
-		doc.append("repository", repository).append("checkout", checkout);
+		doc.append("_id", id).append("repository", repository);
 		
 		List<Document> filesDoc = new ArrayList<Document>();
 		for (Entry<String, String> f : files.entrySet()) {
@@ -78,18 +77,6 @@ public class WorkingDirectory {
 	 */
 	public void setRepository(String repository) {
 		this.repository = repository;
-	}
-	/**
-	 * @return the checkout
-	 */
-	public String getCheckout() {
-		return checkout;
-	}
-	/**
-	 * @param checkout the checkout to set
-	 */
-	public void setCheckout(String checkout) {
-		this.checkout = checkout;
 	}
 	/**
 	 * @return the files

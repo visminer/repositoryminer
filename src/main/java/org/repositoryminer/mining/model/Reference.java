@@ -27,7 +27,7 @@ public class Reference {
 	}
 	
 	@SuppressWarnings("unchecked")
-	protected static List<Reference> parserReferences(List<Document> refsDocs, ReferenceType type) {
+	public static List<Reference> parseDocuments(List<Document> refsDocs, ReferenceType type) {
 		List<Reference> refs = new ArrayList<Reference>();
 		for (Document doc : refsDocs) {
 			if (ReferenceType.valueOf(doc.getString("type")) == type) {
@@ -35,7 +35,6 @@ public class Reference {
 				for (String o : (List<String>) doc.get("commits")) {
 					commits.add(o);
 				}
-				
 				Reference r = new Reference(doc.getString("_id"), doc.getString("name"), 
 						doc.getString("full_name"), type, commits);
 				refs.add(r);

@@ -1,5 +1,6 @@
 package org.repositoryminer.mining;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -26,6 +27,10 @@ public class SCMRepository {
 	//private boolean allowTextFiles;
 	//private List<String> allowedExtensions;
 
+	public void mine() throws UnsupportedEncodingException {
+		RepositoryMiner.mine(this);
+	}
+	
 	public SCMRepository() {
 	}
 
