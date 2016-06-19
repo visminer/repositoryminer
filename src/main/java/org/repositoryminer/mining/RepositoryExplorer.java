@@ -17,14 +17,14 @@ import org.repositoryminer.utility.HashHandler;
 
 public class RepositoryExplorer {
 
-	public static Repository mineRepository(String path) throws IOException {
-		File repoFolder = new File(path);
+	public static void mineRepository(Repository repository) throws IOException {
+		File repoFolder = new File(repository.getPath());
 		String canonicalPath = repoFolder.getCanonicalPath();
 		
 		String id = HashHandler.SHA1(canonicalPath.replace("\\", "/"));
 		
 		RepositoryDocumentHandler repoDocHandler = new RepositoryDocumentHandler();
-		Repository repository = new Repository(repoDocHandler.findById(id, null));
+		Repository.initRepository(repoDocHandler.findById(id, null), repository);
 		
 		ReferenceDocumentHandler refsDocHandler = new ReferenceDocumentHandler();
 		List<Document> refsDocs = refsDocHandler.getAllByRepository(id);
@@ -32,22 +32,24 @@ public class RepositoryExplorer {
 		repository.setTags(Reference.parseDocuments(refsDocs, ReferenceType.TAG));
 		repository.setCurrentReference(Reference.getMaster(repository.getBranches()));
 		
+		mineCurrentReference(repository);
+	}
+	
+	public static void mineCurrentCommit(Repository repository) {
+		WorkingDirectoryDocumentHandler wdHandler = new WorkingDirectoryDocumentHandler();
+		Document wdDoc = wdHandler.findById(repository.getCurrentCommit().getId());
+		repository.setWorkingDirectory(Repository.parseWorkingDirectory(wdDoc));
+	}
+	
+	public static void mineCurrentReference(Repository repository) {
 		CommitDocumentHandler commitHandler = new CommitDocumentHandler();
 		List<Document> commitsDocs = commitHandler.getAllByIds(repository.getCurrentReference()
 				.getCommits());
 		repository.setCommits(Commit.parseDocuments(commitsDocs));
-		
-		WorkingDirectoryDocumentHandler wdHandler = new WorkingDirectoryDocumentHandler();
-		Document wdDoc = wdHandler.findById(repository.getCurrentCommit().getId());
-		repository.setWorkingDirectory(Repository.parseWorkingDirectory(wdDoc));
-		
-		return repository;
+		repository.lastCommit();
+		mineCurrentCommit(repository);
 	}
 	
-	// TODO: implement these methods
-	public static void mineNextCommit(Repository repository) {}
-	public static void minePrevCommit(Repository repository) {}
-	public static void mineCurrentCommit(Repository repository) {}
-	public static void mineCurrentReference(Repository repository) {}
+	
 	
 }

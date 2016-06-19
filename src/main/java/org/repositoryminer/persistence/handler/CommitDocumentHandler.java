@@ -9,6 +9,7 @@ import org.repositoryminer.persistence.Connection;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.BasicDBObjectBuilder;
+import com.mongodb.client.MongoCursor;
 
 import static com.mongodb.client.model.Projections.fields;
 import static com.mongodb.client.model.Projections.excludeId;
@@ -31,7 +32,9 @@ public class CommitDocumentHandler extends DocumentHandler {
 	public List<Document> getAllByIds(List<String> ids) {
 		BasicDBObject whereClause = new BasicDBObject();
 		whereClause.put("_id", new BasicDBObject("$in", ids));
-		return findMany(whereClause, null);
+		MongoCursor<Document> cursor = collection.find(whereClause).
+				sort(new BasicDBObject("commit_date", 1)).iterator();
+		return fromCursorToList(cursor);
 	}
 	
 	@SuppressWarnings("unchecked")
