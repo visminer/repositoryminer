@@ -3,8 +3,10 @@ package org.repositoryminer.mining.model;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.bson.Document;
 import org.repositoryminer.mining.RepositoryExplorer;
@@ -108,6 +110,32 @@ public class Repository {
 		}
 		return commitsAux;
 	}
+
+	public List<Contributor> getCommittersUntilCommit(Commit commit) {
+		int index = commits.indexOf(commit);
+		if (index == -1) {
+			return new ArrayList<Contributor>();
+		}
+		
+		Set<Contributor> contribsSet = new HashSet<Contributor>();
+		for (int i = 0; i <= index; i++) {
+			contribsSet.add(commits.get(i).getCommitter());
+		}
+		return new ArrayList<Contributor>(contribsSet);
+	}
+	
+	public List<Contributor> getAuthorsUntilCommit(Commit commit) {
+		int index = commits.indexOf(commit);
+		if (index == -1) {
+			return new ArrayList<Contributor>();
+		}
+		
+		Set<Contributor> contribsSet = new HashSet<Contributor>();
+		for (int i = 0; i <= index; i++) {
+			contribsSet.add(commits.get(i).getAuthor());
+		}
+		return new ArrayList<Contributor>(contribsSet);
+	}
 	
 	/**
 	 * @param currentCommit
@@ -153,11 +181,7 @@ public class Repository {
 		repository.contributors = Contributor.parseDocuments((List<Document>) doc.get("contributors"));
 	}
 
-	public Repository() {
-	}
-
 	public Repository(String path) {
-		super();
 		this.path = path;
 	}
 
