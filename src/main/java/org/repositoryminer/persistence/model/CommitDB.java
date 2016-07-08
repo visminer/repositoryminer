@@ -9,7 +9,7 @@ import org.bson.Document;
  * This class represents the "commit" object in the database. This class
  * represents a commit.
  */
-public class Commit {
+public class CommitDB {
 
 	private String id;
 	private String message;
@@ -17,11 +17,11 @@ public class Commit {
 	private Date commitDate;
 	private String repository;
 	private List<String> parents;
-	private Contributor author;
-	private Contributor committer;
-	private List<Diff> diffs;
+	private ContributorDB author;
+	private ContributorDB committer;
+	private List<DiffDB> diffs;
 
-	public Commit() {
+	public CommitDB() {
 	}
 
 	public Document toDocument() {
@@ -29,12 +29,12 @@ public class Commit {
 		doc.append("_id", id).append("message", message).append("authored_date", authoredDate)
 				.append("commit_date", commitDate).append("repository", repository).append("parents", parents)
 				.append("author", author.toDocument()).append("committer", committer.toDocument())
-				.append("diffs", Diff.toDocumentList(diffs));
+				.append("diffs", DiffDB.toDocumentList(diffs));
 		return doc;
 	}
 
-	public Commit(String id, String message, Date authoredDate, Date commitDate, String repository,
-			List<String> parents, Contributor author, Contributor committer, List<Diff> diffs) {
+	public CommitDB(String id, String message, Date authoredDate, Date commitDate, String repository,
+			List<String> parents, ContributorDB author, ContributorDB committer, List<DiffDB> diffs) {
 		super();
 		this.id = id;
 		this.message = message;
@@ -140,7 +140,7 @@ public class Commit {
 	/**
 	 * @return the author
 	 */
-	public Contributor getAuthor() {
+	public ContributorDB getAuthor() {
 		return author;
 	}
 
@@ -148,14 +148,14 @@ public class Commit {
 	 * @param author
 	 *            the author to set
 	 */
-	public void setAuthor(Contributor author) {
+	public void setAuthor(ContributorDB author) {
 		this.author = author;
 	}
 
 	/**
 	 * @return the committer
 	 */
-	public Contributor getCommitter() {
+	public ContributorDB getCommitter() {
 		return committer;
 	}
 
@@ -163,14 +163,14 @@ public class Commit {
 	 * @param committer
 	 *            the committer to set
 	 */
-	public void setCommitter(Contributor committer) {
+	public void setCommitter(ContributorDB committer) {
 		this.committer = committer;
 	}
 
 	/**
 	 * @return the diffs
 	 */
-	public List<Diff> getDiffs() {
+	public List<DiffDB> getDiffs() {
 		return diffs;
 	}
 
@@ -178,7 +178,7 @@ public class Commit {
 	 * @param diffs
 	 *            the diffs to set
 	 */
-	public void setDiffs(List<Diff> diffs) {
+	public void setDiffs(List<DiffDB> diffs) {
 		this.diffs = diffs;
 	}
 

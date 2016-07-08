@@ -10,7 +10,7 @@ import org.repositoryminer.scm.DiffType;
  * This class represents the "change" object in the database. This class
  * represents the changes made in a commit.
  */
-public class Diff {
+public class DiffDB {
 
 	private String path;
 	private String oldPath;
@@ -19,12 +19,12 @@ public class Diff {
 	private int linesRemoved;
 	private DiffType type;
 
-	public Diff() {
+	public DiffDB() {
 	}
 
-	public static List<Document> toDocumentList(List<Diff> diffs) {
+	public static List<Document> toDocumentList(List<DiffDB> diffs) {
 		List<Document> list = new ArrayList<Document>();
-		for (Diff d : diffs) {
+		for (DiffDB d : diffs) {
 			Document doc = new Document();
 			doc.append("path", d.getPath()).append("old_path", d.getOldPath()).append("hash", d.getHash())
 					.append("lines_added", d.getLinesAdded()).append("lines_removed", d.getLinesRemoved())
@@ -34,7 +34,7 @@ public class Diff {
 		return list;
 	}
 
-	public Diff(String path, String oldPath, String hash, int linesAdded, int linesRemoved, DiffType type) {
+	public DiffDB(String path, String oldPath, String hash, int linesAdded, int linesRemoved, DiffType type) {
 		super();
 		this.path = path;
 		this.oldPath = oldPath;

@@ -13,21 +13,21 @@ import java.util.Map.Entry;
 
 import org.bson.Document;
 
-public class WorkingDirectory {
+public class WorkingDirectoryDB {
 
 	private String id;
 	private String repository;
 	private Map<String, String> files;
 	
-	public WorkingDirectory() {}
+	public WorkingDirectoryDB() {}
 	
-	public WorkingDirectory(String repository) {
+	public WorkingDirectoryDB(String repository) {
 		this.repository = repository;
 		this.files = new HashMap<String, String>();
 	}
 	
-	public void processDiff(List<Diff> diffs) {
-		for (Diff d : diffs) {
+	public void processDiff(List<DiffDB> diffs) {
+		for (DiffDB d : diffs) {
 			if (d.getType() == ADD || d.getType() == MODIFY || d.getType() == COPY) {
 				files.put(d.getPath(), id);
 			} else if(d.getType() == DELETE) {

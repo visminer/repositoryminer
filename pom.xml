@@ -3,13 +3,12 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.repositoryminer</groupId>
-	<artifactId>repositoryminer</artifactId>
+	<artifactId>repository-miner</artifactId>
 	<name>RepositoryMiner</name>
 	<url>https://github.com/visminer/RepositoryMiner</url>
 	<version>1.0</version>
 
 	<properties>
-		<jdk-version>1.7</jdk-version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 	</properties>

@@ -10,7 +10,7 @@ import org.repositoryminer.scm.ReferenceType;
  * This class represents the "reference" object in the database.
  * This class represents a reference.
  */
-public class Reference {
+public class ReferenceDB {
 
 	private String id;
 	private String repository;
@@ -19,7 +19,7 @@ public class Reference {
 	private ReferenceType type;
 	private List<String> commits;
 
-	public Reference(){}
+	public ReferenceDB(){}
 	
 	public Document toDocument() {
 		Document doc = new Document();
@@ -28,7 +28,7 @@ public class Reference {
 		return doc;
 	}
 	
-	public Reference(String id, String repository, String name, String fullName, ReferenceType type) {
+	public ReferenceDB(String id, String repository, String name, String fullName, ReferenceType type) {
 		super();
 		this.id = id;
 		this.repository = repository;

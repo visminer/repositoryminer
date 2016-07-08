@@ -13,8 +13,8 @@ import org.repositoryminer.codesmell.ICodeSmell;
 import org.repositoryminer.metric.IMetric;
 import org.repositoryminer.parser.IParser;
 import org.repositoryminer.persistence.handler.CommitAnalysisDocumentHandler;
-import org.repositoryminer.persistence.model.Commit;
-import org.repositoryminer.persistence.model.Diff;
+import org.repositoryminer.persistence.model.CommitDB;
+import org.repositoryminer.persistence.model.DiffDB;
 import org.repositoryminer.scm.SCM;
 import org.repositoryminer.technicaldebt.ITechnicalDebt;
 import org.repositoryminer.utility.HashHandler;
@@ -43,19 +43,19 @@ public class SourceAnalyzer {
 		}
 	}
 
-	public void analyze(List<Commit> commits) throws UnsupportedEncodingException {
-		for (Commit commit : commits) {
+	public void analyze(List<CommitDB> commits) throws UnsupportedEncodingException {
+		for (CommitDB commit : commits) {
 			scm.checkout(commit.getId());
 
 			for (IParser parser : repository.getParsers())
 				parser.setSourceFolders(repositoryPath);
 
-			for (Diff diff : commit.getDiffs()) 
+			for (DiffDB diff : commit.getDiffs()) 
 				processAST(diff.getPath(), diff.getHash(), commit);
 		}
 	}
 
-	private void processAST(String file, String fileHash, Commit commit) throws UnsupportedEncodingException {
+	private void processAST(String file, String fileHash, CommitDB commit) throws UnsupportedEncodingException {
 		int index = file.lastIndexOf(".") + 1;
 		String ext = file.substring(index);
 
@@ -72,7 +72,7 @@ public class SourceAnalyzer {
 		process(commit, file, fileHash, ast);
 	}
 
-	private void process(Commit commit, String file, String hash, AST ast) {
+	private void process(CommitDB commit, String file, String hash, AST ast) {
 		Document doc = new Document();
 		doc.append("commit", commit.getId());
 		doc.append("commit_date", commit.getCommitDate());

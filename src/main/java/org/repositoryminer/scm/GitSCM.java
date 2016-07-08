@@ -1,8 +1,10 @@
 package org.repositoryminer.scm;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
 
@@ -33,10 +35,10 @@ import org.eclipse.jgit.treewalk.filter.PathFilter;
 import org.eclipse.jgit.util.io.DisabledOutputStream;
 import org.repositoryminer.exceptions.ErrorMessage;
 import org.repositoryminer.exceptions.VisMinerAPIException;
-import org.repositoryminer.persistence.model.Commit;
-import org.repositoryminer.persistence.model.Contributor;
-import org.repositoryminer.persistence.model.Diff;
-import org.repositoryminer.persistence.model.Reference;
+import org.repositoryminer.persistence.model.CommitDB;
+import org.repositoryminer.persistence.model.ContributorDB;
+import org.repositoryminer.persistence.model.DiffDB;
+import org.repositoryminer.persistence.model.ReferenceDB;
 import org.repositoryminer.utility.HashHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,8 +92,8 @@ public class GitSCM implements SCM {
 	}
 
 	@Override
-	public List<Reference> getReferences() {
-		List<Reference> refs = new ArrayList<Reference>();
+	public List<ReferenceDB> getReferences() {
+		List<ReferenceDB> refs = new ArrayList<ReferenceDB>();
 
 		Iterable<Ref> branches = null;
 		try {
@@ -106,7 +108,7 @@ public class GitSCM implements SCM {
 
 			int i = b.getName().lastIndexOf("/") + 1;
 			String id = HashHandler.SHA1(absolutePath + "/" + b.getName());
-			Reference r = new Reference(id, repoId, b.getName().substring(i), b.getName(), ReferenceType.BRANCH);
+			ReferenceDB r = new ReferenceDB(id, repoId, b.getName().substring(i), b.getName(), ReferenceType.BRANCH);
 			refs.add(r);
 		}
 
@@ -120,7 +122,7 @@ public class GitSCM implements SCM {
 		for (Ref t : tags) {
 			int i = t.getName().lastIndexOf("/") + 1;
 			String id = HashHandler.SHA1(absolutePath + "/" + t.getName());
-			Reference r = new Reference(id, repoId, t.getName().substring(i), t.getName(), ReferenceType.TAG);
+			ReferenceDB r = new ReferenceDB(id, repoId, t.getName().substring(i), t.getName(), ReferenceType.TAG);
 			refs.add(r);
 		}
 
@@ -128,42 +130,41 @@ public class GitSCM implements SCM {
 	}
 
 	@Override
-	public List<Commit> getCommits(int skip, int maxCount) {
+	public List<CommitDB> getCommits() {
 		Iterable<RevCommit> revCommits = null;
 		try {
-			if (maxCount != 0)
-				revCommits = git.log().all().setSkip(skip).setMaxCount(maxCount).call();
-			else
-				revCommits = git.log().all().call();
+			revCommits = git.log().all().call();
 		} catch (GitAPIException | IOException e) {
 			errorHandler(ErrorMessage.GIT_LOG_COMMIT_ERROR.toString(), e);
 		}
 
-		List<Commit> commits = new ArrayList<Commit>();
+		List<CommitDB> commits = new ArrayList<CommitDB>();
 
 		for (RevCommit revCommit : revCommits) {
 			PersonIdent author = revCommit.getAuthorIdent();
 			PersonIdent committer = revCommit.getCommitterIdent();
 
-			Contributor myAuthor = new Contributor(author.getName(), author.getEmailAddress());
+			ContributorDB myAuthor = new ContributorDB(author.getName(), author.getEmailAddress());
 
-			Contributor myCommitter = new Contributor(committer.getName(), committer.getEmailAddress());
+			ContributorDB myCommitter = new ContributorDB(committer.getName(), committer.getEmailAddress());
 
 			List<String> parents = new ArrayList<String>();
 			for (RevCommit parent : revCommit.getParents())
 				parents.add(parent.getName());
 
-			List<Diff> changes = null;
+			List<DiffDB> changes = null;
 			try {
 				changes = getCommitedFiles(revCommit.getName());
 			} catch (IOException e) {
 				errorHandler(ErrorMessage.GIT_RETRIEVE_CHANGES_ERROR.toString(), e);
 			}
 
-			Commit c = new Commit(revCommit.getName(), revCommit.getFullMessage(), author.getWhen(),
+			CommitDB c = new CommitDB(revCommit.getName(), revCommit.getFullMessage(), author.getWhen(),
 					committer.getWhen(), repoId, parents, myAuthor, myCommitter, changes);
 			commits.add(c);
 		}
+
+		Collections.reverse(commits);
 		return commits;
 	}
 
@@ -203,6 +204,10 @@ public class GitSCM implements SCM {
 
 	@Override
 	public void checkout(String hash) {
+		File lockFile = new File(absolutePath + "/index.lock");
+		if (lockFile.exists()) {
+			lockFile.delete();
+		}
 		makeCheckout("master", false);
 		makeCheckout(hash, true);
 	}
@@ -219,13 +224,11 @@ public class GitSCM implements SCM {
 	@Override
 	public void reset() {
 		try {
-
-			if (!git.status().call().isClean())
+			if (!git.status().call().isClean()) {
 				git.reset().setMode(ResetType.HARD).call();
-
+			}
 			makeCheckout("master", false);
 			git.branchDelete().setBranchNames(RM_BRANCH).setForce(true).call();
-
 		} catch (NoWorkTreeException | GitAPIException e) {
 			errorHandler(ErrorMessage.GIT_RESET_ERROR.toString(), e);
 		}
@@ -237,7 +240,7 @@ public class GitSCM implements SCM {
 		throw new VisMinerAPIException(errorMessage, e);
 	}
 
-	private List<Diff> getCommitedFiles(String commit) throws IOException {
+	private List<DiffDB> getCommitedFiles(String commit) throws IOException {
 		RevCommit revCommit = revWalk.parseCommit(ObjectId.fromString(commit));
 		AnyObjectId currentCommit = repository.resolve(commit);
 		AnyObjectId oldCommit = revCommit.getParentCount() > 0 ? repository.resolve(revCommit.getParent(0).getName())
@@ -246,7 +249,7 @@ public class GitSCM implements SCM {
 		List<DiffEntry> diffs = null;
 		diffs = diffFormatter.scan(oldCommit, currentCommit);
 
-		List<Diff> changes = new ArrayList<Diff>();
+		List<DiffDB> changes = new ArrayList<DiffDB>();
 		for (DiffEntry entry : diffs) {
 
 			RevCommit parentCommit = oldCommit == null ? null
@@ -254,11 +257,9 @@ public class GitSCM implements SCM {
 
 			String path = null; // file path of the current commit
 			String oldPath = null; // file path of the previous commit
-
 			DiffType type = null;
-			
-			switch (entry.getChangeType()) {
 
+			switch (entry.getChangeType()) {
 			case ADD:
 				path = absolutePath + "/" + entry.getNewPath();
 				type = DiffType.ADD;
@@ -285,11 +286,10 @@ public class GitSCM implements SCM {
 				oldPath = absolutePath + "/" + entry.getOldPath();
 				type = DiffType.RENAME;
 				break;
-				
 			}
 
 			int[] lines = getLinesAddedAndDeleted(path, parentCommit, revCommit);
-			Diff change = new Diff(path, oldPath, HashHandler.SHA1(path), lines[0], lines[1], type);
+			DiffDB change = new DiffDB(path, oldPath, HashHandler.SHA1(path), lines[0], lines[1], type);
 			changes.add(change);
 		}
 		return changes;
@@ -325,14 +325,10 @@ public class GitSCM implements SCM {
 	}
 
 	private void makeCheckout(String hash, boolean create) {
-		try {
-			if (create)
-				Runtime.getRuntime().exec("git checkout -f -b " + RM_BRANCH + " " + hash, null,
-						new java.io.File(absolutePath));
-			else
-				Runtime.getRuntime().exec("git checkout -f " + hash, null, new java.io.File(absolutePath));
-		} catch (IOException e) {
-			errorHandler(ErrorMessage.GIT_CHECKOUT_ERROR.toString(), e);
+		if (create) {
+			git.checkout().setForce(true).setCreateBranch(true).setName(RM_BRANCH).setStartPoint(hash);
+		} else {
+			git.checkout().setForce(true).setStartPoint(hash);
 		}
 	}
 

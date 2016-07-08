@@ -2,8 +2,8 @@ package org.repositoryminer.scm;
 
 import java.util.List;
 
-import org.repositoryminer.persistence.model.Commit;
-import org.repositoryminer.persistence.model.Reference;
+import org.repositoryminer.persistence.model.CommitDB;
+import org.repositoryminer.persistence.model.ReferenceDB;
 
 /**
  * Interface that define what is needed to support a repository.
@@ -36,15 +36,13 @@ public interface SCM {
 	 * @param repositoryId
 	 * @return List all references(e.g. tags and branches).
 	 */
-	public List<Reference> getReferences();
+	public List<ReferenceDB> getReferences();
 
 	/**
-	 * @param skip The number of commits to jump before start the fetch.
-	 * @param The max number of commits.
-	 * @return A list with <max> commits beginning from <skip>.
+	 * @return A list with all commits in the repository.
 	 * This method iterates through all commits.
 	 */
-	public List<Commit> getCommits(int skip, int maxCount);
+	public List<CommitDB> getCommits();
 	
 	/**
 	 * @param fullName

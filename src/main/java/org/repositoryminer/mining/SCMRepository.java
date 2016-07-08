@@ -16,7 +16,6 @@ public class SCMRepository {
 	private String name;
 	private String description;
 	private SCMType scm;
-	private int commitThreshold = 3000;
 	private String charset = "UTF-8";
 	private int binaryThreshold = 2048;
 	private List<IParser> parsers;
@@ -24,8 +23,8 @@ public class SCMRepository {
 	private List<ICodeSmell> codeSmells;
 	private List<ITechnicalDebt> technicalDebts;
 	// TODO : To implement
-	//private boolean allowTextFiles;
-	//private List<String> allowedExtensions;
+	// private boolean allowTextFiles;
+	// private List<String> allowedExtensions;
 
 	public void mine() throws UnsupportedEncodingException {
 		RepositoryMiner.mine(this);
@@ -122,22 +121,6 @@ public class SCMRepository {
 	 */
 	public SCMRepository setScm(SCMType scm) {
 		this.scm = scm;
-		return this;
-	}
-
-	/**
-	 * @return the commitThreshold
-	 */
-	public int getCommitThreshold() {
-		return commitThreshold;
-	}
-
-	/**
-	 * @param commitThreshold
-	 *            the commitThreshold to set
-	 */
-	public SCMRepository setCommitThreshold(int commitThreshold) {
-		this.commitThreshold = commitThreshold;
 		return this;
 	}
 

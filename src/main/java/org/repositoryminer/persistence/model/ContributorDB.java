@@ -9,15 +9,15 @@ import org.bson.Document;
  * This class represents the "personIdent" object in the database. This class
  * represents a person who contributes to the repository.
  */
-public class Contributor {
+public class ContributorDB {
 
 	private String name;
 	private String email;
 
-	public Contributor() {
+	public ContributorDB() {
 	}
 
-	public Contributor(String name, String email) {
+	public ContributorDB(String name, String email) {
 		super();
 		this.name = name;
 		this.email = email;
@@ -29,9 +29,9 @@ public class Contributor {
 		return doc;
 	}
 
-	public static List<Document> toDocumentList(List<Contributor> contributors) {
+	public static List<Document> toDocumentList(List<ContributorDB> contributors) {
 		List<Document> list = new ArrayList<Document>();
-		for (Contributor c : contributors) {
+		for (ContributorDB c : contributors) {
 			list.add(c.toDocument());
 		}
 		return list;
@@ -83,7 +83,7 @@ public class Contributor {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Contributor other = (Contributor) obj;
+		ContributorDB other = (ContributorDB) obj;
 		if (email == null) {
 			if (other.email != null)
 				return false;

@@ -11,11 +11,11 @@ import org.repositoryminer.persistence.handler.CommitDocumentHandler;
 import org.repositoryminer.persistence.handler.ReferenceDocumentHandler;
 import org.repositoryminer.persistence.handler.RepositoryDocumentHandler;
 import org.repositoryminer.persistence.handler.WorkingDirectoryDocumentHandler;
-import org.repositoryminer.persistence.model.Commit;
-import org.repositoryminer.persistence.model.Contributor;
-import org.repositoryminer.persistence.model.Reference;
-import org.repositoryminer.persistence.model.Repository;
-import org.repositoryminer.persistence.model.WorkingDirectory;
+import org.repositoryminer.persistence.model.CommitDB;
+import org.repositoryminer.persistence.model.ContributorDB;
+import org.repositoryminer.persistence.model.ReferenceDB;
+import org.repositoryminer.persistence.model.RepositoryDB;
+import org.repositoryminer.persistence.model.WorkingDirectoryDB;
 import org.repositoryminer.scm.SCM;
 import org.repositoryminer.scm.SCMFactory;
 import org.repositoryminer.utility.HashHandler;
@@ -29,23 +29,22 @@ public class RepositoryMiner {
 		String absPath = scm.getAbsolutePath();
 		String id = HashHandler.SHA1(absPath);
 
-		Repository r = new Repository(repository);
+		RepositoryDB r = new RepositoryDB(repository);
 		r.setId(id);
 		r.setPath(absPath);
 
-		WorkingDirectory wd = new WorkingDirectory(id);
+		WorkingDirectoryDB wd = new WorkingDirectoryDB(id);
 		WorkingDirectoryDocumentHandler wdHandler = new WorkingDirectoryDocumentHandler();
 
 		ReferenceDocumentHandler refHandler = new ReferenceDocumentHandler();
-		List<Reference> refs = scm.getReferences();
-		for (Reference ref : refs) {
+		List<ReferenceDB> refs = scm.getReferences();
+		for (ReferenceDB ref : refs) {
 			ref.setCommits(scm.getReferenceCommits(ref.getFullName(), ref.getType()));
 			refHandler.insert(ref.toDocument());
 			ref.setCommits(null);
 		}
 
-		int skip = 0;
-		Set<Contributor> contributors = new HashSet<Contributor>();
+		Set<ContributorDB> contributors = new HashSet<ContributorDB>();
 		CommitDocumentHandler commitHandler = new CommitDocumentHandler();
 
 		SourceAnalyzer sourceAnalyzer = null;
@@ -54,31 +53,24 @@ public class RepositoryMiner {
 			sourceAnalyzer = new SourceAnalyzer(repository, scm, id, absPath);
 		}
 
-		while (true) {
-			List<Commit> commits = scm.getCommits(skip, repository.getCommitThreshold());
-			List<Document> docs = new ArrayList<Document>();
-			if (commits.size() == 0)
-				break;
+		List<CommitDB> commits = scm.getCommits();
+		List<Document> docs = new ArrayList<Document>();
 
-			for (Commit c : commits) {
-				docs.add(c.toDocument());
-				contributors.add(c.getCommitter());
-				wd.setId(c.getId());
-				wd.processDiff(c.getDiffs());
-				wdHandler.insert(wd.toDocument());
-			}
+		for (CommitDB c : commits) {
+			docs.add(c.toDocument());
+			contributors.add(c.getCommitter());
+			wd.setId(c.getId());
+			wd.processDiff(c.getDiffs());
+			wdHandler.insert(wd.toDocument());
+		}
 
-			commitHandler.insertMany(docs);
-			if (sourceAnalyzer != null)
-				sourceAnalyzer.analyze(commits);
-
-			if (repository.getCommitThreshold() == 0)
-				break;
-			skip += repository.getCommitThreshold();
+		commitHandler.insertMany(docs);
+		if (sourceAnalyzer != null) {
+			sourceAnalyzer.analyze(commits);
 		}
 
 		RepositoryDocumentHandler repoHandler = new RepositoryDocumentHandler();
-		r.setContributors(new ArrayList<Contributor>(contributors));
+		r.setContributors(new ArrayList<ContributorDB>(contributors));
 		repoHandler.insert(r.toDocument());
 
 		scm.close();

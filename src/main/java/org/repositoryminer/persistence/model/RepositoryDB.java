@@ -9,19 +9,19 @@ import org.repositoryminer.scm.SCMType;
  * This class represents the "repository" object in the database. This class
  * represents a repository.
  */
-public class Repository {
+public class RepositoryDB {
 
 	private String id;
 	private String name;
 	private String description;
 	private String path;
 	private SCMType scm;
-	private List<Contributor> contributors;
+	private List<ContributorDB> contributors;
 
-	public Repository() {
+	public RepositoryDB() {
 	}
 
-	public Repository(org.repositoryminer.mining.SCMRepository repo) {
+	public RepositoryDB(org.repositoryminer.mining.SCMRepository repo) {
 		super();
 		this.name = repo.getName();
 		this.description = repo.getDescription();
@@ -32,7 +32,7 @@ public class Repository {
 	public Document toDocument() {
 		Document doc = new Document();
 		doc.append("_id", id).append("name", name).append("description", description).append("path", path)
-				.append("scm", scm.toString()).append("contributors", Contributor.toDocumentList(contributors));
+				.append("scm", scm.toString()).append("contributors", ContributorDB.toDocumentList(contributors));
 		return doc;
 	}
 
@@ -114,7 +114,7 @@ public class Repository {
 	/**
 	 * @return the contributors
 	 */
-	public List<Contributor> getContributors() {
+	public List<ContributorDB> getContributors() {
 		return contributors;
 	}
 
@@ -122,7 +122,7 @@ public class Repository {
 	 * @param contributors
 	 *            the contributors to set
 	 */
-	public void setContributors(List<Contributor> contributors) {
+	public void setContributors(List<ContributorDB> contributors) {
 		this.contributors = contributors;
 	}
 
