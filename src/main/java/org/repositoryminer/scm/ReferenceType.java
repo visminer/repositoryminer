@@ -2,6 +2,6 @@ package org.repositoryminer.scm;
 
 public enum ReferenceType {
 
-	BRANCH, TAG;
+	BRANCH, TAG, CUSTOM_TIME_TAG;
 
 }

@@ -6,7 +6,6 @@ import java.security.NoSuchAlgorithmException;
 public class HashHandler {
 
 	public static String SHA1(String input){
-
 		MessageDigest mDigest;
 		try {
 			mDigest = MessageDigest.getInstance("SHA1");
@@ -21,7 +20,6 @@ public class HashHandler {
 			sb.append(Integer.toString((result[i] & 0xff) + 0x100, 16).substring(1));
 		}
 		return sb.toString();
-
 	}
 
 }

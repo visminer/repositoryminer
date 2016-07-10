@@ -22,6 +22,8 @@ public class SCMRepository {
 	private List<IMetric> metrics;
 	private List<ICodeSmell> codeSmells;
 	private List<ITechnicalDebt> technicalDebts;
+	private List<TimeFrameType> timeFrames;
+	
 	// TODO : To implement
 	// private boolean allowTextFiles;
 	// private List<String> allowedExtensions;
@@ -57,6 +59,11 @@ public class SCMRepository {
 	
 	public SCMRepository setTechnicalDebts(ITechnicalDebt... technicalDebts) {
 		this.technicalDebts = Arrays.asList(technicalDebts);
+		return this;
+	}
+	
+	public SCMRepository setTimeFrames(TimeFrameType... timeFrames) {
+		this.timeFrames = Arrays.asList(timeFrames);
 		return this;
 	}
 	
@@ -219,5 +226,19 @@ public class SCMRepository {
 		this.technicalDebts = technicalDebts;
 		return this;
 	}
-	
+
+	/**
+	 * @return the timeFrames
+	 */
+	public List<TimeFrameType> getTimeFrames() {
+		return timeFrames;
+	}
+
+	/**
+	 * @param timeFrames the timeFrames to set
+	 */
+	public void setTimeFrames(List<TimeFrameType> timeFrames) {
+		this.timeFrames = timeFrames;
+	}
+
 }

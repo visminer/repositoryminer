@@ -65,6 +65,12 @@ public class RepositoryMiner {
 		}
 
 		commitHandler.insertMany(docs);
+		
+		if (repository.getTimeFrames() != null) {
+			ProcessTimeFrames procTimeFrames = new ProcessTimeFrames(absPath, id);
+			procTimeFrames.analyzeCommits(commits, repository.getTimeFrames());
+		}
+		
 		if (sourceAnalyzer != null) {
 			sourceAnalyzer.analyze(commits);
 		}
@@ -72,7 +78,6 @@ public class RepositoryMiner {
 		RepositoryDocumentHandler repoHandler = new RepositoryDocumentHandler();
 		r.setContributors(new ArrayList<ContributorDB>(contributors));
 		repoHandler.insert(r.toDocument());
-
 		scm.close();
 	}
 
