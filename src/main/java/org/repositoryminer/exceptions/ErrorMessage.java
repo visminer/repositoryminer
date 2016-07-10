@@ -14,7 +14,8 @@ public enum ErrorMessage {
 	GIT_RETRIEVE_DATA_ERROR("GIT - It was impossible to retrieve the data from a file."),
 	GIT_REPOSITORY_IOERROR("GIT - It was impossible to analyze the repository, some unexpected IO error has ocurred."),
 	SCM_NOT_FOUND("Not found SCM system."),
-	DUPLICATE_REPOSITORY("Repository already exists in database.");
+	DUPLICATE_REPOSITORY("Repository already exists in database."),
+	REPOSITORY_NOT_FOUND("Repository not found.");
 	
 	private String message;
 	

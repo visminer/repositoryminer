@@ -52,6 +52,8 @@ public class SourceAnalyzer {
 
 			for (DiffDB diff : commit.getDiffs()) 
 				processAST(diff.getPath(), diff.getHash(), commit);
+			
+			scm.reset();
 		}
 	}
 

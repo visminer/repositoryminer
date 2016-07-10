@@ -62,8 +62,19 @@ public class GitSCM implements SCM {
 	@Override
 	public void open(String repositoryPath, int binaryThreshold) {
 		FileRepositoryBuilder repositoryBuilder = new FileRepositoryBuilder();
+		File repositoryFolder = new File(repositoryPath);
+		
+		if (!repositoryFolder.exists()) {
+			throw new VisMinerAPIException(ErrorMessage.REPOSITORY_NOT_FOUND.toString());
+		}
+		
+		String path = repositoryFolder.getAbsolutePath();
+		if (!path.endsWith(".git")) {
+			path += File.separator + ".git";
+		}
+		
 		try {
-			repository = repositoryBuilder.setGitDir(new java.io.File(repositoryPath)).readEnvironment().findGitDir()
+			repository = repositoryBuilder.setGitDir(new java.io.File(path)).readEnvironment().findGitDir()
 					.build();
 		} catch (IOException e) {
 			throw new VisMinerAPIException(ErrorMessage.GIT_REPOSITORY_IOERROR.toString(), e);
@@ -325,10 +336,14 @@ public class GitSCM implements SCM {
 	}
 
 	private void makeCheckout(String hash, boolean create) {
+		try{
 		if (create) {
-			git.checkout().setForce(true).setCreateBranch(true).setName(RM_BRANCH).setStartPoint(hash);
+			git.checkout().setForce(true).setCreateBranch(true).setName(RM_BRANCH).setStartPoint(hash).call();
 		} else {
-			git.checkout().setForce(true).setStartPoint(hash);
+			git.checkout().setForce(true).setName(hash).call();
+		}
+		} catch (GitAPIException e) {
+			errorHandler(ErrorMessage.GIT_CHECKOUT_ERROR.toString(), e);
 		}
 	}
 
