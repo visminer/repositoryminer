@@ -1,4 +1,4 @@
-package org.repositoryminer.codesmell;
+package org.repositoryminer.codesmell.commit;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,11 +7,12 @@ import org.bson.Document;
 import org.repositoryminer.ast.AST;
 import org.repositoryminer.ast.AbstractTypeDeclaration;
 import org.repositoryminer.ast.AbstractTypeDeclaration.Archetype;
+import org.repositoryminer.codesmell.CodeSmellId;
 import org.repositoryminer.ast.MethodDeclaration;
 import org.repositoryminer.ast.TypeDeclaration;
 import org.repositoryminer.metric.CCMetric;
 
-public class ComplexMethod implements ICodeSmell {
+public class ComplexMethod implements ICommitCodeSmell {
 	
 	private List<Document> methodsDoc;
 	private int ccThreshold = 4;
@@ -33,7 +34,7 @@ public class ComplexMethod implements ICodeSmell {
 				methodsDoc.add(new Document("method", method.getName()).append("value", new Boolean(complexMethod)));
 			}
 
-			document.append("name", new String("Complex Method")).append("methods", methodsDoc);
+			document.append("name", CodeSmellId.COMPLEX_METHOD).append("methods", methodsDoc);
 		}
 	}
 	

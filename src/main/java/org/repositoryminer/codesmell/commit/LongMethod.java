@@ -1,4 +1,4 @@
-package org.repositoryminer.codesmell;
+package org.repositoryminer.codesmell.commit;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,12 +9,13 @@ import org.repositoryminer.ast.AbstractTypeDeclaration;
 import org.repositoryminer.ast.AbstractTypeDeclaration.Archetype;
 import org.repositoryminer.ast.MethodDeclaration;
 import org.repositoryminer.ast.TypeDeclaration;
+import org.repositoryminer.codesmell.CodeSmellId;
 import org.repositoryminer.metric.CCMetric;
 import org.repositoryminer.metric.LVARMetric;
 import org.repositoryminer.metric.MLOCMetric;
 import org.repositoryminer.metric.PARMetric;
 
-public class LongMethod implements ICodeSmell {
+public class LongMethod implements ICommitCodeSmell {
 
 	private List<Document> methodsDoc;
 	private int ccThreshold = 4;
@@ -31,8 +32,6 @@ public class LongMethod implements ICodeSmell {
 		this.lvarThreshold = lvarThreshold;
 	}
 
-
-
 	@Override
 	public void detect(AbstractTypeDeclaration type, AST ast, Document document) {
 		if (type.getArchetype() == Archetype.CLASS_OR_INTERFACE) {
@@ -45,7 +44,7 @@ public class LongMethod implements ICodeSmell {
 				methodsDoc.add(new Document("method", method.getName()).append("value", new Boolean(longMethod)));
 			}
 
-			document.append("name", new String("Long Method")).append("methods", methodsDoc);
+			document.append("name", CodeSmellId.LONG_METHOD).append("methods", methodsDoc);
 		}
 	}
 	
@@ -63,7 +62,6 @@ public class LongMethod implements ICodeSmell {
 		int lvar = lvarMetric.calculate(method);
 		
 		longMethod = (cc > ccThreshold && mloc > mlocThreshold && par > parThreshold && lvar > lvarThreshold);	
-		
 		return longMethod;
 	}
 

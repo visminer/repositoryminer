@@ -1,4 +1,4 @@
-package org.repositoryminer.codesmell;
+package org.repositoryminer.codesmell.commit;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,12 +9,13 @@ import org.repositoryminer.ast.AbstractTypeDeclaration;
 import org.repositoryminer.ast.AbstractTypeDeclaration.Archetype;
 import org.repositoryminer.ast.MethodDeclaration;
 import org.repositoryminer.ast.TypeDeclaration;
+import org.repositoryminer.codesmell.CodeSmellId;
 import org.repositoryminer.metric.CCMetric;
 import org.repositoryminer.metric.MLOCMetric;
 import org.repositoryminer.metric.MaxNestingMetric;
 import org.repositoryminer.metric.NOAVMetric;
 
-public class BrainMethod implements ICodeSmell {
+public class BrainMethod implements ICommitCodeSmell {
 	
 	private List<Document> methodsDoc;
 	private int mlocThreshold = 65;
@@ -43,7 +44,7 @@ public class BrainMethod implements ICodeSmell {
 				methodsDoc.add(new Document("method", method.getName()).append("value", new Boolean(brainMethod)));
 			}
 
-			document.append("name", new String("Brain Method")).append("methods", methodsDoc);
+			document.append("name", CodeSmellId.BRAIN_METHOD).append("methods", methodsDoc);
 		}
 	}
 	

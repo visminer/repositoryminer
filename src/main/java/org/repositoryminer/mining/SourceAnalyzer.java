@@ -9,9 +9,9 @@ import java.util.Map;
 import org.bson.Document;
 import org.repositoryminer.ast.AST;
 import org.repositoryminer.ast.AbstractTypeDeclaration;
-import org.repositoryminer.codesmell.ICodeSmell;
+import org.repositoryminer.codesmell.commit.ICommitCodeSmell;
 import org.repositoryminer.metric.IMetric;
-import org.repositoryminer.parser.IParser;
+import org.repositoryminer.parser.Parser;
 import org.repositoryminer.persistence.handler.CommitAnalysisDocumentHandler;
 import org.repositoryminer.persistence.model.CommitDB;
 import org.repositoryminer.persistence.model.DiffDB;
@@ -23,7 +23,7 @@ public class SourceAnalyzer {
 
 	private SCM scm;
 	private SCMRepository repository;
-	private Map<String, IParser> parserMap;
+	private Map<String, Parser> parserMap;
 	private String repositoryId;
 	private String repositoryPath;
 	private CommitAnalysisDocumentHandler persistence;
@@ -35,8 +35,8 @@ public class SourceAnalyzer {
 		this.repositoryPath = repositoryPath;
 		this.persistence = new CommitAnalysisDocumentHandler();
 
-		parserMap = new HashMap<String, IParser>();
-		for (IParser parser : repository.getParsers()){
+		parserMap = new HashMap<String, Parser>();
+		for (Parser parser : repository.getParsers()){
 			parser.setCharSet(repository.getCharset());
 			for (String ext : parser.getExtensions())
 				parserMap.put(ext, parser);
@@ -47,8 +47,8 @@ public class SourceAnalyzer {
 		for (CommitDB commit : commits) {
 			scm.checkout(commit.getId());
 
-			for (IParser parser : repository.getParsers())
-				parser.setSourceFolders(repositoryPath);
+			for (Parser parser : repository.getParsers())
+				parser.processSourceFolders(repositoryPath);
 
 			for (DiffDB diff : commit.getDiffs()) 
 				processAST(diff.getPath(), diff.getHash(), commit);
@@ -61,7 +61,7 @@ public class SourceAnalyzer {
 		int index = file.lastIndexOf(".") + 1;
 		String ext = file.substring(index);
 
-		IParser parser = parserMap.get(ext);
+		Parser parser = parserMap.get(ext);
 		if (parser == null)
 			return;
 
@@ -116,7 +116,7 @@ public class SourceAnalyzer {
 	
 	private void processCodeSmells(List<Document> codeSmellsDoc, AST ast, AbstractTypeDeclaration type, Document typeDoc) {
 		if (repository.getCodeSmells() != null) {
-			for (ICodeSmell codeSmell : repository.getCodeSmells()) {
+			for (ICommitCodeSmell codeSmell : repository.getCodeSmells()) {
 				Document apDoc = new Document();
 				codeSmell.detect(type, ast, apDoc);
 				codeSmellsDoc.add(apDoc);

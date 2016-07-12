@@ -4,9 +4,9 @@ import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.List;
 
-import org.repositoryminer.codesmell.ICodeSmell;
+import org.repositoryminer.codesmell.commit.ICommitCodeSmell;
 import org.repositoryminer.metric.IMetric;
-import org.repositoryminer.parser.IParser;
+import org.repositoryminer.parser.Parser;
 import org.repositoryminer.scm.SCMType;
 import org.repositoryminer.technicaldebt.ITechnicalDebt;
 
@@ -18,9 +18,9 @@ public class SCMRepository {
 	private SCMType scm;
 	private String charset = "UTF-8";
 	private int binaryThreshold = 2048;
-	private List<IParser> parsers;
+	private List<Parser> parsers;
 	private List<IMetric> metrics;
-	private List<ICodeSmell> codeSmells;
+	private List<ICommitCodeSmell> codeSmells;
 	private List<ITechnicalDebt> technicalDebts;
 	private List<TimeFrameType> timeFrames;
 	
@@ -43,7 +43,7 @@ public class SCMRepository {
 		this.scm = scm;
 	}
 
-	public SCMRepository setParsers(IParser... parsers){
+	public SCMRepository setParsers(Parser... parsers){
 		this.parsers = Arrays.asList(parsers);
 		return this;
 	}
@@ -52,7 +52,7 @@ public class SCMRepository {
 		return this;
 	}
 	
-	public SCMRepository setCodeSmells(ICodeSmell... codeSmells){
+	public SCMRepository setCodeSmells(ICommitCodeSmell... codeSmells){
 		this.codeSmells = Arrays.asList(codeSmells);
 		return this;
 	}
@@ -166,7 +166,7 @@ public class SCMRepository {
 	/**
 	 * @return the parsers
 	 */
-	public List<IParser> getParsers() {
+	public List<Parser> getParsers() {
 		return parsers;
 	}
 
@@ -174,7 +174,7 @@ public class SCMRepository {
 	 * @param parsers
 	 *            the parsers to set
 	 */
-	public SCMRepository setParsers(List<IParser> parsers) {
+	public SCMRepository setParsers(List<Parser> parsers) {
 		this.parsers = parsers;
 		return this;
 	}
@@ -198,7 +198,7 @@ public class SCMRepository {
 	/**
 	 * @return the codeSmells
 	 */
-	public List<ICodeSmell> getCodeSmells() {
+	public List<ICommitCodeSmell> getCodeSmells() {
 		return codeSmells;
 	}
 
@@ -206,7 +206,7 @@ public class SCMRepository {
 	 * @param codeSmells
 	 *            the antiPatterns to set
 	 */
-	public SCMRepository setCodeSmells(List<ICodeSmell> codeSmells) {
+	public SCMRepository setCodeSmells(List<ICommitCodeSmell> codeSmells) {
 		this.codeSmells = codeSmells;
 		return this;
 	}

@@ -272,34 +272,37 @@ public class GitSCM implements SCM {
 
 			switch (entry.getChangeType()) {
 			case ADD:
-				path = absolutePath + "/" + entry.getNewPath();
+				path = entry.getNewPath();
 				type = DiffType.ADD;
 				break;
 
 			case COPY:
-				path = absolutePath + "/" + entry.getNewPath();
-				oldPath = absolutePath + "/" + entry.getOldPath();
+				path = entry.getNewPath();
+				oldPath = entry.getOldPath();
 				type = DiffType.COPY;
 				break;
 
 			case DELETE:
-				path = absolutePath + "/" + entry.getOldPath();
+				path = entry.getOldPath();
 				type = DiffType.DELETE;
 				break;
 
 			case MODIFY:
-				path = absolutePath + "/" + entry.getNewPath();
+				path = entry.getNewPath();
 				type = DiffType.MODIFY;
 				break;
 
 			case RENAME:
-				path = absolutePath + "/" + entry.getNewPath();
-				oldPath = absolutePath + "/" + entry.getOldPath();
+				path = entry.getNewPath();
+				oldPath = entry.getOldPath();
 				type = DiffType.RENAME;
 				break;
 			}
 
 			int[] lines = getLinesAddedAndDeleted(path, parentCommit, revCommit);
+			path = absolutePath + "/" + path;
+			oldPath = (oldPath != null) ? absolutePath + "/" + oldPath : null;
+			
 			DiffDB change = new DiffDB(path, oldPath, HashHandler.SHA1(path), lines[0], lines[1], type);
 			changes.add(change);
 		}

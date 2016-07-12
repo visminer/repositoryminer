@@ -1,16 +1,17 @@
-package org.repositoryminer.codesmell;
+package org.repositoryminer.codesmell.commit;
 
 import org.bson.Document;
 import org.repositoryminer.ast.AST;
 import org.repositoryminer.ast.AbstractTypeDeclaration;
 import org.repositoryminer.ast.AbstractTypeDeclaration.Archetype;
 import org.repositoryminer.ast.TypeDeclaration;
+import org.repositoryminer.codesmell.CodeSmellId;
 import org.repositoryminer.metric.ATFDMetric;
 import org.repositoryminer.metric.NOAMetric;
 import org.repositoryminer.metric.TCCMetric;
 import org.repositoryminer.metric.WMCMetric;
 
-public class GodClass implements ICodeSmell {
+public class GodClass implements ICommitCodeSmell {
 
 	private int atfdThreshold = 40;
 	private int wmcThreshold = 75;
@@ -35,7 +36,7 @@ public class GodClass implements ICodeSmell {
 			TypeDeclaration cls = (TypeDeclaration) type;
 
 			boolean godClass = detect(type, cls);
-			document.append("name", new String("God Class")).append("value", new Boolean(godClass));
+			document.append("name", CodeSmellId.GOD_CLASS).append("value", new Boolean(godClass));
 		}
 	}
 

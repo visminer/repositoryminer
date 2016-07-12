@@ -1,4 +1,4 @@
-package org.repositoryminer.codesmell;
+package org.repositoryminer.codesmell.commit;
 
 import org.bson.Document;
 import org.repositoryminer.ast.AST;
@@ -6,11 +6,12 @@ import org.repositoryminer.ast.AbstractTypeDeclaration;
 import org.repositoryminer.ast.AbstractTypeDeclaration.Archetype;
 import org.repositoryminer.ast.MethodDeclaration;
 import org.repositoryminer.ast.TypeDeclaration;
+import org.repositoryminer.codesmell.CodeSmellId;
 import org.repositoryminer.metric.SLOCMetric;
 import org.repositoryminer.metric.TCCMetric;
 import org.repositoryminer.metric.WMCMetric;
 
-public class BrainClass implements ICodeSmell {
+public class BrainClass implements ICommitCodeSmell {
 	
 	private int wmcThreshold = 47;
 	private float tccThreshold = 0.5f;
@@ -31,7 +32,7 @@ public class BrainClass implements ICodeSmell {
 		if (type.getArchetype() == Archetype.CLASS_OR_INTERFACE) {
 			TypeDeclaration cls = (TypeDeclaration) type;
 			boolean brainClass = detect(ast, type, cls);
-			document.append("name", new String("Brain Class")).append("value", new Boolean(brainClass));
+			document.append("name", new String(CodeSmellId.BRAIN_CLASS)).append("value", new Boolean(brainClass));
 		}
 	}
 

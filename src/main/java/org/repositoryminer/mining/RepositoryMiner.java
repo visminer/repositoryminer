@@ -41,7 +41,6 @@ public class RepositoryMiner {
 		for (ReferenceDB ref : refs) {
 			ref.setCommits(scm.getReferenceCommits(ref.getFullName(), ref.getType()));
 			refHandler.insert(ref.toDocument());
-			ref.setCommits(null);
 		}
 
 		Set<ContributorDB> contributors = new HashSet<ContributorDB>();
@@ -78,7 +77,8 @@ public class RepositoryMiner {
 		RepositoryDocumentHandler repoHandler = new RepositoryDocumentHandler();
 		r.setContributors(new ArrayList<ContributorDB>(contributors));
 		repoHandler.insert(r.toDocument());
+		
 		scm.close();
 	}
-
+	
 }

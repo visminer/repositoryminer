@@ -1,6 +1,7 @@
+
 package org.repositoryminer.metric;
 
-public interface MetricIds {
+public interface MetricId {
 
 	public static final String ATFD = "ATFD";
 	public static final String CC = "CC";

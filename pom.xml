@@ -64,6 +64,12 @@
 			<scope>compile</scope>
 		</dependency>
 
+		<dependency>
+			<groupId>net.sourceforge.pmd</groupId>
+			<artifactId>pmd-java</artifactId>
+			<version>5.5.0</version>
+		</dependency>
+
 	</dependencies>
 
 </project>

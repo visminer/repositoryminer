@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
@@ -21,7 +20,7 @@ import org.repositoryminer.ast.ImportDeclaration;
 import org.repositoryminer.ast.MethodDeclaration;
 import org.repositoryminer.ast.ParameterDeclaration;
 import org.repositoryminer.ast.TypeDeclaration;
-import org.repositoryminer.parser.IParser;
+import org.repositoryminer.parser.Parser;
 
 /**
  * Java AST generator
@@ -33,11 +32,7 @@ import org.repositoryminer.parser.IParser;
  * 
  */
 
-public class JavaParser implements IParser {
-
-	private List<String> sourceFolders;
-	private Set<String> extensions;
-	private String charset;
+public class JavaParser extends Parser {
 
 	public JavaParser() {
 		extensions = new HashSet<String>(1);
@@ -45,21 +40,16 @@ public class JavaParser implements IParser {
 	}
 
 	@Override
-	public Set<String> getExtensions() {
-		return extensions;
-	}
-
-	@Override
-	public void setCharSet(String charset){
-		this.charset = charset;
-	}
-	
-	@Override
-	public void setSourceFolders(String repositoryPath) {
+	public void processSourceFolders(String repositoryPath) {
 		sourceFolders = new ArrayList<String>();
 		scanRepository(repositoryPath);
 	}
 
+	@Override
+	public String getLanguage() {
+		return "java";
+	}
+	
 	private void scanRepository(String path) {
 		File directory = new File(path);
 
@@ -100,7 +90,6 @@ public class JavaParser implements IParser {
 	}
 
 	public AST generate(String filePath, String source) {
-
 		Document document = new Document();
 		document.setName(filePath);
 
@@ -159,12 +148,10 @@ public class JavaParser implements IParser {
 		ast.setSourceCode(source);
 
 		return ast;
-
 	}
 
 	private static org.repositoryminer.ast.AbstractTypeDeclaration processType(
 			org.eclipse.jdt.core.dom.TypeDeclaration type) {
-
 		TypeDeclaration clsDecl = new TypeDeclaration();
 		clsDecl.setInterface(type.isInterface());
 
@@ -180,17 +167,14 @@ public class JavaParser implements IParser {
 		for (org.eclipse.jdt.core.dom.MethodDeclaration methodDecl : type.getMethods()) {
 			methods.add(processMethod(methodDecl));
 		}
+
 		clsDecl.setMethods(methods);
-
 		return clsDecl;
-
 	}
 
 	@SuppressWarnings("unchecked")
 	private static MethodDeclaration processMethod(org.eclipse.jdt.core.dom.MethodDeclaration methodDecl) {
-
 		MethodDeclaration m = new MethodDeclaration();
-
 		m.setConstructor(methodDecl.isConstructor());
 		m.setVarargs(methodDecl.isVarargs());
 		m.setName(methodDecl.getName().getFullyQualifiedName());
@@ -240,12 +224,10 @@ public class JavaParser implements IParser {
 		m.setEndPositionInSourceCode(methodDecl.getStartPosition() + methodDecl.getLength());
 
 		return m;
-
 	}
 
 	@SuppressWarnings("unchecked")
 	private static FieldDeclaration processField(org.eclipse.jdt.core.dom.FieldDeclaration field) {
-
 		FieldDeclaration fieldDecl = new FieldDeclaration();
 		fieldDecl.setType(field.getType().toString());
 
@@ -257,7 +239,6 @@ public class JavaParser implements IParser {
 			fieldDecl.setModifier(modifier.toString());
 
 		return fieldDecl;
-
 	}
 
 }
