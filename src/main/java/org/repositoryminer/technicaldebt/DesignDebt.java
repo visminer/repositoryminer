@@ -6,6 +6,7 @@ import org.bson.Document;
 import org.repositoryminer.ast.AST;
 import org.repositoryminer.ast.AbstractTypeDeclaration;
 import org.repositoryminer.ast.AbstractTypeDeclaration.Archetype;
+import org.repositoryminer.codesmell.CodeSmellId;
 
 public class DesignDebt implements ITechnicalDebt {
 
@@ -15,12 +16,12 @@ public class DesignDebt implements ITechnicalDebt {
 		if (type.getArchetype() == Archetype.CLASS_OR_INTERFACE) {
 			boolean isDesignDebt = false;
 			for (Document antiPattern : antiPatterns) {
-				if (antiPattern.containsValue("God Class")) {
+				if (antiPattern.containsValue(CodeSmellId.GOD_CLASS)) {
 					if (antiPattern.getBoolean("value")) {
 						isDesignDebt = true;
 					}
 				}
-				if (antiPattern.containsValue("Long Method")) {
+				if (antiPattern.containsValue(CodeSmellId.LONG_METHOD)) {
 					List<Document> methods = ((List<Document>) antiPattern.get("methods"));
 					for (Document method : methods) {
 						if (method.getBoolean("value")) {
@@ -30,7 +31,7 @@ public class DesignDebt implements ITechnicalDebt {
 				}
 			}
 
-			document.append("name", "Design Debt").append("value", new Boolean(isDesignDebt)).append("status", 0);
+			document.append("name", TechnicalDebtId.DESIGN_DEBT).append("value", new Boolean(isDesignDebt)).append("status", 0);
 		}
 	}
 
