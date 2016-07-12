@@ -62,7 +62,6 @@ public class CCMetric extends MethodBasedMetricTemplate {
 
 	private int calculateExpression(String expression, NodeType type) {
 		int cc = 1;
-
 		char[] chars = expression.toCharArray();
 
 		if (type != NodeType.CATCH) {

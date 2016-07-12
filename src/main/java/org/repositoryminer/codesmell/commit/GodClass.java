@@ -19,8 +19,7 @@ public class GodClass implements ICommitCodeSmell {
 	private int noaThreshold = 20;
 	private boolean useNoa = false;
 
-	public GodClass() {
-	};
+	public GodClass() {}
 
 	public GodClass(int atfdThreshold, int wmcThreshold, float tccThreshold, int noaThreshold, boolean useNoa) {
 		this.atfdThreshold = atfdThreshold;

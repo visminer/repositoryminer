@@ -18,6 +18,7 @@ public class ComplexMethod implements ICommitCodeSmell {
 	private int ccThreshold = 4;
 	
 	public ComplexMethod() {}
+	
 	public ComplexMethod(int ccThreshold) {
 		this.ccThreshold = ccThreshold;
 	}

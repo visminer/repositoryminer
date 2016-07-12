@@ -37,7 +37,6 @@ public class MLOCMetric extends MethodBasedMetricTemplate {
 	
 	public int calculate(MethodDeclaration method, AST ast){
 		String sourceCode = ast.getSourceCode();
-				
 		String methodSourceCode = sourceCode.substring(method.getStartPositionInSourceCode(), method.getEndPositionInSourceCode());
 
 		if(methodSourceCode == null || methodSourceCode.length() == 0)
@@ -53,7 +52,6 @@ public class MLOCMetric extends MethodBasedMetricTemplate {
 			i++;
 
 		return i;
-		
 	}
 
 }

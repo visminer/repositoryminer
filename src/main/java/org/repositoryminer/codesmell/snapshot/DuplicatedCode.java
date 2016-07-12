@@ -3,7 +3,6 @@ package org.repositoryminer.codesmell.snapshot;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -23,8 +22,16 @@ import net.sourceforge.pmd.cpd.Match;
 
 public class DuplicatedCode implements ISnapshotCodeSmell {
 
-	private static final int TOKENS_THRESHOLD = 100;
+	private int tokensThreshold = 100;
+	private boolean skipLexicalErrors = true;
 
+	public DuplicatedCode() {}
+	
+	public DuplicatedCode(int tokensThreshold, boolean skipLexicalErrors) {
+		this.tokensThreshold = tokensThreshold;
+		this.skipLexicalErrors = skipLexicalErrors;
+	}
+	
 	@Override
 	public void detect(List<Parser> parsers, String repositoryPath, Document document) {
 		document.append(CodeSmellId.DUPLICATED_CODE, calculate(parsers, repositoryPath));
@@ -37,9 +44,9 @@ public class DuplicatedCode implements ISnapshotCodeSmell {
 			CPDConfiguration config = new CPDConfiguration();
 			config.setEncoding(parser.getCharset());
 			config.setLanguage(languageFactory(parser.getLanguage()));
-			config.setSkipLexicalErrors(true);
+			config.setSkipLexicalErrors(skipLexicalErrors);
 			config.setSourceEncoding(parser.getCharset());
-			config.setMinimumTileSize(TOKENS_THRESHOLD);
+			config.setMinimumTileSize(tokensThreshold);
 			config.setNonRecursive(true);
 
 			ArrayList<File> files = new ArrayList<File>();

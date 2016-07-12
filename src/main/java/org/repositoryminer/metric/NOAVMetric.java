@@ -16,7 +16,6 @@ public class NOAVMetric extends MethodBasedMetricTemplate {
 
 	@Override
 	public void calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast, Document document) {
-		
 		methodsDoc = new ArrayList<Document>();
 		
 		for(MethodDeclaration method : methods){
