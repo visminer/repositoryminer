@@ -21,7 +21,7 @@ public class RepositoryDB {
 	public RepositoryDB() {
 	}
 
-	public RepositoryDB(org.repositoryminer.mining.SCMRepository repo) {
+	public RepositoryDB(org.repositoryminer.mining.RepositoryMiner repo) {
 		super();
 		this.name = repo.getName();
 		this.description = repo.getDescription();

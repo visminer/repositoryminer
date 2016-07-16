@@ -7,7 +7,7 @@ import org.bson.Document;
 import org.repositoryminer.ast.AST;
 import org.repositoryminer.ast.AbstractTypeDeclaration;
 
-public class SLOCMetric implements IMetric{
+public class SLOCMetric implements ICommitMetric{
 
 	private Pattern pattern;
 

@@ -17,7 +17,6 @@ public class CCMetric extends MethodBasedMetricTemplate {
 	@Override
 	public void calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast, Document document) {
 		methodsDoc = new ArrayList<Document>();
-
 		int ccClass = calculate(methods);
 		document.append("name", CC).append("accumulated", new Integer(ccClass)).append("methods", methodsDoc);
 	}

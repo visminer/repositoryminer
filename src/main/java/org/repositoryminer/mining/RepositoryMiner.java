@@ -1,84 +1,240 @@
 package org.repositoryminer.mining;
 
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 
-import org.bson.Document;
-import org.repositoryminer.persistence.handler.CommitDocumentHandler;
-import org.repositoryminer.persistence.handler.ReferenceDocumentHandler;
-import org.repositoryminer.persistence.handler.RepositoryDocumentHandler;
-import org.repositoryminer.persistence.handler.WorkingDirectoryDocumentHandler;
-import org.repositoryminer.persistence.model.CommitDB;
-import org.repositoryminer.persistence.model.ContributorDB;
-import org.repositoryminer.persistence.model.ReferenceDB;
-import org.repositoryminer.persistence.model.RepositoryDB;
-import org.repositoryminer.persistence.model.WorkingDirectoryDB;
-import org.repositoryminer.scm.SCM;
-import org.repositoryminer.scm.SCMFactory;
-import org.repositoryminer.utility.HashHandler;
+import org.repositoryminer.codesmell.commit.ICommitCodeSmell;
+import org.repositoryminer.codesmell.tag.ITagCodeSmell;
+import org.repositoryminer.metric.ICommitMetric;
+import org.repositoryminer.parser.Parser;
+import org.repositoryminer.scm.SCMType;
+import org.repositoryminer.technicaldebt.ITechnicalDebt;
 
 public class RepositoryMiner {
 
-	public static void mine(SCMRepository repository) throws UnsupportedEncodingException {
-		SCM scm = SCMFactory.getSCM(repository.getScm());
-		scm.open(repository.getPath(), repository.getBinaryThreshold());
+	private String path;
+	private String name;
+	private String description;
+	private SCMType scm;
+	private String charset = "UTF-8";
+	private int binaryThreshold = 2048;
+	private List<Parser> parsers;
+	private List<ICommitMetric> commitMetrics;
+	private List<ICommitCodeSmell> commitCodeSmells;
+	private List<ITechnicalDebt> technicalDebts;
+	private List<TimeFrameType> timeFrames;
+	private List<ITagCodeSmell> tagCodeSmells;
 
-		String absPath = scm.getAbsolutePath();
-		String id = HashHandler.SHA1(absPath);
+	// TODO : To implement
+	// private boolean allowTextFiles;
+	// private List<String> allowedExtensions;
 
-		RepositoryDB r = new RepositoryDB(repository);
-		r.setId(id);
-		r.setPath(absPath);
-
-		WorkingDirectoryDB wd = new WorkingDirectoryDB(id);
-		WorkingDirectoryDocumentHandler wdHandler = new WorkingDirectoryDocumentHandler();
-
-		ReferenceDocumentHandler refHandler = new ReferenceDocumentHandler();
-		List<ReferenceDB> refs = scm.getReferences();
-		for (ReferenceDB ref : refs) {
-			ref.setCommits(scm.getReferenceCommits(ref.getFullName(), ref.getType()));
-			refHandler.insert(ref.toDocument());
-		}
-
-		Set<ContributorDB> contributors = new HashSet<ContributorDB>();
-		CommitDocumentHandler commitHandler = new CommitDocumentHandler();
-
-		SourceAnalyzer sourceAnalyzer = null;
-		if (repository.getMetrics() != null || repository.getCodeSmells() != null
-				|| repository.getTechnicalDebts() != null) {
-			sourceAnalyzer = new SourceAnalyzer(repository, scm, id, absPath);
-		}
-
-		List<CommitDB> commits = scm.getCommits();
-		List<Document> docs = new ArrayList<Document>();
-
-		for (CommitDB c : commits) {
-			docs.add(c.toDocument());
-			contributors.add(c.getCommitter());
-			wd.setId(c.getId());
-			wd.processDiff(c.getDiffs());
-			wdHandler.insert(wd.toDocument());
-		}
-
-		commitHandler.insertMany(docs);
-		
-		if (repository.getTimeFrames() != null) {
-			ProcessTimeFrames procTimeFrames = new ProcessTimeFrames(absPath, id);
-			procTimeFrames.analyzeCommits(commits, repository.getTimeFrames());
-		}
-		
-		if (sourceAnalyzer != null) {
-			sourceAnalyzer.analyze(commits);
-		}
-
-		RepositoryDocumentHandler repoHandler = new RepositoryDocumentHandler();
-		r.setContributors(new ArrayList<ContributorDB>(contributors));
-		repoHandler.insert(r.toDocument());
-		
-		scm.close();
+	public void mine() throws UnsupportedEncodingException {
+		MiningProcessor.mine(this);
 	}
-	
+
+	public RepositoryMiner() {
+	}
+
+	public RepositoryMiner(String path, String name, String description, SCMType scm) {
+		super();
+		this.path = path;
+		this.name = name;
+		this.description = description;
+		this.scm = scm;
+	}
+
+	public void setParsers(Parser... parsers) {
+		this.parsers = Arrays.asList(parsers);
+	}
+
+	public void setCommitMetrics(ICommitMetric... commitMetrics) {
+		this.commitMetrics = Arrays.asList(commitMetrics);
+	}
+
+	public void setCommitCodeSmells(ICommitCodeSmell... commitCodeSmells) {
+		this.commitCodeSmells = Arrays.asList(commitCodeSmells);
+	}
+
+	public void setTechnicalDebts(ITechnicalDebt... technicalDebts) {
+		this.technicalDebts = Arrays.asList(technicalDebts);
+	}
+
+	public void setTimeFrames(TimeFrameType... timeFrames) {
+		this.timeFrames = Arrays.asList(timeFrames);
+	}
+
+	public void setTagCodeSmells(ITagCodeSmell tagCodeSmells) {
+		this.tagCodeSmells = Arrays.asList(tagCodeSmells);
+	}
+
+	/**
+	 * @return the path
+	 */
+	public String getPath() {
+		return path;
+	}
+
+	/**
+	 * @param path the path to set
+	 */
+	public void setPath(String path) {
+		this.path = path;
+	}
+
+	/**
+	 * @return the name
+	 */
+	public String getName() {
+		return name;
+	}
+
+	/**
+	 * @param name the name to set
+	 */
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	/**
+	 * @return the description
+	 */
+	public String getDescription() {
+		return description;
+	}
+
+	/**
+	 * @param description the description to set
+	 */
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	/**
+	 * @return the scm
+	 */
+	public SCMType getScm() {
+		return scm;
+	}
+
+	/**
+	 * @param scm the scm to set
+	 */
+	public void setScm(SCMType scm) {
+		this.scm = scm;
+	}
+
+	/**
+	 * @return the charset
+	 */
+	public String getCharset() {
+		return charset;
+	}
+
+	/**
+	 * @param charset the charset to set
+	 */
+	public void setCharset(String charset) {
+		this.charset = charset;
+	}
+
+	/**
+	 * @return the binaryThreshold
+	 */
+	public int getBinaryThreshold() {
+		return binaryThreshold;
+	}
+
+	/**
+	 * @param binaryThreshold the binaryThreshold to set
+	 */
+	public void setBinaryThreshold(int binaryThreshold) {
+		this.binaryThreshold = binaryThreshold;
+	}
+
+	/**
+	 * @return the parsers
+	 */
+	public List<Parser> getParsers() {
+		return parsers;
+	}
+
+	/**
+	 * @param parsers the parsers to set
+	 */
+	public void setParsers(List<Parser> parsers) {
+		this.parsers = parsers;
+	}
+
+	/**
+	 * @return the commitMetrics
+	 */
+	public List<ICommitMetric> getCommitMetrics() {
+		return commitMetrics;
+	}
+
+	/**
+	 * @param commitMetrics the commitMetrics to set
+	 */
+	public void setCommitMetrics(List<ICommitMetric> commitMetrics) {
+		this.commitMetrics = commitMetrics;
+	}
+
+	/**
+	 * @return the commitCodeSmells
+	 */
+	public List<ICommitCodeSmell> getCommitCodeSmells() {
+		return commitCodeSmells;
+	}
+
+	/**
+	 * @param commitCodeSmells the commitCodeSmells to set
+	 */
+	public void setCommitCodeSmells(List<ICommitCodeSmell> commitCodeSmells) {
+		this.commitCodeSmells = commitCodeSmells;
+	}
+
+	/**
+	 * @return the technicalDebts
+	 */
+	public List<ITechnicalDebt> getTechnicalDebts() {
+		return technicalDebts;
+	}
+
+	/**
+	 * @param technicalDebts the technicalDebts to set
+	 */
+	public void setTechnicalDebts(List<ITechnicalDebt> technicalDebts) {
+		this.technicalDebts = technicalDebts;
+	}
+
+	/**
+	 * @return the timeFrames
+	 */
+	public List<TimeFrameType> getTimeFrames() {
+		return timeFrames;
+	}
+
+	/**
+	 * @param timeFrames the timeFrames to set
+	 */
+	public void setTimeFrames(List<TimeFrameType> timeFrames) {
+		this.timeFrames = timeFrames;
+	}
+
+	/**
+	 * @return the tagCodeSmells
+	 */
+	public List<ITagCodeSmell> getTagCodeSmells() {
+		return tagCodeSmells;
+	}
+
+	/**
+	 * @param tagCodeSmells the tagCodeSmells to set
+	 */
+	public void setTagCodeSmells(List<ITagCodeSmell> tagCodeSmells) {
+		this.tagCodeSmells = tagCodeSmells;
+	}
+
 }

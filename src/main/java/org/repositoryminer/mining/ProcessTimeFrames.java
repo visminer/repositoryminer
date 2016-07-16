@@ -28,7 +28,7 @@ public class ProcessTimeFrames {
 		this.repositoryId = repositoryId;
 	}
 
-	public void analyzeCommits(List<CommitDB> commits, List<TimeFrameType> timeFrames) {
+	public List<ReferenceDB> analyzeCommits(List<CommitDB> commits, List<TimeFrameType> timeFrames) {
 		boolean monthFrame = false;
 		boolean trimesterFrame = false;
 		boolean semesterFrame = false;
@@ -70,13 +70,15 @@ public class ProcessTimeFrames {
 		}
 
 		List<Document> docs = new ArrayList<Document>();
-		for (ReferenceDB r : refs.values()) {
+		List<ReferenceDB> timeRefs = new ArrayList<ReferenceDB>(refs.values());
+		for (ReferenceDB r : timeRefs) {
 			Collections.reverse(r.getCommits());
 			docs.add(r.toDocument());
 		}
 		
 		ReferenceDocumentHandler docHandler = new ReferenceDocumentHandler();
 		docHandler.insertMany(docs);
+		return timeRefs;
 	}
 
 	private void analyzeYear(String hash, int year, int month) {

@@ -30,13 +30,8 @@ public class DesignDebt implements ITechnicalDebt {
 					}
 				}
 			}
-
 			document.append("name", TechnicalDebtId.DESIGN_DEBT).append("value", new Boolean(isDesignDebt)).append("status", 0);
 		}
-	}
-
-	public boolean detect(Document document) {
-		return false;
 	}
 
 }

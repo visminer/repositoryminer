@@ -11,7 +11,7 @@ import org.repositoryminer.ast.MethodDeclaration;
 import org.repositoryminer.ast.AbstractTypeDeclaration;
 import org.repositoryminer.ast.AbstractTypeDeclaration.Archetype;
 
-public abstract class MethodBasedMetricTemplate implements IMetric {
+public abstract class MethodBasedMetricTemplate implements ICommitMetric {
 
 	protected List<FieldDeclaration> currentFields = new ArrayList<FieldDeclaration>();
 
@@ -26,7 +26,6 @@ public abstract class MethodBasedMetricTemplate implements IMetric {
 				if (cls.getFields() != null) {
 					currentFields = cls.getFields();
 				}
-
 				calculate(type, cls.getMethods(), ast, document);
 			}
 		}

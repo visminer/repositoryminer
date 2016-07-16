@@ -1,9 +1,11 @@
-package org.repositoryminer.codesmell.snapshot;
+package org.repositoryminer.codesmell.tag;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -20,7 +22,7 @@ import net.sourceforge.pmd.cpd.Language;
 import net.sourceforge.pmd.cpd.Mark;
 import net.sourceforge.pmd.cpd.Match;
 
-public class DuplicatedCode implements ISnapshotCodeSmell {
+public class DuplicatedCode implements ITagCodeSmell {
 
 	private int tokensThreshold = 100;
 	private boolean skipLexicalErrors = true;
@@ -34,10 +36,10 @@ public class DuplicatedCode implements ISnapshotCodeSmell {
 	
 	@Override
 	public void detect(List<Parser> parsers, String repositoryPath, Document document) {
-		document.append(CodeSmellId.DUPLICATED_CODE, calculate(parsers, repositoryPath));
+		document.append("name", CodeSmellId.DUPLICATED_CODE).append("occurrences", calculate(parsers, repositoryPath));
 	}
 
-	public Document calculate(List<Parser> parsers, String repositoryPath) {
+	public List<Document> calculate(List<Parser> parsers, String repositoryPath) {
 		List<Document> docs = new ArrayList<Document>();
 
 		for (Parser parser : parsers) {
@@ -87,7 +89,7 @@ public class DuplicatedCode implements ISnapshotCodeSmell {
 			}
 		}
 		
-		return new Document("occurrences", docs);
+		return docs;
 	}
 
 	private static void addSourcesFilesToCPD(List<File> files, CPD cpd) {
@@ -109,16 +111,19 @@ public class DuplicatedCode implements ISnapshotCodeSmell {
 		}
 	}
 
-	private float getDuplicatedPercentage(String filename, int lineCount) {
+	private Double getDuplicatedPercentage(String filename, int lineCount) {
 		try {
 			String source = new String(Files.readAllBytes(Paths.get(filename)));
 			SLOCMetric slocMetric = new SLOCMetric();
 			
 			int sloc = slocMetric.calculate(source);
-			float percentage = (float) lineCount / sloc;
-			return Math.round(percentage);
+			double percentage = (double) lineCount / sloc;
+			DecimalFormat df = new DecimalFormat("#.####");
+			df.setRoundingMode(RoundingMode.CEILING);
+			return Double.valueOf(df.format(percentage));
+			
 		} catch (IOException e) {
-			return 0;
+			return 0.0;
 		}
 	}
 	
