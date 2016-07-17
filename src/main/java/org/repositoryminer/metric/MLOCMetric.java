@@ -1,18 +1,18 @@
 package org.repositoryminer.metric;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.bson.Document;
 import org.repositoryminer.ast.AST;
-import org.repositoryminer.ast.MethodDeclaration;
 import org.repositoryminer.ast.AbstractTypeDeclaration;
+import org.repositoryminer.ast.MethodDeclaration;
+import org.repositoryminer.listener.IMetricCalculationListener;
 
 public class MLOCMetric extends MethodBasedMetricTemplate {
 	
-	private List<Document> methodsDoc;
 	private Pattern pattern;
 
 	public MLOCMetric(){
@@ -20,18 +20,19 @@ public class MLOCMetric extends MethodBasedMetricTemplate {
 	}
 
 	@Override
-	public void calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast, Document document) {
+	public void calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast, 
+			IMetricCalculationListener listener) {
 		
-		methodsDoc = new ArrayList<Document>();
+		Map<String, Integer> valuesPerMethod = new HashMap<String, Integer>();
 		int accumulated = 0;
 		
 		for(MethodDeclaration method : methods){
 			int mloc = calculate(method, ast);
 			accumulated += mloc;
-			methodsDoc.add(new Document("method", method.getName()).append("value", new Integer(mloc)));
+			valuesPerMethod.put(method.getName(), new Integer(mloc));
 		}
 		
-		document.append("name", MLOC).append("accumulated", new Integer(accumulated)).append("methods", methodsDoc);
+		listener.updateMethodBasedMetricValue(MLOC, accumulated, valuesPerMethod);
 	}
 	
 	

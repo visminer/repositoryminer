@@ -1,27 +1,29 @@
 package org.repositoryminer.metric;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
-import org.bson.Document;
 import org.repositoryminer.ast.AST;
 import org.repositoryminer.ast.AbstractTypeDeclaration;
 import org.repositoryminer.ast.MethodDeclaration;
 import org.repositoryminer.ast.Statement;
 import org.repositoryminer.ast.Statement.NodeType;
+import org.repositoryminer.listener.IMetricCalculationListener;
 
 public class ATFDMetric extends MethodBasedMetricTemplate {
 
-	private List<Document> methodsDoc;
+	private Map<String, Integer> valuesPerMethod;
 
 	@Override
-	public void calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast, Document document) {
-		methodsDoc = new ArrayList<Document>();
+	public void calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast, 
+			IMetricCalculationListener listener) {
+		valuesPerMethod = new HashMap<String, Integer>();
 
 		int atfdClass = calculate(type, methods, true);
-		document.append("name", ATFD).append("accumulated", new Integer(atfdClass)).append("methods", methodsDoc);
+		listener.updateMethodBasedMetricValue(ATFD, atfdClass, valuesPerMethod);
 	}
 
 	public int calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, boolean calculateByMethod) {
@@ -32,7 +34,7 @@ public class ATFDMetric extends MethodBasedMetricTemplate {
 
 			atfdClass += atfdMethod;
 			if (calculateByMethod) {
-				methodsDoc.add(new Document("method", mDeclaration.getName()).append("value", new Integer(atfdMethod)));
+				valuesPerMethod.put(mDeclaration.getName(), new Integer(atfdMethod));
 			}
 		}
 

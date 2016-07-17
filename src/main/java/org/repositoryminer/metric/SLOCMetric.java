@@ -3,9 +3,9 @@ package org.repositoryminer.metric;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.bson.Document;
 import org.repositoryminer.ast.AST;
 import org.repositoryminer.ast.AbstractTypeDeclaration;
+import org.repositoryminer.listener.IMetricCalculationListener;
 
 public class SLOCMetric implements ICommitMetric{
 
@@ -16,10 +16,10 @@ public class SLOCMetric implements ICommitMetric{
 	}
 
 	@Override
-	public void calculate(AbstractTypeDeclaration type, AST ast, Document document) {
+	public void calculate(AbstractTypeDeclaration type, AST ast, IMetricCalculationListener listener) {
 		int sloc = calculate(ast.getSourceCode());
 		
-		document.append("name", SLOC).append("accumulated", new Integer(sloc));
+		listener.updateMetricValue(SLOC, sloc);
 	}
 	
 	public int calculate(String source){
