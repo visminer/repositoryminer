@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.bson.Document;
+import org.repositoryminer.listener.IProgressListener;
 import org.repositoryminer.persistence.handler.ReferenceDocumentHandler;
 import org.repositoryminer.persistence.model.CommitDB;
 import org.repositoryminer.persistence.model.ReferenceDB;
@@ -21,11 +22,15 @@ public class ProcessTimeFrames {
 	private Map<String, ReferenceDB> refs;
 	private String repositoryPath;
 	private String repositoryId;
+	
+	private IProgressListener progressListener;
 
-	public ProcessTimeFrames(String repositoryPath, String repositoryId) {
+	public ProcessTimeFrames(String repositoryPath, String repositoryId, IProgressListener progressListener) {
 		this.refs = new TreeMap<String, ReferenceDB>();
 		this.repositoryPath = repositoryPath;
 		this.repositoryId = repositoryId;
+		
+		this.progressListener = progressListener;
 	}
 
 	public List<ReferenceDB> analyzeCommits(List<CommitDB> commits, List<TimeFrameType> timeFrames) {
@@ -51,7 +56,11 @@ public class ProcessTimeFrames {
 			}
 		}
 
+		progressListener.initCommitsProcessingProgress(commits.size());
+		int idx = 0;
 		for (CommitDB c : commits) {
+			progressListener.commitProgressChange(++idx, commits.size());
+			
 			Calendar calendar = Calendar.getInstance();
 			calendar.setTime(c.getCommitDate());
 

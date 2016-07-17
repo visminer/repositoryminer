@@ -6,6 +6,8 @@ import java.util.List;
 
 import org.repositoryminer.codesmell.commit.ICommitCodeSmell;
 import org.repositoryminer.codesmell.tag.ITagCodeSmell;
+import org.repositoryminer.listener.IMiningListener;
+import org.repositoryminer.listener.IProgressListener;
 import org.repositoryminer.metric.ICommitMetric;
 import org.repositoryminer.parser.Parser;
 import org.repositoryminer.scm.SCMType;
@@ -19,20 +21,16 @@ public class RepositoryMiner {
 	private SCMType scm;
 	private String charset = "UTF-8";
 	private int binaryThreshold = 2048;
+	
+	private IMiningListener miningListener;
+	private IProgressListener progressListener;
+	
 	private List<Parser> parsers;
 	private List<ICommitMetric> commitMetrics;
 	private List<ICommitCodeSmell> commitCodeSmells;
 	private List<ITechnicalDebt> technicalDebts;
 	private List<TimeFrameType> timeFrames;
 	private List<ITagCodeSmell> tagCodeSmells;
-
-	// TODO : To implement
-	// private boolean allowTextFiles;
-	// private List<String> allowedExtensions;
-
-	public void mine() throws UnsupportedEncodingException {
-		MiningProcessor.mine(this);
-	}
 
 	public RepositoryMiner() {
 	}
@@ -45,6 +43,28 @@ public class RepositoryMiner {
 		this.scm = scm;
 	}
 
+	// TODO : To implement
+	// private boolean allowTextFiles;
+	// private List<String> allowedExtensions;
+	public void mine() throws UnsupportedEncodingException {
+		MiningProcessor processor = new MiningProcessor(this);
+		processor.setProgressListener(progressListener).
+				setMiningListener(miningListener).
+				mine();
+	}
+	
+	public RepositoryMiner setMiningListener(IMiningListener listener) {
+		miningListener =listener;
+		
+		return this;
+	}
+	
+	public RepositoryMiner setProgressListener(IProgressListener listener) {
+		progressListener = listener;
+		
+		return this;
+	}
+	
 	public void setParsers(Parser... parsers) {
 		this.parsers = Arrays.asList(parsers);
 	}
