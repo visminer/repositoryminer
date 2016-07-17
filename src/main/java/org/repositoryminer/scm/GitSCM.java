@@ -48,7 +48,6 @@ import org.slf4j.LoggerFactory;
  */
 public class GitSCM implements SCM {
 
-	private static final String RM_BRANCH = "RM-c1b31321c0";
 	private static final Logger LOGGER = LoggerFactory.getLogger(GitSCM.class);
 
 	private Repository repository;
@@ -219,7 +218,6 @@ public class GitSCM implements SCM {
 		if (lockFile.exists()) {
 			lockFile.delete();
 		}
-		makeCheckout("master", false);
 		makeCheckout(hash, true);
 	}
 
@@ -238,8 +236,6 @@ public class GitSCM implements SCM {
 			if (!git.status().call().isClean()) {
 				git.reset().setMode(ResetType.HARD).call();
 			}
-			makeCheckout("master", false);
-			git.branchDelete().setBranchNames(RM_BRANCH).setForce(true).call();
 		} catch (NoWorkTreeException | GitAPIException e) {
 			errorHandler(ErrorMessage.GIT_RESET_ERROR.toString(), e);
 		}
@@ -340,11 +336,7 @@ public class GitSCM implements SCM {
 
 	private void makeCheckout(String hash, boolean create) {
 		try{
-		if (create) {
-			git.checkout().setForce(true).setCreateBranch(true).setName(RM_BRANCH).setStartPoint(hash).call();
-		} else {
 			git.checkout().setForce(true).setName(hash).call();
-		}
 		} catch (GitAPIException e) {
 			errorHandler(ErrorMessage.GIT_CHECKOUT_ERROR.toString(), e);
 		}
