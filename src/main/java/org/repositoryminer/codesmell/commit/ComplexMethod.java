@@ -1,20 +1,19 @@
 package org.repositoryminer.codesmell.commit;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.bson.Document;
 import org.repositoryminer.ast.AST;
 import org.repositoryminer.ast.AbstractTypeDeclaration;
 import org.repositoryminer.ast.AbstractTypeDeclaration.Archetype;
-import org.repositoryminer.codesmell.CodeSmellId;
 import org.repositoryminer.ast.MethodDeclaration;
 import org.repositoryminer.ast.TypeDeclaration;
+import org.repositoryminer.codesmell.CodeSmellId;
+import org.repositoryminer.listener.ICommitCodeSmellDetectionListener;
 import org.repositoryminer.metric.CCMetric;
 
 public class ComplexMethod implements ICommitCodeSmell {
 	
-	private List<Document> methodsDoc;
 	private int ccThreshold = 4;
 	
 	public ComplexMethod() {}
@@ -24,18 +23,18 @@ public class ComplexMethod implements ICommitCodeSmell {
 	}
 
 	@Override
-	public void detect(AbstractTypeDeclaration type, AST ast, Document document) {
+	public void detect(AbstractTypeDeclaration type, AST ast, ICommitCodeSmellDetectionListener listener) {
 		if (type.getArchetype() == Archetype.CLASS_OR_INTERFACE) {
 			TypeDeclaration cls = (TypeDeclaration) type;
-			
-			methodsDoc = new ArrayList<Document>();
+
+			Map<String, Boolean> detectionsPerMethod = new HashMap<String, Boolean>();
 
 			for(MethodDeclaration method : cls.getMethods()){
 				boolean complexMethod = detect(method);
-				methodsDoc.add(new Document("method", method.getName()).append("value", new Boolean(complexMethod)));
+				detectionsPerMethod.put(method.getName(), new Boolean(complexMethod));
 			}
 
-			document.append("name", CodeSmellId.COMPLEX_METHOD).append("methods", methodsDoc);
+			listener.updateMethodBasedSmellDetection(CodeSmellId.COMPLEX_METHOD, detectionsPerMethod);
 		}
 	}
 	

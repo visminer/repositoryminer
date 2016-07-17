@@ -1,29 +1,31 @@
 package org.repositoryminer.metric;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import org.bson.Document;
 import org.repositoryminer.ast.AST;
 import org.repositoryminer.ast.AbstractTypeDeclaration;
 import org.repositoryminer.ast.MethodDeclaration;
+import org.repositoryminer.listener.IMetricCalculationListener;
 
 public class MaxNestingMetric extends MethodBasedMetricTemplate {
 
-	private List<Document> methodsDoc;
-
 	@Override
-	public void calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast, Document document) {
-		methodsDoc = new ArrayList<Document>();
+	public void calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast, 
+			IMetricCalculationListener listener) {
+		Map<String, Integer> valuesPerMethod = new HashMap<String, Integer>();
 		for(MethodDeclaration method : methods){
 			int maxNesting = calculate(method); 
-			methodsDoc.add(new Document("method", method.getName()).append("value", new Integer(maxNesting)));
+			valuesPerMethod.put(method.getName(), new Integer(maxNesting));
 		}
-		document.append("name", MAX_NESTING).append("methods", methodsDoc);
+		
+		listener.updateMethodBasedMetricValue(MAX_NESTING, 0, valuesPerMethod);
 	}
 
 	public int calculate(MethodDeclaration method){
-		return method.getMaxNesting(); //FIXME solve inconsistency of the values found
+		//FIXME solve inconsistency of the values found
+		return method.getMaxNesting();
 	}
 
 }

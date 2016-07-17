@@ -7,11 +7,12 @@ import org.repositoryminer.ast.AST;
 import org.repositoryminer.ast.AbstractTypeDeclaration;
 import org.repositoryminer.ast.AbstractTypeDeclaration.Archetype;
 import org.repositoryminer.codesmell.CodeSmellId;
+import org.repositoryminer.listener.ITechnicalDebtDetectionListener;
 
 public class CodeDebt implements ITechnicalDebt {
 	
 	@Override
-	public void detect(AbstractTypeDeclaration type, AST ast, List<Document> codeSmells, Document document) {
+	public void detect(AbstractTypeDeclaration type, AST ast, List<Document> codeSmells, ITechnicalDebtDetectionListener listener) {
 		if (type.getArchetype() == Archetype.CLASS_OR_INTERFACE) {
 			
 			boolean isCodeDebt = false;
@@ -23,9 +24,7 @@ public class CodeDebt implements ITechnicalDebt {
 				}
 				//TODO: Implements duplicated code detection and check for its existence when detect CodeDebt 				
 			}
-			document.append("name", TechnicalDebtId.CODE_DEBT)
-			.append("value", new Boolean(isCodeDebt))
-			.append("status", 0);
+			listener.updateDebtDetection(TechnicalDebtId.CODE_DEBT, new Boolean(isCodeDebt));
 		}
 	}
 

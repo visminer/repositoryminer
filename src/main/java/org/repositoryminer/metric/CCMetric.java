@@ -1,24 +1,27 @@
 package org.repositoryminer.metric;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import org.bson.Document;
 import org.repositoryminer.ast.AST;
 import org.repositoryminer.ast.AbstractTypeDeclaration;
 import org.repositoryminer.ast.MethodDeclaration;
 import org.repositoryminer.ast.Statement;
 import org.repositoryminer.ast.Statement.NodeType;
+import org.repositoryminer.listener.IMetricCalculationListener;
 
 public class CCMetric extends MethodBasedMetricTemplate {
 
-	private List<Document> methodsDoc;
+	private Map<String, Integer> valuesPerMethod;
 
 	@Override
-	public void calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast, Document document) {
-		methodsDoc = new ArrayList<Document>();
+	public void calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast, 
+			IMetricCalculationListener listener) {
+		valuesPerMethod = new HashMap<String, Integer>();
+
 		int ccClass = calculate(methods);
-		document.append("name", CC).append("accumulated", new Integer(ccClass)).append("methods", methodsDoc);
+		listener.updateMethodBasedMetricValue(CC, ccClass, valuesPerMethod);
 	}
 
 	// for classes
@@ -28,7 +31,7 @@ public class CCMetric extends MethodBasedMetricTemplate {
 
 			int cc = calculate(method);
 			ccClass += cc;
-			methodsDoc.add(new Document("method", method.getName()).append("value", new Integer(cc)));
+			valuesPerMethod.put(method.getName(),new Integer(cc));
 		}
 		return ccClass;
 	}

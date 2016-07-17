@@ -1,11 +1,11 @@
 package org.repositoryminer.codesmell.commit;
 
-import org.bson.Document;
 import org.repositoryminer.ast.AST;
 import org.repositoryminer.ast.AbstractTypeDeclaration;
 import org.repositoryminer.ast.AbstractTypeDeclaration.Archetype;
 import org.repositoryminer.ast.TypeDeclaration;
 import org.repositoryminer.codesmell.CodeSmellId;
+import org.repositoryminer.listener.ICommitCodeSmellDetectionListener;
 import org.repositoryminer.metric.ATFDMetric;
 import org.repositoryminer.metric.NOAMetric;
 import org.repositoryminer.metric.TCCMetric;
@@ -30,12 +30,12 @@ public class GodClass implements ICommitCodeSmell {
 	}
 
 	@Override
-	public void detect(AbstractTypeDeclaration type, AST ast, Document document) {
+	public void detect(AbstractTypeDeclaration type, AST ast, ICommitCodeSmellDetectionListener listener) {
 		if (type.getArchetype() == Archetype.CLASS_OR_INTERFACE) {
 			TypeDeclaration cls = (TypeDeclaration) type;
 
 			boolean godClass = detect(type, cls);
-			document.append("name", CodeSmellId.GOD_CLASS).append("value", new Boolean(godClass));
+			listener.updateSmellDetection(CodeSmellId.GOD_CLASS, godClass);
 		}
 	}
 

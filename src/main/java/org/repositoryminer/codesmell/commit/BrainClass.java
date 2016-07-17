@@ -1,12 +1,12 @@
 package org.repositoryminer.codesmell.commit;
 
-import org.bson.Document;
 import org.repositoryminer.ast.AST;
 import org.repositoryminer.ast.AbstractTypeDeclaration;
 import org.repositoryminer.ast.AbstractTypeDeclaration.Archetype;
 import org.repositoryminer.ast.MethodDeclaration;
 import org.repositoryminer.ast.TypeDeclaration;
 import org.repositoryminer.codesmell.CodeSmellId;
+import org.repositoryminer.listener.ICommitCodeSmellDetectionListener;
 import org.repositoryminer.metric.SLOCMetric;
 import org.repositoryminer.metric.TCCMetric;
 import org.repositoryminer.metric.WMCMetric;
@@ -28,11 +28,11 @@ public class BrainClass implements ICommitCodeSmell {
 	}
 
 	@Override
-	public void detect(AbstractTypeDeclaration type, AST ast, Document document) {
+	public void detect(AbstractTypeDeclaration type, AST ast, ICommitCodeSmellDetectionListener listener) {
 		if (type.getArchetype() == Archetype.CLASS_OR_INTERFACE) {
 			TypeDeclaration cls = (TypeDeclaration) type;
 			boolean brainClass = detect(ast, type, cls);
-			document.append("name", new String(CodeSmellId.BRAIN_CLASS)).append("value", new Boolean(brainClass));
+			listener.updateSmellDetection(CodeSmellId.BRAIN_CLASS, brainClass);
 		}
 	}
 

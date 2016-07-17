@@ -3,20 +3,21 @@ package org.repositoryminer.metric;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.bson.Document;
 import org.repositoryminer.ast.AST;
 import org.repositoryminer.ast.AbstractTypeDeclaration;
 import org.repositoryminer.ast.FieldDeclaration;
 import org.repositoryminer.ast.MethodDeclaration;
 import org.repositoryminer.ast.Statement;
 import org.repositoryminer.ast.Statement.NodeType;
+import org.repositoryminer.listener.IMetricCalculationListener;
 
 public class TCCMetric extends MethodBasedMetricTemplate {
 
 	@Override
-	public void calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast, Document document) {
+	public void calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast, 
+			IMetricCalculationListener listener) {
 		float tcc = calculate(type, methods);
-		document.append("name", TCC).append("accumulated", new Float(tcc));
+		listener.updateMetricValue(TCC, tcc);
 	}
 
 	public float calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods) {

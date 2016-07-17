@@ -1,29 +1,31 @@
 package org.repositoryminer.metric;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import org.bson.Document;
 import org.repositoryminer.ast.AST;
 import org.repositoryminer.ast.AbstractTypeDeclaration;
 import org.repositoryminer.ast.MethodDeclaration;
 import org.repositoryminer.ast.Statement;
 import org.repositoryminer.ast.Statement.NodeType;
+import org.repositoryminer.listener.IMetricCalculationListener;
 
 public class NOAVMetric extends MethodBasedMetricTemplate {
 	
-	private List<Document> methodsDoc;
-
 	@Override
-	public void calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast, Document document) {
-		methodsDoc = new ArrayList<Document>();
+	public void calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast, 
+			IMetricCalculationListener listener) {
+		Map<String, Integer> valuesPerMethod = new HashMap<String, Integer>();
 		
+		int accumulated = 0;
 		for(MethodDeclaration method : methods){
 			int noav = calculate(method);
-			methodsDoc.add(new Document("method", method.getName()).append("value", new Integer(noav)));
+			valuesPerMethod.put(method.getName(), new Integer(noav));
+			accumulated += noav;
 		}
 		
-		document.append("name", NOAV).append("methods", methodsDoc);
+		listener.updateMethodBasedMetricValue(NOAV, accumulated, valuesPerMethod);
 	}
 	
 	public int calculate(MethodDeclaration method){

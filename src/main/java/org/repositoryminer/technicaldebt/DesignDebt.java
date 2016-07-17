@@ -7,12 +7,13 @@ import org.repositoryminer.ast.AST;
 import org.repositoryminer.ast.AbstractTypeDeclaration;
 import org.repositoryminer.ast.AbstractTypeDeclaration.Archetype;
 import org.repositoryminer.codesmell.CodeSmellId;
+import org.repositoryminer.listener.ITechnicalDebtDetectionListener;
 
 public class DesignDebt implements ITechnicalDebt {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public void detect(AbstractTypeDeclaration type, AST ast, List<Document> antiPatterns, Document document) {
+	public void detect(AbstractTypeDeclaration type, AST ast, List<Document> antiPatterns, ITechnicalDebtDetectionListener listener) {
 		if (type.getArchetype() == Archetype.CLASS_OR_INTERFACE) {
 			boolean isDesignDebt = false;
 			for (Document antiPattern : antiPatterns) {
@@ -30,8 +31,12 @@ public class DesignDebt implements ITechnicalDebt {
 					}
 				}
 			}
-			document.append("name", TechnicalDebtId.DESIGN_DEBT).append("value", new Boolean(isDesignDebt)).append("status", 0);
+			listener.updateDebtDetection(TechnicalDebtId.DESIGN_DEBT, new Boolean(isDesignDebt));
 		}
+	}
+
+	public boolean detect(Document document) {
+		return false;
 	}
 
 }

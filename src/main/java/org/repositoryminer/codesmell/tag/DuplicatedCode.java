@@ -2,30 +2,26 @@ package org.repositoryminer.codesmell.tag;
 
 import java.io.File;
 import java.io.IOException;
-import java.math.RoundingMode;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.bson.Document;
-import org.repositoryminer.codesmell.CodeSmellId;
-import org.repositoryminer.metric.SLOCMetric;
+import org.repositoryminer.listener.IDuplicatedCodeDetectionListener;
+import org.repositoryminer.listener.ITagCodeSmellDetectionListener;
 import org.repositoryminer.parser.Parser;
 
 import net.sourceforge.pmd.cpd.CPD;
 import net.sourceforge.pmd.cpd.CPDConfiguration;
 import net.sourceforge.pmd.cpd.JavaLanguage;
 import net.sourceforge.pmd.cpd.Language;
-import net.sourceforge.pmd.cpd.Mark;
 import net.sourceforge.pmd.cpd.Match;
 
 public class DuplicatedCode implements ITagCodeSmell {
 
 	private int tokensThreshold = 100;
 	private boolean skipLexicalErrors = true;
+	
+	private IDuplicatedCodeDetectionListener listener;
 
 	public DuplicatedCode() {}
 	
@@ -35,12 +31,13 @@ public class DuplicatedCode implements ITagCodeSmell {
 	}
 	
 	@Override
-	public void detect(List<Parser> parsers, String repositoryPath, Document document) {
-		document.append("name", CodeSmellId.DUPLICATED_CODE).append("occurrences", calculate(parsers, repositoryPath));
+	public void detect(List<Parser> parsers, String repositoryPath, ITagCodeSmellDetectionListener listener) {
+		this.listener = (IDuplicatedCodeDetectionListener)listener;
+		calculate(parsers, repositoryPath);
 	}
 
-	public List<Document> calculate(List<Parser> parsers, String repositoryPath) {
-		List<Document> docs = new ArrayList<Document>();
+	public void calculate(List<Parser> parsers, String repositoryPath) {
+		listener.initDuplicationDetection();
 
 		for (Parser parser : parsers) {
 			CPDConfiguration config = new CPDConfiguration();
@@ -68,28 +65,12 @@ public class DuplicatedCode implements ITagCodeSmell {
 			Iterator<Match> ms = cpd.getMatches();
 			while (ms.hasNext()) {
 				Match m = ms.next();
-				Document auxDoc = new Document();
-				auxDoc.append("line_count", m.getLineCount());
-				auxDoc.append("token_count", m.getTokenCount());
-				auxDoc.append("source_code_slice", m.getSourceCodeSlice());
-				auxDoc.append("language", parser.getLanguage());
 				
-				List<Document> filesDoc = new ArrayList<Document>();
-				for (Mark mark : m.getMarkSet()) {
-					Document fileDoc = new Document();
-					fileDoc.append("begin_line", mark.getBeginLine());
-					fileDoc.append("end_line", mark.getEndLine());
-					fileDoc.append("file_name", mark.getFilename());
-					fileDoc.append("percentage", getDuplicatedPercentage(mark.getFilename(), m.getLineCount()));
-					filesDoc.add(fileDoc);
-				}
-				
-				auxDoc.append("files", filesDoc);
-				docs.add(auxDoc);
+				listener.updateDuplicationDetection(m, parser);
 			}
 		}
 		
-		return docs;
+		listener.endOfDuplicationDetection();
 	}
 
 	private static void addSourcesFilesToCPD(List<File> files, CPD cpd) {
@@ -111,20 +92,5 @@ public class DuplicatedCode implements ITagCodeSmell {
 		}
 	}
 
-	private Double getDuplicatedPercentage(String filename, int lineCount) {
-		try {
-			String source = new String(Files.readAllBytes(Paths.get(filename)));
-			SLOCMetric slocMetric = new SLOCMetric();
-			
-			int sloc = slocMetric.calculate(source);
-			double percentage = (double) lineCount / sloc;
-			DecimalFormat df = new DecimalFormat("#.####");
-			df.setRoundingMode(RoundingMode.CEILING);
-			return Double.valueOf(df.format(percentage));
-			
-		} catch (IOException e) {
-			return 0.0;
-		}
-	}
 	
 }

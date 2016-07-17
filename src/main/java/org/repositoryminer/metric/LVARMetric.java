@@ -1,32 +1,33 @@
 package org.repositoryminer.metric;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import org.bson.Document;
 import org.repositoryminer.ast.AST;
 import org.repositoryminer.ast.AbstractTypeDeclaration;
 import org.repositoryminer.ast.MethodDeclaration;
 import org.repositoryminer.ast.Statement;
 import org.repositoryminer.ast.Statement.NodeType;
+import org.repositoryminer.listener.IMetricCalculationListener;
 
 public class LVARMetric extends MethodBasedMetricTemplate {
 
-	private List<Document> methodsDoc;
-	
 	@Override
-	public void calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast, Document document) {
+	public void calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast, 
+			IMetricCalculationListener listener) {
 		
-		methodsDoc = new ArrayList<Document>();
+		Map<String, Integer> valuesPerMethod = new HashMap<String, Integer>();
 		int accumulated = 0;
 		
 		for(MethodDeclaration method : methods){
 			int lvar = calculate(method);
 			accumulated += lvar;
-			methodsDoc.add(new Document("method", method.getName()).append("value", new Integer(lvar)));
+			valuesPerMethod.put(method.getName(), new Integer(lvar));
 		}
 		
-		document.append("name", LVAR).append("accumulated", new Integer(accumulated)).append("methods", methodsDoc);
+		listener.updateMethodBasedMetricValue(LVAR, accumulated, valuesPerMethod);
 	}
 	
 	public int calculate(MethodDeclaration method){
