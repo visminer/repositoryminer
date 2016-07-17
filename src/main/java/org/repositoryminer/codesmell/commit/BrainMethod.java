@@ -1,15 +1,15 @@
 package org.repositoryminer.codesmell.commit;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.bson.Document;
 import org.repositoryminer.ast.AST;
 import org.repositoryminer.ast.AbstractTypeDeclaration;
 import org.repositoryminer.ast.AbstractTypeDeclaration.Archetype;
 import org.repositoryminer.ast.MethodDeclaration;
 import org.repositoryminer.ast.TypeDeclaration;
 import org.repositoryminer.codesmell.CodeSmellId;
+import org.repositoryminer.listener.ICommitCodeSmellDetectionListener;
 import org.repositoryminer.metric.CCMetric;
 import org.repositoryminer.metric.MLOCMetric;
 import org.repositoryminer.metric.MaxNestingMetric;
@@ -17,7 +17,6 @@ import org.repositoryminer.metric.NOAVMetric;
 
 public class BrainMethod implements ICommitCodeSmell {
 	
-	private List<Document> methodsDoc;
 	private int mlocThreshold = 65;
 	private float ccMlocThreshold = 0.24f;
 	private int maxNestingThreshold = 5;
@@ -33,18 +32,18 @@ public class BrainMethod implements ICommitCodeSmell {
 	}
 
 	@Override
-	public void detect(AbstractTypeDeclaration type, AST ast, Document document) {
+	public void detect(AbstractTypeDeclaration type, AST ast, ICommitCodeSmellDetectionListener listener) {
 		if (type.getArchetype() == Archetype.CLASS_OR_INTERFACE) {
 			TypeDeclaration cls = (TypeDeclaration) type;
 			
-			methodsDoc = new ArrayList<Document>();
+			Map<String, Boolean> detectionsPerMethod = new HashMap<String, Boolean>();
 
 			for(MethodDeclaration method : cls.getMethods()){
 				boolean brainMethod = detect(method, ast);
-				methodsDoc.add(new Document("method", method.getName()).append("value", new Boolean(brainMethod)));
+				detectionsPerMethod.put(method.getName(), new Boolean(brainMethod));
 			}
 
-			document.append("name", CodeSmellId.BRAIN_METHOD).append("methods", methodsDoc);
+			listener.updateMethodBasedSmellDetection(CodeSmellId.BRAIN_METHOD, detectionsPerMethod);
 		}
 	}
 	
@@ -67,3 +66,4 @@ public class BrainMethod implements ICommitCodeSmell {
 	}
 
 }
+

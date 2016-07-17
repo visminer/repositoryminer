@@ -1,15 +1,15 @@
 package org.repositoryminer.codesmell.commit;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.bson.Document;
 import org.repositoryminer.ast.AST;
 import org.repositoryminer.ast.AbstractTypeDeclaration;
 import org.repositoryminer.ast.AbstractTypeDeclaration.Archetype;
 import org.repositoryminer.ast.MethodDeclaration;
 import org.repositoryminer.ast.TypeDeclaration;
 import org.repositoryminer.codesmell.CodeSmellId;
+import org.repositoryminer.listener.ICommitCodeSmellDetectionListener;
 import org.repositoryminer.metric.CCMetric;
 import org.repositoryminer.metric.LVARMetric;
 import org.repositoryminer.metric.MLOCMetric;
@@ -17,7 +17,6 @@ import org.repositoryminer.metric.PARMetric;
 
 public class LongMethod implements ICommitCodeSmell {
 
-	private List<Document> methodsDoc;
 	private int ccThreshold = 4;
 	private int mlocThreshold = 30;
 	private int parThreshold = 4;
@@ -33,18 +32,18 @@ public class LongMethod implements ICommitCodeSmell {
 	}
 
 	@Override
-	public void detect(AbstractTypeDeclaration type, AST ast, Document document) {
+	public void detect(AbstractTypeDeclaration type, AST ast, ICommitCodeSmellDetectionListener listener) {
 		if (type.getArchetype() == Archetype.CLASS_OR_INTERFACE) {
 			TypeDeclaration cls = (TypeDeclaration) type;
 			
-			methodsDoc = new ArrayList<Document>();
+			Map<String, Boolean> detectionsPerMethod = new HashMap<String, Boolean>();
 
 			for(MethodDeclaration method : cls.getMethods()){
 				boolean longMethod = detect(method, ast);
-				methodsDoc.add(new Document("method", method.getName()).append("value", new Boolean(longMethod)));
+				detectionsPerMethod.put(method.getName(), new Boolean(longMethod));
 			}
 
-			document.append("name", CodeSmellId.LONG_METHOD).append("methods", methodsDoc);
+			listener.updateMethodBasedSmellDetection(CodeSmellId.LONG_METHOD, detectionsPerMethod);
 		}
 	}
 	
