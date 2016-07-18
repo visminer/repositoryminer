@@ -39,7 +39,7 @@ import org.repositoryminer.persistence.model.CommitDB;
 import org.repositoryminer.persistence.model.ContributorDB;
 import org.repositoryminer.persistence.model.DiffDB;
 import org.repositoryminer.persistence.model.ReferenceDB;
-import org.repositoryminer.utility.HashHandler;
+import org.repositoryminer.utility.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -94,7 +94,7 @@ public class GitSCM implements SCM {
 			diffFormatter.setBinaryFileThreshold(binaryThreshold);
 
 		absolutePath = repository.getWorkTree().getAbsolutePath().replace("\\", "/");
-		repoId = HashHandler.SHA1(absolutePath);
+		repoId = StringUtils.encodeToSHA1(absolutePath);
 	}
 
 	@Override
@@ -118,7 +118,7 @@ public class GitSCM implements SCM {
 				continue;
 
 			int i = b.getName().lastIndexOf("/") + 1;
-			String id = HashHandler.SHA1(absolutePath + "/" + b.getName());
+			String id = StringUtils.encodeToSHA1(absolutePath + "/" + b.getName());
 			ReferenceDB r = new ReferenceDB(id, repoId, b.getName().substring(i), b.getName(), ReferenceType.BRANCH);
 			refs.add(r);
 		}
@@ -132,7 +132,7 @@ public class GitSCM implements SCM {
 
 		for (Ref t : tags) {
 			int i = t.getName().lastIndexOf("/") + 1;
-			String id = HashHandler.SHA1(absolutePath + "/" + t.getName());
+			String id = StringUtils.encodeToSHA1(absolutePath + "/" + t.getName());
 			ReferenceDB r = new ReferenceDB(id, repoId, t.getName().substring(i), t.getName(), ReferenceType.TAG);
 			refs.add(r);
 		}
@@ -303,7 +303,7 @@ public class GitSCM implements SCM {
 			path = absolutePath + "/" + path;
 			oldPath = (oldPath != null) ? absolutePath + "/" + oldPath : null;
 			
-			DiffDB change = new DiffDB(path, oldPath, HashHandler.SHA1(path), lines[0], lines[1], type);
+			DiffDB change = new DiffDB(path, oldPath, StringUtils.encodeToSHA1(path), lines[0], lines[1], type);
 			changes.add(change);
 		}
 		return changes;

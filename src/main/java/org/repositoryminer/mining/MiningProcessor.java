@@ -18,7 +18,7 @@ import org.repositoryminer.persistence.model.RepositoryDB;
 import org.repositoryminer.persistence.model.WorkingDirectoryDB;
 import org.repositoryminer.scm.SCM;
 import org.repositoryminer.scm.SCMFactory;
-import org.repositoryminer.utility.HashHandler;
+import org.repositoryminer.utility.StringUtils;
 
 public class MiningProcessor {
 
@@ -64,7 +64,7 @@ public class MiningProcessor {
 		scm.open(repository.getPath(), repository.getBinaryThreshold());
 
 		String absPath = scm.getAbsolutePath();
-		String id = HashHandler.SHA1(absPath);
+		String id = StringUtils.encodeToSHA1(absPath);
 
 		RepositoryDB r = new RepositoryDB(repository);
 		r.setId(id);

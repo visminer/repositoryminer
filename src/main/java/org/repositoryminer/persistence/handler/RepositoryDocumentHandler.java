@@ -1,5 +1,6 @@
 package org.repositoryminer.persistence.handler;
 
+import org.bson.Document;
 import org.repositoryminer.persistence.Connection;
 
 public class RepositoryDocumentHandler extends DocumentHandler {
@@ -10,4 +11,9 @@ public class RepositoryDocumentHandler extends DocumentHandler {
 		super.collection = Connection.getInstance().getCollection(COLLECTION_NAME);
 	}
 
+	public boolean checkIfRepositoryExists(String id) {
+		Document clause = new Document("_id", id);
+		return collection.count(clause) == 1 ? true : false;
+	}
+	
 }

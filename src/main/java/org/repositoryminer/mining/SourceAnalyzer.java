@@ -18,7 +18,7 @@ import org.repositoryminer.persistence.model.DiffDB;
 import org.repositoryminer.persistence.model.ReferenceDB;
 import org.repositoryminer.scm.SCM;
 import org.repositoryminer.technicaldebt.ITechnicalDebt;
-import org.repositoryminer.utility.HashHandler;
+import org.repositoryminer.utility.StringUtils;
 
 public class SourceAnalyzer {
 
@@ -161,7 +161,7 @@ public class SourceAnalyzer {
 			Document typeDoc = new Document();
 			String typeHash = file + "/" + type.getName();
 			typeDoc.append("name", type.getName()).append("declaration", type.getArchetype().toString()).append("hash",
-					HashHandler.SHA1(typeHash));
+					StringUtils.encodeToSHA1(typeHash));
 
 			List<Document> codeSmellsDocs = new ArrayList<Document>();
 			processCommitMetrics(ast, type, typeDoc);

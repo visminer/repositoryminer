@@ -1,6 +1,5 @@
 package org.repositoryminer.mining;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -14,15 +13,13 @@ import org.repositoryminer.persistence.handler.ReferenceDocumentHandler;
 import org.repositoryminer.persistence.handler.RepositoryDocumentHandler;
 import org.repositoryminer.persistence.handler.WorkingDirectoryDocumentHandler;
 import org.repositoryminer.scm.ReferenceType;
-import org.repositoryminer.utility.HashHandler;
+import org.repositoryminer.utility.StringUtils;
 
 public class RepositoryExplorer {
 
 	public static void mineRepository(Repository repository) throws IOException {
-		File repoFolder = new File(repository.getPath());
-		String canonicalPath = repoFolder.getCanonicalPath();
-		
-		String id = HashHandler.SHA1(canonicalPath.replace("\\", "/"));
+		String canonicalPath = StringUtils.treatPath(repository.getPath());
+		String id = StringUtils.encodeToSHA1(canonicalPath);
 		
 		RepositoryDocumentHandler repoDocHandler = new RepositoryDocumentHandler();
 		Repository.initRepository(repoDocHandler.findById(id, null), repository);
@@ -53,25 +50,25 @@ public class RepositoryExplorer {
 	
 	public static Document getAllMeasures(String file, String commit) {
 		CommitAnalysisDocumentHandler docHandler = new CommitAnalysisDocumentHandler();
-		String fileHash = HashHandler.SHA1(file);
+		String fileHash = StringUtils.encodeToSHA1(file);
 		return docHandler.getAllMeasures(fileHash, commit);
 	}
 	
 	public static Document getMetricMeasures(String file, String commit) {
 		CommitAnalysisDocumentHandler docHandler = new CommitAnalysisDocumentHandler();
-		String fileHash = HashHandler.SHA1(file);
+		String fileHash = StringUtils.encodeToSHA1(file);
 		return docHandler.getMetricsMeasures(fileHash, commit);
 	}
 	
 	public static Document getCodeSmellsMeasures(String file, String commit) {
 		CommitAnalysisDocumentHandler docHandler = new CommitAnalysisDocumentHandler();
-		String fileHash = HashHandler.SHA1(file);
+		String fileHash = StringUtils.encodeToSHA1(file);
 		return docHandler.getCodeSmellsMeasures(fileHash, commit);
 	}
 	
 	public static Document getTechnicalDebtsMeasures(String file, String commit) {
 		CommitAnalysisDocumentHandler docHandler = new CommitAnalysisDocumentHandler();
-		String fileHash = HashHandler.SHA1(file);
+		String fileHash = StringUtils.encodeToSHA1(file);
 		return docHandler.getTechnicalDebtsMeasures(fileHash, commit);
 	}
 	

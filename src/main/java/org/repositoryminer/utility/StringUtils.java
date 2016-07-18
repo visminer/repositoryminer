@@ -1,11 +1,13 @@
 package org.repositoryminer.utility;
 
+import java.io.File;
+import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-public class HashHandler {
+public class StringUtils {
 
-	public static String SHA1(String input){
+	public static String encodeToSHA1(String input){
 		MessageDigest mDigest;
 		try {
 			mDigest = MessageDigest.getInstance("SHA1");
@@ -22,4 +24,10 @@ public class HashHandler {
 		return sb.toString();
 	}
 
+	public static String treatPath(String path) throws IOException {
+		File file = new File(path);
+		String treatedPath = file.getCanonicalPath();
+		return treatedPath.replace("\\", "/");
+	}
+	
 }

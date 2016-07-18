@@ -12,7 +12,7 @@ import org.repositoryminer.persistence.handler.ReferenceDocumentHandler;
 import org.repositoryminer.persistence.model.CommitDB;
 import org.repositoryminer.persistence.model.ReferenceDB;
 import org.repositoryminer.scm.ReferenceType;
-import org.repositoryminer.utility.HashHandler;
+import org.repositoryminer.utility.StringUtils;
 
 public class ProcessTimeFrames {
 
@@ -130,7 +130,7 @@ public class ProcessTimeFrames {
 			ReferenceDB tempRef = refs.get(key);
 			tempRef.getCommits().add(hash);
 		} else {
-			String id = HashHandler.SHA1(repositoryPath + "/" + key);
+			String id = StringUtils.encodeToSHA1(repositoryPath + "/" + key);
 			ReferenceDB r = new ReferenceDB(id, repositoryId, name, key, ReferenceType.CUSTOM_TIME_TAG);
 			r.setCommits(new ArrayList<String>());
 			r.getCommits().add(hash);

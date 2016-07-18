@@ -13,7 +13,7 @@ import java.util.Set;
 
 public class CommitAnalysisDocumentHandler extends DocumentHandler {
 
-	private static final String COLLECTION_NAME = "commit_analysis";
+	private static final String COLLECTION_NAME = "commits_analysis";
 
 	public CommitAnalysisDocumentHandler() {
 		super.collection = Connection.getInstance().getCollection(COLLECTION_NAME);
