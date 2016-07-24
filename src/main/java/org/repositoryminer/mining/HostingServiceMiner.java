@@ -10,6 +10,7 @@ import org.repositoryminer.exceptions.VisMinerAPIException;
 import org.repositoryminer.persistence.handler.IssueDocumentHandler;
 import org.repositoryminer.persistence.handler.MilestoneDocumentHandler;
 import org.repositoryminer.persistence.handler.RepositoryDocumentHandler;
+import org.repositoryminer.persistence.model.ContributorDB;
 import org.repositoryminer.persistence.model.IssueDB;
 import org.repositoryminer.persistence.model.MilestoneDB;
 import org.repositoryminer.scm.hostingservice.HostingService;
@@ -26,18 +27,29 @@ public class HostingServiceMiner {
 
 	private HostingService service;
 
-	public void connect(String user, String password) throws IOException{
+	public HostingServiceMiner() {}
+	
+	public HostingServiceMiner(String repositoryPath, String owner, String name, HostingServiceType serviceType) {
+		super();
+		this.repositoryPath = repositoryPath;
+		this.owner = owner;
+		this.name = name;
+		this.serviceType = serviceType;
+	}
+
+	public void mine(String user, String password) throws IOException{
 		service = HostingServiceFactory.getHostingService(serviceType);
 		service.connect(owner, name, user, password);
 		process();
 	}
 
-	public void connect(String token) throws IOException{
+	public void mine(String token) throws IOException{
 		service = HostingServiceFactory.getHostingService(serviceType);
 		service.connect(owner, name, token);
 		process();
 	}
 
+	@SuppressWarnings("unchecked")
 	private void process() throws IOException {
 		String canonicalPath = StringUtils.treatPath(repositoryPath);
 		String id = StringUtils.encodeToSHA1(canonicalPath);
@@ -53,6 +65,22 @@ public class HostingServiceMiner {
 		issueDocHandler.deleteByRepository(id);
 		mileDocHandler.deleteByRepository(id);
 
+		Document repoDoc = repoDocHandler.findOnlyContributors(id);
+		List<ContributorDB> contributorsDb = service.getAllContributors();
+		
+		for (Document contributorDoc : (List<Document>) repoDoc.get("contributors")) {
+			String name = contributorDoc.getString("name");
+			for (ContributorDB contributorDb : contributorsDb) {
+				if (name.equals(contributorDb.getName())) {
+					contributorDoc.put("login", contributorDb.getLogin());
+					contributorDoc.put("avatar_url", contributorDb.getAvatarUrl());
+					contributorDoc.put("collaborator", contributorDb.isCollaborator());
+					break;
+				}
+			}
+		}
+		
+		repoDocHandler.updateOnlyContributors(repoDoc);
 		List<IssueDB> issues = service.getAllIssues();
 		List<MilestoneDB> milestones = service.getAllMilestones();
 

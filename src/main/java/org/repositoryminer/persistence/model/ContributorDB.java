@@ -13,6 +13,9 @@ public class ContributorDB {
 
 	private String name;
 	private String email;
+	private String login;
+	private String avatarUrl;
+	private boolean collaborator;
 
 	public ContributorDB() {
 	}
@@ -21,6 +24,14 @@ public class ContributorDB {
 		super();
 		this.name = name;
 		this.email = email;
+	}
+
+	public ContributorDB(String name, String login, String avatarUrl, boolean collaborator) {
+		super();
+		this.name = name;
+		this.login = login;
+		this.avatarUrl = avatarUrl;
+		this.collaborator = collaborator;
 	}
 
 	public Document toDocument() {
@@ -65,6 +76,48 @@ public class ContributorDB {
 	 */
 	public void setEmail(String email) {
 		this.email = email;
+	}
+
+	/**
+	 * @return the login
+	 */
+	public String getLogin() {
+		return login;
+	}
+
+	/**
+	 * @param login the login to set
+	 */
+	public void setLogin(String login) {
+		this.login = login;
+	}
+
+	/**
+	 * @return the avatarUrl
+	 */
+	public String getAvatarUrl() {
+		return avatarUrl;
+	}
+
+	/**
+	 * @param avatarUrl the avatarUrl to set
+	 */
+	public void setAvatarUrl(String avatarUrl) {
+		this.avatarUrl = avatarUrl;
+	}
+
+	/**
+	 * @return the collaborator
+	 */
+	public boolean isCollaborator() {
+		return collaborator;
+	}
+
+	/**
+	 * @param collaborator the collaborator to set
+	 */
+	public void setCollaborator(boolean collaborator) {
+		this.collaborator = collaborator;
 	}
 
 	@Override

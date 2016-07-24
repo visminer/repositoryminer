@@ -16,4 +16,15 @@ public class RepositoryDocumentHandler extends DocumentHandler {
 		return collection.count(clause) == 1 ? true : false;
 	}
 	
+	public Document findOnlyContributors(String id) {
+		Document projection = new Document("contributors", 1);
+		return findById(id, projection);
+	}
+
+	public void updateOnlyContributors(Document doc) {
+		Document clause = new Document("_id", doc.get("_id"));
+		Document newDoc = new Document("$set", new Document("contributors", doc.get("contributors")));
+		collection.updateOne(clause, newDoc);
+	}
+	
 }

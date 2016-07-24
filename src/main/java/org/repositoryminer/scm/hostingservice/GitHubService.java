@@ -4,13 +4,18 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.egit.github.core.Contributor;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.RepositoryId;
+import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.client.GitHubClient;
+import org.eclipse.egit.github.core.service.CollaboratorService;
 import org.eclipse.egit.github.core.service.IssueService;
 import org.eclipse.egit.github.core.service.MilestoneService;
+import org.eclipse.egit.github.core.service.RepositoryService;
+import org.repositoryminer.persistence.model.ContributorDB;
 import org.repositoryminer.persistence.model.IssueDB;
 import org.repositoryminer.persistence.model.LabelDB;
 import org.repositoryminer.persistence.model.MilestoneDB;
@@ -20,12 +25,16 @@ public class GitHubService implements HostingService {
 	private IssueService issueServ;
 	private MilestoneService milestoneServ;
 	private RepositoryId repositoryId;
+	private CollaboratorService collaboratorServ;
+	private RepositoryService repoServ;
 
 	// Initializes repository and needed services.
 	private void init(String name, String owner, GitHubClient client) {
 		repositoryId = new RepositoryId(owner, name);
 		issueServ = new IssueService(client);
 		milestoneServ = new MilestoneService(client);
+		collaboratorServ = new CollaboratorService(client);
+		repoServ = new RepositoryService(client);
 	}
 
 	@Override
@@ -102,6 +111,31 @@ public class GitHubService implements HostingService {
 		}
 
 		return milesDB;
+	}
+
+	@Override
+	public List<ContributorDB> getAllContributors() {
+		List<ContributorDB> contributors = new ArrayList<ContributorDB>();
+
+		try {
+			for (Contributor contributor : repoServ.getContributors(repositoryId, true)) {
+				contributors.add(new ContributorDB(contributor.getName(), contributor.getLogin(),
+						contributor.getAvatarUrl(), false));
+			}
+
+			for (User user : collaboratorServ.getCollaborators(repositoryId)) {
+				for (ContributorDB contributor : contributors) {
+					if (contributor.getLogin().equals(user.getLogin())) {
+						contributor.setCollaborator(true);
+						contributor.setEmail(user.getEmail());
+					}
+				}
+			}
+
+			return contributors;
+		} catch (IOException e) {
+			return contributors;
+		}
 	}
 
 }

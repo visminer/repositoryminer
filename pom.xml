@@ -13,6 +13,14 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 	</properties>
 
+	<repositories>
+		<repository>
+			<id>egit</id>
+			<name>Eclipse GitHUB API</name>
+			<url>https://repo.eclipse.org/content/repositories/egit-releases</url>
+		</repository>
+	</repositories>
+
 	<dependencies>
 
 		<dependency>
@@ -36,7 +44,7 @@
 		<dependency>
 			<groupId>org.eclipse.mylyn.github</groupId>
 			<artifactId>org.eclipse.egit.github.core</artifactId>
-			<version>2.1.5</version>
+			<version>4.4.0.201606070830-r</version>
 		</dependency>
 
 		<dependency>
