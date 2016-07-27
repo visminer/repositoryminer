@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.bson.Document;
+import org.repositoryminer.listener.IProgressListener;
 import org.repositoryminer.persistence.handler.CommitDocumentHandler;
 import org.repositoryminer.persistence.handler.ReferenceDocumentHandler;
 import org.repositoryminer.persistence.handler.RepositoryDocumentHandler;
@@ -22,51 +23,55 @@ import org.repositoryminer.utility.StringUtils;
 
 public class MiningProcessor {
 
-	private static void calculateMeasures(RepositoryMiner repoMiner, List<CommitDB> commits, List<ReferenceDB> scmRefs,
-			List<ReferenceDB> timeRefs, SCM scm, String repoId, String repoPath) throws UnsupportedEncodingException {
-		
-		boolean commitMetrics = (repoMiner.getCommitMetrics() != null && repoMiner.getCommitMetrics().size() > 0) ? true : false;
-		boolean commitTechnicalDebts = (repoMiner.getTechnicalDebts() != null
-				&& repoMiner.getTechnicalDebts().size() > 0) ? true : false;
-		boolean commitCodeSmells = (repoMiner.getCommitCodeSmells() != null
-				&& repoMiner.getCommitCodeSmells().size() > 0) ? true : false;
-		boolean tagCodeSmells = (repoMiner.getTagCodeSmells() != null && repoMiner.getTagCodeSmells().size() > 0) ? true
-				: false;
+	public MiningProcessor() {
+	}
+
+	private void calculateAndDetect(RepositoryMiner repositoryMiner, List<CommitDB> commits, List<ReferenceDB> scmRefs, List<ReferenceDB> timeRefs,
+			SCM scm, String repoId, String repoPath) throws UnsupportedEncodingException {
+
+		boolean commitMetrics = (repositoryMiner.getCommitMetrics() != null
+				&& repositoryMiner.getCommitMetrics().size() > 0);
+		boolean commitTechnicalDebts = (repositoryMiner.getTechnicalDebts() != null
+				&& repositoryMiner.getTechnicalDebts().size() > 0);
+		boolean commitCodeSmells = (repositoryMiner.getCommitCodeSmells() != null
+				&& repositoryMiner.getCommitCodeSmells().size() > 0);
+		boolean tagCodeSmells = (repositoryMiner.getTagCodeSmells() != null
+				&& repositoryMiner.getTagCodeSmells().size() > 0);
 
 		if (!commitCodeSmells && !commitMetrics && !commitTechnicalDebts && !tagCodeSmells) {
 			return;
 		}
-		
+
 		List<ReferenceDB> tags = null;
 		if (tagCodeSmells) {
 			tags = new ArrayList<ReferenceDB>();
-			 for (ReferenceDB ref : scmRefs) {
-				 tags.add(ref);
-			 }
-			 for (ReferenceDB ref : timeRefs) {
-				 tags.add(ref);
-			 }
+			for (ReferenceDB ref : scmRefs) {
+				tags.add(ref);
+			}
+			for (ReferenceDB ref : timeRefs) {
+				tags.add(ref);
+			}
 		}
 
-		SourceAnalyzer sourceAnalyzer = new SourceAnalyzer(repoMiner, scm, repoId, repoPath);
+		SourceAnalyzer sourceAnalyzer = new SourceAnalyzer(repositoryMiner, scm, repoId, repoPath);
 		sourceAnalyzer.setCommitCodeSmells(commitCodeSmells);
 		sourceAnalyzer.setCommitMetrics(commitMetrics);
 		sourceAnalyzer.setCommits(commits);
 		sourceAnalyzer.setCommitTechnicalDebts(commitTechnicalDebts);
 		sourceAnalyzer.setTagCodeSmells(tagCodeSmells);
 		sourceAnalyzer.setTags(tags);
-		
+
 		sourceAnalyzer.analyze();
 	}
 
-	public static void mine(RepositoryMiner repository) throws UnsupportedEncodingException {
-		SCM scm = SCMFactory.getSCM(repository.getScm());
-		scm.open(repository.getPath(), repository.getBinaryThreshold());
+	public void mine(RepositoryMiner repositoryMiner) throws UnsupportedEncodingException {
+		SCM scm = SCMFactory.getSCM(repositoryMiner.getScm());
+		scm.open(repositoryMiner.getPath(), repositoryMiner.getBinaryThreshold());
 
 		String absPath = scm.getAbsolutePath();
 		String id = StringUtils.encodeToSHA1(absPath);
 
-		RepositoryDB r = new RepositoryDB(repository);
+		RepositoryDB r = new RepositoryDB(repositoryMiner);
 		r.setId(id);
 		r.setPath(absPath);
 
@@ -86,7 +91,14 @@ public class MiningProcessor {
 		List<CommitDB> commits = scm.getCommits();
 		List<Document> docs = new ArrayList<Document>();
 
+		IProgressListener progressListener = repositoryMiner.getProgressListener();
+		
+		int idx = 0;
 		for (CommitDB c : commits) {
+			if (progressListener != null) {
+				progressListener.commitsProgressChange(++idx, commits.size());
+			}
+
 			docs.add(c.toDocument());
 			contributors.add(c.getCommitter());
 			wd.setId(c.getId());
@@ -95,15 +107,19 @@ public class MiningProcessor {
 		}
 
 		commitHandler.insertMany(docs);
-		
+
 		List<ReferenceDB> timeRefs = new ArrayList<ReferenceDB>();
-		if (repository.getTimeFrames() != null) {
+		if (repositoryMiner.getTimeFrames() != null) {
+			if (progressListener != null) {
+				progressListener.initTimeFramesProcessingProgress();
+			}
+
 			ProcessTimeFrames procTimeFrames = new ProcessTimeFrames(absPath, id);
-			timeRefs = procTimeFrames.analyzeCommits(commits, repository.getTimeFrames());
+			timeRefs = procTimeFrames.analyzeCommits(commits, repositoryMiner.getTimeFrames(), progressListener);
 		}
 
-		calculateMeasures(repository, commits, refs, timeRefs, scm, id, absPath);
-		
+		calculateAndDetect(repositoryMiner, commits, refs, timeRefs, scm, id, absPath);
+
 		RepositoryDocumentHandler repoHandler = new RepositoryDocumentHandler();
 		r.setContributors(new ArrayList<ContributorDB>(contributors));
 		repoHandler.insert(r.toDocument());

@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.repositoryminer.codesmell.commit.ICommitCodeSmell;
 import org.repositoryminer.codesmell.tag.ITagCodeSmell;
+import org.repositoryminer.listener.IProgressListener;
 import org.repositoryminer.metric.ICommitMetric;
 import org.repositoryminer.parser.Parser;
 import org.repositoryminer.scm.SCMType;
@@ -19,222 +20,207 @@ public class RepositoryMiner {
 	private SCMType scm;
 	private String charset = "UTF-8";
 	private int binaryThreshold = 2048;
+	
 	private List<Parser> parsers;
 	private List<ICommitMetric> commitMetrics;
 	private List<ICommitCodeSmell> commitCodeSmells;
 	private List<ITechnicalDebt> technicalDebts;
 	private List<TimeFrameType> timeFrames;
 	private List<ITagCodeSmell> tagCodeSmells;
-
+	
+	private IProgressListener progressListener;
+	
 	// TODO : To implement
 	// private boolean allowTextFiles;
 	// private List<String> allowedExtensions;
 
-	public void mine() throws UnsupportedEncodingException {
-		MiningProcessor.mine(this);
-	}
-
-	public RepositoryMiner() {
-	}
-
+	public RepositoryMiner() {}
+	
 	public RepositoryMiner(String path, String name, String description, SCMType scm) {
 		super();
+		
 		this.path = path;
 		this.name = name;
 		this.description = description;
 		this.scm = scm;
 	}
-
-	public void setParsers(Parser... parsers) {
+	
+	public RepositoryMiner setParsers(Parser... parsers) {
 		this.parsers = Arrays.asList(parsers);
+		
+		return this;
 	}
 
-	public void setCommitMetrics(ICommitMetric... commitMetrics) {
+	public RepositoryMiner setCommitMetrics(ICommitMetric... commitMetrics) {
 		this.commitMetrics = Arrays.asList(commitMetrics);
+		
+		return this;
 	}
 
-	public void setCommitCodeSmells(ICommitCodeSmell... commitCodeSmells) {
+	public RepositoryMiner setCommitCodeSmells(ICommitCodeSmell... commitCodeSmells) {
 		this.commitCodeSmells = Arrays.asList(commitCodeSmells);
+		
+		return this;
 	}
 
-	public void setTechnicalDebts(ITechnicalDebt... technicalDebts) {
+	public RepositoryMiner setTechnicalDebts(ITechnicalDebt... technicalDebts) {
 		this.technicalDebts = Arrays.asList(technicalDebts);
+		
+		return this;
 	}
 
-	public void setTimeFrames(TimeFrameType... timeFrames) {
+	public RepositoryMiner setTimeFrames(TimeFrameType... timeFrames) {
 		this.timeFrames = Arrays.asList(timeFrames);
+		
+		return this;
 	}
 
-	public void setTagCodeSmells(ITagCodeSmell tagCodeSmells) {
+	public RepositoryMiner setTagCodeSmells(ITagCodeSmell... tagCodeSmells) {
 		this.tagCodeSmells = Arrays.asList(tagCodeSmells);
+		
+		return this;
 	}
 
-	/**
-	 * @return the path
-	 */
 	public String getPath() {
 		return path;
 	}
 
-	/**
-	 * @param path the path to set
-	 */
-	public void setPath(String path) {
+	public RepositoryMiner setPath(String path) {
 		this.path = path;
+		
+		return this;
 	}
 
-	/**
-	 * @return the name
-	 */
 	public String getName() {
 		return name;
 	}
 
-	/**
-	 * @param name the name to set
-	 */
-	public void setName(String name) {
+	public RepositoryMiner setName(String name) {
 		this.name = name;
+		
+		return this;
 	}
 
-	/**
-	 * @return the description
-	 */
 	public String getDescription() {
 		return description;
 	}
 
-	/**
-	 * @param description the description to set
-	 */
-	public void setDescription(String description) {
+	public RepositoryMiner setDescription(String description) {
 		this.description = description;
+		
+		return this;
 	}
 
-	/**
-	 * @return the scm
-	 */
 	public SCMType getScm() {
 		return scm;
 	}
 
-	/**
-	 * @param scm the scm to set
-	 */
-	public void setScm(SCMType scm) {
+	public RepositoryMiner setScm(SCMType scm) {
 		this.scm = scm;
+		
+		return this;
 	}
 
-	/**
-	 * @return the charset
-	 */
 	public String getCharset() {
 		return charset;
 	}
 
-	/**
-	 * @param charset the charset to set
-	 */
-	public void setCharset(String charset) {
+	public RepositoryMiner setCharset(String charset) {
 		this.charset = charset;
+		
+		return this;
 	}
 
-	/**
-	 * @return the binaryThreshold
-	 */
 	public int getBinaryThreshold() {
 		return binaryThreshold;
 	}
 
-	/**
-	 * @param binaryThreshold the binaryThreshold to set
-	 */
-	public void setBinaryThreshold(int binaryThreshold) {
+	public RepositoryMiner setBinaryThreshold(int binaryThreshold) {
 		this.binaryThreshold = binaryThreshold;
+		
+		return this;
 	}
 
-	/**
-	 * @return the parsers
-	 */
 	public List<Parser> getParsers() {
 		return parsers;
 	}
 
-	/**
-	 * @param parsers the parsers to set
-	 */
-	public void setParsers(List<Parser> parsers) {
+	public RepositoryMiner setParsers(List<Parser> parsers) {
 		this.parsers = parsers;
+		
+		return this;
 	}
 
-	/**
-	 * @return the commitMetrics
-	 */
 	public List<ICommitMetric> getCommitMetrics() {
 		return commitMetrics;
 	}
 
-	/**
-	 * @param commitMetrics the commitMetrics to set
-	 */
-	public void setCommitMetrics(List<ICommitMetric> commitMetrics) {
+	public RepositoryMiner setCommitMetrics(List<ICommitMetric> commitMetrics) {
 		this.commitMetrics = commitMetrics;
+		
+		return this;
 	}
 
-	/**
-	 * @return the commitCodeSmells
-	 */
 	public List<ICommitCodeSmell> getCommitCodeSmells() {
 		return commitCodeSmells;
 	}
 
-	/**
-	 * @param commitCodeSmells the commitCodeSmells to set
-	 */
-	public void setCommitCodeSmells(List<ICommitCodeSmell> commitCodeSmells) {
+	public RepositoryMiner setCommitCodeSmells(List<ICommitCodeSmell> commitCodeSmells) {
 		this.commitCodeSmells = commitCodeSmells;
+		
+		return this;
 	}
 
-	/**
-	 * @return the technicalDebts
-	 */
 	public List<ITechnicalDebt> getTechnicalDebts() {
 		return technicalDebts;
 	}
 
-	/**
-	 * @param technicalDebts the technicalDebts to set
-	 */
-	public void setTechnicalDebts(List<ITechnicalDebt> technicalDebts) {
+	public RepositoryMiner setTechnicalDebts(List<ITechnicalDebt> technicalDebts) {
 		this.technicalDebts = technicalDebts;
+		
+		return this;
 	}
 
-	/**
-	 * @return the timeFrames
-	 */
 	public List<TimeFrameType> getTimeFrames() {
 		return timeFrames;
 	}
 
-	/**
-	 * @param timeFrames the timeFrames to set
-	 */
-	public void setTimeFrames(List<TimeFrameType> timeFrames) {
+	public RepositoryMiner setTimeFrames(List<TimeFrameType> timeFrames) {
 		this.timeFrames = timeFrames;
+		
+		return this;
 	}
 
-	/**
-	 * @return the tagCodeSmells
-	 */
 	public List<ITagCodeSmell> getTagCodeSmells() {
 		return tagCodeSmells;
 	}
 
-	/**
-	 * @param tagCodeSmells the tagCodeSmells to set
-	 */
-	public void setTagCodeSmells(List<ITagCodeSmell> tagCodeSmells) {
+	public RepositoryMiner setTagCodeSmells(List<ITagCodeSmell> tagCodeSmells) {
 		this.tagCodeSmells = tagCodeSmells;
+		
+		return this;
+	}
+	
+	public RepositoryMiner setProgressListener(IProgressListener progressListener) {
+		this.progressListener = progressListener;
+		
+		return this;
+	}
+	
+	public IProgressListener getProgressListener() {
+		return progressListener;
+	}
+	
+	public void mine() throws UnsupportedEncodingException {
+		MiningProcessor processor = new MiningProcessor();
+		
+		if (progressListener != null) {
+			progressListener.initMining(name);
+			processor.mine(this);
+			progressListener.endOfMining();
+		} else {
+			processor.mine(this);
+		}
 	}
 
 }
