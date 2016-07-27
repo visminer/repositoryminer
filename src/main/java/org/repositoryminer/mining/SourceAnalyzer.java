@@ -9,6 +9,7 @@ import org.repositoryminer.ast.AST;
 import org.repositoryminer.ast.AbstractTypeDeclaration;
 import org.repositoryminer.codesmell.commit.ICommitCodeSmell;
 import org.repositoryminer.codesmell.tag.ITagCodeSmell;
+import org.repositoryminer.listener.IProgressListener;
 import org.repositoryminer.metric.ICommitMetric;
 import org.repositoryminer.parser.Parser;
 import org.repositoryminer.persistence.handler.CommitAnalysisDocumentHandler;
@@ -23,7 +24,7 @@ import org.repositoryminer.utility.StringUtils;
 public class SourceAnalyzer {
 
 	private SCM scm;
-	private RepositoryMiner repository;
+	private RepositoryMiner repositoryMiner;
 	private List<Parser> parsers;
 	private String repositoryId;
 	private String repositoryPath;
@@ -37,23 +38,30 @@ public class SourceAnalyzer {
 	private List<CommitDB> commits;
 	private List<ReferenceDB> tags;
 
-	private Parser parser = null;
+	private Parser parser;
+	private IProgressListener progressListener; 
 	
-	public SourceAnalyzer(RepositoryMiner repository, SCM scm, String repositoryId, String repositoryPath) {
+	public SourceAnalyzer(RepositoryMiner repositoryMiner, SCM scm, String repositoryId, String repositoryPath) {
 		this.scm = scm;
-		this.repository = repository;
+		this.repositoryMiner = repositoryMiner;
 		this.repositoryId = repositoryId;
 		this.repositoryPath = repositoryPath;
 		this.persistenceCommit = new CommitAnalysisDocumentHandler();
 		this.persistenceTag = new TagAnalysisDocumentHandler();
-		this.parsers = repository.getParsers();
+		this.parsers = repositoryMiner.getParsers();
 		
-		for (Parser parser : repository.getParsers()) {
-			parser.setCharSet(repository.getCharset());
+		for (Parser parser : repositoryMiner.getParsers()) {
+			parser.setCharSet(repositoryMiner.getCharset());
 		}
 	}
 
 	public void analyze() throws UnsupportedEncodingException {
+		progressListener = repositoryMiner.getProgressListener();
+		
+		if (progressListener != null) {
+			progressListener.initSourceAnalysisProcessingProgress();
+		}
+		
 		if (commitCodeSmells || commitMetrics || commitTechnicalDebts) {
 			analyzeCommits();
 		}
@@ -64,11 +72,16 @@ public class SourceAnalyzer {
 	}
 
 	private void analyzeTags() {
+		int idx = 0;
 		for (ReferenceDB tag : tags) {
+			if (progressListener != null) {
+				progressListener.tagsProgressChange(++idx, tags.size());
+			}
+
 			String commitId = tag.getCommits().get(0);
 			scm.checkout(commitId);
 			
-			for (Parser parser : repository.getParsers()) {
+			for (Parser parser : repositoryMiner.getParsers()) {
 				parser.processSourceFolders(repositoryPath);
 			}
 			
@@ -81,10 +94,15 @@ public class SourceAnalyzer {
 	}
 
 	private void analyzeCommits() throws UnsupportedEncodingException {
+		int idx = 0;
 		for (CommitDB commit : commits) {
+			if (progressListener != null) {
+				progressListener.commitsProgressChange(++idx, commits.size());
+			}
+			
 			scm.checkout(commit.getId());
 
-			for (Parser parser : repository.getParsers()) {
+			for (Parser parser : repositoryMiner.getParsers()) {
 				parser.processSourceFolders(repositoryPath);
 			}
 			
@@ -117,7 +135,7 @@ public class SourceAnalyzer {
 			return;
 		}
 
-		String source = new String(data, repository.getCharset());
+		String source = new String(data, repositoryMiner.getCharset());
 		AST ast = parser.generate(file, source);
 		processCommit(commit, file, fileHash, ast);
 	}
@@ -137,7 +155,7 @@ public class SourceAnalyzer {
 	private void processTagCodeSmells(Document tagDoc) {
 		if (tagCodeSmells) {
 			List<Document> codeSmellsDocs = new ArrayList<Document>();
-			for (ITagCodeSmell codeSmell : repository.getTagCodeSmells()) {
+			for (ITagCodeSmell codeSmell : repositoryMiner.getTagCodeSmells()) {
 				Document doc = new Document();
 				codeSmell.detect(parsers, repositoryPath, doc);
 				codeSmellsDocs.add(doc);
@@ -177,7 +195,7 @@ public class SourceAnalyzer {
 	private void processCommitMetrics(AST ast, AbstractTypeDeclaration type, Document typeDoc) {
 		if (commitMetrics) {
 			List<Document> metricsDoc = new ArrayList<Document>();
-			for (ICommitMetric metric : repository.getCommitMetrics()) {
+			for (ICommitMetric metric : repositoryMiner.getCommitMetrics()) {
 				Document mDoc = new Document();
 				metric.calculate(type, ast, mDoc);
 				metricsDoc.add(mDoc);
@@ -188,7 +206,7 @@ public class SourceAnalyzer {
 
 	private void processCommitCodeSmells(List<Document> codeSmellsDocs, AST ast, AbstractTypeDeclaration type, Document typeDoc) {
 		if (commitCodeSmells) {
-			for (ICommitCodeSmell codeSmell : repository.getCommitCodeSmells()) {
+			for (ICommitCodeSmell codeSmell : repositoryMiner.getCommitCodeSmells()) {
 				Document doc = new Document();
 				codeSmell.detect(type, ast, doc);
 				codeSmellsDocs.add(doc);
@@ -202,7 +220,7 @@ public class SourceAnalyzer {
 			Document typeDoc) {
 		if (commitTechnicalDebts) {
 			List<Document> technicalDebtsDoc = new ArrayList<Document>();
-			for (ITechnicalDebt td : repository.getTechnicalDebts()) {
+			for (ITechnicalDebt td : repositoryMiner.getTechnicalDebts()) {
 				Document tdDoc = new Document();
 				td.detect(type, ast, codeSmellsDoc, tdDoc);
 				technicalDebtsDoc.add(tdDoc);

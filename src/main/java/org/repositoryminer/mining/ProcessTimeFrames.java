@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.bson.Document;
+import org.repositoryminer.listener.IProgressListener;
 import org.repositoryminer.persistence.handler.ReferenceDocumentHandler;
 import org.repositoryminer.persistence.model.CommitDB;
 import org.repositoryminer.persistence.model.ReferenceDB;
@@ -28,7 +29,7 @@ public class ProcessTimeFrames {
 		this.repositoryId = repositoryId;
 	}
 
-	public List<ReferenceDB> analyzeCommits(List<CommitDB> commits, List<TimeFrameType> timeFrames) {
+	public List<ReferenceDB> analyzeCommits(List<CommitDB> commits, List<TimeFrameType> timeFrames, IProgressListener progressListener) {
 		boolean monthFrame = false;
 		boolean trimesterFrame = false;
 		boolean semesterFrame = false;
@@ -51,7 +52,12 @@ public class ProcessTimeFrames {
 			}
 		}
 
+		int idx = 0;
 		for (CommitDB c : commits) {
+			if (progressListener != null) {
+				progressListener.commitsProgressChange(++idx, commits.size());
+			}
+			
 			Calendar calendar = Calendar.getInstance();
 			calendar.setTime(c.getCommitDate());
 
@@ -71,7 +77,12 @@ public class ProcessTimeFrames {
 
 		List<Document> docs = new ArrayList<Document>();
 		List<ReferenceDB> timeRefs = new ArrayList<ReferenceDB>(refs.values());
+		idx = 0;
 		for (ReferenceDB r : timeRefs) {
+			if (progressListener != null) {
+				progressListener.timeFramesProgressChange(++idx, timeRefs.size());
+			}
+			
 			Collections.reverse(r.getCommits());
 			docs.add(r.toDocument());
 		}
