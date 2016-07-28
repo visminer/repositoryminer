@@ -12,6 +12,42 @@ import org.repositoryminer.parser.Parser;
 import org.repositoryminer.scm.SCMType;
 import org.repositoryminer.technicaldebt.ITechnicalDebt;
 
+/**
+ * <h1>A facade for the repository miner API</h1>
+ * <p>
+ * This is the entry point to configure the parameters that enable the mining of
+ * software projects. We can divide the parameters (attributes) into two sets:
+ * <p>
+ * <ul>
+ * <li>Mandatory parameters -> project's path, project's name, project's
+ * description, {@link org.repositoryminer.scm.SCMType} and others
+ * <li>Optional parameters -> lists of metrics (to be calculated), list of
+ * codesmells (to be detected) and others
+ * </ul>
+ * <p>
+ * Prior to activating the mining ({@link #mine()}) it must be attributed
+ * instances to needed parameters. The responsibility for creating such
+ * instances lies with caller applications. In this case, it is mandatory that
+ * callers make sure that necessary resources are present/provided, <i>e.g.</i>,
+ * the .git directory if a GIT project is intended to be mined. RepositoryMiner
+ * does <b>NOT</b> perform any checking on the parameters before mining
+ * projects.
+ * <p>
+ * It may be important to provide an instance of
+ * {@link org.repositoryminer.listener.IProgressListener} so that callers will
+ * be notified about the progress of the mining. The
+ * {@link #setProgressListener(IProgressListener)} method can be used to inject
+ * a listener.
+ * <p>
+ * Raised exceptions are:
+ * <p>
+ * <ul>
+ * <li>UnsupportedEncodingException, if a unknown text encoding is found in
+ * analyzed source-code artifact.
+ * </ul>
+ * It is up to the caller ignore raised exceptions and skip to next mining step
+ * <p>
+ */
 public class RepositoryMiner {
 
 	private String path;
@@ -20,64 +56,107 @@ public class RepositoryMiner {
 	private SCMType scm;
 	private String charset = "UTF-8";
 	private int binaryThreshold = 2048;
-	
+
 	private List<Parser> parsers;
 	private List<ICommitMetric> commitMetrics;
 	private List<ICommitCodeSmell> commitCodeSmells;
 	private List<ITechnicalDebt> technicalDebts;
 	private List<TimeFrameType> timeFrames;
 	private List<ITagCodeSmell> tagCodeSmells;
-	
-	private IProgressListener progressListener;
-	
-	// TODO : To implement
-	// private boolean allowTextFiles;
-	// private List<String> allowedExtensions;
 
-	public RepositoryMiner() {}
-	
+	private IProgressListener progressListener;
+
+	/**
+	 * Use this void constructor if parameters are going to be set later
+	 * <p>
+	 * Otherwise, the non-void constructor (
+	 * {@link #RepositoryMiner(String, String, String, SCMType)}) can be used if
+	 * mandatory parameters are known
+	 */
+	public RepositoryMiner() {
+	}
+
+	/**
+	 * Use this non-void constructor if mandatory parameters are known
+	 * <p>
+	 * Otherwise, the void constructor ({@link #RepositoryMiner()} can be used
+	 * if mandatory parameters are not known
+	 * 
+	 * @param path
+	 *            path to versioned project to be mined
+	 * @param name
+	 *            user-friendly name of the project
+	 * @param description
+	 *            extra descriptive information about the project
+	 * @param scm
+	 *            the SCM type ({@link org.repositoryminer.scm.SCMType}) of the
+	 *            mined project
+	 */
 	public RepositoryMiner(String path, String name, String description, SCMType scm) {
 		super();
-		
+
 		this.path = path;
 		this.name = name;
 		this.description = description;
 		this.scm = scm;
 	}
-	
+
+	/**
+	 * It activates the mining of a project
+	 * <p>
+	 * One must make sure that all needed parameters are set prior to calling
+	 * this method
+	 * <p>
+	 * 
+	 * @throws UnsupportedEncodingException
+	 *             raised if an unsupported encoding is found in a mined code
+	 *             artifact.
+	 */
+	public void mine() throws UnsupportedEncodingException {
+		MiningProcessor processor = new MiningProcessor();
+
+		if (progressListener != null) {
+			progressListener.initMining(name);
+			processor.mine(this);
+			progressListener.endOfMining();
+		} else {
+			processor.mine(this);
+		}
+	}
+
 	public RepositoryMiner setParsers(Parser... parsers) {
 		this.parsers = Arrays.asList(parsers);
-		
+
 		return this;
 	}
 
 	public RepositoryMiner setCommitMetrics(ICommitMetric... commitMetrics) {
 		this.commitMetrics = Arrays.asList(commitMetrics);
-		
+
 		return this;
 	}
 
 	public RepositoryMiner setCommitCodeSmells(ICommitCodeSmell... commitCodeSmells) {
 		this.commitCodeSmells = Arrays.asList(commitCodeSmells);
-		
+
 		return this;
 	}
 
 	public RepositoryMiner setTechnicalDebts(ITechnicalDebt... technicalDebts) {
 		this.technicalDebts = Arrays.asList(technicalDebts);
-		
+
 		return this;
 	}
 
 	public RepositoryMiner setTimeFrames(TimeFrameType... timeFrames) {
 		this.timeFrames = Arrays.asList(timeFrames);
-		
+
 		return this;
 	}
 
 	public RepositoryMiner setTagCodeSmells(ITagCodeSmell... tagCodeSmells) {
 		this.tagCodeSmells = Arrays.asList(tagCodeSmells);
-		
+
 		return this;
 	}
 
@@ -87,7 +166,7 @@ public class RepositoryMiner {
 
 	public RepositoryMiner setPath(String path) {
 		this.path = path;
-		
+
 		return this;
 	}
 
@@ -97,7 +176,7 @@ public class RepositoryMiner {
 
 	public RepositoryMiner setName(String name) {
 		this.name = name;
-		
+
 		return this;
 	}
 
@@ -107,7 +186,7 @@ public class RepositoryMiner {
 
 	public RepositoryMiner setDescription(String description) {
 		this.description = description;
-		
+
 		return this;
 	}
 
@@ -117,7 +196,7 @@ public class RepositoryMiner {
 
 	public RepositoryMiner setScm(SCMType scm) {
 		this.scm = scm;
-		
+
 		return this;
 	}
 
@@ -127,7 +206,7 @@ public class RepositoryMiner {
 
 	public RepositoryMiner setCharset(String charset) {
 		this.charset = charset;
-		
+
 		return this;
 	}
 
@@ -137,7 +216,7 @@ public class RepositoryMiner {
 
 	public RepositoryMiner setBinaryThreshold(int binaryThreshold) {
 		this.binaryThreshold = binaryThreshold;
-		
+
 		return this;
 	}
 
@@ -147,7 +226,7 @@ public class RepositoryMiner {
 
 	public RepositoryMiner setParsers(List<Parser> parsers) {
 		this.parsers = parsers;
-		
+
 		return this;
 	}
 
@@ -157,7 +236,7 @@ public class RepositoryMiner {
 
 	public RepositoryMiner setCommitMetrics(List<ICommitMetric> commitMetrics) {
 		this.commitMetrics = commitMetrics;
-		
+
 		return this;
 	}
 
@@ -167,7 +246,7 @@ public class RepositoryMiner {
 
 	public RepositoryMiner setCommitCodeSmells(List<ICommitCodeSmell> commitCodeSmells) {
 		this.commitCodeSmells = commitCodeSmells;
-		
+
 		return this;
 	}
 
@@ -177,7 +256,7 @@ public class RepositoryMiner {
 
 	public RepositoryMiner setTechnicalDebts(List<ITechnicalDebt> technicalDebts) {
 		this.technicalDebts = technicalDebts;
-		
+
 		return this;
 	}
 
@@ -187,7 +266,7 @@ public class RepositoryMiner {
 
 	public RepositoryMiner setTimeFrames(List<TimeFrameType> timeFrames) {
 		this.timeFrames = timeFrames;
-		
+
 		return this;
 	}
 
@@ -197,30 +276,18 @@ public class RepositoryMiner {
 
 	public RepositoryMiner setTagCodeSmells(List<ITagCodeSmell> tagCodeSmells) {
 		this.tagCodeSmells = tagCodeSmells;
-		
+
 		return this;
 	}
-	
+
 	public RepositoryMiner setProgressListener(IProgressListener progressListener) {
 		this.progressListener = progressListener;
-		
+
 		return this;
 	}
-	
+
 	public IProgressListener getProgressListener() {
 		return progressListener;
-	}
-	
-	public void mine() throws UnsupportedEncodingException {
-		MiningProcessor processor = new MiningProcessor();
-		
-		if (progressListener != null) {
-			progressListener.initMining(name);
-			processor.mine(this);
-			progressListener.endOfMining();
-		} else {
-			processor.mine(this);
-		}
 	}
 
 }

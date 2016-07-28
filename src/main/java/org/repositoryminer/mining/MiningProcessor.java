@@ -21,13 +21,77 @@ import org.repositoryminer.scm.SCM;
 import org.repositoryminer.scm.SCMFactory;
 import org.repositoryminer.utility.StringUtils;
 
+/**
+ * <h1>The actual mining processor behind
+ * {@link org.repositoryminer.mining.RepositoryMiner}</h1>
+ * <p>
+ * MiningProcessor is a second level entry for the mining API. Direct calls to
+ * instances of this class can be made, but we encourage the use of our main
+ * facade, {@link org.repositoryminer.mining.RepositoryMiner}, provided it has
+ * all the necessary parameters to get the mining process started.
+ * <p>
+ * It is very important that the injected instance of
+ * {@link org.repositoryminer.mining.RepositoryMiner} has all of the mandatory
+ * parameters set to valid values so that the persistence of the mined
+ * information will be consistent.
+ * <p>
+ * At least, one list of the following entities must be configured to enable the
+ * mining:
+ * <ul>
+ * <li>Metric -> list of metrics to be calculated. It is assumed that the
+ * elements of this list are instances of
+ * {@link org.repositoryminer.metric.ICommitMetric}
+ * <li>Commits Codesmells -> list of commits-oriented smells to be detected.
+ * Each element of this list has to be a sub-type of
+ * {@link org.repositoryminer.codesmell.commit.ICommitCodeSmell}
+ * <li>Tags Codesmells -> list of tag-related smells to be detected. Each
+ * element of this list must be a sub-type of
+ * {@link org.repositoryminer.codesmell.tag.ITagCodeSmell}
+ * <li>Technical debts -> list of technical debts to be detected. All items of
+ * the list must be an instance of any class inherited from
+ * {@link org.repositoryminer.technicaldebt.ITechnicalDebt}
+ * </ul>
+ * At least one of the lists must be populated so to get the mining process
+ * started. The lists are then injected in a instance of
+ * {@link org.repositoryminer.mining.SourceAnalyzer} which is capable of
+ * performing the actual calculations and detections.
+ * <p>
+ * Raised exceptions are:
+ * <p>
+ * <ul>
+ * <li>UnsupportedEncodingException, if a unknown text encoding is found in
+ * analyzed source-code artifact.
+ * </ul>
+ * It is up to the caller ignore raised exceptions and skip to next mining step
+ * <p>
+ */
 public class MiningProcessor {
 
 	public MiningProcessor() {
 	}
 
-	private void calculateAndDetect(RepositoryMiner repositoryMiner, List<CommitDB> commits, List<ReferenceDB> scmRefs, List<ReferenceDB> timeRefs,
-			SCM scm, String repoId, String repoPath) throws UnsupportedEncodingException {
+	/**
+	 * Performs both the calculation (metrics) and detections (smells/debts) on
+	 * the artifacts of a targeted project. An instance of
+	 * {@link org.repositoryminer.mining.SourceAnalyzer} is prepared/configured
+	 * and put into action (
+	 * {@link org.repositoryminer.mining.SourceAnalyzer#analyze()})
+	 * 
+	 * @param repositoryMiner
+	 *            instance of {@link org.repositoryminer.mining.RepositoryMiner}
+	 * @param commits
+	 *            list of all commits from project's repository
+	 * @param scmRefs
+	 * @param timeRefs
+	 * @param scm
+	 * @param repoId
+	 *            hash to uniquely identify the repository
+	 * @param repoPath
+	 *            path to the project being mined
+	 * @throws UnsupportedEncodingException
+	 */
+	private void calculateAndDetect(RepositoryMiner repositoryMiner, List<CommitDB> commits, List<ReferenceDB> scmRefs,
+			List<ReferenceDB> timeRefs, SCM scm, String repoId, String repoPath) throws UnsupportedEncodingException {
 
 		boolean commitMetrics = (repositoryMiner.getCommitMetrics() != null
 				&& repositoryMiner.getCommitMetrics().size() > 0);
@@ -64,6 +128,15 @@ public class MiningProcessor {
 		sourceAnalyzer.analyze();
 	}
 
+	/**
+	 * Starts the mining process
+	 * 
+	 * @param repositoryMiner
+	 *            instance of {@link org.repositoryminer.mining.RepositoryMiner}
+	 *            . It must <b>NEVER<b> be null, since it will provide important
+	 *            parameters for the source-code analysis and persistence
+	 * @throws UnsupportedEncodingException
+	 */
 	public void mine(RepositoryMiner repositoryMiner) throws UnsupportedEncodingException {
 		SCM scm = SCMFactory.getSCM(repositoryMiner.getScm());
 		scm.open(repositoryMiner.getPath(), repositoryMiner.getBinaryThreshold());
@@ -92,7 +165,7 @@ public class MiningProcessor {
 		List<Document> docs = new ArrayList<Document>();
 
 		IProgressListener progressListener = repositoryMiner.getProgressListener();
-		
+
 		int idx = 0;
 		for (CommitDB c : commits) {
 			if (progressListener != null) {
