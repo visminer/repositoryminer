@@ -1,4 +1,4 @@
-package org.repositoryminer.metric;
+package org.repositoryminer.metric.clazz;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +11,7 @@ import org.repositoryminer.ast.MethodDeclaration;
 import org.repositoryminer.ast.AbstractTypeDeclaration;
 import org.repositoryminer.ast.AbstractTypeDeclaration.Archetype;
 
-public abstract class MethodBasedMetricTemplate implements ICommitMetric {
+public abstract class MethodBasedMetricTemplate implements IClassMetric {
 
 	protected List<FieldDeclaration> currentFields = new ArrayList<FieldDeclaration>();
 

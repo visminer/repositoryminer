@@ -1,4 +1,4 @@
-package org.repositoryminer.codesmell.tag;
+package org.repositoryminer.codesmell.project;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,7 +12,7 @@ import java.util.List;
 
 import org.bson.Document;
 import org.repositoryminer.codesmell.CodeSmellId;
-import org.repositoryminer.metric.SLOCMetric;
+import org.repositoryminer.metric.clazz.SLOCMetric;
 import org.repositoryminer.parser.Parser;
 
 import net.sourceforge.pmd.cpd.CPD;
@@ -22,7 +22,7 @@ import net.sourceforge.pmd.cpd.Language;
 import net.sourceforge.pmd.cpd.Mark;
 import net.sourceforge.pmd.cpd.Match;
 
-public class DuplicatedCode implements ITagCodeSmell {
+public class DuplicatedCode implements IProjectCodeSmell {
 
 	private int tokensThreshold = 100;
 	private boolean skipLexicalErrors = true;

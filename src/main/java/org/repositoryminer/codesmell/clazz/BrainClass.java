@@ -1,4 +1,4 @@
-package org.repositoryminer.codesmell.commit;
+package org.repositoryminer.codesmell.clazz;
 
 import org.bson.Document;
 import org.repositoryminer.ast.AST;
@@ -7,11 +7,11 @@ import org.repositoryminer.ast.AbstractTypeDeclaration.Archetype;
 import org.repositoryminer.ast.MethodDeclaration;
 import org.repositoryminer.ast.TypeDeclaration;
 import org.repositoryminer.codesmell.CodeSmellId;
-import org.repositoryminer.metric.SLOCMetric;
-import org.repositoryminer.metric.TCCMetric;
-import org.repositoryminer.metric.WMCMetric;
+import org.repositoryminer.metric.clazz.SLOCMetric;
+import org.repositoryminer.metric.clazz.TCCMetric;
+import org.repositoryminer.metric.clazz.WMCMetric;
 
-public class BrainClass implements ICommitCodeSmell {
+public class BrainClass implements IClassCodeSmell {
 	
 	private int wmcThreshold = 47;
 	private float tccThreshold = 0.5f;

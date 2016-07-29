@@ -4,10 +4,10 @@ import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.List;
 
-import org.repositoryminer.codesmell.commit.ICommitCodeSmell;
-import org.repositoryminer.codesmell.tag.ITagCodeSmell;
+import org.repositoryminer.codesmell.clazz.IClassCodeSmell;
+import org.repositoryminer.codesmell.project.IProjectCodeSmell;
 import org.repositoryminer.listener.IProgressListener;
-import org.repositoryminer.metric.ICommitMetric;
+import org.repositoryminer.metric.clazz.IClassMetric;
 import org.repositoryminer.parser.Parser;
 import org.repositoryminer.scm.SCMType;
 import org.repositoryminer.technicaldebt.ITechnicalDebt;
@@ -58,11 +58,11 @@ public class RepositoryMiner {
 	private int binaryThreshold = 2048;
 
 	private List<Parser> parsers;
-	private List<ICommitMetric> commitMetrics;
-	private List<ICommitCodeSmell> commitCodeSmells;
+	private List<IClassMetric> classMetrics;
+	private List<IClassCodeSmell> classCodeSmells;
 	private List<ITechnicalDebt> technicalDebts;
 	private List<TimeFrameType> timeFrames;
-	private List<ITagCodeSmell> tagCodeSmells;
+	private List<IProjectCodeSmell> projectCodeSmells;
 
 	private IProgressListener progressListener;
 
@@ -94,7 +94,6 @@ public class RepositoryMiner {
 	 */
 	public RepositoryMiner(String path, String name, String description, SCMType scm) {
 		super();
-
 		this.path = path;
 		this.name = name;
 		this.description = description;
@@ -114,7 +113,6 @@ public class RepositoryMiner {
 	 */
 	public void mine() throws UnsupportedEncodingException {
 		MiningProcessor processor = new MiningProcessor();
-
 		if (progressListener != null) {
 			progressListener.initMining(name);
 			processor.mine(this);
@@ -126,37 +124,31 @@ public class RepositoryMiner {
 
 	public RepositoryMiner setParsers(Parser... parsers) {
 		this.parsers = Arrays.asList(parsers);
-
 		return this;
 	}
 
-	public RepositoryMiner setCommitMetrics(ICommitMetric... commitMetrics) {
-		this.commitMetrics = Arrays.asList(commitMetrics);
-
+	public RepositoryMiner setClasstMetrics(IClassMetric... classMetrics) {
+		this.classMetrics = Arrays.asList(classMetrics);
 		return this;
 	}
 
-	public RepositoryMiner setCommitCodeSmells(ICommitCodeSmell... commitCodeSmells) {
-		this.commitCodeSmells = Arrays.asList(commitCodeSmells);
-
+	public RepositoryMiner setClassCodeSmells(IClassCodeSmell... classCodeSmells) {
+		this.classCodeSmells = Arrays.asList(classCodeSmells);
 		return this;
 	}
 
 	public RepositoryMiner setTechnicalDebts(ITechnicalDebt... technicalDebts) {
 		this.technicalDebts = Arrays.asList(technicalDebts);
-
 		return this;
 	}
 
 	public RepositoryMiner setTimeFrames(TimeFrameType... timeFrames) {
 		this.timeFrames = Arrays.asList(timeFrames);
-
 		return this;
 	}
 
-	public RepositoryMiner setTagCodeSmells(ITagCodeSmell... tagCodeSmells) {
-		this.tagCodeSmells = Arrays.asList(tagCodeSmells);
-
+	public RepositoryMiner setProjectCodeSmells(IProjectCodeSmell... projectCodeSmells) {
+		this.projectCodeSmells = Arrays.asList(projectCodeSmells);
 		return this;
 	}
 
@@ -166,7 +158,6 @@ public class RepositoryMiner {
 
 	public RepositoryMiner setPath(String path) {
 		this.path = path;
-
 		return this;
 	}
 
@@ -176,7 +167,6 @@ public class RepositoryMiner {
 
 	public RepositoryMiner setName(String name) {
 		this.name = name;
-
 		return this;
 	}
 
@@ -186,7 +176,6 @@ public class RepositoryMiner {
 
 	public RepositoryMiner setDescription(String description) {
 		this.description = description;
-
 		return this;
 	}
 
@@ -196,7 +185,6 @@ public class RepositoryMiner {
 
 	public RepositoryMiner setScm(SCMType scm) {
 		this.scm = scm;
-
 		return this;
 	}
 
@@ -206,7 +194,6 @@ public class RepositoryMiner {
 
 	public RepositoryMiner setCharset(String charset) {
 		this.charset = charset;
-
 		return this;
 	}
 
@@ -216,7 +203,6 @@ public class RepositoryMiner {
 
 	public RepositoryMiner setBinaryThreshold(int binaryThreshold) {
 		this.binaryThreshold = binaryThreshold;
-
 		return this;
 	}
 
@@ -226,37 +212,6 @@ public class RepositoryMiner {
 
 	public RepositoryMiner setParsers(List<Parser> parsers) {
 		this.parsers = parsers;
-
-		return this;
-	}
-
-	public List<ICommitMetric> getCommitMetrics() {
-		return commitMetrics;
-	}
-
-	public RepositoryMiner setCommitMetrics(List<ICommitMetric> commitMetrics) {
-		this.commitMetrics = commitMetrics;
-
-		return this;
-	}
-
-	public List<ICommitCodeSmell> getCommitCodeSmells() {
-		return commitCodeSmells;
-	}
-
-	public RepositoryMiner setCommitCodeSmells(List<ICommitCodeSmell> commitCodeSmells) {
-		this.commitCodeSmells = commitCodeSmells;
-
-		return this;
-	}
-
-	public List<ITechnicalDebt> getTechnicalDebts() {
-		return technicalDebts;
-	}
-
-	public RepositoryMiner setTechnicalDebts(List<ITechnicalDebt> technicalDebts) {
-		this.technicalDebts = technicalDebts;
-
 		return this;
 	}
 
@@ -266,23 +221,47 @@ public class RepositoryMiner {
 
 	public RepositoryMiner setTimeFrames(List<TimeFrameType> timeFrames) {
 		this.timeFrames = timeFrames;
-
 		return this;
 	}
 
-	public List<ITagCodeSmell> getTagCodeSmells() {
-		return tagCodeSmells;
+	public List<IClassMetric> getClassMetrics() {
+		return classMetrics;
 	}
 
-	public RepositoryMiner setTagCodeSmells(List<ITagCodeSmell> tagCodeSmells) {
-		this.tagCodeSmells = tagCodeSmells;
+	public RepositoryMiner setClassMetrics(List<IClassMetric> classMetrics) {
+		this.classMetrics = classMetrics;
+		return this;
+	}
 
+	public List<IClassCodeSmell> getClassCodeSmells() {
+		return classCodeSmells;
+	}
+
+	public RepositoryMiner setClassCodeSmells(List<IClassCodeSmell> classCodeSmells) {
+		this.classCodeSmells = classCodeSmells;
+		return this;
+	}
+
+	public List<ITechnicalDebt> getTechnicalDebts() {
+		return technicalDebts;
+	}
+
+	public RepositoryMiner setTechnicalDebts(List<ITechnicalDebt> technicalDebts) {
+		this.technicalDebts = technicalDebts;
+		return this;
+	}
+
+	public List<IProjectCodeSmell> getProjectCodeSmells() {
+		return projectCodeSmells;
+	}
+
+	public RepositoryMiner setProjectCodeSmells(List<IProjectCodeSmell> projectCodeSmells) {
+		this.projectCodeSmells = projectCodeSmells;
 		return this;
 	}
 
 	public RepositoryMiner setProgressListener(IProgressListener progressListener) {
 		this.progressListener = progressListener;
-
 		return this;
 	}
 

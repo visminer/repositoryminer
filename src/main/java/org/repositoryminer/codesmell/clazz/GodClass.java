@@ -1,4 +1,4 @@
-package org.repositoryminer.codesmell.commit;
+package org.repositoryminer.codesmell.clazz;
 
 import org.bson.Document;
 import org.repositoryminer.ast.AST;
@@ -6,12 +6,12 @@ import org.repositoryminer.ast.AbstractTypeDeclaration;
 import org.repositoryminer.ast.AbstractTypeDeclaration.Archetype;
 import org.repositoryminer.ast.TypeDeclaration;
 import org.repositoryminer.codesmell.CodeSmellId;
-import org.repositoryminer.metric.ATFDMetric;
-import org.repositoryminer.metric.NOAMetric;
-import org.repositoryminer.metric.TCCMetric;
-import org.repositoryminer.metric.WMCMetric;
+import org.repositoryminer.metric.clazz.ATFDMetric;
+import org.repositoryminer.metric.clazz.NOAMetric;
+import org.repositoryminer.metric.clazz.TCCMetric;
+import org.repositoryminer.metric.clazz.WMCMetric;
 
-public class GodClass implements ICommitCodeSmell {
+public class GodClass implements IClassCodeSmell {
 
 	private int atfdThreshold = 40;
 	private int wmcThreshold = 75;

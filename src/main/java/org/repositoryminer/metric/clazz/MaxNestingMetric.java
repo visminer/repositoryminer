@@ -1,4 +1,4 @@
-package org.repositoryminer.metric;
+package org.repositoryminer.metric.clazz;
 
 import java.util.ArrayList;
 import java.util.List;

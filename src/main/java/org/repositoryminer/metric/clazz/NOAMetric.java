@@ -1,4 +1,4 @@
-package org.repositoryminer.metric;
+package org.repositoryminer.metric.clazz;
 
 import java.util.List;
 
@@ -9,7 +9,7 @@ import org.repositoryminer.ast.AbstractTypeDeclaration.Archetype;
 import org.repositoryminer.ast.FieldDeclaration;
 import org.repositoryminer.ast.TypeDeclaration;
 
-public class NOAMetric implements ICommitMetric {
+public class NOAMetric implements IClassMetric {
 
 	@Override
 	public void calculate(AbstractTypeDeclaration type, AST ast,

@@ -1,4 +1,4 @@
-package org.repositoryminer.metric;
+package org.repositoryminer.metric.clazz;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -7,7 +7,7 @@ import org.bson.Document;
 import org.repositoryminer.ast.AST;
 import org.repositoryminer.ast.AbstractTypeDeclaration;
 
-public class SLOCMetric implements ICommitMetric{
+public class SLOCMetric implements IClassMetric{
 
 	private Pattern pattern;
 

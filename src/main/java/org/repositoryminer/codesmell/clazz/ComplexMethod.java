@@ -1,4 +1,4 @@
-package org.repositoryminer.codesmell.commit;
+package org.repositoryminer.codesmell.clazz;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,11 +8,11 @@ import org.repositoryminer.ast.AST;
 import org.repositoryminer.ast.AbstractTypeDeclaration;
 import org.repositoryminer.ast.AbstractTypeDeclaration.Archetype;
 import org.repositoryminer.codesmell.CodeSmellId;
+import org.repositoryminer.metric.clazz.CCMetric;
 import org.repositoryminer.ast.MethodDeclaration;
 import org.repositoryminer.ast.TypeDeclaration;
-import org.repositoryminer.metric.CCMetric;
 
-public class ComplexMethod implements ICommitCodeSmell {
+public class ComplexMethod implements IClassCodeSmell {
 	
 	private List<Document> methodsDoc;
 	private int ccThreshold = 4;

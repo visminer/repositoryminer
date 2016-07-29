@@ -7,10 +7,10 @@ import java.util.List;
 import org.bson.Document;
 import org.repositoryminer.ast.AST;
 import org.repositoryminer.ast.AbstractTypeDeclaration;
-import org.repositoryminer.codesmell.commit.ICommitCodeSmell;
-import org.repositoryminer.codesmell.tag.ITagCodeSmell;
+import org.repositoryminer.codesmell.clazz.IClassCodeSmell;
+import org.repositoryminer.codesmell.project.IProjectCodeSmell;
 import org.repositoryminer.listener.IProgressListener;
-import org.repositoryminer.metric.ICommitMetric;
+import org.repositoryminer.metric.clazz.IClassMetric;
 import org.repositoryminer.parser.Parser;
 import org.repositoryminer.persistence.handler.CommitAnalysisDocumentHandler;
 import org.repositoryminer.persistence.handler.TagAnalysisDocumentHandler;
@@ -155,7 +155,7 @@ public class SourceAnalyzer {
 	private void processTagCodeSmells(Document tagDoc) {
 		if (tagCodeSmells) {
 			List<Document> codeSmellsDocs = new ArrayList<Document>();
-			for (ITagCodeSmell codeSmell : repositoryMiner.getTagCodeSmells()) {
+			for (IProjectCodeSmell codeSmell : repositoryMiner.getProjectCodeSmells()) {
 				Document doc = new Document();
 				codeSmell.detect(parsers, repositoryPath, doc);
 				codeSmellsDocs.add(doc);
@@ -195,7 +195,7 @@ public class SourceAnalyzer {
 	private void processCommitMetrics(AST ast, AbstractTypeDeclaration type, Document typeDoc) {
 		if (commitMetrics) {
 			List<Document> metricsDoc = new ArrayList<Document>();
-			for (ICommitMetric metric : repositoryMiner.getCommitMetrics()) {
+			for (IClassMetric metric : repositoryMiner.getClassMetrics()) {
 				Document mDoc = new Document();
 				metric.calculate(type, ast, mDoc);
 				metricsDoc.add(mDoc);
@@ -206,7 +206,7 @@ public class SourceAnalyzer {
 
 	private void processCommitCodeSmells(List<Document> codeSmellsDocs, AST ast, AbstractTypeDeclaration type, Document typeDoc) {
 		if (commitCodeSmells) {
-			for (ICommitCodeSmell codeSmell : repositoryMiner.getCommitCodeSmells()) {
+			for (IClassCodeSmell codeSmell : repositoryMiner.getClassCodeSmells()) {
 				Document doc = new Document();
 				codeSmell.detect(type, ast, doc);
 				codeSmellsDocs.add(doc);

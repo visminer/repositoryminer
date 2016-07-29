@@ -76,6 +76,7 @@ public class Repository {
 		return true;
 	}
 
+	/**TODO: Implement support for new reference type **/
 	public void setCurrentReference(ReferenceType type, String name) {
 		List<Reference> refs = null;
 		switch (type) {

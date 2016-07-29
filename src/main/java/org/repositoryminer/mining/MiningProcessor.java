@@ -40,13 +40,13 @@ import org.repositoryminer.utility.StringUtils;
  * <ul>
  * <li>Metric -> list of metrics to be calculated. It is assumed that the
  * elements of this list are instances of
- * {@link org.repositoryminer.metric.ICommitMetric}
+ * {@link org.repositoryminer.metric.clazz.IClassMetric}
  * <li>Commits Codesmells -> list of commits-oriented smells to be detected.
  * Each element of this list has to be a sub-type of
- * {@link org.repositoryminer.codesmell.commit.ICommitCodeSmell}
+ * {@link org.repositoryminer.codesmell.clazz.IClassCodeSmell}
  * <li>Tags Codesmells -> list of tag-related smells to be detected. Each
  * element of this list must be a sub-type of
- * {@link org.repositoryminer.codesmell.tag.ITagCodeSmell}
+ * {@link org.repositoryminer.codesmell.project.IProjectCodeSmell}
  * <li>Technical debts -> list of technical debts to be detected. All items of
  * the list must be an instance of any class inherited from
  * {@link org.repositoryminer.technicaldebt.ITechnicalDebt}
@@ -93,21 +93,21 @@ public class MiningProcessor {
 	private void calculateAndDetect(RepositoryMiner repositoryMiner, List<CommitDB> commits, List<ReferenceDB> scmRefs,
 			List<ReferenceDB> timeRefs, SCM scm, String repoId, String repoPath) throws UnsupportedEncodingException {
 
-		boolean commitMetrics = (repositoryMiner.getCommitMetrics() != null
-				&& repositoryMiner.getCommitMetrics().size() > 0);
-		boolean commitTechnicalDebts = (repositoryMiner.getTechnicalDebts() != null
+		boolean classMetrics = (repositoryMiner.getClassMetrics() != null
+				&& repositoryMiner.getClassMetrics().size() > 0);
+		boolean technicalDebts = (repositoryMiner.getTechnicalDebts() != null
 				&& repositoryMiner.getTechnicalDebts().size() > 0);
-		boolean commitCodeSmells = (repositoryMiner.getCommitCodeSmells() != null
-				&& repositoryMiner.getCommitCodeSmells().size() > 0);
-		boolean tagCodeSmells = (repositoryMiner.getTagCodeSmells() != null
-				&& repositoryMiner.getTagCodeSmells().size() > 0);
+		boolean classCodeSmells = (repositoryMiner.getClassCodeSmells() != null
+				&& repositoryMiner.getClassCodeSmells().size() > 0);
+		boolean projectCodeSmells = (repositoryMiner.getProjectCodeSmells() != null
+				&& repositoryMiner.getProjectCodeSmells().size() > 0);
 
-		if (!commitCodeSmells && !commitMetrics && !commitTechnicalDebts && !tagCodeSmells) {
+		if (!classCodeSmells && !classMetrics && !technicalDebts && !projectCodeSmells) {
 			return;
 		}
 
 		List<ReferenceDB> tags = null;
-		if (tagCodeSmells) {
+		if (projectCodeSmells) {
 			tags = new ArrayList<ReferenceDB>();
 			for (ReferenceDB ref : scmRefs) {
 				tags.add(ref);
@@ -118,11 +118,11 @@ public class MiningProcessor {
 		}
 
 		SourceAnalyzer sourceAnalyzer = new SourceAnalyzer(repositoryMiner, scm, repoId, repoPath);
-		sourceAnalyzer.setCommitCodeSmells(commitCodeSmells);
-		sourceAnalyzer.setCommitMetrics(commitMetrics);
+		sourceAnalyzer.setCommitCodeSmells(classCodeSmells);
+		sourceAnalyzer.setCommitMetrics(classMetrics);
 		sourceAnalyzer.setCommits(commits);
-		sourceAnalyzer.setCommitTechnicalDebts(commitTechnicalDebts);
-		sourceAnalyzer.setTagCodeSmells(tagCodeSmells);
+		sourceAnalyzer.setCommitTechnicalDebts(technicalDebts);
+		sourceAnalyzer.setTagCodeSmells(projectCodeSmells);
 		sourceAnalyzer.setTags(tags);
 
 		sourceAnalyzer.analyze();
