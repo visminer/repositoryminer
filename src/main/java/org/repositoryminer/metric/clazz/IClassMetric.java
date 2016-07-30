@@ -3,7 +3,6 @@ package org.repositoryminer.metric.clazz;
 import org.bson.Document;
 import org.repositoryminer.ast.AST;
 import org.repositoryminer.ast.AbstractTypeDeclaration;
-import org.repositoryminer.metric.MetricId;
 
 /**
  * <h1>Top class for all metrics to inherit from</h1>
@@ -23,7 +22,7 @@ import org.repositoryminer.metric.MetricId;
  * can be pushed to the instance of org.bson.Document injected into
  * {@link #calculate(AbstractTypeDeclaration, AST, Document)}.
  */
-public interface IClassMetric extends MetricId {
+public interface IClassMetric {
 
 	/**
 	 * Activates the calculation of the metric

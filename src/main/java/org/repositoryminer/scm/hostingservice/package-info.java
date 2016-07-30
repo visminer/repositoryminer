@@ -1,0 +1,1 @@
+package org.repositoryminer.scm.hostingservice;

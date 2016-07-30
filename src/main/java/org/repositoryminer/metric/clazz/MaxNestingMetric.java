@@ -7,6 +7,7 @@ import org.bson.Document;
 import org.repositoryminer.ast.AST;
 import org.repositoryminer.ast.AbstractTypeDeclaration;
 import org.repositoryminer.ast.MethodDeclaration;
+import org.repositoryminer.metric.MetricId;
 
 public class MaxNestingMetric extends MethodBasedMetricTemplate {
 
@@ -19,7 +20,7 @@ public class MaxNestingMetric extends MethodBasedMetricTemplate {
 			int maxNesting = calculate(method); 
 			methodsDoc.add(new Document("method", method.getName()).append("value", new Integer(maxNesting)));
 		}
-		document.append("name", MAX_NESTING).append("methods", methodsDoc);
+		document.append("name", MetricId.MAX_NESTING).append("methods", methodsDoc);
 	}
 
 	public int calculate(MethodDeclaration method){

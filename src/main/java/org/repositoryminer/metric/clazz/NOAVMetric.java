@@ -9,6 +9,7 @@ import org.repositoryminer.ast.AbstractTypeDeclaration;
 import org.repositoryminer.ast.MethodDeclaration;
 import org.repositoryminer.ast.Statement;
 import org.repositoryminer.ast.Statement.NodeType;
+import org.repositoryminer.metric.MetricId;
 
 public class NOAVMetric extends MethodBasedMetricTemplate {
 	
@@ -23,7 +24,7 @@ public class NOAVMetric extends MethodBasedMetricTemplate {
 			methodsDoc.add(new Document("method", method.getName()).append("value", new Integer(noav)));
 		}
 		
-		document.append("name", NOAV).append("methods", methodsDoc);
+		document.append("name", MetricId.NOAV).append("methods", methodsDoc);
 	}
 	
 	public int calculate(MethodDeclaration method){

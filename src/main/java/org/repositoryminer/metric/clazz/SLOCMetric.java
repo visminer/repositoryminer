@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 import org.bson.Document;
 import org.repositoryminer.ast.AST;
 import org.repositoryminer.ast.AbstractTypeDeclaration;
+import org.repositoryminer.metric.MetricId;
 
 public class SLOCMetric implements IClassMetric{
 
@@ -19,7 +20,7 @@ public class SLOCMetric implements IClassMetric{
 	public void calculate(AbstractTypeDeclaration type, AST ast, Document document) {
 		int sloc = calculate(ast.getSourceCode());
 		
-		document.append("name", SLOC).append("accumulated", new Integer(sloc));
+		document.append("name", MetricId.SLOC).append("accumulated", new Integer(sloc));
 	}
 	
 	public int calculate(String source){

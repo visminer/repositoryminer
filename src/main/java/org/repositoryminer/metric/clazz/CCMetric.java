@@ -9,6 +9,7 @@ import org.repositoryminer.ast.AbstractTypeDeclaration;
 import org.repositoryminer.ast.MethodDeclaration;
 import org.repositoryminer.ast.Statement;
 import org.repositoryminer.ast.Statement.NodeType;
+import org.repositoryminer.metric.MetricId;
 
 /**
  * <h1>The cyclomatic complexity (CC) method-based metric</h1>
@@ -51,7 +52,7 @@ public class CCMetric extends MethodBasedMetricTemplate {
 	public void calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast, Document document) {
 		methodsDoc = new ArrayList<Document>();
 		int ccClass = calculate(methods);
-		document.append("name", CC).append("accumulated", new Integer(ccClass)).append("methods", methodsDoc);
+		document.append("name", MetricId.CC).append("accumulated", new Integer(ccClass)).append("methods", methodsDoc);
 	}
 
 	/**

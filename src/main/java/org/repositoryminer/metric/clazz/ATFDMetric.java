@@ -11,6 +11,7 @@ import org.repositoryminer.ast.AbstractTypeDeclaration;
 import org.repositoryminer.ast.MethodDeclaration;
 import org.repositoryminer.ast.Statement;
 import org.repositoryminer.ast.Statement.NodeType;
+import org.repositoryminer.metric.MetricId;
 
 public class ATFDMetric extends MethodBasedMetricTemplate {
 
@@ -21,7 +22,7 @@ public class ATFDMetric extends MethodBasedMetricTemplate {
 		methodsDoc = new ArrayList<Document>();
 
 		int atfdClass = calculate(type, methods, true);
-		document.append("name", ATFD).append("accumulated", new Integer(atfdClass)).append("methods", methodsDoc);
+		document.append("name", MetricId.ATFD).append("accumulated", new Integer(atfdClass)).append("methods", methodsDoc);
 	}
 
 	public int calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, boolean calculateByMethod) {

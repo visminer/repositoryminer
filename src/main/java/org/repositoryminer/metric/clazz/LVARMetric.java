@@ -9,6 +9,7 @@ import org.repositoryminer.ast.AbstractTypeDeclaration;
 import org.repositoryminer.ast.MethodDeclaration;
 import org.repositoryminer.ast.Statement;
 import org.repositoryminer.ast.Statement.NodeType;
+import org.repositoryminer.metric.MetricId;
 
 public class LVARMetric extends MethodBasedMetricTemplate {
 
@@ -26,7 +27,7 @@ public class LVARMetric extends MethodBasedMetricTemplate {
 			methodsDoc.add(new Document("method", method.getName()).append("value", new Integer(lvar)));
 		}
 		
-		document.append("name", LVAR).append("accumulated", new Integer(accumulated)).append("methods", methodsDoc);
+		document.append("name", MetricId.LVAR).append("accumulated", new Integer(accumulated)).append("methods", methodsDoc);
 	}
 	
 	public int calculate(MethodDeclaration method){

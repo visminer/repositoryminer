@@ -8,6 +8,7 @@ import org.repositoryminer.ast.AbstractTypeDeclaration;
 import org.repositoryminer.ast.AbstractTypeDeclaration.Archetype;
 import org.repositoryminer.ast.FieldDeclaration;
 import org.repositoryminer.ast.TypeDeclaration;
+import org.repositoryminer.metric.MetricId;
 
 public class NOAMetric implements IClassMetric {
 
@@ -16,7 +17,7 @@ public class NOAMetric implements IClassMetric {
 			Document document) {
 		if (Archetype.CLASS_OR_INTERFACE == type.getArchetype()) {
 			TypeDeclaration cls = (TypeDeclaration) type;
-			document.append("name", NOA).append("accumulated", new Integer(calculate(cls.getFields())));
+			document.append("name", MetricId.NOA).append("accumulated", new Integer(calculate(cls.getFields())));
 		}
 	}
 

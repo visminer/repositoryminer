@@ -10,13 +10,14 @@ import org.repositoryminer.ast.FieldDeclaration;
 import org.repositoryminer.ast.MethodDeclaration;
 import org.repositoryminer.ast.Statement;
 import org.repositoryminer.ast.Statement.NodeType;
+import org.repositoryminer.metric.MetricId;
 
 public class TCCMetric extends MethodBasedMetricTemplate {
 
 	@Override
 	public void calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast, Document document) {
 		float tcc = calculate(type, methods);
-		document.append("name", TCC).append("accumulated", new Float(tcc));
+		document.append("name", MetricId.TCC).append("accumulated", new Float(tcc));
 	}
 
 	public float calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods) {
