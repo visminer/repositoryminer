@@ -37,86 +37,50 @@ public class ReferenceDB {
 		this.type = type;
 	}
 
-	/**
-	 * @return the id
-	 */
 	public String getId() {
 		return id;
 	}
 
-	/**
-	 * @param id the id to set
-	 */
 	public void setId(String id) {
 		this.id = id;
 	}
 
-	/**
-	 * @return the repository
-	 */
 	public String getRepository() {
 		return repository;
 	}
 
-	/**
-	 * @param repository the repository to set
-	 */
 	public void setRepository(String repository) {
 		this.repository = repository;
 	}
 
-	/**
-	 * @return the name
-	 */
 	public String getName() {
 		return name;
 	}
 
-	/**
-	 * @param name the name to set
-	 */
 	public void setName(String name) {
 		this.name = name;
 	}
 
-	/**
-	 * @return the fullName
-	 */
 	public String getFullName() {
 		return fullName;
 	}
 
-	/**
-	 * @param fullName the fullName to set
-	 */
 	public void setFullName(String fullName) {
 		this.fullName = fullName;
 	}
 
-	/**
-	 * @return the type
-	 */
 	public ReferenceType getType() {
 		return type;
 	}
 
-	/**
-	 * @param type the type to set
-	 */
 	public void setType(ReferenceType type) {
 		this.type = type;
 	}
 
-	/**
-	 * @return the commits
-	 */
 	public List<String> getCommits() {
 		return commits;
 	}
 
-	/**
-	 * @param commits the commits to set
-	 */
 	public void setCommits(List<String> commits) {
 		this.commits = commits;
 	}

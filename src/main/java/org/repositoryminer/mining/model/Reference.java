@@ -50,68 +50,45 @@ public class Reference {
 		}
 		return null;
 	}
-	
-	/**
-	 * @return the id
-	 */
+
 	public String getId() {
 		return id;
 	}
-	/**
-	 * @param id the id to set
-	 */
+
 	public void setId(String id) {
 		this.id = id;
 	}
-	/**
-	 * @return the name
-	 */
+
 	public String getName() {
 		return name;
 	}
-	/**
-	 * @param name the name to set
-	 */
+
 	public void setName(String name) {
 		this.name = name;
 	}
-	/**
-	 * @return the fullName
-	 */
+
 	public String getFullName() {
 		return fullName;
 	}
-	/**
-	 * @param fullName the fullName to set
-	 */
+
 	public void setFullName(String fullName) {
 		this.fullName = fullName;
 	}
-	/**
-	 * @return the type
-	 */
+
 	public ReferenceType getType() {
 		return type;
 	}
-	/**
-	 * @param type the type to set
-	 */
+
 	public void setType(ReferenceType type) {
 		this.type = type;
 	}
 
-	/**
-	 * @return the commits
-	 */
 	public List<String> getCommits() {
 		return commits;
 	}
 
-	/**
-	 * @param commits the commits to set
-	 */
 	public void setCommits(List<String> commits) {
 		this.commits = commits;
 	}
-
+	
 }

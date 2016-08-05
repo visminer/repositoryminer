@@ -38,9 +38,9 @@ public class GitHubService implements HostingService {
 	}
 
 	@Override
-	public void connect(String owner, String name, String user, String password) {
+	public void connect(String owner, String name, String login, String password) {
 		GitHubClient client = new GitHubClient();
-		client.setCredentials(user, password);
+		client.setCredentials(login, password);
 		init(name, owner, client);
 	}
 

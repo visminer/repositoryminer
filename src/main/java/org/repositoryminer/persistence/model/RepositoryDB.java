@@ -36,92 +36,50 @@ public class RepositoryDB {
 		return doc;
 	}
 
-	/**
-	 * @return the id
-	 */
 	public String getId() {
 		return id;
 	}
 
-	/**
-	 * @param id
-	 *            the id to set
-	 */
 	public void setId(String id) {
 		this.id = id;
 	}
 
-	/**
-	 * @return the name
-	 */
 	public String getName() {
 		return name;
 	}
 
-	/**
-	 * @param name
-	 *            the name to set
-	 */
 	public void setName(String name) {
 		this.name = name;
 	}
 
-	/**
-	 * @return the description
-	 */
 	public String getDescription() {
 		return description;
 	}
 
-	/**
-	 * @param description
-	 *            the description to set
-	 */
 	public void setDescription(String description) {
 		this.description = description;
 	}
 
-	/**
-	 * @return the path
-	 */
 	public String getPath() {
 		return path;
 	}
 
-	/**
-	 * @param path
-	 *            the path to set
-	 */
 	public void setPath(String path) {
 		this.path = path;
 	}
 
-	/**
-	 * @return the scm
-	 */
 	public SCMType getScm() {
 		return scm;
 	}
 
-	/**
-	 * @param scm
-	 *            the scm to set
-	 */
 	public void setScm(SCMType scm) {
 		this.scm = scm;
 	}
 
-	/**
-	 * @return the contributors
-	 */
 	public List<ContributorDB> getContributors() {
 		return contributors;
 	}
 
-	/**
-	 * @param contributors
-	 *            the contributors to set
-	 */
 	public void setContributors(List<ContributorDB> contributors) {
 		this.contributors = contributors;
 	}

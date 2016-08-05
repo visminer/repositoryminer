@@ -20,7 +20,7 @@ import org.repositoryminer.technicaldebt.ITechnicalDebt;
  * <p>
  * <ul>
  * <li>Mandatory parameters -> project's path, project's name, project's
- * description, {@link org.repositoryminer.scm.SCMType} and others
+ * description, {@link org.repositoryminer.scm.SCMType}.
  * <li>Optional parameters -> lists of metrics (to be calculated), list of
  * codesmells (to be detected) and others
  * </ul>
@@ -38,14 +38,6 @@ import org.repositoryminer.technicaldebt.ITechnicalDebt;
  * be notified about the progress of the mining. The
  * {@link #setProgressListener(IProgressListener)} method can be used to inject
  * a listener.
- * <p>
- * Raised exceptions are:
- * <p>
- * <ul>
- * <li>UnsupportedEncodingException, if a unknown text encoding is found in
- * analyzed source-code artifact.
- * </ul>
- * It is up to the caller ignore raised exceptions and skip to next mining step
  * <p>
  */
 public class RepositoryMiner {
@@ -108,8 +100,7 @@ public class RepositoryMiner {
 	 * <p>
 	 * 
 	 * @throws UnsupportedEncodingException
-	 *             raised if an unsupported encoding is found in a mined code
-	 *             artifact.
+	 *             raised if the OS does not support the selected charset.
 	 */
 	public void mine() throws UnsupportedEncodingException {
 		MiningProcessor processor = new MiningProcessor();

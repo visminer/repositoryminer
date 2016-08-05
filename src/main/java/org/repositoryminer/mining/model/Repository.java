@@ -186,166 +186,90 @@ public class Repository {
 		this.path = path;
 	}
 
-	/**
-	 * @return the id
-	 */
 	public String getId() {
 		return id;
 	}
 
-	/**
-	 * @param id
-	 *            the id to set
-	 */
 	public void setId(String id) {
 		this.id = id;
 	}
 
-	/**
-	 * @return the name
-	 */
 	public String getName() {
 		return name;
 	}
 
-	/**
-	 * @param name
-	 *            the name to set
-	 */
 	public void setName(String name) {
 		this.name = name;
 	}
 
-	/**
-	 * @return the description
-	 */
 	public String getDescription() {
 		return description;
 	}
 
-	/**
-	 * @param description
-	 *            the description to set
-	 */
 	public void setDescription(String description) {
 		this.description = description;
 	}
 
-	/**
-	 * @return the path
-	 */
 	public String getPath() {
 		return path;
 	}
 
-	/**
-	 * @param path
-	 *            the path to set
-	 */
 	public void setPath(String path) {
 		this.path = path;
 	}
 
-	/**
-	 * @return the scm
-	 */
 	public SCMType getScm() {
 		return scm;
 	}
 
-	/**
-	 * @param scm
-	 *            the scm to set
-	 */
 	public void setScm(SCMType scm) {
 		this.scm = scm;
 	}
 
-	/**
-	 * @return the commits
-	 */
 	public List<Commit> getCommits() {
 		return commits;
 	}
 
-	/**
-	 * @param commits
-	 *            the commits to set
-	 */
 	public void setCommits(List<Commit> commits) {
 		this.commits = commits;
 	}
 
-	/**
-	 * @return the branches
-	 */
 	public List<Reference> getBranches() {
 		return branches;
 	}
 
-	/**
-	 * @param branches
-	 *            the branches to set
-	 */
 	public void setBranches(List<Reference> branches) {
 		this.branches = branches;
 	}
 
-	/**
-	 * @return the tags
-	 */
 	public List<Reference> getTags() {
 		return tags;
 	}
 
-	/**
-	 * @param tags
-	 *            the tags to set
-	 */
 	public void setTags(List<Reference> tags) {
 		this.tags = tags;
 	}
 
-	/**
-	 * @return the contributors
-	 */
 	public List<Contributor> getContributors() {
 		return contributors;
 	}
 
-	/**
-	 * @param contributors
-	 *            the contributors to set
-	 */
 	public void setContributors(List<Contributor> contributors) {
 		this.contributors = contributors;
 	}
 
-	/**
-	 * @return the workingDirectory
-	 */
 	public Map<String, String> getWorkingDirectory() {
 		return workingDirectory;
 	}
 
-	/**
-	 * @param workingDirectory
-	 *            the workingDirectory to set
-	 */
 	public void setWorkingDirectory(Map<String, String> workingDirectory) {
 		this.workingDirectory = workingDirectory;
 	}
 
-	/**
-	 * @return the currentCommit
-	 */
 	public Commit getCurrentCommit() {
 		return commits.get(currentCommit);
 	}
 
-	/**
-	 * @return the currentReference
-	 */
 	public Reference getCurrentReference() {
 		return currentReference;
 	}

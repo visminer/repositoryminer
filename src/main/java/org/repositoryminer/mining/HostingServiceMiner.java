@@ -1,6 +1,5 @@
 package org.repositoryminer.mining;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,58 +15,110 @@ import org.repositoryminer.persistence.model.MilestoneDB;
 import org.repositoryminer.scm.hostingservice.HostingService;
 import org.repositoryminer.scm.hostingservice.HostingServiceFactory;
 import org.repositoryminer.scm.hostingservice.HostingServiceType;
-import org.repositoryminer.utility.StringUtils;
 
+/**
+ * This is the entry point to configure the parameters that enable the
+ * synchronization of analyzed project with some web hosting service,
+ * <i>e.g.</i> github.
+ * <p>
+ * <b>This analysis must to execute after mining the repository with
+ * {@link RepositoryMiner}.</b>
+ * <p>
+ * Check more informations in the service that will be used about how to know
+ * the owner and a name of a repository, <i>e.g.</i> in GitHUB we access a
+ * repository like this, github.com/<owner>/<repository_name>.
+ * <p>
+ * Check if the user has the enough rights in the repository, otherwise the
+ * synchronization will not retrieve some data
+ */
 public class HostingServiceMiner {
 
-	private String repositoryPath;
+	private String repositoryId;
 	private String owner;
 	private String name;
 	private HostingServiceType serviceType;
 
 	private HostingService service;
 
-	public HostingServiceMiner() {}
-	
-	public HostingServiceMiner(String repositoryPath, String owner, String name, HostingServiceType serviceType) {
+	/**
+	 * Use this void constructor if parameters are going to be set later.
+	 */
+	public HostingServiceMiner() {
+	}
+
+	/**
+	 * Use this non-void constructor if mandatory parameters are known
+	 * <p>
+	 * 
+	 * @param repositoryId
+	 *            the ID of repository mined before
+	 * @param owner
+	 *            repository owner username
+	 * @param name
+	 *            repository name
+	 * @param serviceType
+	 *            the web hosting service ({@link HostingServiceType}) we want
+	 *            do the synchronization
+	 */
+	public HostingServiceMiner(String repositoryId, String owner, String name, HostingServiceType serviceType) {
 		super();
-		this.repositoryPath = repositoryPath;
+		this.repositoryId = repositoryId;
 		this.owner = owner;
 		this.name = name;
 		this.serviceType = serviceType;
 	}
 
-	public void mine(String user, String password) throws IOException{
+	/**
+	 * This method is used to start the synchronization using login and password
+	 * credentials
+	 * <p>
+	 * <b>We not store your credentials</b>
+	 * <p>
+	 * 
+	 * @param login
+	 *            check the service to know the login options,
+	 *            generally is email or username
+	 * @param password
+	 */
+	public void sync(String login, String password) {
 		service = HostingServiceFactory.getHostingService(serviceType);
-		service.connect(owner, name, user, password);
+		service.connect(owner, name, login, password);
 		process();
 	}
 
-	public void mine(String token) throws IOException{
+	/**
+	 * This method is used to start the synchronization using an access token
+	 * provided by the service
+	 * <p>
+	 * <b>We not store your credentials</b><br>
+	 * <b>We encourage the use of this method when possible, because is more
+	 * secure</b>
+	 * <p>
+	 * 
+	 * @param token
+	 */
+	public void sync(String token) {
 		service = HostingServiceFactory.getHostingService(serviceType);
 		service.connect(owner, name, token);
 		process();
 	}
 
 	@SuppressWarnings("unchecked")
-	private void process() throws IOException {
-		String canonicalPath = StringUtils.treatPath(repositoryPath);
-		String id = StringUtils.encodeToSHA1(canonicalPath);
-
+	private void process() {
 		RepositoryDocumentHandler repoDocHandler = new RepositoryDocumentHandler();
-		if (!repoDocHandler.checkIfRepositoryExists(id)) {
+		if (!repoDocHandler.checkIfRepositoryExists(repositoryId)) {
 			throw new VisMinerAPIException(ErrorMessage.REPOSITORY_NOT_FOUND.toString());
 		}
 
 		IssueDocumentHandler issueDocHandler = new IssueDocumentHandler();
 		MilestoneDocumentHandler mileDocHandler = new MilestoneDocumentHandler();
 
-		issueDocHandler.deleteByRepository(id);
-		mileDocHandler.deleteByRepository(id);
+		issueDocHandler.deleteByRepository(repositoryId);
+		mileDocHandler.deleteByRepository(repositoryId);
 
-		Document repoDoc = repoDocHandler.findOnlyContributors(id);
+		Document repoDoc = repoDocHandler.findOnlyContributors(repositoryId);
 		List<ContributorDB> contributorsDb = service.getAllContributors();
-		
+
 		for (Document contributorDoc : (List<Document>) repoDoc.get("contributors")) {
 			String name = contributorDoc.getString("name");
 			for (ContributorDB contributorDb : contributorsDb) {
@@ -79,7 +130,7 @@ public class HostingServiceMiner {
 				}
 			}
 		}
-		
+
 		repoDocHandler.updateOnlyContributors(repoDoc);
 		List<IssueDB> issues = service.getAllIssues();
 		List<MilestoneDB> milestones = service.getAllMilestones();
@@ -101,7 +152,7 @@ public class HostingServiceMiner {
 
 		if (issues.size() > 0) {
 			for (IssueDB issue : issues) {
-				issue.setRepository(id);
+				issue.setRepository(repositoryId);
 				issuesDocs.add(issue.toDocument());
 			}
 			issueDocHandler.insertMany(issuesDocs);
@@ -109,65 +160,41 @@ public class HostingServiceMiner {
 
 		if (milestones.size() > 0) {
 			for (MilestoneDB mile : milestones) {
-				mile.setRepository(id);
+				mile.setRepository(repositoryId);
 				milesDocs.add(mile.toDocument());
 			}
 			mileDocHandler.insertMany(milesDocs);
 		}
 	}
 
-	/**
-	 * @return the repositoryPath
-	 */
-	public String getRepositoryPath() {
-		return repositoryPath;
+	public String getRepositoryId() {
+		return repositoryId;
 	}
 
-	/**
-	 * @param repositoryPath the repositoryPath to set
-	 */
-	public void setRepositoryPath(String repositoryPath) {
-		this.repositoryPath = repositoryPath;
+	public void setRepositoryId(String repositoryId) {
+		this.repositoryId = repositoryId;
 	}
 
-	/**
-	 * @return the owner
-	 */
 	public String getOwner() {
 		return owner;
 	}
 
-	/**
-	 * @param owner the owner to set
-	 */
 	public void setOwner(String owner) {
 		this.owner = owner;
 	}
 
-	/**
-	 * @return the name
-	 */
 	public String getName() {
 		return name;
 	}
 
-	/**
-	 * @param name the name to set
-	 */
 	public void setName(String name) {
 		this.name = name;
 	}
 
-	/**
-	 * @return the serviceType
-	 */
 	public HostingServiceType getServiceType() {
 		return serviceType;
 	}
 
-	/**
-	 * @param serviceType the serviceType to set
-	 */
 	public void setServiceType(HostingServiceType serviceType) {
 		this.serviceType = serviceType;
 	}

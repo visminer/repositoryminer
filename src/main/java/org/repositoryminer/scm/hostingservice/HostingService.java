@@ -11,11 +11,11 @@ public interface HostingService {
 	/**
 	 * @param owner
 	 * @param name
-	 * @param user
+	 * @param login
 	 * @param password
-	 * Initialize connection with web service using user and password.
+	 * Initialize connection with web service using login and password.
 	 */
-	public void connect(String owner, String name, String user, String password);
+	public void connect(String owner, String name, String login, String password);
 	
 	/**
 	 * @param owner

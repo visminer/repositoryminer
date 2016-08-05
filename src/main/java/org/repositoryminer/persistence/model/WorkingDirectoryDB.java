@@ -53,40 +53,27 @@ public class WorkingDirectoryDB {
 		doc.append("files", filesDoc);
 		return doc;
 	}
-	
-	/**
-	 * @return the id
-	 */
+
 	public String getId() {
 		return id;
 	}
-	/**
-	 * @param id the id to set
-	 */
+
 	public void setId(String id) {
 		this.id = id;
 	}
-	/**
-	 * @return the repository
-	 */
+
 	public String getRepository() {
 		return repository;
 	}
-	/**
-	 * @param repository the repository to set
-	 */
+
 	public void setRepository(String repository) {
 		this.repository = repository;
 	}
-	/**
-	 * @return the files
-	 */
+
 	public Map<String, String> getFiles() {
 		return files;
 	}
-	/**
-	 * @param files the files to set
-	 */
+
 	public void setFiles(Map<String, String> files) {
 		this.files = files;
 	}
