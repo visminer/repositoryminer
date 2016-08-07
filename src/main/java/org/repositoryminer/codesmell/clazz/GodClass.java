@@ -6,10 +6,10 @@ import org.repositoryminer.ast.AbstractTypeDeclaration;
 import org.repositoryminer.ast.AbstractTypeDeclaration.Archetype;
 import org.repositoryminer.ast.TypeDeclaration;
 import org.repositoryminer.codesmell.CodeSmellId;
-import org.repositoryminer.metric.clazz.ATFDMetric;
-import org.repositoryminer.metric.clazz.NOAMetric;
-import org.repositoryminer.metric.clazz.TCCMetric;
-import org.repositoryminer.metric.clazz.WMCMetric;
+import org.repositoryminer.metric.clazz.ATFD;
+import org.repositoryminer.metric.clazz.NOA;
+import org.repositoryminer.metric.clazz.TCC;
+import org.repositoryminer.metric.clazz.WMC;
 
 /**
  * <h1>God Class</h1>
@@ -76,10 +76,10 @@ public class GodClass implements IClassCodeSmell {
 	public boolean detect(AbstractTypeDeclaration type, TypeDeclaration cls) {
 		boolean godClass = false;
 
-		ATFDMetric atfdMetric = new ATFDMetric();
-		WMCMetric wmcMetric = new WMCMetric();
-		TCCMetric tccMetric = new TCCMetric();
-		NOAMetric noaMetric = new NOAMetric();
+		ATFD atfdMetric = new ATFD();
+		WMC wmcMetric = new WMC();
+		TCC tccMetric = new TCC();
+		NOA noaMetric = new NOA();
 
 		int atfd = atfdMetric.calculate(type, cls.getMethods(), false);
 		float tcc = tccMetric.calculate(type, cls.getMethods());

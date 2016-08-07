@@ -12,7 +12,13 @@ import org.repositoryminer.ast.Statement;
 import org.repositoryminer.ast.Statement.NodeType;
 import org.repositoryminer.metric.MetricId;
 
-public class TCCMetric extends MethodBasedMetricTemplate {
+/**
+ * <h1>Tight Class Cohesion</h1>
+ * <p>
+ * The relative number of method pairs of a class that access in common at least
+ * one attribute of the measured class.
+ */
+public class TCC extends MethodBasedMetricTemplate {
 
 	@Override
 	public void calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast, Document document) {

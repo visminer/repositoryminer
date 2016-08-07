@@ -11,12 +11,17 @@ import org.repositoryminer.ast.AbstractTypeDeclaration;
 import org.repositoryminer.ast.MethodDeclaration;
 import org.repositoryminer.metric.MetricId;
 
-public class MLOCMetric extends MethodBasedMetricTemplate {
+/**
+ * <h1>Method Lines of Code</h1>
+ * <p>
+ * MLOC is defined as the number of non-blank and non-comment lines inside method bodies.
+ */
+public class MLOC extends MethodBasedMetricTemplate {
 	
 	private List<Document> methodsDoc;
 	private Pattern pattern;
 
-	public MLOCMetric(){
+	public MLOC(){
 		pattern = Pattern.compile("(\r\n)|(\r)|(\n)");
 	}
 

@@ -12,12 +12,12 @@ import org.repositoryminer.ast.Statement.NodeType;
 import org.repositoryminer.metric.MetricId;
 
 /**
- * <h1>Cyclomatic Complexity</h1>
+ * <h1>McCabe’s Cyclomatic Number</h1>
  * <p>
- * CC is defined as "a quantitative measure of the number of linearly
+ * CYCLO is defined as "a quantitative measure of the number of linearly
  * independent paths through a program's source code".
  * <p>
- * CC plays a key-role in understanding the overall complexity of code by
+ * CYCLO plays a key-role in understanding the overall complexity of code by
  * measuring the complexity of methods. It is calculated as follows:
  * <ul>
  * <li>if a decision statement is found (for-loop, while-loop, if), 1 must be
@@ -40,7 +40,7 @@ import org.repositoryminer.metric.MetricId;
  * Each of the resulting tests adds 1 to the value of the metric.
  * </ul>
  */
-public class CCMetric extends MethodBasedMetricTemplate {
+public class CYCLO extends MethodBasedMetricTemplate {
 
 	private List<Document> methodsDoc;
 
@@ -52,7 +52,7 @@ public class CCMetric extends MethodBasedMetricTemplate {
 	public void calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast, Document document) {
 		methodsDoc = new ArrayList<Document>();
 		int ccClass = calculate(methods);
-		document.append("name", MetricId.CC).append("accumulated", new Integer(ccClass)).append("methods", methodsDoc);
+		document.append("name", MetricId.CYCLO).append("accumulated", new Integer(ccClass)).append("methods", methodsDoc);
 	}
 
 	/**

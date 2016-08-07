@@ -12,7 +12,7 @@ import java.util.List;
 
 import org.bson.Document;
 import org.repositoryminer.codesmell.CodeSmellId;
-import org.repositoryminer.metric.clazz.SLOCMetric;
+import org.repositoryminer.metric.clazz.LOC;
 import org.repositoryminer.parser.Parser;
 
 import net.sourceforge.pmd.cpd.CPD;
@@ -123,7 +123,7 @@ public class DuplicatedCode implements IProjectCodeSmell {
 	private Double getDuplicatedPercentage(String filename, int lineCount) {
 		try {
 			String source = new String(Files.readAllBytes(Paths.get(filename)));
-			SLOCMetric slocMetric = new SLOCMetric();
+			LOC slocMetric = new LOC();
 
 			int sloc = slocMetric.calculate(source);
 			double percentage = (double) lineCount / sloc;

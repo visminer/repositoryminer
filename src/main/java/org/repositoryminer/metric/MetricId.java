@@ -4,9 +4,9 @@ package org.repositoryminer.metric;
 public interface MetricId {
 
 	public static final String ATFD = "ATFD";
-	public static final String CC = "CC";
+	public static final String CYCLO = "CYCLO";
 	public static final String LVAR = "LVAR";
-	public static final String MAX_NESTING = "MAX_NESTING";
+	public static final String MAXNESTING = "MAXNESTING";
 	public static final String MLOC = "MLOC";
 	public static final String NOA = "NOA";
 	public static final String NOAV = "NOAV";

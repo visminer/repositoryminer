@@ -13,7 +13,13 @@ import org.repositoryminer.ast.Statement;
 import org.repositoryminer.ast.Statement.NodeType;
 import org.repositoryminer.metric.MetricId;
 
-public class ATFDMetric extends MethodBasedMetricTemplate {
+/**
+ * <h1>Access To Foreign Data</h1>
+ * <p>
+ * ATFD is defined as the number of attributes from unrelated classes that are
+ * accessed directly or by invoking accessor methods.
+ */
+public class ATFD extends MethodBasedMetricTemplate {
 
 	private List<Document> methodsDoc;
 
@@ -22,7 +28,8 @@ public class ATFDMetric extends MethodBasedMetricTemplate {
 		methodsDoc = new ArrayList<Document>();
 
 		int atfdClass = calculate(type, methods, true);
-		document.append("name", MetricId.ATFD).append("accumulated", new Integer(atfdClass)).append("methods", methodsDoc);
+		document.append("name", MetricId.ATFD).append("accumulated", new Integer(atfdClass)).append("methods",
+				methodsDoc);
 	}
 
 	public int calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, boolean calculateByMethod) {
@@ -44,15 +51,15 @@ public class ATFDMetric extends MethodBasedMetricTemplate {
 		Set<String> accessedFields = new HashSet<String>();
 
 		for (Statement stm : method.getStatements()) {
-			
+
 			if (stm.getNodeType().equals(NodeType.FIELD_ACCESS)) {
 				String exp = stm.getExpression();
 				String type = exp.substring(0, exp.lastIndexOf("."));
 				if (!currType.getName().equals(type))
 					accessedFields.add(exp.toLowerCase());
-				
+
 			} else if (stm.getNodeType().equals(NodeType.METHOD_INVOCATION)) {
-				
+
 				String exp = stm.getExpression();
 				String type = exp.substring(0, exp.lastIndexOf("."));
 				String methodInv = exp.substring(exp.lastIndexOf(".") + 1);
@@ -62,7 +69,7 @@ public class ATFDMetric extends MethodBasedMetricTemplate {
 					} else if (methodInv.startsWith("is") && methodInv.length() > 2)
 						accessedFields.add((type + "." + methodInv.substring(2)).toLowerCase());
 				}
-				
+
 			}
 
 		}

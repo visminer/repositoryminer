@@ -11,7 +11,12 @@ import org.repositoryminer.ast.Statement;
 import org.repositoryminer.ast.Statement.NodeType;
 import org.repositoryminer.metric.MetricId;
 
-public class LVARMetric extends MethodBasedMetricTemplate {
+/**
+ * <h1>Number of Local Variables</h1>
+ * <p>
+ * LVAR is defined as the number of local variables inside a method.
+ */
+public class LVAR extends MethodBasedMetricTemplate {
 
 	private List<Document> methodsDoc;
 	

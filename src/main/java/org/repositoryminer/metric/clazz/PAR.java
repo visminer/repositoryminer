@@ -9,7 +9,12 @@ import org.repositoryminer.ast.AbstractTypeDeclaration;
 import org.repositoryminer.ast.MethodDeclaration;
 import org.repositoryminer.metric.MetricId;
 
-public class PARMetric extends MethodBasedMetricTemplate {
+/**
+ * <h1>Number of Parameters</h1>
+ * <p>
+ * PAR is defined as the number of parameters per method.
+ */
+public class PAR extends MethodBasedMetricTemplate {
 
 	private List<Document> methodsDoc;
 	

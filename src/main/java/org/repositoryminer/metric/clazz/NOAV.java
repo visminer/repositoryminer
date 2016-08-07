@@ -11,37 +11,44 @@ import org.repositoryminer.ast.Statement;
 import org.repositoryminer.ast.Statement.NodeType;
 import org.repositoryminer.metric.MetricId;
 
-public class NOAVMetric extends MethodBasedMetricTemplate {
-	
+/**
+ * <h1>Number of Accessed Variables</h1>
+ * <p>
+ * NOAV is defined as the total number of variables accessed directly from the
+ * measured operation. Variables include parameters, local variables, but also
+ * instance variables and global variables.
+ */
+public class NOAV extends MethodBasedMetricTemplate {
+
 	private List<Document> methodsDoc;
 
 	@Override
 	public void calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast, Document document) {
 		methodsDoc = new ArrayList<Document>();
-		
-		for(MethodDeclaration method : methods){
+
+		for (MethodDeclaration method : methods) {
 			int noav = calculate(method);
 			methodsDoc.add(new Document("method", method.getName()).append("value", new Integer(noav)));
 		}
-		
+
 		document.append("name", MetricId.NOAV).append("methods", methodsDoc);
 	}
-	
-	public int calculate(MethodDeclaration method){
+
+	public int calculate(MethodDeclaration method) {
 		int noav = 0;
-		LVARMetric lvarMetric = new LVARMetric();
-		PARMetric parMetric = new PARMetric();
-		
-		for(Statement stmt : method.getStatements()){
-			if(NodeType.VARIABLE_ACCESS.equals(stmt.getNodeType()))
+		LVAR lvarMetric = new LVAR();
+		PAR parMetric = new PAR();
+
+		for (Statement stmt : method.getStatements()) {
+			if (NodeType.VARIABLE_ACCESS.equals(stmt.getNodeType()))
 				noav++;
 		}
-		
-		//removing variable declarations from count
+
+		// removing variable declarations from count
 		noav = noav - lvarMetric.calculate(method);
-		//removing method parameters from count
+		// removing method parameters from count
 		noav = noav - parMetric.calculate(method);
-		
+
 		return noav;
 	}
 

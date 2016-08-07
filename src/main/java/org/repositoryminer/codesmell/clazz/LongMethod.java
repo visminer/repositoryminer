@@ -10,10 +10,10 @@ import org.repositoryminer.ast.AbstractTypeDeclaration.Archetype;
 import org.repositoryminer.ast.MethodDeclaration;
 import org.repositoryminer.ast.TypeDeclaration;
 import org.repositoryminer.codesmell.CodeSmellId;
-import org.repositoryminer.metric.clazz.CCMetric;
-import org.repositoryminer.metric.clazz.LVARMetric;
-import org.repositoryminer.metric.clazz.MLOCMetric;
-import org.repositoryminer.metric.clazz.PARMetric;
+import org.repositoryminer.metric.clazz.CYCLO;
+import org.repositoryminer.metric.clazz.LVAR;
+import org.repositoryminer.metric.clazz.MLOC;
+import org.repositoryminer.metric.clazz.PAR;
 
 public class LongMethod implements IClassCodeSmell {
 
@@ -51,10 +51,10 @@ public class LongMethod implements IClassCodeSmell {
 	public boolean detect(MethodDeclaration method, AST ast){
 		boolean longMethod = false;
 		
-		CCMetric ccMetric = new CCMetric();
-		MLOCMetric mlocMetric = new MLOCMetric();
-		PARMetric parMetric = new PARMetric();
-		LVARMetric lvarMetric = new LVARMetric();
+		CYCLO ccMetric = new CYCLO();
+		MLOC mlocMetric = new MLOC();
+		PAR parMetric = new PAR();
+		LVAR lvarMetric = new LVAR();
 		
 		int cc = ccMetric.calculate(method);
 		int mloc = mlocMetric.calculate(method, ast);

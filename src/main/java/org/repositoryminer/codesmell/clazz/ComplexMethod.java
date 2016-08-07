@@ -8,7 +8,7 @@ import org.repositoryminer.ast.AST;
 import org.repositoryminer.ast.AbstractTypeDeclaration;
 import org.repositoryminer.ast.AbstractTypeDeclaration.Archetype;
 import org.repositoryminer.codesmell.CodeSmellId;
-import org.repositoryminer.metric.clazz.CCMetric;
+import org.repositoryminer.metric.clazz.CYCLO;
 import org.repositoryminer.ast.MethodDeclaration;
 import org.repositoryminer.ast.TypeDeclaration;
 
@@ -18,7 +18,7 @@ import org.repositoryminer.ast.TypeDeclaration;
  * This code smell is used to detect methods which are too complex. Complex
  * methods causes negative impact in software understandability and maintenance.
  * <p>
- * A method is considered too complex when it has cyclomatic complexity too high.
+ * A method is considered too complex when it has McCabe’s cyclomatic number too high.
  * The default threshold for cyclomatic complexity is 4.
  */
 public class ComplexMethod implements IClassCodeSmell {
@@ -51,11 +51,8 @@ public class ComplexMethod implements IClassCodeSmell {
 
 	public boolean detect(MethodDeclaration method) {
 		boolean complexMethod = false;
-
-		CCMetric ccMetric = new CCMetric();
-
+		CYCLO ccMetric = new CYCLO();
 		complexMethod = ccMetric.calculate(method) > ccThreshold;
-
 		return complexMethod;
 	}
 

@@ -10,10 +10,10 @@ import org.repositoryminer.ast.AbstractTypeDeclaration.Archetype;
 import org.repositoryminer.ast.MethodDeclaration;
 import org.repositoryminer.ast.TypeDeclaration;
 import org.repositoryminer.codesmell.CodeSmellId;
-import org.repositoryminer.metric.clazz.CCMetric;
-import org.repositoryminer.metric.clazz.MLOCMetric;
-import org.repositoryminer.metric.clazz.MaxNestingMetric;
-import org.repositoryminer.metric.clazz.NOAVMetric;
+import org.repositoryminer.metric.clazz.CYCLO;
+import org.repositoryminer.metric.clazz.MLOC;
+import org.repositoryminer.metric.clazz.MAXNESTING;
+import org.repositoryminer.metric.clazz.NOAV;
 
 /**
  * <h1>Brain Method</h1>
@@ -23,13 +23,13 @@ import org.repositoryminer.metric.clazz.NOAVMetric;
  * functionality of a class.
  * <p>
  * The expression used to evaluate if a method is affected by brain method is:<br>
- * <i>(MLOC > mlocThreshold) && (CC / MLOC >= ccMlocThreshold) && (MAX_NESTING >=
+ * <i>(MLOC > mlocThreshold) && (CYCLO / MLOC >= ccMlocThreshold) && (MAX_NESTING >=
  * maxNestingThreshold && NOAV > noavThreshold)</i>
  * <p>
  * The parameters used are:
  * <ul>
  * <li>MLOC: source lines of code per method</li>
- * <li>CC: cyclomatic complexity</li>
+ * <li>CYCLO: McCabe’s cyclomatic number</li>
  * <li>MAX_NESTING: maximum nesting level</li>
  * <li>NOAV: number of accessed variables</li>
  * </ul>
@@ -78,15 +78,15 @@ public class BrainMethod implements IClassCodeSmell {
 	public boolean detect(MethodDeclaration method, AST ast) {
 		boolean brainMethod = false;
 
-		MLOCMetric mlocMetric = new MLOCMetric();
-		CCMetric ccMetric = new CCMetric();
-		NOAVMetric noavMetric = new NOAVMetric();
-		MaxNestingMetric maxNestingMetric = new MaxNestingMetric();
+		MLOC mlocMetric = new MLOC();
+		CYCLO ccMetric = new CYCLO();
+		NOAV noavMetric = new NOAV();
+		MAXNESTING mAXNESTINGMetric = new MAXNESTING();
 
 		int cc = ccMetric.calculate(method);
 		int mloc = mlocMetric.calculate(method, ast);
 		int noav = noavMetric.calculate(method);
-		int maxNesting = maxNestingMetric.calculate(method);
+		int maxNesting = mAXNESTINGMetric.calculate(method);
 
 		brainMethod = (mloc > mlocThreshold) && (cc / mloc >= ccMlocThreshold)
 				&& (maxNesting >= maxNestingThreshold && noav > noavThreshold);
