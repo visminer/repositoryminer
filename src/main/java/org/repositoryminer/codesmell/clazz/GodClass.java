@@ -11,6 +11,39 @@ import org.repositoryminer.metric.clazz.NOAMetric;
 import org.repositoryminer.metric.clazz.TCCMetric;
 import org.repositoryminer.metric.clazz.WMCMetric;
 
+/**
+ * <h1>God Class</h1>
+ * <p>
+ * This code smell detects classes that tend to centralize the intelligence of a
+ * system. A god class performs too much work for its own delegating only minor
+ * details for trivial classes or using some data of others. This has a negative
+ * impact in reusability and understandability of that part of the system.
+ * <p>
+ * The expression used to evaluate if a class is affected by god class is:<br>
+ * <i> if (useNoa)<br>
+ * godClass = (ATFD > atfdThreshold) && ((WMC > wmcThreshold) || ((TCC <
+ * tccThreshold) && (NOA > noaThreshold)))<br>
+ * else<br>
+ * godClass = (ATFD > atfdThreshold) && ((WMC > wmcThreshold) || ((TCC <
+ * tccThreshold))) </i>
+ * <p>
+ * The parameters used are:
+ * <ul>
+ * <li>ATFD: access to foreign data</li>
+ * <li>WMC: weighted method count</li>
+ * <li>TCC: tight class cohesion</li>
+ * <li>NOA: number of attributes</li>
+ * </ul>
+ * The default thresholds used are:
+ * <ul>
+ * <li>atfdThreshold = 40</li>
+ * <li>wmcThreshold = 75</li>
+ * <li>tccThreshold = 0.2</li>
+ * <li>noaThreshold = 20</li>
+ * </ul>
+ * <b>P.S.</b> The "useNoa" is a flag to define if the NOA metric will be
+ * considered or not. The default value of "useNoa" is false.
+ */
 public class GodClass implements IClassCodeSmell {
 
 	private int atfdThreshold = 40;
@@ -19,7 +52,8 @@ public class GodClass implements IClassCodeSmell {
 	private int noaThreshold = 20;
 	private boolean useNoa = false;
 
-	public GodClass() {}
+	public GodClass() {
+	}
 
 	public GodClass(int atfdThreshold, int wmcThreshold, float tccThreshold, int noaThreshold, boolean useNoa) {
 		this.atfdThreshold = atfdThreshold;
@@ -41,7 +75,7 @@ public class GodClass implements IClassCodeSmell {
 
 	public boolean detect(AbstractTypeDeclaration type, TypeDeclaration cls) {
 		boolean godClass = false;
-		
+
 		ATFDMetric atfdMetric = new ATFDMetric();
 		WMCMetric wmcMetric = new WMCMetric();
 		TCCMetric tccMetric = new TCCMetric();
@@ -52,11 +86,13 @@ public class GodClass implements IClassCodeSmell {
 		int wmc = wmcMetric.calculate(cls.getMethods());
 		int noa = noaMetric.calculate(cls.getFields());
 
-		if(useNoa)
-			godClass = (atfd > atfdThreshold) && ((wmc > wmcThreshold) || ((tcc < tccThreshold) && (noa > noaThreshold)));
+		if (useNoa)
+			godClass = (atfd > atfdThreshold)
+					&& ((wmc > wmcThreshold) || ((tcc < tccThreshold) && (noa > noaThreshold)));
 		else
 			godClass = (atfd > atfdThreshold) && ((wmc > wmcThreshold) || ((tcc < tccThreshold)));
-		
+
 		return godClass;
 	}
+	
 }

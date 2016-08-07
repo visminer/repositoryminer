@@ -22,18 +22,27 @@ import net.sourceforge.pmd.cpd.Language;
 import net.sourceforge.pmd.cpd.Mark;
 import net.sourceforge.pmd.cpd.Match;
 
+/**
+ * The detection of duplicated code plays an essential role to detect desing
+ * problems. But detect clones might not be relevant if they are too small. The
+ * goal of the detection is capture the portions of code that contain
+ * significant amount of duplication.
+ * <p>
+ * The only threshold of this code smell is the number of tokens, in other
+ * words, the amount of duplication that a portion of code must have to be considered
+ * duplicate.
+ */
 public class DuplicatedCode implements IProjectCodeSmell {
 
 	private int tokensThreshold = 100;
-	private boolean skipLexicalErrors = true;
 
-	public DuplicatedCode() {}
-	
-	public DuplicatedCode(int tokensThreshold, boolean skipLexicalErrors) {
-		this.tokensThreshold = tokensThreshold;
-		this.skipLexicalErrors = skipLexicalErrors;
+	public DuplicatedCode() {
 	}
-	
+
+	public DuplicatedCode(int tokensThreshold) {
+		this.tokensThreshold = tokensThreshold;
+	}
+
 	@Override
 	public void detect(List<Parser> parsers, String repositoryPath, Document document) {
 		document.append("name", CodeSmellId.DUPLICATED_CODE).append("occurrences", calculate(parsers, repositoryPath));
@@ -46,7 +55,7 @@ public class DuplicatedCode implements IProjectCodeSmell {
 			CPDConfiguration config = new CPDConfiguration();
 			config.setEncoding(parser.getCharset());
 			config.setLanguage(languageFactory(parser.getLanguage()));
-			config.setSkipLexicalErrors(skipLexicalErrors);
+			config.setSkipLexicalErrors(true);
 			config.setSourceEncoding(parser.getCharset());
 			config.setMinimumTileSize(tokensThreshold);
 			config.setNonRecursive(true);
@@ -63,7 +72,7 @@ public class DuplicatedCode implements IProjectCodeSmell {
 			if (null != config.getFiles() && !config.getFiles().isEmpty()) {
 				addSourcesFilesToCPD(config.getFiles(), cpd);
 			}
-			
+
 			cpd.go();
 			Iterator<Match> ms = cpd.getMatches();
 			while (ms.hasNext()) {
@@ -73,7 +82,7 @@ public class DuplicatedCode implements IProjectCodeSmell {
 				auxDoc.append("token_count", m.getTokenCount());
 				auxDoc.append("source_code_slice", m.getSourceCodeSlice());
 				auxDoc.append("language", parser.getLanguage());
-				
+
 				List<Document> filesDoc = new ArrayList<Document>();
 				for (Mark mark : m.getMarkSet()) {
 					Document fileDoc = new Document();
@@ -83,12 +92,12 @@ public class DuplicatedCode implements IProjectCodeSmell {
 					fileDoc.append("percentage", getDuplicatedPercentage(mark.getFilename(), m.getLineCount()));
 					filesDoc.add(fileDoc);
 				}
-				
+
 				auxDoc.append("files", filesDoc);
 				docs.add(auxDoc);
 			}
 		}
-		
+
 		return docs;
 	}
 
@@ -115,16 +124,16 @@ public class DuplicatedCode implements IProjectCodeSmell {
 		try {
 			String source = new String(Files.readAllBytes(Paths.get(filename)));
 			SLOCMetric slocMetric = new SLOCMetric();
-			
+
 			int sloc = slocMetric.calculate(source);
 			double percentage = (double) lineCount / sloc;
 			DecimalFormat df = new DecimalFormat("#.####");
 			df.setRoundingMode(RoundingMode.CEILING);
 			return Double.valueOf(df.format(percentage));
-			
+
 		} catch (IOException e) {
 			return 0.0;
 		}
 	}
-	
+
 }

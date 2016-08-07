@@ -11,15 +11,50 @@ import org.repositoryminer.metric.clazz.SLOCMetric;
 import org.repositoryminer.metric.clazz.TCCMetric;
 import org.repositoryminer.metric.clazz.WMCMetric;
 
+/**
+ * <h1>Brain Class</h1>
+ * <p>
+ * This code smell is about too complex classes that tend accumulate an
+ * excessive amount of intelligence, usually constituted with several methods
+ * affected by Brain Method.
+ * <p>
+ * This code smell recalls God Class, because those classes also have the
+ * tendency to centralize intelligence of the system. The two disharmonies looks
+ * like quite similar, this is partially true because they refer to complex
+ * classes. But the two problems are distinct.
+ * <p>
+ * The expression used to evaluate if a class is affected by Brain Class is:<br>
+ * <i>IS_GOD_CLASS && (WMC >= wmcThreshold && TCC < tccThreshold) && ((NBM >
+ * nbmThreshold && SLOC >= slocThreshold) || (NBM == nbmThreshold && SLOC >=
+ * (2 * slocThreshold) && WMC >= (2 * wmcThreshold)))</i>
+ * <p>
+ * The parameters used are:
+ * <ul>
+ * <li>IS_GOD_CLASS: true if the class is a god class or false otherwise</li>
+ * <li>WMC: weighted methods per class</li>
+ * <li>TCC: tight class cohesion</li>
+ * <li>NBM: number of brain methods</li>
+ * <li>SLOC: source lines of code</li>
+ * </ul>
+ * The default thresholds used are:
+ * <ul>
+ * <li>wmcThreshold = 47</li>
+ * <li>tccThreshold = 0.5</li>
+ * <li>nbmThreshold = 1</li>
+ * <li>slocThreshold = 197</li>
+ * </ul>
+ * <p>
+ */
 public class BrainClass implements IClassCodeSmell {
-	
+
 	private int wmcThreshold = 47;
 	private float tccThreshold = 0.5f;
 	private int nbmThreshold = 1;
 	private int slocThreshold = 197;
-	
-	public BrainClass() {}
-	
+
+	public BrainClass() {
+	}
+
 	public BrainClass(int wmcThreshold, float tccThreshold, int nbmThreshold, int slocThreshold) {
 		this.wmcThreshold = wmcThreshold;
 		this.tccThreshold = tccThreshold;
@@ -36,28 +71,29 @@ public class BrainClass implements IClassCodeSmell {
 		}
 	}
 
-	public boolean detect(AST ast, AbstractTypeDeclaration type, TypeDeclaration cls){
-		boolean brainClass  = false;
+	public boolean detect(AST ast, AbstractTypeDeclaration type, TypeDeclaration cls) {
+		boolean brainClass = false;
 		WMCMetric wmcMetric = new WMCMetric();
 		GodClass godClass = new GodClass();
 		BrainMethod brainMethod = new BrainMethod();
 		TCCMetric tccMetric = new TCCMetric();
 		SLOCMetric slocMetric = new SLOCMetric();
-		
+
 		int wmc = wmcMetric.calculate(cls.getMethods());
 		boolean isGodClass = godClass.detect(type, cls);
-		int nbm = 0; //number of brain methods
+		int nbm = 0; // number of brain methods
 		float tcc = tccMetric.calculate(type, cls.getMethods());
 		int sloc = slocMetric.calculate(ast.getSourceCode());
-	
-		for(MethodDeclaration method : cls.getMethods()){
-			if(brainMethod.detect(method, ast))
+
+		for (MethodDeclaration method : cls.getMethods()) {
+			if (brainMethod.detect(method, ast))
 				nbm++;
 		}
-		
-		brainClass = isGodClass && (wmc >=wmcThreshold && tcc < tccThreshold) && 
-					((nbm > nbmThreshold && sloc >= slocThreshold) || (nbm == nbmThreshold && sloc >= (2*slocThreshold) && wmc >= (2*wmcThreshold) ));
-		
+
+		brainClass = isGodClass && (wmc >= wmcThreshold && tcc < tccThreshold)
+				&& ((nbm > nbmThreshold && sloc >= slocThreshold)
+						|| (nbm == nbmThreshold && sloc >= (2 * slocThreshold) && wmc >= (2 * wmcThreshold)));
+
 		return brainClass;
 	}
 

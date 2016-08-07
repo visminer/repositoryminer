@@ -7,6 +7,9 @@ import org.bson.Document;
 import org.repositoryminer.ast.AST;
 import org.repositoryminer.parser.Parser;
 
+/**
+ * This interface defines how to implement code smell detection in project level.
+ */
 public interface IProjectCodeSmell {
 
 	TreeMap<String, AST> astMap = new TreeMap<String, AST>();

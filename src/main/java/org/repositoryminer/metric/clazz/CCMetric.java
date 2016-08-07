@@ -12,7 +12,7 @@ import org.repositoryminer.ast.Statement.NodeType;
 import org.repositoryminer.metric.MetricId;
 
 /**
- * <h1>The cyclomatic complexity (CC) method-based metric</h1>
+ * <h1>Cyclomatic Complexity</h1>
  * <p>
  * CC is defined as "a quantitative measure of the number of linearly
  * independent paths through a program's source code".

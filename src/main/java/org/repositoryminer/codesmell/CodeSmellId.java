@@ -1,5 +1,8 @@
 package org.repositoryminer.codesmell;
 
+/**
+ * This class contains the unique identifiers to the code smells
+ */
 public class CodeSmellId {
 
 	public static final String DUPLICATED_CODE = "DUPLICATED_CODE";
