@@ -4,10 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.egit.github.core.Contributor;
-import org.eclipse.egit.github.core.Issue;
-import org.eclipse.egit.github.core.Label;
-import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.client.GitHubClient;
@@ -15,10 +11,10 @@ import org.eclipse.egit.github.core.service.CollaboratorService;
 import org.eclipse.egit.github.core.service.IssueService;
 import org.eclipse.egit.github.core.service.MilestoneService;
 import org.eclipse.egit.github.core.service.RepositoryService;
-import org.repositoryminer.persistence.model.ContributorDB;
-import org.repositoryminer.persistence.model.IssueDB;
-import org.repositoryminer.persistence.model.LabelDB;
-import org.repositoryminer.persistence.model.MilestoneDB;
+import org.repositoryminer.model.Contributor;
+import org.repositoryminer.model.Issue;
+import org.repositoryminer.model.Label;
+import org.repositoryminer.model.Milestone;
 
 public class GitHubService implements HostingService {
 
@@ -52,14 +48,14 @@ public class GitHubService implements HostingService {
 	}
 
 	@Override
-	public List<IssueDB> getAllIssues() {
+	public List<Issue> getAllIssues() {
 		int number = 1;
-		List<IssueDB> issuesDB = new ArrayList<IssueDB>();
+		List<Issue> issues = new ArrayList<Issue>();
 
 		while (true) {
 			try {
-				Issue issue = issueServ.getIssue(repositoryId, number++);
-				IssueDB issueDB = new IssueDB(issue.getUser().getLogin(), issue.getClosedAt(), issue.getComments(),
+				org.eclipse.egit.github.core.Issue issue = issueServ.getIssue(repositoryId, number++);
+				Issue issueDB = new Issue(issue.getUser().getLogin(), issue.getClosedAt(), issue.getComments(),
 						issue.getCreatedAt(), issue.getNumber(), StatusType.parse(issue.getState()), issue.getTitle(),
 						issue.getUpdatedAt(), issue.getBody());
 
@@ -72,31 +68,31 @@ public class GitHubService implements HostingService {
 				}
 
 				if (issue.getLabels() != null) {
-					List<LabelDB> labels = new ArrayList<LabelDB>();
-					for (Label l : issue.getLabels()) {
-						labels.add(new LabelDB(l.getName(), l.getColor()));
+					List<Label> labels = new ArrayList<Label>();
+					for (org.eclipse.egit.github.core.Label l : issue.getLabels()) {
+						labels.add(new Label(l.getName(), l.getColor()));
 					}
 					issueDB.setLabels(labels);
 				}
 
-				issuesDB.add(issueDB);
+				issues.add(issueDB);
 			} catch (IOException e) {
 				break;
 			}
 		}
 
-		return issuesDB;
+		return issues;
 	}
 
 	@Override
-	public List<MilestoneDB> getAllMilestones() {
+	public List<Milestone> getAllMilestones() {
 		int number = 1;
-		List<MilestoneDB> milesDB = new ArrayList<MilestoneDB>();
+		List<Milestone> milesDB = new ArrayList<Milestone>();
 
 		while (true) {
 			try {
-				Milestone mile = milestoneServ.getMilestone(repositoryId, number++);
-				MilestoneDB mileDB = new MilestoneDB(mile.getNumber(), StatusType.parse(mile.getState()),
+				org.eclipse.egit.github.core.Milestone mile = milestoneServ.getMilestone(repositoryId, number++);
+				Milestone mileDB = new Milestone(mile.getNumber(), StatusType.parse(mile.getState()),
 						mile.getTitle(), mile.getDescription(), mile.getOpenIssues(), mile.getClosedIssues(),
 						mile.getCreatedAt(), mile.getDueOn());
 
@@ -114,17 +110,17 @@ public class GitHubService implements HostingService {
 	}
 
 	@Override
-	public List<ContributorDB> getAllContributors() {
-		List<ContributorDB> contributors = new ArrayList<ContributorDB>();
+	public List<Contributor> getAllContributors() {
+		List<Contributor> contributors = new ArrayList<Contributor>();
 
 		try {
-			for (Contributor contributor : repoServ.getContributors(repositoryId, true)) {
-				contributors.add(new ContributorDB(contributor.getName(), contributor.getLogin(),
+			for (org.eclipse.egit.github.core.Contributor contributor : repoServ.getContributors(repositoryId, true)) {
+				contributors.add(new Contributor(contributor.getName(), contributor.getLogin(),
 						contributor.getAvatarUrl(), false));
 			}
 
 			for (User user : collaboratorServ.getCollaborators(repositoryId)) {
-				for (ContributorDB contributor : contributors) {
+				for (Contributor contributor : contributors) {
 					if (contributor.getLogin().equals(user.getLogin())) {
 						contributor.setCollaborator(true);
 						contributor.setEmail(user.getEmail());
