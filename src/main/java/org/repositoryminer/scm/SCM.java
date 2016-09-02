@@ -2,8 +2,8 @@ package org.repositoryminer.scm;
 
 import java.util.List;
 
-import org.repositoryminer.persistence.model.CommitDB;
-import org.repositoryminer.persistence.model.ReferenceDB;
+import org.repositoryminer.model.Commit;
+import org.repositoryminer.model.Reference;
 
 /**
  * Interface that define what is needed to support a repository.
@@ -36,13 +36,13 @@ public interface SCM {
 	 * @param repositoryId
 	 * @return List all references(e.g. tags and branches).
 	 */
-	public List<ReferenceDB> getReferences();
+	public List<Reference> getReferences();
 
 	/**
 	 * @return A list with all commits in the repository.
 	 * This method iterates through all commits.
 	 */
-	public List<CommitDB> getCommits();
+	public List<Commit> getCommits();
 	
 	/**
 	 * @param fullName
