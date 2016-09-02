@@ -6,17 +6,16 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.bson.Document;
 import org.repositoryminer.listener.IProgressListener;
+import org.repositoryminer.model.Commit;
+import org.repositoryminer.model.Contributor;
+import org.repositoryminer.model.Reference;
+import org.repositoryminer.model.Repository;
+import org.repositoryminer.model.WorkingDirectory;
 import org.repositoryminer.persistence.handler.CommitDocumentHandler;
 import org.repositoryminer.persistence.handler.ReferenceDocumentHandler;
 import org.repositoryminer.persistence.handler.RepositoryDocumentHandler;
 import org.repositoryminer.persistence.handler.WorkingDirectoryDocumentHandler;
-import org.repositoryminer.persistence.model.CommitDB;
-import org.repositoryminer.persistence.model.ContributorDB;
-import org.repositoryminer.persistence.model.ReferenceDB;
-import org.repositoryminer.persistence.model.RepositoryDB;
-import org.repositoryminer.persistence.model.WorkingDirectoryDB;
 import org.repositoryminer.scm.SCM;
 import org.repositoryminer.scm.SCMFactory;
 import org.repositoryminer.utility.StringUtils;
@@ -71,6 +70,77 @@ public class MiningProcessor {
 	}
 
 	/**
+	 * Starts the mining process
+	 * 
+	 * @param repositoryMiner
+	 *            instance of {@link org.repositoryminer.mining.RepositoryMiner}
+	 *            . It must <b>NEVER<b> be null, since it will provide important
+	 *            parameters for the source-code analysis and persistence
+	 * @throws UnsupportedEncodingException
+	 */
+	public Repository mine(RepositoryMiner repositoryMiner) throws UnsupportedEncodingException {
+		SCM scm = SCMFactory.getSCM(repositoryMiner.getScm());
+		scm.open(repositoryMiner.getPath(), repositoryMiner.getBinaryThreshold());
+
+		String absPath = scm.getAbsolutePath();
+		String id = StringUtils.encodeToSHA1(absPath);
+
+		Repository repository = new Repository(repositoryMiner);
+		repository.setId(id);
+		repository.setPath(absPath);
+
+		WorkingDirectory wd = new WorkingDirectory(id);
+		WorkingDirectoryDocumentHandler wdHandler = new WorkingDirectoryDocumentHandler();
+
+		ReferenceDocumentHandler refHandler = new ReferenceDocumentHandler();
+		List<Reference> refs = scm.getReferences();
+		for (Reference ref : refs) {
+			ref.setCommits(scm.getReferenceCommits(ref.getFullName(), ref.getType()));
+			refHandler.insert(ref.toDocument());
+		}
+
+		Set<Contributor> contributors = new HashSet<Contributor>();
+		CommitDocumentHandler commitHandler = new CommitDocumentHandler();
+
+		List<Commit> commits = scm.getCommits();
+
+		IProgressListener progressListener = repositoryMiner.getProgressListener();
+		int idx = 0;
+		for (Commit commit : commits) {
+			if (progressListener != null) {
+				progressListener.commitsProgressChange(++idx, commits.size());
+			}
+
+			contributors.add(commit.getCommitter());
+			wd.setId(commit.getId());
+			wd.processDiff(commit.getDiffs());
+			wdHandler.insert(wd.toDocument());
+
+			commitHandler.insert(commit.toDocument());
+		}
+
+		List<Reference> timeRefs = new ArrayList<Reference>();
+		if (repositoryMiner.getTimeFrames() != null) {
+			if (progressListener != null) {
+				progressListener.initTimeFramesProgress();
+			}
+
+			ProcessTimeFrames procTimeFrames = new ProcessTimeFrames(absPath, id);
+			timeRefs = procTimeFrames.analyzeCommits(commits, repositoryMiner.getTimeFrames(), progressListener);
+		}
+
+		calculateAndDetect(repositoryMiner, commits, refs, timeRefs, scm, id, absPath);
+
+		RepositoryDocumentHandler repoHandler = new RepositoryDocumentHandler();
+		repository.setContributors(new ArrayList<Contributor>(contributors));
+		repoHandler.insert(repository.toDocument());
+
+		scm.close();
+		
+		return repository;
+	}
+
+	/**
 	 * Performs both the calculation (metrics) and detections (smells/debts) on
 	 * the artifacts of a targeted project. An instance of
 	 * {@link org.repositoryminer.mining.SourceAnalyzer} is prepared/configured
@@ -90,114 +160,29 @@ public class MiningProcessor {
 	 *            path to the project being mined
 	 * @throws UnsupportedEncodingException
 	 */
-	private void calculateAndDetect(RepositoryMiner repositoryMiner, List<CommitDB> commits, List<ReferenceDB> scmRefs,
-			List<ReferenceDB> timeRefs, SCM scm, String repoId, String repoPath) throws UnsupportedEncodingException {
-
-		boolean classMetrics = (repositoryMiner.getClassMetrics() != null
-				&& repositoryMiner.getClassMetrics().size() > 0);
-		boolean technicalDebts = (repositoryMiner.getTechnicalDebts() != null
-				&& repositoryMiner.getTechnicalDebts().size() > 0);
-		boolean classCodeSmells = (repositoryMiner.getClassCodeSmells() != null
-				&& repositoryMiner.getClassCodeSmells().size() > 0);
-		boolean projectCodeSmells = (repositoryMiner.getProjectCodeSmells() != null
-				&& repositoryMiner.getProjectCodeSmells().size() > 0);
-
-		if (!classCodeSmells && !classMetrics && !technicalDebts && !projectCodeSmells) {
+	private void calculateAndDetect(RepositoryMiner repositoryMiner, List<Commit> commits, List<Reference> scmRefs,
+			List<Reference> timeRefs, SCM scm, String repoId, String repoPath) throws UnsupportedEncodingException {
+		if (!repositoryMiner.hasClassCodeSmells() && !repositoryMiner.hasClassMetrics()
+				&& !repositoryMiner.hasTechnicalDebts() && !repositoryMiner.hasProjectsCodeSmells()) {
 			return;
 		}
 
-		List<ReferenceDB> tags = null;
-		if (projectCodeSmells) {
-			tags = new ArrayList<ReferenceDB>();
-			for (ReferenceDB ref : scmRefs) {
+		List<Reference> tags = null;
+		if (repositoryMiner.hasProjectsCodeSmells()) {
+			tags = new ArrayList<Reference>();
+			for (Reference ref : scmRefs) {
 				tags.add(ref);
 			}
-			for (ReferenceDB ref : timeRefs) {
+			for (Reference ref : timeRefs) {
 				tags.add(ref);
 			}
 		}
 
 		SourceAnalyzer sourceAnalyzer = new SourceAnalyzer(repositoryMiner, scm, repoId, repoPath);
-		sourceAnalyzer.setCommitCodeSmells(classCodeSmells);
-		sourceAnalyzer.setCommitMetrics(classMetrics);
 		sourceAnalyzer.setCommits(commits);
-		sourceAnalyzer.setCommitTechnicalDebts(technicalDebts);
-		sourceAnalyzer.setTagCodeSmells(projectCodeSmells);
 		sourceAnalyzer.setTags(tags);
 
 		sourceAnalyzer.analyze();
-	}
-
-	/**
-	 * Starts the mining process
-	 * 
-	 * @param repositoryMiner
-	 *            instance of {@link org.repositoryminer.mining.RepositoryMiner}
-	 *            . It must <b>NEVER<b> be null, since it will provide important
-	 *            parameters for the source-code analysis and persistence
-	 * @throws UnsupportedEncodingException
-	 */
-	public void mine(RepositoryMiner repositoryMiner) throws UnsupportedEncodingException {
-		SCM scm = SCMFactory.getSCM(repositoryMiner.getScm());
-		scm.open(repositoryMiner.getPath(), repositoryMiner.getBinaryThreshold());
-
-		String absPath = scm.getAbsolutePath();
-		String id = StringUtils.encodeToSHA1(absPath);
-
-		RepositoryDB r = new RepositoryDB(repositoryMiner);
-		r.setId(id);
-		r.setPath(absPath);
-
-		WorkingDirectoryDB wd = new WorkingDirectoryDB(id);
-		WorkingDirectoryDocumentHandler wdHandler = new WorkingDirectoryDocumentHandler();
-
-		ReferenceDocumentHandler refHandler = new ReferenceDocumentHandler();
-		List<ReferenceDB> refs = scm.getReferences();
-		for (ReferenceDB ref : refs) {
-			ref.setCommits(scm.getReferenceCommits(ref.getFullName(), ref.getType()));
-			refHandler.insert(ref.toDocument());
-		}
-
-		Set<ContributorDB> contributors = new HashSet<ContributorDB>();
-		CommitDocumentHandler commitHandler = new CommitDocumentHandler();
-
-		List<CommitDB> commits = scm.getCommits();
-		List<Document> docs = new ArrayList<Document>();
-
-		IProgressListener progressListener = repositoryMiner.getProgressListener();
-
-		int idx = 0;
-		for (CommitDB c : commits) {
-			if (progressListener != null) {
-				progressListener.commitsProgressChange(++idx, commits.size());
-			}
-
-			docs.add(c.toDocument());
-			contributors.add(c.getCommitter());
-			wd.setId(c.getId());
-			wd.processDiff(c.getDiffs());
-			wdHandler.insert(wd.toDocument());
-		}
-
-		commitHandler.insertMany(docs);
-
-		List<ReferenceDB> timeRefs = new ArrayList<ReferenceDB>();
-		if (repositoryMiner.getTimeFrames() != null) {
-			if (progressListener != null) {
-				progressListener.initTimeFramesProcessingProgress();
-			}
-
-			ProcessTimeFrames procTimeFrames = new ProcessTimeFrames(absPath, id);
-			timeRefs = procTimeFrames.analyzeCommits(commits, repositoryMiner.getTimeFrames(), progressListener);
-		}
-
-		calculateAndDetect(repositoryMiner, commits, refs, timeRefs, scm, id, absPath);
-
-		RepositoryDocumentHandler repoHandler = new RepositoryDocumentHandler();
-		r.setContributors(new ArrayList<ContributorDB>(contributors));
-		repoHandler.insert(r.toDocument());
-
-		scm.close();
 	}
 
 }

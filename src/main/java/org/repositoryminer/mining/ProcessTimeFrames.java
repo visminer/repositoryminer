@@ -9,9 +9,9 @@ import java.util.TreeMap;
 
 import org.bson.Document;
 import org.repositoryminer.listener.IProgressListener;
+import org.repositoryminer.model.Commit;
+import org.repositoryminer.model.Reference;
 import org.repositoryminer.persistence.handler.ReferenceDocumentHandler;
-import org.repositoryminer.persistence.model.CommitDB;
-import org.repositoryminer.persistence.model.ReferenceDB;
 import org.repositoryminer.scm.ReferenceType;
 import org.repositoryminer.utility.StringUtils;
 
@@ -19,17 +19,17 @@ public class ProcessTimeFrames {
 
 	private static final String RM_TAG_NAME = "CUSTOM_TAG-";
 
-	private Map<String, ReferenceDB> refs;
+	private Map<String, Reference> refs;
 	private String repositoryPath;
 	private String repositoryId;
 
 	public ProcessTimeFrames(String repositoryPath, String repositoryId) {
-		this.refs = new TreeMap<String, ReferenceDB>();
+		this.refs = new TreeMap<String, Reference>();
 		this.repositoryPath = repositoryPath;
 		this.repositoryId = repositoryId;
 	}
 
-	public List<ReferenceDB> analyzeCommits(List<CommitDB> commits, List<TimeFrameType> timeFrames, IProgressListener progressListener) {
+	public List<Reference> analyzeCommits(List<Commit> commits, List<TimeFrameType> timeFrames, IProgressListener progressListener) {
 		boolean monthFrame = false;
 		boolean trimesterFrame = false;
 		boolean semesterFrame = false;
@@ -53,7 +53,7 @@ public class ProcessTimeFrames {
 		}
 
 		int idx = 0;
-		for (CommitDB c : commits) {
+		for (Commit c : commits) {
 			if (progressListener != null) {
 				progressListener.commitsProgressChange(++idx, commits.size());
 			}
@@ -76,9 +76,9 @@ public class ProcessTimeFrames {
 		}
 
 		List<Document> docs = new ArrayList<Document>();
-		List<ReferenceDB> timeRefs = new ArrayList<ReferenceDB>(refs.values());
+		List<Reference> timeRefs = new ArrayList<Reference>(refs.values());
 		idx = 0;
-		for (ReferenceDB r : timeRefs) {
+		for (Reference r : timeRefs) {
 			if (progressListener != null) {
 				progressListener.timeFramesProgressChange(++idx, timeRefs.size());
 			}
@@ -138,12 +138,11 @@ public class ProcessTimeFrames {
 
 	private void checkReference(String key, String name, String hash) {
 		if (refs.containsKey(key)) {
-			ReferenceDB tempRef = refs.get(key);
+			Reference tempRef = refs.get(key);
 			tempRef.getCommits().add(hash);
 		} else {
 			String id = StringUtils.encodeToSHA1(repositoryPath + "/" + key);
-			ReferenceDB r = new ReferenceDB(id, repositoryId, name, key, ReferenceType.CUSTOM_TIME_TAG);
-			r.setCommits(new ArrayList<String>());
+			Reference r = new Reference(id, repositoryId, name, repositoryPath, ReferenceType.CUSTOM_TIME_TAG, new ArrayList<String>());
 			r.getCommits().add(hash);
 			refs.put(key, r);
 		}

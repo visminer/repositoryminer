@@ -4,9 +4,9 @@ import java.io.IOException;
 import java.util.List;
 
 import org.bson.Document;
-import org.repositoryminer.mining.model.Commit;
-import org.repositoryminer.mining.model.Reference;
-import org.repositoryminer.mining.model.Repository;
+import org.repositoryminer.model.Commit;
+import org.repositoryminer.model.Reference;
+import org.repositoryminer.model.Repository;
 import org.repositoryminer.persistence.handler.CommitAnalysisDocumentHandler;
 import org.repositoryminer.persistence.handler.CommitDocumentHandler;
 import org.repositoryminer.persistence.handler.ReferenceDocumentHandler;
