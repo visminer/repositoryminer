@@ -9,6 +9,7 @@ import org.repositoryminer.codesmell.project.IProjectCodeSmell;
 import org.repositoryminer.listener.IProgressListener;
 import org.repositoryminer.metric.clazz.IClassMetric;
 import org.repositoryminer.parser.Parser;
+import org.repositoryminer.postprocessing.IPostMiningTask;
 import org.repositoryminer.scm.SCMType;
 import org.repositoryminer.technicaldebt.ITechnicalDebt;
 
@@ -55,6 +56,8 @@ public class RepositoryMiner {
 	private List<ITechnicalDebt> technicalDebts;
 	private List<TimeFrameType> timeFrames;
 	private List<IProjectCodeSmell> projectCodeSmells;
+	
+	private List<IPostMiningTask> postMiningTasks;
 
 	private IProgressListener progressListener;
 
@@ -104,12 +107,13 @@ public class RepositoryMiner {
 	 */
 	public void mine() throws UnsupportedEncodingException {
 		MiningProcessor processor = new MiningProcessor();
+		PostMiningProcessor postProcessor = new PostMiningProcessor();
 		if (progressListener != null) {
 			progressListener.initMining(name);
-			processor.mine(this);
+			postProcessor.executeTasks(processor.mine(this), this);
 			progressListener.endOfMining();
 		} else {
-			processor.mine(this);
+			postProcessor.executeTasks(processor.mine(this), this);
 		}
 	}
 
@@ -142,7 +146,12 @@ public class RepositoryMiner {
 		this.projectCodeSmells = Arrays.asList(projectCodeSmells);
 		return this;
 	}
-
+	
+	public RepositoryMiner setPostMiningTasks(IPostMiningTask... postMiningTasks) {
+		this.postMiningTasks = Arrays.asList(postMiningTasks);
+		return this;
+	}
+	
 	public String getPath() {
 		return path;
 	}
@@ -249,6 +258,35 @@ public class RepositoryMiner {
 	public RepositoryMiner setProjectCodeSmells(List<IProjectCodeSmell> projectCodeSmells) {
 		this.projectCodeSmells = projectCodeSmells;
 		return this;
+	}
+	
+	public List<IPostMiningTask> getPostMiningTasks() {
+		return postMiningTasks;
+	}
+
+	public RepositoryMiner setPostMiningTasks(List<IPostMiningTask> postMiningTasks) {
+		this.postMiningTasks = postMiningTasks;
+		return this;
+	}
+	
+	public boolean hasClassMetrics() {
+		return (classMetrics != null && !classMetrics.isEmpty());
+	}
+	
+	public boolean hasTechnicalDebts() {
+		return (technicalDebts != null && !technicalDebts.isEmpty());
+	}
+
+	public boolean hasClassCodeSmells() {
+		return (classCodeSmells != null && !classCodeSmells.isEmpty());
+	}
+	
+	public boolean hasProjectsCodeSmells() {
+		return (projectCodeSmells != null && !projectCodeSmells.isEmpty());
+	}
+	
+	public boolean hasPostMiningTasks() {
+		return (postMiningTasks != null && !postMiningTasks.isEmpty());
 	}
 
 	public RepositoryMiner setProgressListener(IProgressListener progressListener) {
