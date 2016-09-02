@@ -1,4 +1,4 @@
-package org.repositoryminer.persistence.model;
+package org.repositoryminer.model;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +10,7 @@ import org.repositoryminer.scm.DiffType;
  * This class represents the "change" object in the database. This class
  * represents the changes made in a commit.
  */
-public class DiffDB {
+public class Diff {
 
 	private String path;
 	private String oldPath;
@@ -19,12 +19,20 @@ public class DiffDB {
 	private int linesRemoved;
 	private DiffType type;
 
-	public DiffDB() {
+	public static List<Diff> parseDocuments(List<Document> docs) {
+		List<Diff> diffs = new ArrayList<Diff>();
+		for (Document doc : docs) {
+			Diff diff = new Diff(doc.getString("path"), doc.getString("old_path"),
+				doc.getString("hash"), doc.getInteger("lines_added", 0), doc.getInteger("lines_removed", 0),
+				DiffType.valueOf(doc.getString("type")));
+			diffs.add(diff);
+		}
+		return diffs;
 	}
 
-	public static List<Document> toDocumentList(List<DiffDB> diffs) {
+	public static List<Document> toDocumentList(List<Diff> diffs) {
 		List<Document> list = new ArrayList<Document>();
-		for (DiffDB d : diffs) {
+		for (Diff d : diffs) {
 			Document doc = new Document();
 			doc.append("path", d.getPath()).append("old_path", d.getOldPath()).append("hash", d.getHash())
 					.append("lines_added", d.getLinesAdded()).append("lines_removed", d.getLinesRemoved())
@@ -34,7 +42,10 @@ public class DiffDB {
 		return list;
 	}
 
-	public DiffDB(String path, String oldPath, String hash, int linesAdded, int linesRemoved, DiffType type) {
+	public Diff() {
+	}
+
+	public Diff(String path, String oldPath, String hash, int linesAdded, int linesRemoved, DiffType type) {
 		super();
 		this.path = path;
 		this.oldPath = oldPath;

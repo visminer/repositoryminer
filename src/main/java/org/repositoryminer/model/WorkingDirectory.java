@@ -1,4 +1,4 @@
-package org.repositoryminer.persistence.model;
+package org.repositoryminer.model;
 
 import static org.repositoryminer.scm.DiffType.ADD;
 import static org.repositoryminer.scm.DiffType.COPY;
@@ -13,21 +13,21 @@ import java.util.Map.Entry;
 
 import org.bson.Document;
 
-public class WorkingDirectoryDB {
+public class WorkingDirectory {
 
 	private String id;
 	private String repository;
 	private Map<String, String> files;
 	
-	public WorkingDirectoryDB() {}
+	public WorkingDirectory() {}
 	
-	public WorkingDirectoryDB(String repository) {
+	public WorkingDirectory(String repository) {
 		this.repository = repository;
 		this.files = new HashMap<String, String>();
 	}
 	
-	public void processDiff(List<DiffDB> diffs) {
-		for (DiffDB d : diffs) {
+	public void processDiff(List<Diff> diffs) {
+		for (Diff d : diffs) {
 			if (d.getType() == ADD || d.getType() == MODIFY || d.getType() == COPY) {
 				files.put(d.getPath(), id);
 			} else if(d.getType() == DELETE) {

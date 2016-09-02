@@ -1,4 +1,4 @@
-package org.repositoryminer.persistence.model;
+package org.repositoryminer.model;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,7 +9,7 @@ import org.bson.Document;
  * This class represents the "personIdent" object in the database. This class
  * represents a person who contributes to the repository.
  */
-public class ContributorDB {
+public class Contributor {
 
 	private String name;
 	private String email;
@@ -17,16 +17,30 @@ public class ContributorDB {
 	private String avatarUrl;
 	private boolean collaborator;
 
-	public ContributorDB() {
+	public static List<Contributor> parseDocuments(List<Document> docs) {
+		List<Contributor> contributors = new ArrayList<Contributor>();
+		for (Document doc : docs) {
+			Contributor c = new Contributor(doc.getString("name"), doc.getString("email"));
+			contributors.add(c);
+		}
+		return contributors;
+	}
+	
+	public static Contributor parseDocument(Document doc) {
+		Contributor c = new Contributor(doc.getString("name"), doc.getString("email"));
+		return c;
+	}
+	
+	public Contributor() {
 	}
 
-	public ContributorDB(String name, String email) {
+	public Contributor(String name, String email) {
 		super();
 		this.name = name;
 		this.email = email;
 	}
 
-	public ContributorDB(String name, String login, String avatarUrl, boolean collaborator) {
+	public Contributor(String name, String login, String avatarUrl, boolean collaborator) {
 		super();
 		this.name = name;
 		this.login = login;
@@ -40,9 +54,9 @@ public class ContributorDB {
 		return doc;
 	}
 
-	public static List<Document> toDocumentList(List<ContributorDB> contributors) {
+	public static List<Document> toDocumentList(List<Contributor> contributors) {
 		List<Document> list = new ArrayList<Document>();
-		for (ContributorDB c : contributors) {
+		for (Contributor c : contributors) {
 			list.add(c.toDocument());
 		}
 		return list;
@@ -104,7 +118,7 @@ public class ContributorDB {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		ContributorDB other = (ContributorDB) obj;
+		Contributor other = (Contributor) obj;
 		if (email == null) {
 			if (other.email != null)
 				return false;

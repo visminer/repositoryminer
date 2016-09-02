@@ -1,4 +1,4 @@
-package org.repositoryminer.persistence.model;
+package org.repositoryminer.model;
 
 import java.util.Date;
 import java.util.List;
@@ -6,7 +6,7 @@ import java.util.List;
 import org.bson.Document;
 import org.repositoryminer.scm.hostingservice.StatusType;
 
-public class IssueDB {
+public class Issue {
 
 	private String creator;
 	private String assignee;
@@ -20,11 +20,21 @@ public class IssueDB {
 	private String body; 
 	private int milestone;
 	private String repository;
-	private List<LabelDB> labels;
+	private List<Label> labels;
 	
-	public IssueDB() {}
+	public Document toDocument() {
+		Document doc = new Document();
+		doc.append("creator", creator).append("assignee", assignee).append("closed_at", closedAt)
+				.append("comments", comments).append("created_at", createdAt).append("number", number)
+				.append("status", status.toString()).append("title", title).append("updated_at", updatedAt)
+				.append("body", body).append("milestone", milestone).append("repository", repository)
+				.append("labels", Label.toDocumentList(labels));
+		return doc;
+	}
 
-	public IssueDB(String creator, Date closedAt, int comments, Date createdAt, int number, StatusType status,
+	public Issue() {}
+
+	public Issue(String creator, Date closedAt, int comments, Date createdAt, int number, StatusType status,
 			String title, Date updatedAt, String body) {
 		super();
 		this.creator = creator;
@@ -36,16 +46,6 @@ public class IssueDB {
 		this.title = title;
 		this.updatedAt = updatedAt;
 		this.body = body;
-	}
-
-	public Document toDocument() {
-		Document doc = new Document();
-		doc.append("creator", creator).append("assignee", assignee).append("closed_at", closedAt)
-				.append("comments", comments).append("created_at", createdAt).append("number", number)
-				.append("status", status.toString()).append("title", title).append("updated_at", updatedAt)
-				.append("body", body).append("milestone", milestone).append("repository", repository)
-				.append("labels", LabelDB.toDocumentList(labels));
-		return doc;
 	}
 
 	public String getCreator() {
@@ -144,11 +144,11 @@ public class IssueDB {
 		this.repository = repository;
 	}
 
-	public List<LabelDB> getLabels() {
+	public List<Label> getLabels() {
 		return labels;
 	}
 
-	public void setLabels(List<LabelDB> labels) {
+	public void setLabels(List<Label> labels) {
 		this.labels = labels;
 	}
 	

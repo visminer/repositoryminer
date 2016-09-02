@@ -1,5 +1,6 @@
-package org.repositoryminer.persistence.model;
+package org.repositoryminer.model;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -9,7 +10,7 @@ import org.bson.Document;
  * This class represents the "commit" object in the database. This class
  * represents a commit.
  */
-public class CommitDB {
+public class Commit {
 
 	private String id;
 	private String message;
@@ -17,11 +18,43 @@ public class CommitDB {
 	private Date commitDate;
 	private String repository;
 	private List<String> parents;
-	private ContributorDB author;
-	private ContributorDB committer;
-	private List<DiffDB> diffs;
+	private Contributor author;
+	private Contributor committer;
+	private List<Diff> diffs;
 
-	public CommitDB() {
+	@SuppressWarnings("unchecked")
+	public static List<Commit> parseDocuments(List<Document> commitsDocs) {
+		List<Commit> commits = new ArrayList<Commit>();
+		for (Document doc : commitsDocs) {
+			List<String> parents = new ArrayList<String>();
+			for (String p : (List<String>) doc.get("parents")) {
+				parents.add(p);
+			}
+			commits.add(parseDocument(doc, parents));
+		}
+		return commits;
+	}
+
+	@SuppressWarnings("unchecked")
+	public static Commit parseDocument(Document commitDoc, List<String> parents) {
+		Commit commit = new Commit(commitDoc.getString("_id"), commitDoc.getString("message"),
+				commitDoc.getDate("authored_date"), commitDoc.getDate("commit_date"), commitDoc.getString("repository"),
+				parents, Contributor.parseDocument((Document) commitDoc.get("author")),
+				Contributor.parseDocument((Document) commitDoc.get("committer")),
+				Diff.parseDocuments((List<Document>) commitDoc.get("diffs")));
+
+		return commit;
+	}
+
+	@SuppressWarnings("unchecked")
+	public static Commit parseDocument(Document commitDoc) {
+		Commit commit = new Commit(commitDoc.getString("_id"), commitDoc.getString("message"),
+				commitDoc.getDate("authored_date"), commitDoc.getDate("commit_date"), commitDoc.getString("repository"),
+				new ArrayList<String>(), Contributor.parseDocument((Document) commitDoc.get("author")),
+				Contributor.parseDocument((Document) commitDoc.get("committer")),
+				Diff.parseDocuments((List<Document>) commitDoc.get("diffs")));
+
+		return commit;
 	}
 
 	public Document toDocument() {
@@ -29,17 +62,20 @@ public class CommitDB {
 		doc.append("_id", id).append("message", message).append("authored_date", authoredDate)
 				.append("commit_date", commitDate).append("repository", repository).append("parents", parents)
 				.append("author", author.toDocument()).append("committer", committer.toDocument())
-				.append("diffs", DiffDB.toDocumentList(diffs));
+				.append("diffs", Diff.toDocumentList(diffs));
 		return doc;
 	}
 
-	public CommitDB(String id) {
+	public Commit() {
+	}
+
+	public Commit(String id) {
 		super();
 		this.id = id;
 	}
 
-	public CommitDB(String id, String message, Date authoredDate, Date commitDate, String repository,
-			List<String> parents, ContributorDB author, ContributorDB committer, List<DiffDB> diffs) {
+	public Commit(String id, String message, Date authoredDate, Date commitDate, String repository,
+			List<String> parents, Contributor author, Contributor committer, List<Diff> diffs) {
 		super();
 		this.id = id;
 		this.message = message;
@@ -100,27 +136,27 @@ public class CommitDB {
 		this.parents = parents;
 	}
 
-	public ContributorDB getAuthor() {
+	public Contributor getAuthor() {
 		return author;
 	}
 
-	public void setAuthor(ContributorDB author) {
+	public void setAuthor(Contributor author) {
 		this.author = author;
 	}
 
-	public ContributorDB getCommitter() {
+	public Contributor getCommitter() {
 		return committer;
 	}
 
-	public void setCommitter(ContributorDB committer) {
+	public void setCommitter(Contributor committer) {
 		this.committer = committer;
 	}
 
-	public List<DiffDB> getDiffs() {
+	public List<Diff> getDiffs() {
 		return diffs;
 	}
 
-	public void setDiffs(List<DiffDB> diffs) {
+	public void setDiffs(List<Diff> diffs) {
 		this.diffs = diffs;
 	}
 
@@ -140,7 +176,7 @@ public class CommitDB {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		CommitDB other = (CommitDB) obj;
+		Commit other = (Commit) obj;
 		if (id == null) {
 			if (other.id != null)
 				return false;

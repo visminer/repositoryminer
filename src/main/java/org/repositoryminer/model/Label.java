@@ -1,30 +1,30 @@
-package org.repositoryminer.persistence.model;
+package org.repositoryminer.model;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.bson.Document;
 
-public class LabelDB {
+public class Label {
 
 	private String name;
 	private String color;
 	
-	public LabelDB() {}
+	public Label() {}
 
-	public LabelDB(String name, String color) {
+	public Label(String name, String color) {
 		super();
 		this.name = name;
 		this.color = color;
 	}
 
-	public static List<Document> toDocumentList(List<LabelDB> labels) {
+	public static List<Document> toDocumentList(List<Label> labels) {
 		if (labels == null) {
 			return null;
 		}
 		
 		List<Document> docs = new ArrayList<Document>();
-		for (LabelDB l : labels) {
+		for (Label l : labels) {
 			docs.add(new Document("name", l.name).append("color", l.color));
 		}
 		return docs;
