@@ -17,7 +17,7 @@ import static com.mongodb.client.model.Projections.include;
 
 public class CommitDocumentHandler extends DocumentHandler {
 
-	private static final String COLLECTION_NAME = "commits";
+	private static final String COLLECTION_NAME = "rm_commits";
 
 	public CommitDocumentHandler() {
 		super.collection = Connection.getInstance().getCollection(COLLECTION_NAME);

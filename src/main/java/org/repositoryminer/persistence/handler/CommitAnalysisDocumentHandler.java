@@ -1,9 +1,5 @@
 package org.repositoryminer.persistence.handler;
 
-import com.mongodb.BasicDBObject;
-import org.bson.Document;
-import org.repositoryminer.persistence.Connection;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -11,15 +7,26 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
 
+import org.bson.Document;
+import org.repositoryminer.persistence.Connection;
+
+import com.mongodb.BasicDBObject;
+
 public class CommitAnalysisDocumentHandler extends DocumentHandler {
 
-	private static final String COLLECTION_NAME = "commits_analysis";
+	private static final String COLLECTION_NAME = "rm_commits_analysis";
 
 	public CommitAnalysisDocumentHandler() {
 		super.collection = Connection.getInstance().getCollection(COLLECTION_NAME);
 	}
 
-	public Document getOneClassById(String fileHash, String idCommit) {
+	public List<Document> getAllByCommit(String idCommit) {
+		BasicDBObject whereClause = new BasicDBObject();
+		whereClause.put("commit", idCommit);
+		return findMany(whereClause, null);
+	}
+
+	public Document getOneByFileAndCommit(String fileHash, String idCommit) {
 		BasicDBObject andQuery = new BasicDBObject();
 		List<BasicDBObject> conditions = new ArrayList<BasicDBObject>();
 
@@ -37,10 +44,10 @@ public class CommitAnalysisDocumentHandler extends DocumentHandler {
 		conditions.add(new BasicDBObject("commit", commitHash));
 		return findOne(new BasicDBObject("$and", conditions), null);
 	}
-	
-	public Document getCodeSmellsMeasures(String fileHash, String commitHash) {
+
+	public Document getMetricsMeasures(String fileHash, String commitHash) {
 		BasicDBObject fields = new BasicDBObject();
-		fields.put("abstract_types.metrics", 0);
+		fields.put("abstract_types.codesmells", 0);
 		fields.put("abstract_types.technicaldebts", 0);
 		
 		List<BasicDBObject> conditions = new ArrayList<BasicDBObject>();
@@ -48,10 +55,10 @@ public class CommitAnalysisDocumentHandler extends DocumentHandler {
 		conditions.add(new BasicDBObject("commit", commitHash));
 		return findOne(new BasicDBObject("$and", conditions), fields);
 	}
-	
-	public Document getMetricsMeasures(String fileHash, String commitHash) {
+
+	public Document getCodeSmellsMeasures(String fileHash, String commitHash) {
 		BasicDBObject fields = new BasicDBObject();
-		fields.put("abstract_types.codesmells", 0);
+		fields.put("abstract_types.metrics", 0);
 		fields.put("abstract_types.technicaldebts", 0);
 		
 		List<BasicDBObject> conditions = new ArrayList<BasicDBObject>();
@@ -71,12 +78,6 @@ public class CommitAnalysisDocumentHandler extends DocumentHandler {
 		return findOne(new BasicDBObject("$and", conditions), fields);
 	}
 	
-	public List<Document> getAllByCommit(String idCommit) {
-		BasicDBObject whereClause = new BasicDBObject();
-		whereClause.put("commit", idCommit);
-		return findMany(whereClause, null);
-	}
-
 	@SuppressWarnings("unchecked")
 	public List<Document> getAllByReference(String idReference) {
 		ReferenceDocumentHandler referenceHandler = new ReferenceDocumentHandler();
@@ -89,7 +90,7 @@ public class CommitAnalysisDocumentHandler extends DocumentHandler {
 			LinkedHashMap<String, String> typesHash = getTypesHashMap(commitIdsList);
 			final Set<String> filesHash = typesHash.keySet();
 			for (String fileHash : filesHash) {
-				final Document type = getOneClassById(fileHash, typesHash.get(fileHash));
+				final Document type = getOneByFileAndCommit(fileHash, typesHash.get(fileHash));
 				if (type != null)
 					types.add(type);
 			}
@@ -212,7 +213,7 @@ public class CommitAnalysisDocumentHandler extends DocumentHandler {
 
 		for (Document tag : tags) {
 			for (String commitId : (ArrayList<String>) tag.get("commits")) {
-				Document type = getOneClassById(fileHash, commitId);
+				Document type = getOneByFileAndCommit(fileHash, commitId);
 				if (type != null) {
 					timeline.put(tag, type);
 					break;
@@ -233,4 +234,5 @@ public class CommitAnalysisDocumentHandler extends DocumentHandler {
 
 		return file.getString("file_hash");
 	}
-}								
+	
+}
