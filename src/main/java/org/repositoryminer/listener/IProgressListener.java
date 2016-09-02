@@ -42,7 +42,7 @@ public interface IProgressListener {
 	/**
 	 * Notifies that the processing of timeframes has started
 	 */
-	public void initTimeFramesProcessingProgress();
+	public void initTimeFramesProgress();
 
 	/**
 	 * Notifies the progress of timeframes processing
@@ -57,7 +57,7 @@ public interface IProgressListener {
 	/**
 	 * Notified that the processing of source analysis has started
 	 */
-	public void initSourceAnalysisProcessingProgress();
+	public void initSourceAnalysisProgress();
 
 	/**
 	 * Notifies the progress of tags processing
@@ -68,6 +68,24 @@ public interface IProgressListener {
 	 *            total number of tags to be processed
 	 */
 	public void tagsProgressChange(int tagIndex, int numberOfTags);
+
+	/**
+	 * Notifies that the progress of a post mining task has started
+	 * 
+	 * @param postMiningTaskName
+	 *            the name of the task being started
+	 */
+	public void initPostMiningTaskProgress(String postMiningTaskName);
+
+	/**
+	 * Notifies the progress of post mining tasks processing
+	 * 
+	 * @param taskStepIndex
+	 *            the current index of the task's step being processed
+	 * @param numberOfTaskSteps
+	 *            total number of task's steps to be processed
+	 */
+	public void postMiningTaskProgressChange(int taskStepIndex, int numberOfTaskSteps);
 
 	/**
 	 * Notifies that the mining of the project has ended
