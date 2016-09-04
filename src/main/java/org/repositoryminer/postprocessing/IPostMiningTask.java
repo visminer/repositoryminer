@@ -6,8 +6,12 @@ import org.repositoryminer.model.Repository;
 /**
  * <h1>Post mining task interface</h1>
  * <p>
- * A collection of routines that must be implemented by each inherited concrete
- * class
+ * A collection of routines that must be implemented by each post mining task.
+ * All inherited tasks must provide:
+ * <ul>
+ * <li>a name for logging/tracing purposes
+ * <li>a routine to be executed that performs the mining task
+ * </ul>
  */
 public interface IPostMiningTask {
 
@@ -23,7 +27,7 @@ public interface IPostMiningTask {
 	 * @param repository
 	 *            the repository being mined
 	 * @param progressListener
-	 *            instance of the listener to track the steps peformed by the
+	 *            instance of the listener to track the steps performed by the
 	 *            mining
 	 */
 	public void execute(Repository repository, IProgressListener progressListener);

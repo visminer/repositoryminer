@@ -5,6 +5,16 @@ import java.util.List;
 
 import org.bson.Document;
 
+/**
+ * <h1>A wrapper for effort categories associated with a reference</h1>
+ * <p>
+ * Basically, it associates a list of categorized efforts to a repository and a
+ * reference found in the repository. We have repeated the reference-name in
+ * this class and in the database consequently as well for performance purpose:
+ * to avoid navigating to documents in the reference collection to retrieve
+ * reference's name.
+ * <p>
+ */
 public class EffortCategoriesByReference {
 
 	private String repository;

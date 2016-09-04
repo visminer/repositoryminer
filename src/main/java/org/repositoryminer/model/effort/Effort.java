@@ -5,11 +5,31 @@ import java.util.List;
 
 import org.bson.Document;
 
+/**
+ * <h1>Each effort node to base calculations on</h1>
+ * <p>
+ * Current effort measurement is file-oriented and has a calculation-base
+ * composed of:
+ * <ul>
+ * <li>Commits -> number of commits that have affected the file
+ * <li>Modifications -> the code churn related to the file
+ * <li>CodeSmells -> if codesmells affect the file and the impact is a
+ * influential value (> 1.0) a correction factor is applied to the overall
+ * effort
+ * </ul>
+ * The Comparable interface is implemented because it is necessary to rank
+ * effort collections according to their overall calculated effort. That is the
+ * case with
+ * {@link org.repositoryminer.postprocessing.effort.EffortCategoriesMiningTask#processEfforts}
+ * <p>
+ */
 public class Effort implements Comparable<Effort> {
 
 	private String file;
 	private int commits = 0;
 	private int modifications = 0;
+
+	private double smellsImpactFactor = 1.0;
 	private List<String> codeSmells = new ArrayList<String>();
 
 	@SuppressWarnings("unchecked")
@@ -85,8 +105,16 @@ public class Effort implements Comparable<Effort> {
 		this.codeSmells = codeSmells;
 	}
 
-	public double calculateOverallEffort() {
-		return modifications / commits;
+	public double getCodeSmellsImpactFactor() {
+		return this.smellsImpactFactor;
+	}
+
+	public void setCodeSmellsImpactFactor(double smellsImpactFactor) {
+		this.smellsImpactFactor = smellsImpactFactor;
+	}
+
+	public boolean hasCodeSmells() {
+		return (codeSmells != null && !codeSmells.isEmpty());
 	}
 
 	public Effort incCommits() {
@@ -99,6 +127,10 @@ public class Effort implements Comparable<Effort> {
 		this.modifications += modifications;
 
 		return this;
+	}
+
+	public double calculateOverallEffort() {
+		return (modifications / commits) * (hasCodeSmells() ? smellsImpactFactor : 1.0);
 	}
 
 	@Override

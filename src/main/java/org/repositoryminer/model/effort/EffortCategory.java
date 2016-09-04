@@ -5,6 +5,16 @@ import java.util.List;
 
 import org.bson.Document;
 
+/**
+ * <h1>A category wrapper for efforts</h1>
+ * <p>
+ * This class can be used to attach a category name to a list of efforts. For
+ * instance, one may want to rank efforts according to a taxonomy composed of
+ * classifications: MAJOR, MINOR, SUB-MAJOR, etc.
+ * <p>
+ * An example of categorization of efforts can be found in
+ * {@link org.repositoryminer.postprocessing.effort.EffortCategoriesMiningTask}
+ */
 public class EffortCategory {
 
 	private String category;
@@ -16,7 +26,7 @@ public class EffortCategory {
 		for (Document doc : categoryDocs) {
 			EffortCategory category = new EffortCategory();
 			category.setCategory(doc.getString("category"));
-			category.setEfforts(Effort.parseDocuments((List<Document>)doc.get("efforts")));
+			category.setEfforts(Effort.parseDocuments((List<Document>) doc.get("efforts")));
 
 			categories.add(category);
 		}
@@ -27,8 +37,8 @@ public class EffortCategory {
 	public Document toDocument() {
 		Document doc = new Document();
 		doc.append("category", category).append("efforts", Effort.toDocumentList(getEfforts()));
-		
-		return doc; 
+
+		return doc;
 	}
 
 	public static List<Document> toDocumentList(List<EffortCategory> categories) {
@@ -37,7 +47,7 @@ public class EffortCategory {
 			Document doc = new Document();
 			doc.append("category", category.getCategory());
 			doc.append("efforts", Effort.toDocumentList(category.getEfforts()));
-			
+
 			list.add(doc);
 		}
 
