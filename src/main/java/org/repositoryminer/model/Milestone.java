@@ -1,4 +1,4 @@
-package org.repositoryminer.persistence.model;
+package org.repositoryminer.model;
 
 import java.util.Date;
 import java.util.List;
@@ -6,7 +6,7 @@ import java.util.List;
 import org.bson.Document;
 import org.repositoryminer.scm.hostingservice.StatusType;
 
-public class MilestoneDB {
+public class Milestone {
 
 	private int number;
 	private StatusType status;
@@ -20,9 +20,18 @@ public class MilestoneDB {
 	private List<Integer> issues;
 	private String repository;
 	
-	public MilestoneDB() {}
+	public Document toDocument() {
+		Document doc = new Document();
+		doc.append("number", number).append("status", status.toString()).append("title", title)
+				.append("description", description).append("creator", creator).append("opened_issues", openedIssues)
+				.append("closed_issues", closedIssues).append("created_at", createdAt).append("due_on", dueOn)
+				.append("repository", repository).append("issues", issues);
+		return doc;
+	}
+
+	public Milestone() {}
 	
-	public MilestoneDB(int number, StatusType status, String title, String description, int openedIssues,
+	public Milestone(int number, StatusType status, String title, String description, int openedIssues,
 			int closedIssues, Date createdAt, Date dueOn) {
 		super();
 		this.number = number;
@@ -33,15 +42,6 @@ public class MilestoneDB {
 		this.closedIssues = closedIssues;
 		this.createdAt = createdAt;
 		this.dueOn = dueOn;
-	}
-
-	public Document toDocument() {
-		Document doc = new Document();
-		doc.append("number", number).append("status", status.toString()).append("title", title)
-				.append("description", description).append("creator", creator).append("opened_issues", openedIssues)
-				.append("closed_issues", closedIssues).append("created_at", createdAt).append("due_on", dueOn)
-				.append("repository", repository).append("issues", issues);
-		return doc;
 	}
 
 	public int getNumber() {

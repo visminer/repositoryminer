@@ -9,9 +9,9 @@ import org.repositoryminer.scm.ReferenceType;
 
 import com.mongodb.BasicDBObject;
 
-public class ReferenceDocumentHandler extends DocumentHandler{
+public class ReferenceDocumentHandler extends DocumentHandler {
 
-	private static final String COLLECTION_NAME = "references";
+	private static final String COLLECTION_NAME = "rm_references";
 
 	public ReferenceDocumentHandler(){
 		super.collection = Connection.getInstance().getCollection(COLLECTION_NAME);

@@ -35,10 +35,10 @@ import org.eclipse.jgit.treewalk.filter.PathFilter;
 import org.eclipse.jgit.util.io.DisabledOutputStream;
 import org.repositoryminer.exceptions.ErrorMessage;
 import org.repositoryminer.exceptions.VisMinerAPIException;
-import org.repositoryminer.persistence.model.CommitDB;
-import org.repositoryminer.persistence.model.ContributorDB;
-import org.repositoryminer.persistence.model.DiffDB;
-import org.repositoryminer.persistence.model.ReferenceDB;
+import org.repositoryminer.model.Commit;
+import org.repositoryminer.model.Contributor;
+import org.repositoryminer.model.Diff;
+import org.repositoryminer.model.Reference;
 import org.repositoryminer.utility.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,19 +63,18 @@ public class GitSCM implements SCM {
 	public void open(String repositoryPath, int binaryThreshold) {
 		FileRepositoryBuilder repositoryBuilder = new FileRepositoryBuilder();
 		File repositoryFolder = new File(repositoryPath);
-		
+
 		if (!repositoryFolder.exists()) {
 			throw new VisMinerAPIException(ErrorMessage.REPOSITORY_NOT_FOUND.toString());
 		}
-		
+
 		String path = repositoryFolder.getAbsolutePath();
 		if (!path.endsWith(".git")) {
 			path += File.separator + ".git";
 		}
-		
+
 		try {
-			repository = repositoryBuilder.setGitDir(new java.io.File(path)).readEnvironment().findGitDir()
-					.build();
+			repository = repositoryBuilder.setGitDir(new java.io.File(path)).readEnvironment().findGitDir().build();
 		} catch (IOException e) {
 			throw new VisMinerAPIException(ErrorMessage.GIT_REPOSITORY_IOERROR.toString(), e);
 		}
@@ -103,8 +102,8 @@ public class GitSCM implements SCM {
 	}
 
 	@Override
-	public List<ReferenceDB> getReferences() {
-		List<ReferenceDB> refs = new ArrayList<ReferenceDB>();
+	public List<Reference> getReferences() {
+		List<Reference> refs = new ArrayList<Reference>();
 
 		Iterable<Ref> branches = null;
 		try {
@@ -119,7 +118,8 @@ public class GitSCM implements SCM {
 
 			int i = b.getName().lastIndexOf("/") + 1;
 			String id = StringUtils.encodeToSHA1(absolutePath + "/" + b.getName());
-			ReferenceDB r = new ReferenceDB(id, repoId, b.getName().substring(i), b.getName(), ReferenceType.BRANCH);
+			Reference r = new Reference(id, repoId, b.getName().substring(i), b.getName(), ReferenceType.BRANCH,
+					null);
 			refs.add(r);
 		}
 
@@ -133,7 +133,7 @@ public class GitSCM implements SCM {
 		for (Ref t : tags) {
 			int i = t.getName().lastIndexOf("/") + 1;
 			String id = StringUtils.encodeToSHA1(absolutePath + "/" + t.getName());
-			ReferenceDB r = new ReferenceDB(id, repoId, t.getName().substring(i), t.getName(), ReferenceType.TAG);
+			Reference r = new Reference(id, repoId, t.getName().substring(i), t.getName(), ReferenceType.TAG, null);
 			refs.add(r);
 		}
 
@@ -141,7 +141,7 @@ public class GitSCM implements SCM {
 	}
 
 	@Override
-	public List<CommitDB> getCommits() {
+	public List<Commit> getCommits() {
 		Iterable<RevCommit> revCommits = null;
 		try {
 			revCommits = git.log().all().call();
@@ -149,29 +149,29 @@ public class GitSCM implements SCM {
 			errorHandler(ErrorMessage.GIT_LOG_COMMIT_ERROR.toString(), e);
 		}
 
-		List<CommitDB> commits = new ArrayList<CommitDB>();
+		List<Commit> commits = new ArrayList<Commit>();
 
 		for (RevCommit revCommit : revCommits) {
 			PersonIdent author = revCommit.getAuthorIdent();
 			PersonIdent committer = revCommit.getCommitterIdent();
 
-			ContributorDB myAuthor = new ContributorDB(author.getName(), author.getEmailAddress());
+			Contributor myAuthor = new Contributor(author.getName(), author.getEmailAddress());
 
-			ContributorDB myCommitter = new ContributorDB(committer.getName(), committer.getEmailAddress());
+			Contributor myCommitter = new Contributor(committer.getName(), committer.getEmailAddress());
 
 			List<String> parents = new ArrayList<String>();
 			for (RevCommit parent : revCommit.getParents())
 				parents.add(parent.getName());
 
-			List<DiffDB> changes = null;
+			List<Diff> diffs = null;
 			try {
-				changes = getCommitedFiles(revCommit.getName());
+				diffs = getDiffsForCommitedFiles(revCommit.getName());
 			} catch (IOException e) {
 				errorHandler(ErrorMessage.GIT_RETRIEVE_CHANGES_ERROR.toString(), e);
 			}
 
-			CommitDB c = new CommitDB(revCommit.getName(), revCommit.getFullMessage(), author.getWhen(),
-					committer.getWhen(), repoId, parents, myAuthor, myCommitter, changes);
+			Commit c = new Commit(revCommit.getName(), revCommit.getFullMessage(), author.getWhen(),
+					committer.getWhen(), repoId, parents, myAuthor, myCommitter, diffs);
 			commits.add(c);
 		}
 
@@ -241,7 +241,7 @@ public class GitSCM implements SCM {
 			makeCheckout("master", false);
 			git.branchDelete().setBranchNames(RM_BRANCH).setForce(true).call();
 		} catch (NoWorkTreeException | GitAPIException e) {
-			errorHandler(ErrorMessage.GIT_RESET_ERROR.toString(), e);
+			//errorHandler(ErrorMessage.GIT_RESET_ERROR.toString(), e);
 		}
 	}
 
@@ -251,7 +251,7 @@ public class GitSCM implements SCM {
 		throw new VisMinerAPIException(errorMessage, e);
 	}
 
-	private List<DiffDB> getCommitedFiles(String commit) throws IOException {
+	private List<Diff> getDiffsForCommitedFiles(String commit) throws IOException {
 		RevCommit revCommit = revWalk.parseCommit(ObjectId.fromString(commit));
 		AnyObjectId currentCommit = repository.resolve(commit);
 		AnyObjectId oldCommit = revCommit.getParentCount() > 0 ? repository.resolve(revCommit.getParent(0).getName())
@@ -260,7 +260,7 @@ public class GitSCM implements SCM {
 		List<DiffEntry> diffs = null;
 		diffs = diffFormatter.scan(oldCommit, currentCommit);
 
-		List<DiffDB> changes = new ArrayList<DiffDB>();
+		List<Diff> changes = new ArrayList<Diff>();
 		for (DiffEntry entry : diffs) {
 
 			RevCommit parentCommit = oldCommit == null ? null
@@ -302,10 +302,11 @@ public class GitSCM implements SCM {
 			int[] lines = getLinesAddedAndDeleted(path, parentCommit, revCommit);
 			path = absolutePath + "/" + path;
 			oldPath = (oldPath != null) ? absolutePath + "/" + oldPath : null;
-			
-			DiffDB change = new DiffDB(path, oldPath, StringUtils.encodeToSHA1(path), lines[0], lines[1], type);
+
+			Diff change = new Diff(path, oldPath, StringUtils.encodeToSHA1(path), lines[0], lines[1], type);
 			changes.add(change);
 		}
+		
 		return changes;
 	}
 
@@ -339,14 +340,14 @@ public class GitSCM implements SCM {
 	}
 
 	private void makeCheckout(String hash, boolean create) {
-		try{
-		if (create) {
-			git.checkout().setForce(true).setCreateBranch(true).setName(RM_BRANCH).setStartPoint(hash).call();
-		} else {
-			git.checkout().setForce(true).setName(hash).call();
-		}
+		try {
+			if (create) {
+				git.checkout().setForce(true).setCreateBranch(true).setName(RM_BRANCH).setStartPoint(hash).call();
+			} else {
+				git.checkout().setForce(true).setName(hash).call();
+			}
 		} catch (GitAPIException e) {
-			errorHandler(ErrorMessage.GIT_CHECKOUT_ERROR.toString(), e);
+			//errorHandler(ErrorMessage.GIT_CHECKOUT_ERROR.toString(), e);
 		}
 	}
 

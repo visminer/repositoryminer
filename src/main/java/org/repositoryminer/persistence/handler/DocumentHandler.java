@@ -39,6 +39,11 @@ public class DocumentHandler {
 		return doc;
 	}
 
+	public List<Document> findAll() {
+		MongoCursor<Document> cursor = collection.find().iterator();
+		return fromCursorToList(cursor);
+	}
+
 	public List<Document> findAll(Bson projection) {
 		MongoCursor<Document> cursor = collection.find().projection(projection).iterator();
 		return fromCursorToList(cursor);

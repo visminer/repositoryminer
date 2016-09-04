@@ -6,12 +6,12 @@ import java.util.List;
 import org.bson.Document;
 import org.repositoryminer.exceptions.ErrorMessage;
 import org.repositoryminer.exceptions.VisMinerAPIException;
+import org.repositoryminer.model.Contributor;
+import org.repositoryminer.model.Issue;
+import org.repositoryminer.model.Milestone;
 import org.repositoryminer.persistence.handler.IssueDocumentHandler;
 import org.repositoryminer.persistence.handler.MilestoneDocumentHandler;
 import org.repositoryminer.persistence.handler.RepositoryDocumentHandler;
-import org.repositoryminer.persistence.model.ContributorDB;
-import org.repositoryminer.persistence.model.IssueDB;
-import org.repositoryminer.persistence.model.MilestoneDB;
 import org.repositoryminer.scm.hostingservice.HostingService;
 import org.repositoryminer.scm.hostingservice.HostingServiceFactory;
 import org.repositoryminer.scm.hostingservice.HostingServiceType;
@@ -117,11 +117,11 @@ public class HostingServiceMiner {
 		mileDocHandler.deleteByRepository(repositoryId);
 
 		Document repoDoc = repoDocHandler.findOnlyContributors(repositoryId);
-		List<ContributorDB> contributorsDb = service.getAllContributors();
+		List<Contributor> contributorsDb = service.getAllContributors();
 
 		for (Document contributorDoc : (List<Document>) repoDoc.get("contributors")) {
 			String name = contributorDoc.getString("name");
-			for (ContributorDB contributorDb : contributorsDb) {
+			for (Contributor contributorDb : contributorsDb) {
 				if (name.equals(contributorDb.getName())) {
 					contributorDoc.put("login", contributorDb.getLogin());
 					contributorDoc.put("avatar_url", contributorDb.getAvatarUrl());
@@ -132,14 +132,14 @@ public class HostingServiceMiner {
 		}
 
 		repoDocHandler.updateOnlyContributors(repoDoc);
-		List<IssueDB> issues = service.getAllIssues();
-		List<MilestoneDB> milestones = service.getAllMilestones();
+		List<Issue> issues = service.getAllIssues();
+		List<Milestone> milestones = service.getAllMilestones();
 
 		// connect issues to milestones
 		if (milestones.size() > 0) {
-			for (MilestoneDB m : milestones) {
+			for (Milestone m : milestones) {
 				m.setIssues(new ArrayList<Integer>());
-				for (IssueDB i : issues) {
+				for (Issue i : issues) {
 					if (i.getMilestone() == m.getNumber()) {
 						m.getIssues().add(i.getNumber());
 					}
@@ -151,7 +151,7 @@ public class HostingServiceMiner {
 		List<Document> milesDocs = new ArrayList<Document>(milestones.size());
 
 		if (issues.size() > 0) {
-			for (IssueDB issue : issues) {
+			for (Issue issue : issues) {
 				issue.setRepository(repositoryId);
 				issuesDocs.add(issue.toDocument());
 			}
@@ -159,7 +159,7 @@ public class HostingServiceMiner {
 		}
 
 		if (milestones.size() > 0) {
-			for (MilestoneDB mile : milestones) {
+			for (Milestone mile : milestones) {
 				mile.setRepository(repositoryId);
 				milesDocs.add(mile.toDocument());
 			}

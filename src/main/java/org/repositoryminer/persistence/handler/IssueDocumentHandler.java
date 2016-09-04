@@ -6,7 +6,7 @@ import com.mongodb.BasicDBObject;
 
 public class IssueDocumentHandler extends DocumentHandler{
 
-	private static final String COLLECTION_NAME = "issues";
+	private static final String COLLECTION_NAME = "rm_issues";
 
 	public IssueDocumentHandler() {
 		super.collection = Connection.getInstance().getCollection(COLLECTION_NAME);

@@ -2,9 +2,9 @@ package org.repositoryminer.scm.hostingservice;
 
 import java.util.List;
 
-import org.repositoryminer.persistence.model.ContributorDB;
-import org.repositoryminer.persistence.model.IssueDB;
-import org.repositoryminer.persistence.model.MilestoneDB;
+import org.repositoryminer.model.Contributor;
+import org.repositoryminer.model.Issue;
+import org.repositoryminer.model.Milestone;
 
 public interface HostingService {
 
@@ -28,16 +28,16 @@ public interface HostingService {
 	/**
 	 * @return All issues from web repository service.
 	 */
-	public List<IssueDB> getAllIssues();
+	public List<Issue> getAllIssues();
 	
 	/**
 	 * @return All milestones from web repository service.
 	 */
-	public List<MilestoneDB> getAllMilestones();
+	public List<Milestone> getAllMilestones();
 	
 	/**
 	 * @return All contributors from a repository.
 	 */
-	public List<ContributorDB> getAllContributors();
+	public List<Contributor> getAllContributors();
 	
 }

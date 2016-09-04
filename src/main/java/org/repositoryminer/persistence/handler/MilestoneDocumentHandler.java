@@ -6,7 +6,7 @@ import com.mongodb.BasicDBObject;
 
 public class MilestoneDocumentHandler extends DocumentHandler{
 
-	private static final String COLLECTION_NAME = "milestones";
+	private static final String COLLECTION_NAME = "rm_milestones";
 
 	public MilestoneDocumentHandler() {
 		super.collection = Connection.getInstance().getCollection(COLLECTION_NAME);
