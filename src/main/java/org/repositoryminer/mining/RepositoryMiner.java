@@ -1,6 +1,6 @@
 package org.repositoryminer.mining;
 
-import java.io.UnsupportedEncodingException;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -102,10 +102,9 @@ public class RepositoryMiner {
 	 * this method
 	 * <p>
 	 * 
-	 * @throws UnsupportedEncodingException
-	 *             raised if the OS does not support the selected charset.
+	 * @throws IOException.
 	 */
-	public void mine() throws UnsupportedEncodingException {
+	public void mine() throws IOException {
 		MiningProcessor processor = new MiningProcessor();
 		PostMiningProcessor postProcessor = new PostMiningProcessor();
 		if (progressListener != null) {

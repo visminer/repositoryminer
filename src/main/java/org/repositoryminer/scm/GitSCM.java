@@ -16,18 +16,15 @@ import org.eclipse.jgit.diff.DiffEntry;
 import org.eclipse.jgit.diff.DiffFormatter;
 import org.eclipse.jgit.diff.RawTextComparator;
 import org.eclipse.jgit.errors.IncorrectObjectTypeException;
-import org.eclipse.jgit.errors.LargeObjectException;
 import org.eclipse.jgit.errors.MissingObjectException;
 import org.eclipse.jgit.errors.NoWorkTreeException;
 import org.eclipse.jgit.errors.RevisionSyntaxException;
 import org.eclipse.jgit.lib.AnyObjectId;
 import org.eclipse.jgit.lib.ObjectId;
-import org.eclipse.jgit.lib.ObjectReader;
 import org.eclipse.jgit.lib.PersonIdent;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
-import org.eclipse.jgit.revwalk.RevTree;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.treewalk.TreeWalk;
@@ -185,32 +182,6 @@ public class GitSCM implements SCM {
 			return getCommitsFromBranch(fullName);
 		else
 			return getCommitsFromTag(fullName);
-	}
-
-	@Override
-	public byte[] getData(String commit, String filePath) {
-		revWalk.reset();
-		ObjectReader reader = repository.newObjectReader();
-		try {
-
-			RevCommit revCommit = revWalk.parseCommit(ObjectId.fromString(commit));
-			RevTree tree = revCommit.getTree();
-			TreeWalk treeWalk = TreeWalk.forPath(reader, filePath, tree);
-
-			ObjectId objId = null;
-			byte[] bytes = null;
-
-			if (treeWalk != null && (objId = treeWalk.getObjectId(0)) != null) {
-				bytes = reader.open(objId).getBytes();
-			}
-
-			reader.close();
-			return bytes;
-
-		} catch (IOException | LargeObjectException e) {
-			errorHandler(ErrorMessage.GIT_RETRIEVE_DATA_ERROR.toString(), e);
-			return null;
-		}
 	}
 
 	@Override

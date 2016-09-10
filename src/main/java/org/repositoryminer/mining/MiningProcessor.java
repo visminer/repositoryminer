@@ -1,6 +1,6 @@
 package org.repositoryminer.mining;
 
-import java.io.UnsupportedEncodingException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -76,9 +76,9 @@ public class MiningProcessor {
 	 *            instance of {@link org.repositoryminer.mining.RepositoryMiner}
 	 *            . It must <b>NEVER<b> be null, since it will provide important
 	 *            parameters for the source-code analysis and persistence
-	 * @throws UnsupportedEncodingException
+	 * @throws IOException
 	 */
-	public Repository mine(RepositoryMiner repositoryMiner) throws UnsupportedEncodingException {
+	public Repository mine(RepositoryMiner repositoryMiner) throws IOException {
 		SCM scm = SCMFactory.getSCM(repositoryMiner.getScm());
 		scm.open(repositoryMiner.getPath(), repositoryMiner.getBinaryThreshold());
 
@@ -158,10 +158,11 @@ public class MiningProcessor {
 	 *            hash to uniquely identify the repository
 	 * @param repoPath
 	 *            path to the project being mined
-	 * @throws UnsupportedEncodingException
+	 * @throws IOException
 	 */
 	private void calculateAndDetect(RepositoryMiner repositoryMiner, List<Commit> commits, List<Reference> scmRefs,
-			List<Reference> timeRefs, SCM scm, String repoId, String repoPath) throws UnsupportedEncodingException {
+			List<Reference> timeRefs, SCM scm, String repoId, String repoPath) throws IOException {
+		
 		if (!repositoryMiner.hasClassCodeSmells() && !repositoryMiner.hasClassMetrics()
 				&& !repositoryMiner.hasTechnicalDebts() && !repositoryMiner.hasProjectsCodeSmells()) {
 			return;

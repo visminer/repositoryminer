@@ -1,6 +1,8 @@
 package org.repositoryminer.mining;
 
-import java.io.UnsupportedEncodingException;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,6 +19,7 @@ import org.repositoryminer.model.Reference;
 import org.repositoryminer.parser.Parser;
 import org.repositoryminer.persistence.handler.CommitAnalysisDocumentHandler;
 import org.repositoryminer.persistence.handler.TagAnalysisDocumentHandler;
+import org.repositoryminer.scm.DiffType;
 import org.repositoryminer.scm.SCM;
 import org.repositoryminer.technicaldebt.ITechnicalDebt;
 import org.repositoryminer.utility.StringUtils;
@@ -59,7 +62,7 @@ public class SourceAnalyzer {
 		this.tags = tags;
 	}
 
-	public void analyze() throws UnsupportedEncodingException {
+	public void analyze() throws IOException {
 		progressListener = repositoryMiner.getProgressListener();
 
 		if (progressListener != null) {
@@ -70,7 +73,7 @@ public class SourceAnalyzer {
 		analyzeTags();
 	}
 
-	private void analyzeCommits() throws UnsupportedEncodingException {
+	private void analyzeCommits() throws IOException {
 		if (repositoryMiner.hasClassMetrics() || repositoryMiner.hasClassCodeSmells()
 				|| repositoryMiner.hasTechnicalDebts()) {
 			int idx = 0;
@@ -86,7 +89,9 @@ public class SourceAnalyzer {
 				}
 
 				for (Diff diff : commit.getDiffs()) {
-					processAST(diff.getPath(), diff.getHash(), commit);
+					if (diff.getType() != DiffType.DELETE) {
+						processAST(diff.getPath(), diff.getHash(), commit);
+					}
 				}
 
 				scm.reset();
@@ -118,9 +123,9 @@ public class SourceAnalyzer {
 		}
 	}
 
-	private void processAST(String file, String fileHash, Commit commit) throws UnsupportedEncodingException {
-		int index = file.lastIndexOf(".") + 1;
-		String ext = file.substring(index);
+	private void processAST(String filePath, String fileHash, Commit commit) throws IOException {
+		int index = filePath.lastIndexOf(".") + 1;
+		String ext = filePath.substring(index);
 
 		if (parser == null || !parser.getExtensions().contains(ext)) {
 			for (Parser p : parsers) {
@@ -134,14 +139,14 @@ public class SourceAnalyzer {
 			return;
 		}
 
-		byte[] data = scm.getData(commit.getId(), file.replaceFirst(repositoryPath + "/", ""));
+		byte[] data = Files.readAllBytes(Paths.get(filePath));
 		if (data == null) {
 			return;
 		}
 
 		String source = new String(data, repositoryMiner.getCharset());
-		AST ast = parser.generate(file, source);
-		processCommit(commit, file, fileHash, ast);
+		AST ast = parser.generate(filePath, source);
+		processCommit(commit, filePath, fileHash, ast);
 	}
 
 	private void processTag(Commit commit, Reference tag) {
