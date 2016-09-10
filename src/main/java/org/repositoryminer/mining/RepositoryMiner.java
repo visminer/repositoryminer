@@ -121,7 +121,7 @@ public class RepositoryMiner {
 		return this;
 	}
 
-	public RepositoryMiner setClasstMetrics(IClassMetric... classMetrics) {
+	public RepositoryMiner setClassMetrics(IClassMetric... classMetrics) {
 		this.classMetrics = Arrays.asList(classMetrics);
 		return this;
 	}
