@@ -45,7 +45,6 @@ import org.slf4j.LoggerFactory;
  */
 public class GitSCM implements SCM {
 
-	private static final String RM_BRANCH = "RM-c1b31321c0";
 	private static final Logger LOGGER = LoggerFactory.getLogger(GitSCM.class);
 
 	private Repository repository;
@@ -53,25 +52,22 @@ public class GitSCM implements SCM {
 	private RevWalk revWalk;
 	private TreeWalk treeWalk;
 	private DiffFormatter diffFormatter;
-	private String absolutePath;
-	private String repoId;
-
+	private String repoPath;
+	
 	@Override
 	public void open(String repositoryPath, int binaryThreshold) {
 		FileRepositoryBuilder repositoryBuilder = new FileRepositoryBuilder();
-		File repositoryFolder = new File(repositoryPath);
+		File repoFolder = new File(repositoryPath, ".git");
 
-		if (!repositoryFolder.exists()) {
+		if (!repoFolder.exists()) {
 			throw new VisMinerAPIException(ErrorMessage.REPOSITORY_NOT_FOUND.toString());
 		}
 
-		String path = repositoryFolder.getAbsolutePath();
-		if (!path.endsWith(".git")) {
-			path += File.separator + ".git";
-		}
-
 		try {
-			repository = repositoryBuilder.setGitDir(new java.io.File(path)).readEnvironment().findGitDir().build();
+			repository = repositoryBuilder.setGitDir(repoFolder).
+					readEnvironment().
+					findGitDir().
+					build();
 		} catch (IOException e) {
 			throw new VisMinerAPIException(ErrorMessage.GIT_REPOSITORY_IOERROR.toString(), e);
 		}
@@ -79,23 +75,17 @@ public class GitSCM implements SCM {
 		git = new Git(repository);
 		revWalk = new RevWalk(repository);
 		treeWalk = new TreeWalk(repository);
-
+		repoPath = repositoryPath;
+		
 		diffFormatter = new DiffFormatter(DisabledOutputStream.INSTANCE);
 		diffFormatter.setRepository(repository);
 		diffFormatter.setContext(0);
 		diffFormatter.setDiffComparator(RawTextComparator.DEFAULT);
 		diffFormatter.setDetectRenames(true);
 
-		if (binaryThreshold != 0)
+		if (binaryThreshold != 0) {
 			diffFormatter.setBinaryFileThreshold(binaryThreshold);
-
-		absolutePath = repository.getWorkTree().getAbsolutePath().replace("\\", "/");
-		repoId = StringUtils.encodeToSHA1(absolutePath);
-	}
-
-	@Override
-	public String getAbsolutePath() {
-		return absolutePath;
+		}
 	}
 
 	@Override
@@ -114,9 +104,7 @@ public class GitSCM implements SCM {
 				continue;
 
 			int i = b.getName().lastIndexOf("/") + 1;
-			String id = StringUtils.encodeToSHA1(absolutePath + "/" + b.getName());
-			Reference r = new Reference(id, repoId, b.getName().substring(i), b.getName(), ReferenceType.BRANCH,
-					null);
+			Reference r = new Reference(null, null, b.getName().substring(i), b.getName(), ReferenceType.BRANCH, null);
 			refs.add(r);
 		}
 
@@ -129,8 +117,7 @@ public class GitSCM implements SCM {
 
 		for (Ref t : tags) {
 			int i = t.getName().lastIndexOf("/") + 1;
-			String id = StringUtils.encodeToSHA1(absolutePath + "/" + t.getName());
-			Reference r = new Reference(id, repoId, t.getName().substring(i), t.getName(), ReferenceType.TAG, null);
+			Reference r = new Reference(null, null, t.getName().substring(i), t.getName(), ReferenceType.TAG, null);
 			refs.add(r);
 		}
 
@@ -168,7 +155,7 @@ public class GitSCM implements SCM {
 			}
 
 			Commit c = new Commit(revCommit.getName(), revCommit.getFullMessage(), author.getWhen(),
-					committer.getWhen(), repoId, parents, myAuthor, myCommitter, diffs);
+					committer.getWhen(), null, parents, myAuthor, myCommitter, diffs);
 			commits.add(c);
 		}
 
@@ -186,12 +173,11 @@ public class GitSCM implements SCM {
 
 	@Override
 	public void checkout(String hash) {
-		File lockFile = new File(absolutePath + "/index.lock");
+		File lockFile = new File(repoPath, "git/index.lock");
 		if (lockFile.exists()) {
 			lockFile.delete();
 		}
-		makeCheckout("master", false);
-		makeCheckout(hash, true);
+		makeCheckout(hash);
 	}
 
 	@Override
@@ -209,10 +195,8 @@ public class GitSCM implements SCM {
 			if (!git.status().call().isClean()) {
 				git.reset().setMode(ResetType.HARD).call();
 			}
-			makeCheckout("master", false);
-			git.branchDelete().setBranchNames(RM_BRANCH).setForce(true).call();
 		} catch (NoWorkTreeException | GitAPIException e) {
-			//errorHandler(ErrorMessage.GIT_RESET_ERROR.toString(), e);
+			errorHandler(ErrorMessage.GIT_RESET_ERROR.toString(), e);
 		}
 	}
 
@@ -271,13 +255,10 @@ public class GitSCM implements SCM {
 			}
 
 			int[] lines = getLinesAddedAndDeleted(path, parentCommit, revCommit);
-			path = absolutePath + "/" + path;
-			oldPath = (oldPath != null) ? absolutePath + "/" + oldPath : null;
-
 			Diff change = new Diff(path, oldPath, StringUtils.encodeToSHA1(path), lines[0], lines[1], type);
 			changes.add(change);
 		}
-		
+
 		return changes;
 	}
 
@@ -310,15 +291,11 @@ public class GitSCM implements SCM {
 		return vet;
 	}
 
-	private void makeCheckout(String hash, boolean create) {
+	private void makeCheckout(String point) {
 		try {
-			if (create) {
-				git.checkout().setForce(true).setCreateBranch(true).setName(RM_BRANCH).setStartPoint(hash).call();
-			} else {
-				git.checkout().setForce(true).setName(hash).call();
-			}
+			git.checkout().setForce(true).setName(point).call();
 		} catch (GitAPIException e) {
-			//errorHandler(ErrorMessage.GIT_CHECKOUT_ERROR.toString(), e);
+			errorHandler(ErrorMessage.GIT_CHECKOUT_ERROR.toString(), e);
 		}
 	}
 

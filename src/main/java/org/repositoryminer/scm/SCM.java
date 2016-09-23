@@ -27,12 +27,6 @@ public interface SCM {
 	public void open(String repositoryPath, int binaryThreshold);
 	
 	/**
-	 * @return The absolute path of the repository.
-	 * The \ are changed by /.
-	 */
-	public String getAbsolutePath();
-	
-	/**
 	 * @param repositoryId
 	 * @return List all references(e.g. tags and branches).
 	 */
