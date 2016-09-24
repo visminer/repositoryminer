@@ -38,46 +38,36 @@ public class CommitAnalysisDocumentHandler extends DocumentHandler {
 		return findOne(andQuery, null);
 	}
 
-	public Document getAllMeasures(String fileHash, String commitHash) {
+	public Document getAllMeasures(long fileHash, String commitHash) {
 		List<BasicDBObject> conditions = new ArrayList<BasicDBObject>();
 		conditions.add(new BasicDBObject("file_hash", fileHash));
 		conditions.add(new BasicDBObject("commit", commitHash));
 		return findOne(new BasicDBObject("$and", conditions), null);
 	}
 
-	public Document getMetricsMeasures(String fileHash, String commitHash) {
+	public Document getMetricsMeasures(long fileHash, String commitHash) {
+		return getMeasuresHelper(fileHash, commitHash, "abstract_types.codesmells", "abstract_types.technicaldebts");
+	}
+
+	public Document getCodeSmellsMeasures(long fileHash, String commitHash) {
+		return getMeasuresHelper(fileHash, commitHash, "abstract_types.metrics", "abstract_types.technicaldebts");
+	}
+
+	public Document getTechnicalDebtsMeasures(long fileHash, String commitHash) {
+		return getMeasuresHelper(fileHash, commitHash, "abstract_types.metrics", "abstract_types.codesmells");
+	}
+
+	private Document getMeasuresHelper(long fileHash, String commit, String nullField1, String nullField2) {
 		BasicDBObject fields = new BasicDBObject();
-		fields.put("abstract_types.codesmells", 0);
-		fields.put("abstract_types.technicaldebts", 0);
-		
+		fields.put(nullField1, 0);
+		fields.put(nullField2, 0);
+
 		List<BasicDBObject> conditions = new ArrayList<BasicDBObject>();
 		conditions.add(new BasicDBObject("file_hash", fileHash));
-		conditions.add(new BasicDBObject("commit", commitHash));
+		conditions.add(new BasicDBObject("commit", commit));
 		return findOne(new BasicDBObject("$and", conditions), fields);
 	}
 
-	public Document getCodeSmellsMeasures(String fileHash, String commitHash) {
-		BasicDBObject fields = new BasicDBObject();
-		fields.put("abstract_types.metrics", 0);
-		fields.put("abstract_types.technicaldebts", 0);
-		
-		List<BasicDBObject> conditions = new ArrayList<BasicDBObject>();
-		conditions.add(new BasicDBObject("file_hash", fileHash));
-		conditions.add(new BasicDBObject("commit", commitHash));
-		return findOne(new BasicDBObject("$and", conditions), fields);
-	}
-	
-	public Document getTechnicalDebtsMeasures(String fileHash, String commitHash) {
-		BasicDBObject fields = new BasicDBObject();
-		fields.put("abstract_types.metrics", 0);
-		fields.put("abstract_types.codesmells", 0);
-		
-		List<BasicDBObject> conditions = new ArrayList<BasicDBObject>();
-		conditions.add(new BasicDBObject("file_hash", fileHash));
-		conditions.add(new BasicDBObject("commit", commitHash));
-		return findOne(new BasicDBObject("$and", conditions), fields);
-	}
-	
 	@SuppressWarnings("unchecked")
 	public List<Document> getAllByReference(String idReference) {
 		ReferenceDocumentHandler referenceHandler = new ReferenceDocumentHandler();
@@ -234,5 +224,5 @@ public class CommitAnalysisDocumentHandler extends DocumentHandler {
 
 		return file.getString("file_hash");
 	}
-	
+
 }

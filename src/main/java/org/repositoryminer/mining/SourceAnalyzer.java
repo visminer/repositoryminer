@@ -22,7 +22,6 @@ import org.repositoryminer.persistence.handler.TagAnalysisDocumentHandler;
 import org.repositoryminer.scm.DiffType;
 import org.repositoryminer.scm.SCM;
 import org.repositoryminer.technicaldebt.ITechnicalDebt;
-import org.repositoryminer.utility.StringUtils;
 
 public class SourceAnalyzer {
 
@@ -123,7 +122,7 @@ public class SourceAnalyzer {
 		}
 	}
 
-	private void processAST(String filePath, String fileHash, Commit commit) throws IOException {
+	private void processAST(String filePath, long fileHash, Commit commit) throws IOException {
 		int index = filePath.lastIndexOf(".") + 1;
 		String ext = filePath.substring(index);
 
@@ -173,22 +172,20 @@ public class SourceAnalyzer {
 		tagDoc.append("code_smells", codeSmellsDocs);
 	}
 
-	private void processCommit(Commit commit, String file, String hash, AST ast) {
+	private void processCommit(Commit commit, String file, long fileHash, AST ast) {
 		Document doc = new Document();
 		doc.append("commit", commit.getId());
 		doc.append("commit_date", commit.getCommitDate());
 		doc.append("package", ast.getDocument().getPackageDeclaration());
 		doc.append("filename", file);
 		doc.append("repository", repositoryId);
-		doc.append("file_hash", hash);
+		doc.append("file_hash", fileHash);
 
 		List<AbstractTypeDeclaration> types = ast.getDocument().getTypes();
 		List<Document> abstractTypeDocs = new ArrayList<Document>();
 		for (AbstractTypeDeclaration type : types) {
 			Document typeDoc = new Document();
-			String typeHash = file + "/" + type.getName();
-			typeDoc.append("name", type.getName()).append("declaration", type.getArchetype().toString()).append("hash",
-					StringUtils.encodeToSHA1(typeHash));
+			typeDoc.append("name", type.getName()).append("declaration", type.getArchetype().toString());
 
 			List<Document> codeSmellsDocs = new ArrayList<Document>();
 			processCommitMetrics(ast, type, typeDoc);

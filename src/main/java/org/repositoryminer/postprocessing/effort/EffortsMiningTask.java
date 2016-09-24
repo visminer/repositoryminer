@@ -196,7 +196,7 @@ public class EffortsMiningTask implements IPostMiningTask {
 	 * @return a list of code smells' names
 	 */
 	@SuppressWarnings("unchecked")
-	private List<String> getCodeSmells(String fileHash, String commitHash) {
+	private List<String> getCodeSmells(long fileHash, String commitHash) {
 		List<String> smells = new ArrayList<String>();
 
 		CommitAnalysisDocumentHandler handler = new CommitAnalysisDocumentHandler();

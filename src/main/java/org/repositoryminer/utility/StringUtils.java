@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.zip.CRC32;
+import java.util.zip.Checksum;
 
 public class StringUtils {
 
@@ -24,6 +26,13 @@ public class StringUtils {
 		return sb.toString();
 	}
 
+	public static long encodeToCRC32(String input) {
+		byte bytes[] = input.getBytes();
+		Checksum checksum = new CRC32();
+		checksum.update(bytes, 0, bytes.length);
+		return checksum.getValue();
+	}
+	
 	public static String normalizePath(String path) throws IOException {
 		File file = new File(path);
 		String treatedPath = file.getCanonicalPath();

@@ -255,7 +255,7 @@ public class GitSCM implements SCM {
 			}
 
 			int[] lines = getLinesAddedAndDeleted(path, parentCommit, revCommit);
-			Diff change = new Diff(path, oldPath, StringUtils.encodeToSHA1(path), lines[0], lines[1], type);
+			Diff change = new Diff(path, oldPath, StringUtils.encodeToCRC32(path), lines[0], lines[1], type);
 			changes.add(change);
 		}
 
