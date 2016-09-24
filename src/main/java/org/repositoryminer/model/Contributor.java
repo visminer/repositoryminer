@@ -1,6 +1,7 @@
 package org.repositoryminer.model;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.bson.Document;
@@ -54,7 +55,7 @@ public class Contributor {
 		return doc;
 	}
 
-	public static List<Document> toDocumentList(List<Contributor> contributors) {
+	public static List<Document> toDocumentList(Collection<Contributor> contributors) {
 		List<Document> list = new ArrayList<Document>();
 		for (Contributor c : contributors) {
 			list.add(c.toDocument());

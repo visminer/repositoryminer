@@ -13,19 +13,16 @@ import org.repositoryminer.model.Commit;
 import org.repositoryminer.model.Reference;
 import org.repositoryminer.persistence.handler.ReferenceDocumentHandler;
 import org.repositoryminer.scm.ReferenceType;
-import org.repositoryminer.utility.StringUtils;
 
 public class ProcessTimeFrames {
 
-	private static final String RM_TAG_NAME = "CUSTOM_TAG-";
-
+	private static final String TAG_PATH = "timetags/";
+	
 	private Map<String, Reference> refs;
-	private String repositoryPath;
 	private String repositoryId;
 
-	public ProcessTimeFrames(String repositoryPath, String repositoryId) {
+	public ProcessTimeFrames(String repositoryId) {
 		this.refs = new TreeMap<String, Reference>();
-		this.repositoryPath = repositoryPath;
 		this.repositoryId = repositoryId;
 	}
 
@@ -37,18 +34,21 @@ public class ProcessTimeFrames {
 
 		for (TimeFrameType type : timeFrames) {
 			switch (type) {
-			case MONTH:
-				monthFrame = true;
-				break;
-			case TRIMESTER:
-				trimesterFrame = true;
-				break;
-			case SEMESTER:
-				semesterFrame = true;
-				break;
-			case YEAR:
-				yearFrame = true;
-				break;
+				case MONTH:
+					monthFrame = true;
+					break;
+					
+				case TRIMESTER:
+					trimesterFrame = true;
+					break;
+					
+				case SEMESTER:
+					semesterFrame = true;
+					break;
+					
+				case YEAR:
+					yearFrame = true;
+					break;
 			}
 		}
 
@@ -65,14 +65,21 @@ public class ProcessTimeFrames {
 			int year = calendar.get(Calendar.YEAR);
 			String hash = c.getId();
 
-			if (monthFrame)
+			if (monthFrame) {
 				analyzeMonth(hash, year, month);
-			if (trimesterFrame)
+			}
+			
+			if (trimesterFrame) {
 				analyzeTrimester(hash, year, month);
-			if (semesterFrame)
+			}
+			
+			if (semesterFrame) {
 				analyzeSemester(hash, year, month);
-			if (yearFrame)
+			}
+			
+			if (yearFrame) {
 				analyzeYear(hash, year, month);
+			}
 		}
 
 		List<Document> docs = new ArrayList<Document>();
@@ -94,13 +101,11 @@ public class ProcessTimeFrames {
 
 	private void analyzeYear(String hash, int year, int month) {
 		String name = String.valueOf(year);
-		String key = RM_TAG_NAME + name;
-		checkReference(key, name, hash);
+		checkReference(name, hash);
 	}
 
 	private void analyzeTrimester(String hash, int year, int month) {
 		String name = year + "-TRIMESTER-";
-		String key = RM_TAG_NAME;
 
 		if (month >= 0 && month <= 2) {
 			name += 1;
@@ -112,13 +117,11 @@ public class ProcessTimeFrames {
 			name += 4;
 		}
 
-		key += name;
-		checkReference(key, name, hash);
+		checkReference(name, hash);
 	}
 
 	private void analyzeSemester(String hash, int year, int month) {
 		String name = year + "-SEMESTER-";
-		String key = RM_TAG_NAME;
 
 		if (month >= 0 && month <= 5) {
 			name += 1;
@@ -126,25 +129,22 @@ public class ProcessTimeFrames {
 			name += 2;
 		}
 
-		key += name;
-		checkReference(key, name, hash);
+		checkReference(name, hash);
 	}
 
 	private void analyzeMonth(String hash, int year, int month) {
 		String name = year + "-MONTH-" + (month + 1);
-		String key = RM_TAG_NAME + name;
-		checkReference(key, name, hash);
+		checkReference(name, hash);
 	}
 
-	private void checkReference(String key, String name, String hash) {
-		if (refs.containsKey(key)) {
-			Reference tempRef = refs.get(key);
+	private void checkReference(String name, String hash) {
+		if (refs.containsKey(name)) {
+			Reference tempRef = refs.get(name);
 			tempRef.getCommits().add(hash);
 		} else {
-			String id = StringUtils.encodeToSHA1(repositoryPath + "/" + key);
-			Reference r = new Reference(id, repositoryId, name, repositoryPath, ReferenceType.CUSTOM_TIME_TAG, new ArrayList<String>());
+			Reference r = new Reference(null, repositoryId, name, TAG_PATH + name, ReferenceType.TIME_TAG, new ArrayList<String>());
 			r.getCommits().add(hash);
-			refs.put(key, r);
+			refs.put(name, r);
 		}
 	}
 

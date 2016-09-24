@@ -97,7 +97,7 @@ public class EffortsMiningTask implements IPostMiningTask {
 
 		effortsByRef.setRepository(repositoryId);
 		effortsByRef.setReference(reference.getId());
-		effortsByRef.setReferenceName(reference.getFullName());
+		effortsByRef.setReferenceName(reference.getName());
 		effortsByRef.setEfforts(new ArrayList<Effort>(effortsMap.values()));
 
 		EffortsDocumentHandler handler = new EffortsDocumentHandler();

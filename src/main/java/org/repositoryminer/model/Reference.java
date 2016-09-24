@@ -15,7 +15,7 @@ public class Reference {
 	private String id;
 	private String repository;
 	private String name;
-	private String fullName;
+	private String path;
 	private ReferenceType type;
 	private List<String> commits;
 
@@ -25,11 +25,13 @@ public class Reference {
 		for (Document doc : refsDocs) {
 			if (ReferenceType.valueOf(doc.getString("type")) == type) {
 				List<String> commits = new ArrayList<String>();
+				
 				for (String o : (List<String>) doc.get("commits")) {
 					commits.add(o);
 				}
+				
 				Reference r = new Reference(doc.getString("_id"), doc.getString("repository"), doc.getString("name"),
-						doc.getString("full_name"), type, commits);
+						doc.getString("path"), type, commits);
 				refs.add(r);
 			}
 		}
@@ -45,7 +47,7 @@ public class Reference {
 				commits.add(o);
 			}
 			Reference r = new Reference(doc.getString("_id"), doc.getString("repository"), doc.getString("name"),
-					doc.getString("full_name"), ReferenceType.valueOf(doc.getString("type")), commits);
+					doc.getString("path"), ReferenceType.valueOf(doc.getString("type")), commits);
 			refs.add(r);
 		}
 		return refs;
@@ -53,29 +55,21 @@ public class Reference {
 
 	public Document toDocument() {
 		Document doc = new Document();
-		doc.append("repository", repository).append("name", name).append("full_name", fullName)
+		doc.append("repository", repository).append("name", name).append("path", path)
 				.append("type", type.toString()).append("commits", commits);
 		return doc;
-	}
-
-	public static Reference getMaster(List<Reference> branches) {
-		for (Reference r : branches) {
-			if (r.getName().equals("master"))
-				return r;
-		}
-		return null;
 	}
 
 	public Reference() {
 	}
 
-	public Reference(String id, String repository, String name, String fullName, ReferenceType type,
+	public Reference(String id, String repository, String name, String path, ReferenceType type,
 			List<String> commits) {
 		super();
 		this.id = id;
 		this.repository = repository;
 		this.name = name;
-		this.fullName = fullName;
+		this.path = path;
 		this.type = type;
 		this.commits = commits;
 	}
@@ -104,12 +98,12 @@ public class Reference {
 		this.name = name;
 	}
 
-	public String getFullName() {
-		return fullName;
+	public String getPath() {
+		return path;
 	}
 
-	public void setFullName(String fullName) {
-		this.fullName = fullName;
+	public void setPath(String path) {
+		this.path = path;
 	}
 
 	public ReferenceType getType() {

@@ -24,7 +24,7 @@ public class StringUtils {
 		return sb.toString();
 	}
 
-	public static String treatPath(String path) throws IOException {
+	public static String normalizePath(String path) throws IOException {
 		File file = new File(path);
 		String treatedPath = file.getCanonicalPath();
 		return treatedPath.replace("\\", "/");

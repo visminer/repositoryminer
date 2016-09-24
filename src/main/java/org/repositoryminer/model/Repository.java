@@ -15,11 +15,10 @@ public class Repository {
 
 	public Document toDocument() {
 		Document doc = new Document();
-		doc.append("name", name).append("description", description).append("scm", scm.toString()).append("contributors",
-				Contributor.toDocumentList(contributors));
+		doc.append("name", name).append("description", description).append("scm", scm.toString());
 		return doc;
 	}
-
+	
 	public Repository(org.repositoryminer.mining.RepositoryMiner repo) {
 		super();
 		this.name = repo.getName();

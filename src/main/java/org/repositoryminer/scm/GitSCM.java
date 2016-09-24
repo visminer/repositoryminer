@@ -164,11 +164,11 @@ public class GitSCM implements SCM {
 	}
 
 	@Override
-	public List<String> getReferenceCommits(String fullName, ReferenceType type) {
+	public List<String> getReferenceCommits(String name, ReferenceType type) {
 		if (type == ReferenceType.BRANCH)
-			return getCommitsFromBranch(fullName);
+			return getCommitsFromBranch(name);
 		else
-			return getCommitsFromTag(fullName);
+			return getCommitsFromTag(name);
 	}
 
 	@Override
