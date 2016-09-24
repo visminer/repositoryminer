@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.bson.Document;
+import org.bson.types.ObjectId;
 import org.repositoryminer.scm.hostingservice.StatusType;
 
 public class Issue {
@@ -27,7 +28,7 @@ public class Issue {
 		doc.append("creator", creator).append("assignee", assignee).append("closed_at", closedAt)
 				.append("comments", comments).append("created_at", createdAt).append("number", number)
 				.append("status", status.toString()).append("title", title).append("updated_at", updatedAt)
-				.append("body", body).append("milestone", milestone).append("repository", repository)
+				.append("body", body).append("milestone", milestone).append("repository", new ObjectId(repository))
 				.append("labels", Label.toDocumentList(labels));
 		return doc;
 	}

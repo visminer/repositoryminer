@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bson.Document;
+import org.bson.types.ObjectId;
 import org.repositoryminer.scm.ReferenceType;
 
 /**
@@ -30,7 +31,7 @@ public class Reference {
 					commits.add(o);
 				}
 				
-				Reference r = new Reference(doc.getString("_id"), doc.getString("repository"), doc.getString("name"),
+				Reference r = new Reference(doc.get("_id").toString(), doc.get("repository").toString(), doc.getString("name"),
 						doc.getString("path"), type, commits);
 				refs.add(r);
 			}
@@ -46,7 +47,7 @@ public class Reference {
 			for (String o : (List<String>) doc.get("commits")) {
 				commits.add(o);
 			}
-			Reference r = new Reference(doc.getString("_id"), doc.getString("repository"), doc.getString("name"),
+			Reference r = new Reference(doc.get("_id").toString(), doc.get("repository").toString(), doc.getString("name"),
 					doc.getString("path"), ReferenceType.valueOf(doc.getString("type")), commits);
 			refs.add(r);
 		}
@@ -55,7 +56,7 @@ public class Reference {
 
 	public Document toDocument() {
 		Document doc = new Document();
-		doc.append("repository", repository).append("name", name).append("path", path)
+		doc.append("repository", new ObjectId(repository)).append("name", name).append("path", path)
 				.append("type", type.toString()).append("commits", commits);
 		return doc;
 	}

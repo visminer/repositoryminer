@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bson.Document;
+import org.bson.types.ObjectId;
 import org.repositoryminer.ast.AST;
 import org.repositoryminer.ast.AbstractTypeDeclaration;
 import org.repositoryminer.codesmell.clazz.IClassCodeSmell;
@@ -138,7 +139,7 @@ public class SourceAnalyzer {
 			return;
 		}
 
-		byte[] data = Files.readAllBytes(Paths.get(filePath));
+		byte[] data = Files.readAllBytes(Paths.get(repositoryPath + "/" + filePath));
 		if (data == null) {
 			return;
 		}
@@ -154,7 +155,7 @@ public class SourceAnalyzer {
 		doc.append("tag_type", tag.getType().toString());
 		doc.append("commit", commit.getId());
 		doc.append("commit_date", commit.getCommitDate());
-		doc.append("repository", repositoryId);
+		doc.append("repository", new ObjectId(repositoryId));
 
 		processProjectCodeSmells(doc);
 		persistenceTag.insert(doc);
@@ -178,7 +179,7 @@ public class SourceAnalyzer {
 		doc.append("commit_date", commit.getCommitDate());
 		doc.append("package", ast.getDocument().getPackageDeclaration());
 		doc.append("filename", file);
-		doc.append("repository", repositoryId);
+		doc.append("repository", new ObjectId(repositoryId));
 		doc.append("file_hash", fileHash);
 
 		List<AbstractTypeDeclaration> types = ast.getDocument().getTypes();

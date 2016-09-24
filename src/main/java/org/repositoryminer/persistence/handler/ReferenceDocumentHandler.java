@@ -3,6 +3,7 @@ package org.repositoryminer.persistence.handler;
 import java.util.List;
 
 import org.bson.Document;
+import org.bson.types.ObjectId;
 import org.repositoryminer.persistence.Connection;
 
 import com.mongodb.BasicDBObject;
@@ -17,7 +18,7 @@ public class ReferenceDocumentHandler extends DocumentHandler {
 
 	public List<Document> getByRepository(String repository) {
 		BasicDBObject whereClause = new BasicDBObject();
-		whereClause.put("repository", repository);
+		whereClause.put("repository", new ObjectId(repository));
 		return findMany(whereClause, null);
 	}
 

@@ -115,10 +115,12 @@ public class MiningProcessor {
 		WorkingDirectory wd = new WorkingDirectory(repository.getId());
 		WorkingDirectoryDocumentHandler wdHandler = new WorkingDirectoryDocumentHandler();
 		
-		List<Commit> commits = scm.getCommits();
+		commits = scm.getCommits();
 		int idx = 0;
 		
 		for (Commit commit : commits) {
+			commit.setRepository(repository.getId());
+			
 			if (repositoryMiner.getProgressListener() != null) {
 				repositoryMiner.getProgressListener().commitsProgressChange(++idx, commits.size());
 			}
@@ -146,13 +148,13 @@ public class MiningProcessor {
 		scm = SCMFactory.getSCM(repositoryMiner.getScm());
 		scm.open(tempRepo, repositoryMiner.getBinaryThreshold());
 
-		Repository repository = new Repository(repositoryMiner);
+		repository = new Repository(repositoryMiner);
 
 		RepositoryDocumentHandler repoHandler = new RepositoryDocumentHandler();
 		Document repoDoc = repository.toDocument();
 		repoHandler.insert(repoDoc);
 
-		repository.setId(repoDoc.getString("_id"));
+		repository.setId(repoDoc.get("_id").toString());
 
 		saveReferences(repository.getId());
 

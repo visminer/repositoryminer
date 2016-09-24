@@ -1,5 +1,6 @@
 package org.repositoryminer.persistence.handler;
 
+import org.bson.types.ObjectId;
 import org.repositoryminer.persistence.Connection;
 
 import com.mongodb.BasicDBObject;
@@ -13,7 +14,7 @@ public class MilestoneDocumentHandler extends DocumentHandler{
 	}
 	
 	public void deleteByRepository(String id) {
-		BasicDBObject where = new BasicDBObject("repository", id);
+		BasicDBObject where = new BasicDBObject("repository", new ObjectId(id));
 		deleteMany(where);
 	}
 	

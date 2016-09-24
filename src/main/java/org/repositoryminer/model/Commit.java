@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.bson.Document;
+import org.bson.types.ObjectId;
 
 /**
  * This class represents the "commit" object in the database. This class
@@ -38,8 +39,9 @@ public class Commit {
 	@SuppressWarnings("unchecked")
 	public static Commit parseDocument(Document commitDoc, List<String> parents) {
 		Commit commit = new Commit(commitDoc.getString("_id"), commitDoc.getString("message"),
-				commitDoc.getDate("authored_date"), commitDoc.getDate("commit_date"), commitDoc.getString("repository"),
-				parents, Contributor.parseDocument((Document) commitDoc.get("author")),
+				commitDoc.getDate("authored_date"), commitDoc.getDate("commit_date"),
+				commitDoc.get("repository").toString(), parents,
+				Contributor.parseDocument((Document) commitDoc.get("author")),
 				Contributor.parseDocument((Document) commitDoc.get("committer")),
 				Diff.parseDocuments((List<Document>) commitDoc.get("diffs")));
 
@@ -49,8 +51,9 @@ public class Commit {
 	@SuppressWarnings("unchecked")
 	public static Commit parseDocument(Document commitDoc) {
 		Commit commit = new Commit(commitDoc.getString("_id"), commitDoc.getString("message"),
-				commitDoc.getDate("authored_date"), commitDoc.getDate("commit_date"), commitDoc.getString("repository"),
-				new ArrayList<String>(), Contributor.parseDocument((Document) commitDoc.get("author")),
+				commitDoc.getDate("authored_date"), commitDoc.getDate("commit_date"),
+				commitDoc.get("repository").toString(), new ArrayList<String>(),
+				Contributor.parseDocument((Document) commitDoc.get("author")),
 				Contributor.parseDocument((Document) commitDoc.get("committer")),
 				Diff.parseDocuments((List<Document>) commitDoc.get("diffs")));
 
@@ -60,9 +63,9 @@ public class Commit {
 	public Document toDocument() {
 		Document doc = new Document();
 		doc.append("_id", id).append("message", message).append("authored_date", authoredDate)
-				.append("commit_date", commitDate).append("repository", repository).append("parents", parents)
-				.append("author", author.toDocument()).append("committer", committer.toDocument())
-				.append("diffs", Diff.toDocumentList(diffs));
+				.append("commit_date", commitDate).append("repository", new ObjectId(repository))
+				.append("parents", parents).append("author", author.toDocument())
+				.append("committer", committer.toDocument()).append("diffs", Diff.toDocumentList(diffs));
 		return doc;
 	}
 
