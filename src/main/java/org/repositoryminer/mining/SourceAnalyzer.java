@@ -1,5 +1,6 @@
 package org.repositoryminer.mining;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -138,8 +139,16 @@ public class SourceAnalyzer {
 		if (parser == null) {
 			return;
 		}
-
-		byte[] data = Files.readAllBytes(Paths.get(repositoryPath + "/" + filePath));
+		
+		File f = new File(repositoryPath, filePath);
+		
+		// This used to treat links to folders
+		if (f.isDirectory()) {
+			return;
+		}
+		
+		byte[] data = Files.readAllBytes(Paths.get(f.getCanonicalPath()));
+		
 		if (data == null) {
 			return;
 		}

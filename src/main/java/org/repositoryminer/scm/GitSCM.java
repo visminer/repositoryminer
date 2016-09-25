@@ -293,7 +293,7 @@ public class GitSCM implements SCM {
 
 	private void makeCheckout(String point) {
 		try {
-			git.checkout().setForce(true).setName(point).call();
+			git.checkout().setStartPoint(point).setAllPaths(true).setForce(true).call();
 		} catch (GitAPIException e) {
 			errorHandler(ErrorMessage.GIT_CHECKOUT_ERROR.toString(), e);
 		}
