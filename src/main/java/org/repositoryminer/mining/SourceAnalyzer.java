@@ -5,8 +5,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.bson.Document;
 import org.bson.types.ObjectId;
@@ -23,6 +25,7 @@ import org.repositoryminer.parser.Parser;
 import org.repositoryminer.persistence.handler.CommitAnalysisDocumentHandler;
 import org.repositoryminer.persistence.handler.TagAnalysisDocumentHandler;
 import org.repositoryminer.scm.DiffType;
+import org.repositoryminer.scm.ReferenceType;
 import org.repositoryminer.scm.SCM;
 import org.repositoryminer.technicaldebt.ITechnicalDebt;
 
@@ -37,7 +40,8 @@ public class SourceAnalyzer {
 	private TagAnalysisDocumentHandler persistenceTag;
 
 	private Map<String, Commit> commitsMap;
-	private List<Reference> tags;
+	private List<Reference> references;
+	private Set<String> commitsProcessed;
 
 	private Parser parser;
 	private IProgressListener progressListener;
@@ -50,6 +54,7 @@ public class SourceAnalyzer {
 		this.persistenceCommit = new CommitAnalysisDocumentHandler();
 		this.persistenceTag = new TagAnalysisDocumentHandler();
 		this.parsers = repositoryMiner.getParsers();
+		this.commitsProcessed = new HashSet<String>();
 
 		for (Parser parser : repositoryMiner.getParsers()) {
 			parser.setCharSet(repositoryMiner.getCharset());
@@ -60,8 +65,8 @@ public class SourceAnalyzer {
 		this.commitsMap = commitsMap;
 	}
 
-	public void setTags(List<Reference> tags) {
-		this.tags = tags;
+	public void setReferences(List<Reference> references) {
+		this.references = references;
 	}
 
 	public void analyze() throws IOException {
@@ -76,15 +81,31 @@ public class SourceAnalyzer {
 	}
 
 	private void analyzeCommits() throws IOException {
-		if (repositoryMiner.hasClassMetrics() || repositoryMiner.hasClassCodeSmells()
-				|| repositoryMiner.hasTechnicalDebts()) {
-			int idx = 0;
-			/*for (Commit commit : commits) {
-				if (progressListener != null) {
-					progressListener.commitsProgressChange(++idx, commits.size());
-				}
+		if (!repositoryMiner.hasClassMetrics() && !repositoryMiner.hasClassCodeSmells()
+				&& !repositoryMiner.hasTechnicalDebts()) {
+			return;
+		}
 
-				scm.checkout(commit.getId());
+		for (Reference ref : references) {
+			if (ref.getType() == ReferenceType.TIME_TAG) {
+				continue;
+			}
+
+			for (String hash : ref.getCommits()) {
+				/* FIXME: NEEDS REVISION
+				 * if (progressListener != null) {
+					progressListener.commitsProgressChange(++idx, commits.size());
+				}*/
+				
+				// Avoids processing again some commits
+				if (!commitsProcessed.contains(hash)) {
+					commitsProcessed.add(hash);
+				} else {
+					continue;
+				}
+				
+				Commit commit = commitsMap.get(hash);
+				scm.checkout(hash);
 
 				for (Parser parser : repositoryMiner.getParsers()) {
 					parser.processSourceFolders(repositoryPath);
@@ -95,18 +116,16 @@ public class SourceAnalyzer {
 						processAST(diff.getPath(), diff.getHash(), commit);
 					}
 				}
-
-				scm.reset();
-			}*/
+			}
 		}
 	}
 
 	private void analyzeTags() {
 		if (repositoryMiner.hasProjectsCodeSmells()) {
 			int idx = 0;
-			for (Reference tag : tags) {
+			for (Reference tag : references) {
 				if (progressListener != null) {
-					progressListener.tagsProgressChange(++idx, tags.size());
+					progressListener.tagsProgressChange(++idx, references.size());
 				}
 
 				String commitId = tag.getCommits().get(0);
@@ -116,11 +135,7 @@ public class SourceAnalyzer {
 					parser.processSourceFolders(repositoryPath);
 				}
 
-				//int index = commits.indexOf(new Commit(commitId));
-				//Commit commit = commits.get(index);
-				//processTag(commit, tag);
-
-				scm.reset();
+				processTag(commitsMap.get(commitId), tag);
 			}
 		}
 	}
@@ -140,16 +155,16 @@ public class SourceAnalyzer {
 		if (parser == null) {
 			return;
 		}
-		
+
 		File f = new File(repositoryPath, filePath);
-		
+
 		// This used to treat links to folders
 		if (f.isDirectory()) {
 			return;
 		}
-		
+
 		byte[] data = Files.readAllBytes(Paths.get(f.getCanonicalPath()));
-		
+
 		if (data == null) {
 			return;
 		}

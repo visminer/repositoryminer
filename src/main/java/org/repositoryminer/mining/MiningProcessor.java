@@ -228,17 +228,17 @@ public class MiningProcessor {
 			return;
 		}
 
-		List<Reference> tags = null;
+		List<Reference> refs = null;
 		if (repositoryMiner.hasProjectsCodeSmells()) {
-			tags = new ArrayList<Reference>();
+			refs = new ArrayList<Reference>();
 			
 			for (Reference ref : repositoryMiner.getReferences().keySet()) {
 				int index = references.indexOf(ref);
-				tags.add(references.get(index));
+				refs.add(references.get(index));
 			}
 			
 			for (Reference ref : timeReferences) {
-				tags.add(ref);
+				refs.add(ref);
 			}
 		}
 		
@@ -246,7 +246,7 @@ public class MiningProcessor {
 		SourceAnalyzer sourceAnalyzer = new SourceAnalyzer(repositoryMiner, scm, repository.getId(), tempPath);
 		
 		sourceAnalyzer.setCommitsMap(commitsMap);
-		sourceAnalyzer.setTags(tags);
+		sourceAnalyzer.setReferences(refs);
 		sourceAnalyzer.analyze();
 	}
 
