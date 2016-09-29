@@ -2,6 +2,7 @@ package org.repositoryminer.mining;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -20,12 +21,20 @@ public class ProcessTimeFrames {
 	
 	private Map<String, Reference> refs;
 	private String repositoryId;
+	private Map<String, Commit> commitsMap;
+	private IProgressListener progressListener;
 
-	public ProcessTimeFrames(String repositoryId) {
-		this.refs = new TreeMap<String, Reference>();
+	public ProcessTimeFrames(String repositoryId, Map<String, Commit> commitsMap, IProgressListener progressListener) {
 		this.repositoryId = repositoryId;
+		this.commitsMap = commitsMap;
+		this.progressListener = progressListener;
 	}
 
+	public Collection<? extends Reference> analyzeCommits(Reference reference, TimeFrameType[] value) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
 	public List<Reference> analyzeCommits(List<Commit> commits, List<TimeFrameType> timeFrames, IProgressListener progressListener) {
 		boolean monthFrame = false;
 		boolean trimesterFrame = false;

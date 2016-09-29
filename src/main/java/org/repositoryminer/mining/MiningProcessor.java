@@ -3,8 +3,11 @@ package org.repositoryminer.mining;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
@@ -97,16 +100,48 @@ public class MiningProcessor {
 		}
 	}
 
-	private void saveTimeReferences(RepositoryMiner repositoryMiner) {
-		if (repositoryMiner.getTimeFrames() != null) {
-			if (repositoryMiner.getProgressListener() != null) {
-				repositoryMiner.getProgressListener().initTimeFramesProgress();
-			}
-
-			ProcessTimeFrames procTimeFrames = new ProcessTimeFrames(repository.getId());
-			timeReferences = procTimeFrames.analyzeCommits(commits, repositoryMiner.getTimeFrames(),
-					repositoryMiner.getProgressListener());
+	/*
+	 * This method is used to create a hash map using the commit hash as key and the commit 
+	 * object as value. The main objective of the method is to make faster the time frame processing.
+	 * This processing will require a lot of searches in some structure, and a hash map is perfect 
+	 * for this job, because its average time complexity is O(1). It is preferable use this process 
+	 * instead of bring back the commits in the reference, because get the commits with the changes 
+	 * made and other data require more resources and requires disk I/O. And these data is 
+	 * already in the class, so making N searches in O(1) time complexity will costs O(N).
+	 */
+	private Map<String, Commit> createCommitsMap() {
+		Map<String, Commit> commitsMap = new HashMap<String, Commit>(commits.size());
+		for (Commit c: commits) {
+			commitsMap.put(c.getId(), c);
 		}
+		return commitsMap;
+	}
+	
+	private void saveTimeReferences(RepositoryMiner rm) {
+		boolean proceed = false;
+		for (Entry<Reference, TimeFrameType[]> entry : rm.getReferences().entrySet()) {
+			if (entry.getValue() != null && rm.getProgressListener() != null) {
+				rm.getProgressListener().initTimeFramesProgress();
+				proceed = true;
+				break;
+			}
+		}
+		
+		if (!proceed) {
+			return;
+		}
+		
+		Map<String, Commit> commitsMap = createCommitsMap();
+		ProcessTimeFrames procTimeFrames = new ProcessTimeFrames(repository.getId(), commitsMap, rm.getProgressListener());
+		timeReferences = new ArrayList<Reference>();
+		
+		for (Entry<Reference, TimeFrameType[]> entry : rm.getReferences().entrySet()) {
+			if (entry.getValue() != null) {
+				int index = references.indexOf(entry.getKey());
+				timeReferences.addAll(procTimeFrames.analyzeCommits(references.get(index), entry.getValue()));
+			}
+		}
+			
 	}
 
 	private void saveCommitsAndSnapshots(RepositoryMiner repositoryMiner) {
@@ -196,17 +231,21 @@ public class MiningProcessor {
 		List<Reference> tags = null;
 		if (repositoryMiner.hasProjectsCodeSmells()) {
 			tags = new ArrayList<Reference>();
-			for (Reference ref : references) {
-				tags.add(ref);
+			
+			for (Reference ref : repositoryMiner.getReferences().keySet()) {
+				int index = references.indexOf(ref);
+				tags.add(references.get(index));
 			}
+			
 			for (Reference ref : timeReferences) {
 				tags.add(ref);
 			}
 		}
-
+		
+		Map<String, Commit> commitsMap = createCommitsMap();
 		SourceAnalyzer sourceAnalyzer = new SourceAnalyzer(repositoryMiner, scm, repository.getId(), tempPath);
 		
-		sourceAnalyzer.setCommits(commits);
+		sourceAnalyzer.setCommitsMap(commitsMap);
 		sourceAnalyzer.setTags(tags);
 		sourceAnalyzer.analyze();
 	}

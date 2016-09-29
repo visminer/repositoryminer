@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.bson.Document;
 import org.bson.types.ObjectId;
@@ -35,7 +36,7 @@ public class SourceAnalyzer {
 	private CommitAnalysisDocumentHandler persistenceCommit;
 	private TagAnalysisDocumentHandler persistenceTag;
 
-	private List<Commit> commits;
+	private Map<String, Commit> commitsMap;
 	private List<Reference> tags;
 
 	private Parser parser;
@@ -55,8 +56,8 @@ public class SourceAnalyzer {
 		}
 	}
 
-	public void setCommits(List<Commit> commits) {
-		this.commits = commits;
+	public void setCommitsMap(Map<String, Commit> commitsMap) {
+		this.commitsMap = commitsMap;
 	}
 
 	public void setTags(List<Reference> tags) {
@@ -78,7 +79,7 @@ public class SourceAnalyzer {
 		if (repositoryMiner.hasClassMetrics() || repositoryMiner.hasClassCodeSmells()
 				|| repositoryMiner.hasTechnicalDebts()) {
 			int idx = 0;
-			for (Commit commit : commits) {
+			/*for (Commit commit : commits) {
 				if (progressListener != null) {
 					progressListener.commitsProgressChange(++idx, commits.size());
 				}
@@ -96,7 +97,7 @@ public class SourceAnalyzer {
 				}
 
 				scm.reset();
-			}
+			}*/
 		}
 	}
 
@@ -115,9 +116,9 @@ public class SourceAnalyzer {
 					parser.processSourceFolders(repositoryPath);
 				}
 
-				int index = commits.indexOf(new Commit(commitId));
-				Commit commit = commits.get(index);
-				processTag(commit, tag);
+				//int index = commits.indexOf(new Commit(commitId));
+				//Commit commit = commits.get(index);
+				//processTag(commit, tag);
 
 				scm.reset();
 			}

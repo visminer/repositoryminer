@@ -11,7 +11,7 @@ public interface MetricId {
 	public static final String NOA = "NOA";
 	public static final String NOAV = "NOAV";
 	public static final String PAR = "PAR";
-	public static final String SLOC = "SLOC";
+	public static final String LOC = "LOC";
 	public static final String TCC = "TCC";
 	public static final String WMC = "WMC";
 	
