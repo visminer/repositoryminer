@@ -2,10 +2,10 @@ package org.repositoryminer.mining;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 import org.bson.Document;
 import org.repositoryminer.listener.IProgressListener;
@@ -13,23 +13,25 @@ import org.repositoryminer.model.Commit;
 import org.repositoryminer.model.Reference;
 import org.repositoryminer.persistence.handler.ReferenceDocumentHandler;
 import org.repositoryminer.scm.ReferenceType;
-import org.repositoryminer.utility.StringUtils;
 
 public class ProcessTimeFrames {
 
-	private static final String RM_TAG_NAME = "CUSTOM_TAG-";
+	private static final String REF_PATH = "timerefs/";
 
 	private Map<String, Reference> refs;
-	private String repositoryPath;
 	private String repositoryId;
+	private Map<String, Commit> commitsMap;
+	private IProgressListener progressListener;
 
-	public ProcessTimeFrames(String repositoryPath, String repositoryId) {
-		this.refs = new TreeMap<String, Reference>();
-		this.repositoryPath = repositoryPath;
+	public ProcessTimeFrames(String repositoryId, Map<String, Commit> commitsMap, IProgressListener progressListener) {
 		this.repositoryId = repositoryId;
+		this.commitsMap = commitsMap;
+		this.progressListener = progressListener;
 	}
 
-	public List<Reference> analyzeCommits(List<Commit> commits, List<TimeFrameType> timeFrames, IProgressListener progressListener) {
+	public Collection<? extends Reference> analyzeCommits(Reference reference, TimeFrameType[] timeFrames) {
+		this.refs = new HashMap<String, Reference>();
+		
 		boolean monthFrame = false;
 		boolean trimesterFrame = false;
 		boolean semesterFrame = false;
@@ -40,67 +42,82 @@ public class ProcessTimeFrames {
 			case MONTH:
 				monthFrame = true;
 				break;
+
 			case TRIMESTER:
 				trimesterFrame = true;
 				break;
+
 			case SEMESTER:
 				semesterFrame = true;
 				break;
+
 			case YEAR:
 				yearFrame = true;
 				break;
 			}
 		}
 
-		int idx = 0;
-		for (Commit c : commits) {
-			if (progressListener != null) {
+		String refPath = REF_PATH;
+		if (reference.getType() == ReferenceType.TAG) {
+			refPath += "tags/" + reference.getName() + "/";
+		} else if (reference.getType() == ReferenceType.BRANCH) {
+			refPath += "heads/" + reference.getName() + "/";
+		}
+
+		for (String hash : reference.getCommits()) {
+			/* FIXME: NEEDS REVISION
+			 * if (progressListener != null) {
 				progressListener.commitsProgressChange(++idx, commits.size());
-			}
-			
+			}*/
+
+			Commit commit = commitsMap.get(hash);
+
 			Calendar calendar = Calendar.getInstance();
-			calendar.setTime(c.getCommitDate());
+			calendar.setTime(commit.getCommitDate());
 
 			int month = calendar.get(Calendar.MONTH);
 			int year = calendar.get(Calendar.YEAR);
-			String hash = c.getId();
 
-			if (monthFrame)
-				analyzeMonth(hash, year, month);
-			if (trimesterFrame)
-				analyzeTrimester(hash, year, month);
-			if (semesterFrame)
-				analyzeSemester(hash, year, month);
-			if (yearFrame)
-				analyzeYear(hash, year, month);
+			if (monthFrame) {
+				analyzeMonth(refPath, year, month, hash);
+			}
+
+			if (trimesterFrame) {
+				analyzeTrimester(refPath, year, month, hash);
+			}
+
+			if (semesterFrame) {
+				analyzeSemester(refPath, year, month, hash);
+			}
+
+			if (yearFrame) {
+				analyzeYear(refPath, year, month, hash);
+			}
 		}
 
 		List<Document> docs = new ArrayList<Document>();
 		List<Reference> timeRefs = new ArrayList<Reference>(refs.values());
-		idx = 0;
+
 		for (Reference r : timeRefs) {
+			/* FIXME: NEEDS REVISION
 			if (progressListener != null) {
 				progressListener.timeFramesProgressChange(++idx, timeRefs.size());
-			}
-			
-			Collections.reverse(r.getCommits());
+			}*/
 			docs.add(r.toDocument());
 		}
-		
+
 		ReferenceDocumentHandler docHandler = new ReferenceDocumentHandler();
 		docHandler.insertMany(docs);
 		return timeRefs;
 	}
 
-	private void analyzeYear(String hash, int year, int month) {
-		String name = String.valueOf(year);
-		String key = RM_TAG_NAME + name;
-		checkReference(key, name, hash);
+	private void analyzeYear(String refPath, int year, int month, String hash) {
+		String name = "YEAR-" + year;
+		checkReference(name, refPath + name, hash);
 	}
 
-	private void analyzeTrimester(String hash, int year, int month) {
-		String name = year + "-TRIMESTER-";
-		String key = RM_TAG_NAME;
+	private void analyzeTrimester(String refPath, int year, int month, String hash) {
+		String name = "YEAR-" + year + "-TRIMESTER-";
 
 		if (month >= 0 && month <= 2) {
 			name += 1;
@@ -112,13 +129,11 @@ public class ProcessTimeFrames {
 			name += 4;
 		}
 
-		key += name;
-		checkReference(key, name, hash);
+		checkReference(name, refPath + name, hash);
 	}
 
-	private void analyzeSemester(String hash, int year, int month) {
-		String name = year + "-SEMESTER-";
-		String key = RM_TAG_NAME;
+	private void analyzeSemester(String refPath, int year, int month, String hash) {
+		String name = "YEAR-" + year + "-SEMESTER-";
 
 		if (month >= 0 && month <= 5) {
 			name += 1;
@@ -126,25 +141,22 @@ public class ProcessTimeFrames {
 			name += 2;
 		}
 
-		key += name;
-		checkReference(key, name, hash);
+		checkReference(name, refPath + name, hash);
 	}
 
-	private void analyzeMonth(String hash, int year, int month) {
-		String name = year + "-MONTH-" + (month + 1);
-		String key = RM_TAG_NAME + name;
-		checkReference(key, name, hash);
+	private void analyzeMonth(String refPath, int year, int month, String hash) {
+		String name = "YEAR-" + year + "-MONTH-" + (month + 1);
+		checkReference(name, refPath + name, hash);
 	}
 
-	private void checkReference(String key, String name, String hash) {
-		if (refs.containsKey(key)) {
-			Reference tempRef = refs.get(key);
+	private void checkReference(String name, String path, String hash) {
+		if (refs.containsKey(name)) {
+			Reference tempRef = refs.get(name);
 			tempRef.getCommits().add(hash);
 		} else {
-			String id = StringUtils.encodeToSHA1(repositoryPath + "/" + key);
-			Reference r = new Reference(id, repositoryId, name, repositoryPath, ReferenceType.CUSTOM_TIME_TAG, new ArrayList<String>());
+			Reference r = new Reference(null, repositoryId, name, path, ReferenceType.TIME_TAG, new ArrayList<String>());
 			r.getCommits().add(hash);
-			refs.put(key, r);
+			refs.put(name, r);
 		}
 	}
 

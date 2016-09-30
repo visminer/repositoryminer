@@ -21,16 +21,9 @@ public interface SCM {
 	
 	/**
 	 * @param repositoryPath
-	 * @param binaryThreshold
 	 * Initializes the repository analysis.
 	 */
-	public void open(String repositoryPath, int binaryThreshold);
-	
-	/**
-	 * @return The absolute path of the repository.
-	 * The \ are changed by /.
-	 */
-	public String getAbsolutePath();
+	public void open(String repositoryPath);
 	
 	/**
 	 * @param repositoryId
@@ -51,13 +44,6 @@ public interface SCM {
 	 */
 	public List<String> getReferenceCommits(String fullName, ReferenceType type);
 	
-	/**
-	 * @param commit The commit hash.
-	 * @param filePath
-	 * @return The content of the file.
-	 */
-	public byte[] getData(String commit, String filePath);
-
 	/**
 	 * @param treeName
 	 * Makes a checkout to a give reference.

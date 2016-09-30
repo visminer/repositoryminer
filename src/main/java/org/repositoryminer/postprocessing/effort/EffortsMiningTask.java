@@ -97,7 +97,7 @@ public class EffortsMiningTask implements IPostMiningTask {
 
 		effortsByRef.setRepository(repositoryId);
 		effortsByRef.setReference(reference.getId());
-		effortsByRef.setReferenceName(reference.getFullName());
+		effortsByRef.setReferenceName(reference.getName());
 		effortsByRef.setEfforts(new ArrayList<Effort>(effortsMap.values()));
 
 		EffortsDocumentHandler handler = new EffortsDocumentHandler();
@@ -196,7 +196,7 @@ public class EffortsMiningTask implements IPostMiningTask {
 	 * @return a list of code smells' names
 	 */
 	@SuppressWarnings("unchecked")
-	private List<String> getCodeSmells(String fileHash, String commitHash) {
+	private List<String> getCodeSmells(long fileHash, String commitHash) {
 		List<String> smells = new ArrayList<String>();
 
 		CommitAnalysisDocumentHandler handler = new CommitAnalysisDocumentHandler();

@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.bson.Document;
 import org.bson.conversions.Bson;
+import org.bson.types.ObjectId;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.MongoCollection;
@@ -26,7 +27,7 @@ public class DocumentHandler {
 
 	public Document findById(String id, Bson projection){
 		BasicDBObject whereClause = new BasicDBObject();
-		whereClause.put("_id", id);
+		whereClause.put("_id", new ObjectId(id));
 		return findOne(whereClause, projection);
 	}
 	

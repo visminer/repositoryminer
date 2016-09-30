@@ -1,12 +1,17 @@
 package org.repositoryminer.mining;
 
-import java.io.UnsupportedEncodingException;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
-import org.repositoryminer.listener.IProgressListener;
+import org.apache.commons.io.FileUtils;
+import org.bson.Document;
 import org.repositoryminer.model.Commit;
 import org.repositoryminer.model.Contributor;
 import org.repositoryminer.model.Reference;
@@ -66,9 +71,110 @@ import org.repositoryminer.utility.StringUtils;
  */
 public class MiningProcessor {
 
-	public MiningProcessor() {
+	private SCM scm;
+	private List<Reference> references;
+	private List<Reference> timeReferences;
+	private List<Commit> commits;
+	private Repository repository;
+	private Set<Contributor> contributors;
+
+	String copyRepositoryFolder(String srcFolder, String destFolderName) throws IOException {
+		File src = new File(srcFolder);
+		File dest = new File(System.getProperty("java.io.tmpdir"), destFolderName);
+		FileUtils.copyDirectory(src, dest);
+		return StringUtils.normalizePath(dest.getCanonicalPath());
 	}
 
+	private void deleteRepositoryFolder(String folderName) throws IOException {
+		File folder = new File(folderName);
+		FileUtils.deleteDirectory(folder);
+	}
+
+	private void saveReferences(String repositoryId) {
+		ReferenceDocumentHandler refHandler = new ReferenceDocumentHandler();
+		references = scm.getReferences();
+		for (Reference ref : references) {
+			ref.setRepository(repositoryId);
+			ref.setCommits(scm.getReferenceCommits(ref.getPath(), ref.getType()));
+			refHandler.insert(ref.toDocument());
+		}
+	}
+
+	/*
+	 * This method is used to create a hash map using the commit hash as key and the commit 
+	 * object as value. The main objective of the method is to make faster the time frame processing.
+	 * This processing will require a lot of searches in some structure, and a hash map is perfect 
+	 * for this job, because its average time complexity is O(1). It is preferable use this process 
+	 * instead of bring back the commits in the reference, because get the commits with the changes 
+	 * made and other data require more resources and requires disk I/O. And these data is 
+	 * already in the class, so making N searches in O(1) time complexity will costs O(N).
+	 */
+	private Map<String, Commit> createCommitsMap() {
+		Map<String, Commit> commitsMap = new HashMap<String, Commit>(commits.size());
+		for (Commit c: commits) {
+			commitsMap.put(c.getId(), c);
+		}
+		return commitsMap;
+	}
+	
+	private void saveTimeReferences(RepositoryMiner rm) {
+		if (rm.getReferences() == null) {
+			return;
+		}
+		
+		boolean proceed = false;
+		for (Entry<Reference, TimeFrameType[]> entry : rm.getReferences().entrySet()) {
+			if (entry.getValue() != null && rm.getProgressListener() != null) {
+				rm.getProgressListener().initTimeFramesProgress();
+				proceed = true;
+				break;
+			} else if (entry.getValue() != null) {
+				proceed = true;
+				break;
+			}
+		}
+		
+		if (!proceed) {
+			return;
+		}
+		
+		Map<String, Commit> commitsMap = createCommitsMap();
+		ProcessTimeFrames procTimeFrames = new ProcessTimeFrames(repository.getId(), commitsMap, rm.getProgressListener());
+		timeReferences = new ArrayList<Reference>();
+		
+		for (Entry<Reference, TimeFrameType[]> entry : rm.getReferences().entrySet()) {
+			if (entry.getValue() != null) {
+				int index = references.indexOf(entry.getKey());
+				timeReferences.addAll(procTimeFrames.analyzeCommits(references.get(index), entry.getValue()));
+			}
+		}
+			
+	}
+
+	private void saveCommitsAndSnapshots(RepositoryMiner repositoryMiner) {
+		contributors = new HashSet<Contributor>();
+		CommitDocumentHandler commitHandler = new CommitDocumentHandler();
+		WorkingDirectory wd = new WorkingDirectory(repository.getId());
+		WorkingDirectoryDocumentHandler wdHandler = new WorkingDirectoryDocumentHandler();
+		
+		commits = scm.getCommits();
+		int idx = 0;
+		
+		for (Commit commit : commits) {
+			commit.setRepository(repository.getId());
+			
+			if (repositoryMiner.getProgressListener() != null) {
+				repositoryMiner.getProgressListener().commitsProgressChange(++idx, commits.size());
+			}
+
+			contributors.add(commit.getCommitter());
+			wd.setId(commit.getId());
+			wd.processDiff(commit.getDiffs());
+			wdHandler.insert(wd.toDocument());
+			commitHandler.insert(commit.toDocument());
+		}
+	}
+	
 	/**
 	 * Starts the mining process
 	 * 
@@ -76,66 +182,35 @@ public class MiningProcessor {
 	 *            instance of {@link org.repositoryminer.mining.RepositoryMiner}
 	 *            . It must <b>NEVER<b> be null, since it will provide important
 	 *            parameters for the source-code analysis and persistence
-	 * @throws UnsupportedEncodingException
+	 * @throws IOException
 	 */
-	public Repository mine(RepositoryMiner repositoryMiner) throws UnsupportedEncodingException {
-		SCM scm = SCMFactory.getSCM(repositoryMiner.getScm());
-		scm.open(repositoryMiner.getPath(), repositoryMiner.getBinaryThreshold());
+	public Repository mine(RepositoryMiner repositoryMiner) throws IOException {
+		String tempRepo = copyRepositoryFolder(repositoryMiner.getPath(), repositoryMiner.getName());
 
-		String absPath = scm.getAbsolutePath();
-		String id = StringUtils.encodeToSHA1(absPath);
+		scm = SCMFactory.getSCM(repositoryMiner.getScm());
+		scm.open(tempRepo);
 
-		Repository repository = new Repository(repositoryMiner);
-		repository.setId(id);
-		repository.setPath(absPath);
-
-		WorkingDirectory wd = new WorkingDirectory(id);
-		WorkingDirectoryDocumentHandler wdHandler = new WorkingDirectoryDocumentHandler();
-
-		ReferenceDocumentHandler refHandler = new ReferenceDocumentHandler();
-		List<Reference> refs = scm.getReferences();
-		for (Reference ref : refs) {
-			ref.setCommits(scm.getReferenceCommits(ref.getFullName(), ref.getType()));
-			refHandler.insert(ref.toDocument());
-		}
-
-		Set<Contributor> contributors = new HashSet<Contributor>();
-		CommitDocumentHandler commitHandler = new CommitDocumentHandler();
-
-		List<Commit> commits = scm.getCommits();
-
-		IProgressListener progressListener = repositoryMiner.getProgressListener();
-		int idx = 0;
-		for (Commit commit : commits) {
-			if (progressListener != null) {
-				progressListener.commitsProgressChange(++idx, commits.size());
-			}
-
-			contributors.add(commit.getCommitter());
-			wd.setId(commit.getId());
-			wd.processDiff(commit.getDiffs());
-			wdHandler.insert(wd.toDocument());
-
-			commitHandler.insert(commit.toDocument());
-		}
-
-		List<Reference> timeRefs = new ArrayList<Reference>();
-		if (repositoryMiner.getTimeFrames() != null) {
-			if (progressListener != null) {
-				progressListener.initTimeFramesProgress();
-			}
-
-			ProcessTimeFrames procTimeFrames = new ProcessTimeFrames(absPath, id);
-			timeRefs = procTimeFrames.analyzeCommits(commits, repositoryMiner.getTimeFrames(), progressListener);
-		}
-
-		calculateAndDetect(repositoryMiner, commits, refs, timeRefs, scm, id, absPath);
+		repository = new Repository(repositoryMiner);
 
 		RepositoryDocumentHandler repoHandler = new RepositoryDocumentHandler();
-		repository.setContributors(new ArrayList<Contributor>(contributors));
-		repoHandler.insert(repository.toDocument());
+		Document repoDoc = repository.toDocument();
+		repoHandler.insert(repoDoc);
 
+		repository.setId(repoDoc.get("_id").toString());
+
+		saveReferences(repository.getId());
+
+		saveCommitsAndSnapshots(repositoryMiner);
+
+		saveTimeReferences(repositoryMiner);
+		
+		calculateAndDetect(repositoryMiner, tempRepo);
+
+		repoDoc.append("contributors", Contributor.toDocumentList(contributors));
+		repoHandler.updateOnlyContributors(repoDoc);
+		
 		scm.close();
+		deleteRepositoryFolder(tempRepo);
 		
 		return repository;
 	}
@@ -149,39 +224,38 @@ public class MiningProcessor {
 	 * 
 	 * @param repositoryMiner
 	 *            instance of {@link org.repositoryminer.mining.RepositoryMiner}
-	 * @param commits
-	 *            list of all commits from project's repository
-	 * @param scmRefs
-	 * @param timeRefs
-	 * @param scm
-	 * @param repoId
-	 *            hash to uniquely identify the repository
-	 * @param repoPath
-	 *            path to the project being mined
-	 * @throws UnsupportedEncodingException
+	 * @param tempPath
+	 *            temporary repository path to access the files content
+	 * @throws IOException
 	 */
-	private void calculateAndDetect(RepositoryMiner repositoryMiner, List<Commit> commits, List<Reference> scmRefs,
-			List<Reference> timeRefs, SCM scm, String repoId, String repoPath) throws UnsupportedEncodingException {
+	private void calculateAndDetect(RepositoryMiner repositoryMiner, String tempPath) throws IOException {
+
 		if (!repositoryMiner.hasClassCodeSmells() && !repositoryMiner.hasClassMetrics()
 				&& !repositoryMiner.hasTechnicalDebts() && !repositoryMiner.hasProjectsCodeSmells()) {
 			return;
 		}
 
-		List<Reference> tags = null;
+		List<Reference> refs = null;
 		if (repositoryMiner.hasProjectsCodeSmells()) {
-			tags = new ArrayList<Reference>();
-			for (Reference ref : scmRefs) {
-				tags.add(ref);
+			refs = new ArrayList<Reference>();
+			
+			for (Reference ref : repositoryMiner.getReferences().keySet()) {
+				int index = references.indexOf(ref);
+				refs.add(references.get(index));
 			}
-			for (Reference ref : timeRefs) {
-				tags.add(ref);
+			
+			if (timeReferences != null) {
+				for (Reference ref : timeReferences) {
+					refs.add(ref);
+				}
 			}
 		}
-
-		SourceAnalyzer sourceAnalyzer = new SourceAnalyzer(repositoryMiner, scm, repoId, repoPath);
-		sourceAnalyzer.setCommits(commits);
-		sourceAnalyzer.setTags(tags);
-
+		
+		Map<String, Commit> commitsMap = createCommitsMap();
+		SourceAnalyzer sourceAnalyzer = new SourceAnalyzer(repositoryMiner, scm, repository.getId(), tempPath);
+		
+		sourceAnalyzer.setCommitsMap(commitsMap);
+		sourceAnalyzer.setReferences(refs);
 		sourceAnalyzer.analyze();
 	}
 

@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.bson.Document;
+import org.bson.types.ObjectId;
 import org.repositoryminer.scm.hostingservice.StatusType;
 
 public class Milestone {
@@ -25,7 +26,7 @@ public class Milestone {
 		doc.append("number", number).append("status", status.toString()).append("title", title)
 				.append("description", description).append("creator", creator).append("opened_issues", openedIssues)
 				.append("closed_issues", closedIssues).append("created_at", createdAt).append("due_on", dueOn)
-				.append("repository", repository).append("issues", issues);
+				.append("repository", new ObjectId(repository)).append("issues", issues);
 		return doc;
 	}
 

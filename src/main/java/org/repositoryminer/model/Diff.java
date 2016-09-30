@@ -14,7 +14,7 @@ public class Diff {
 
 	private String path;
 	private String oldPath;
-	private String hash;
+	private long hash;
 	private int linesAdded;
 	private int linesRemoved;
 	private DiffType type;
@@ -23,7 +23,7 @@ public class Diff {
 		List<Diff> diffs = new ArrayList<Diff>();
 		for (Document doc : docs) {
 			Diff diff = new Diff(doc.getString("path"), doc.getString("old_path"),
-				doc.getString("hash"), doc.getInteger("lines_added", 0), doc.getInteger("lines_removed", 0),
+				doc.getLong("hash"), doc.getInteger("lines_added", 0), doc.getInteger("lines_removed", 0),
 				DiffType.valueOf(doc.getString("type")));
 			diffs.add(diff);
 		}
@@ -45,7 +45,7 @@ public class Diff {
 	public Diff() {
 	}
 
-	public Diff(String path, String oldPath, String hash, int linesAdded, int linesRemoved, DiffType type) {
+	public Diff(String path, String oldPath, long hash, int linesAdded, int linesRemoved, DiffType type) {
 		super();
 		this.path = path;
 		this.oldPath = oldPath;
@@ -71,11 +71,11 @@ public class Diff {
 		this.oldPath = oldPath;
 	}
 
-	public String getHash() {
+	public long getHash() {
 		return hash;
 	}
 
-	public void setHash(String hash) {
+	public void setHash(long hash) {
 		this.hash = hash;
 	}
 

@@ -1,13 +1,14 @@
 package org.repositoryminer.mining;
 
-import java.io.UnsupportedEncodingException;
-import java.util.Arrays;
+import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import org.repositoryminer.codesmell.clazz.IClassCodeSmell;
 import org.repositoryminer.codesmell.project.IProjectCodeSmell;
 import org.repositoryminer.listener.IProgressListener;
 import org.repositoryminer.metric.clazz.IClassMetric;
+import org.repositoryminer.model.Reference;
 import org.repositoryminer.parser.Parser;
 import org.repositoryminer.postprocessing.IPostMiningTask;
 import org.repositoryminer.scm.SCMType;
@@ -48,18 +49,15 @@ public class RepositoryMiner {
 	private String description;
 	private SCMType scm;
 	private String charset = "UTF-8";
-	private int binaryThreshold = 2048;
 
 	private List<Parser> parsers;
 	private List<IClassMetric> classMetrics;
 	private List<IClassCodeSmell> classCodeSmells;
 	private List<ITechnicalDebt> technicalDebts;
-	private List<TimeFrameType> timeFrames;
 	private List<IProjectCodeSmell> projectCodeSmells;
-	
 	private List<IPostMiningTask> postMiningTasks;
-
 	private IProgressListener progressListener;
+	private Map<Reference, TimeFrameType[]> references;
 
 	/**
 	 * Use this void constructor if parameters are going to be set later
@@ -68,8 +66,7 @@ public class RepositoryMiner {
 	 * {@link #RepositoryMiner(String, String, String, SCMType)}) can be used if
 	 * mandatory parameters are known
 	 */
-	public RepositoryMiner() {
-	}
+	public RepositoryMiner() {}
 
 	/**
 	 * Use this non-void constructor if mandatory parameters are known
@@ -102,10 +99,9 @@ public class RepositoryMiner {
 	 * this method
 	 * <p>
 	 * 
-	 * @throws UnsupportedEncodingException
-	 *             raised if the OS does not support the selected charset.
+	 * @throws IOException.
 	 */
-	public void mine() throws UnsupportedEncodingException {
+	public void mine() throws IOException {
 		MiningProcessor processor = new MiningProcessor();
 		PostMiningProcessor postProcessor = new PostMiningProcessor();
 		if (progressListener != null) {
@@ -117,39 +113,24 @@ public class RepositoryMiner {
 		}
 	}
 
-	public RepositoryMiner setParsers(Parser... parsers) {
-		this.parsers = Arrays.asList(parsers);
-		return this;
-	}
-
-	public RepositoryMiner setClasstMetrics(IClassMetric... classMetrics) {
-		this.classMetrics = Arrays.asList(classMetrics);
-		return this;
-	}
-
-	public RepositoryMiner setClassCodeSmells(IClassCodeSmell... classCodeSmells) {
-		this.classCodeSmells = Arrays.asList(classCodeSmells);
-		return this;
-	}
-
-	public RepositoryMiner setTechnicalDebts(ITechnicalDebt... technicalDebts) {
-		this.technicalDebts = Arrays.asList(technicalDebts);
-		return this;
-	}
-
-	public RepositoryMiner setTimeFrames(TimeFrameType... timeFrames) {
-		this.timeFrames = Arrays.asList(timeFrames);
-		return this;
-	}
-
-	public RepositoryMiner setProjectCodeSmells(IProjectCodeSmell... projectCodeSmells) {
-		this.projectCodeSmells = Arrays.asList(projectCodeSmells);
-		return this;
+	public boolean hasClassMetrics() {
+		return (classMetrics != null && !classMetrics.isEmpty());
 	}
 	
-	public RepositoryMiner setPostMiningTasks(IPostMiningTask... postMiningTasks) {
-		this.postMiningTasks = Arrays.asList(postMiningTasks);
-		return this;
+	public boolean hasTechnicalDebts() {
+		return (technicalDebts != null && !technicalDebts.isEmpty());
+	}
+
+	public boolean hasClassCodeSmells() {
+		return (classCodeSmells != null && !classCodeSmells.isEmpty());
+	}
+	
+	public boolean hasProjectsCodeSmells() {
+		return (projectCodeSmells != null && !projectCodeSmells.isEmpty());
+	}
+	
+	public boolean hasPostMiningTasks() {
+		return (postMiningTasks != null && !postMiningTasks.isEmpty());
 	}
 	
 	public String getPath() {
@@ -197,30 +178,12 @@ public class RepositoryMiner {
 		return this;
 	}
 
-	public int getBinaryThreshold() {
-		return binaryThreshold;
-	}
-
-	public RepositoryMiner setBinaryThreshold(int binaryThreshold) {
-		this.binaryThreshold = binaryThreshold;
-		return this;
-	}
-
 	public List<Parser> getParsers() {
 		return parsers;
 	}
 
 	public RepositoryMiner setParsers(List<Parser> parsers) {
 		this.parsers = parsers;
-		return this;
-	}
-
-	public List<TimeFrameType> getTimeFrames() {
-		return timeFrames;
-	}
-
-	public RepositoryMiner setTimeFrames(List<TimeFrameType> timeFrames) {
-		this.timeFrames = timeFrames;
 		return this;
 	}
 
@@ -269,26 +232,6 @@ public class RepositoryMiner {
 		return this;
 	}
 	
-	public boolean hasClassMetrics() {
-		return (classMetrics != null && !classMetrics.isEmpty());
-	}
-	
-	public boolean hasTechnicalDebts() {
-		return (technicalDebts != null && !technicalDebts.isEmpty());
-	}
-
-	public boolean hasClassCodeSmells() {
-		return (classCodeSmells != null && !classCodeSmells.isEmpty());
-	}
-	
-	public boolean hasProjectsCodeSmells() {
-		return (projectCodeSmells != null && !projectCodeSmells.isEmpty());
-	}
-	
-	public boolean hasPostMiningTasks() {
-		return (postMiningTasks != null && !postMiningTasks.isEmpty());
-	}
-
 	public RepositoryMiner setProgressListener(IProgressListener progressListener) {
 		this.progressListener = progressListener;
 		return this;
@@ -296,6 +239,15 @@ public class RepositoryMiner {
 
 	public IProgressListener getProgressListener() {
 		return progressListener;
+	}
+
+	public Map<Reference, TimeFrameType[]> getReferences() {
+		return references;
+	}
+
+	public RepositoryMiner setReferences(Map<Reference, TimeFrameType[]> references) {
+		this.references = references;
+		return this;
 	}
 
 }

@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.bson.Document;
+import org.bson.types.ObjectId;
 
 public class WorkingDirectory {
 
@@ -41,7 +42,7 @@ public class WorkingDirectory {
 
 	public Document toDocument() {
 		Document doc = new Document();
-		doc.append("_id", id).append("repository", repository);
+		doc.append("_id", id).append("repository", new ObjectId(repository));
 		
 		List<Document> filesDoc = new ArrayList<Document>();
 		for (Entry<String, String> f : files.entrySet()) {

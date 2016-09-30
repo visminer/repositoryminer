@@ -1,10 +1,17 @@
 package org.repositoryminer.mining;
 
-import java.io.UnsupportedEncodingException;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.bson.Document;
+import org.bson.types.ObjectId;
 import org.repositoryminer.ast.AST;
 import org.repositoryminer.ast.AbstractTypeDeclaration;
 import org.repositoryminer.codesmell.clazz.IClassCodeSmell;
@@ -16,10 +23,11 @@ import org.repositoryminer.model.Diff;
 import org.repositoryminer.model.Reference;
 import org.repositoryminer.parser.Parser;
 import org.repositoryminer.persistence.handler.CommitAnalysisDocumentHandler;
-import org.repositoryminer.persistence.handler.TagAnalysisDocumentHandler;
+import org.repositoryminer.persistence.handler.SnapshotAnalysisDocumentHandler;
+import org.repositoryminer.scm.DiffType;
+import org.repositoryminer.scm.ReferenceType;
 import org.repositoryminer.scm.SCM;
 import org.repositoryminer.technicaldebt.ITechnicalDebt;
-import org.repositoryminer.utility.StringUtils;
 
 public class SourceAnalyzer {
 
@@ -29,10 +37,11 @@ public class SourceAnalyzer {
 	private String repositoryId;
 	private String repositoryPath;
 	private CommitAnalysisDocumentHandler persistenceCommit;
-	private TagAnalysisDocumentHandler persistenceTag;
+	private SnapshotAnalysisDocumentHandler persistenceSnapshot;
 
-	private List<Commit> commits;
-	private List<Reference> tags;
+	private Map<String, Commit> commitsMap;
+	private List<Reference> references;
+	private Set<String> commitsProcessed;
 
 	private Parser parser;
 	private IProgressListener progressListener;
@@ -43,23 +52,24 @@ public class SourceAnalyzer {
 		this.repositoryId = repositoryId;
 		this.repositoryPath = repositoryPath;
 		this.persistenceCommit = new CommitAnalysisDocumentHandler();
-		this.persistenceTag = new TagAnalysisDocumentHandler();
+		this.persistenceSnapshot = new SnapshotAnalysisDocumentHandler();
 		this.parsers = repositoryMiner.getParsers();
+		this.commitsProcessed = new HashSet<String>();
 
 		for (Parser parser : repositoryMiner.getParsers()) {
 			parser.setCharSet(repositoryMiner.getCharset());
 		}
 	}
 
-	public void setCommits(List<Commit> commits) {
-		this.commits = commits;
+	public void setCommitsMap(Map<String, Commit> commitsMap) {
+		this.commitsMap = commitsMap;
 	}
 
-	public void setTags(List<Reference> tags) {
-		this.tags = tags;
+	public void setReferences(List<Reference> references) {
+		this.references = references;
 	}
 
-	public void analyze() throws UnsupportedEncodingException {
+	public void analyze() throws IOException {
 		progressListener = repositoryMiner.getProgressListener();
 
 		if (progressListener != null) {
@@ -70,26 +80,42 @@ public class SourceAnalyzer {
 		analyzeTags();
 	}
 
-	private void analyzeCommits() throws UnsupportedEncodingException {
-		if (repositoryMiner.hasClassMetrics() || repositoryMiner.hasClassCodeSmells()
-				|| repositoryMiner.hasTechnicalDebts()) {
-			int idx = 0;
-			for (Commit commit : commits) {
-				if (progressListener != null) {
-					progressListener.commitsProgressChange(++idx, commits.size());
-				}
+	private void analyzeCommits() throws IOException {
+		if (!repositoryMiner.hasClassMetrics() && !repositoryMiner.hasClassCodeSmells()
+				&& !repositoryMiner.hasTechnicalDebts()) {
+			return;
+		}
 
-				scm.checkout(commit.getId());
+		for (Reference ref : references) {
+			if (ref.getType() == ReferenceType.TIME_TAG) {
+				continue;
+			}
+
+			for (String hash : ref.getCommits()) {
+				/* FIXME: NEEDS REVISION
+				 * if (progressListener != null) {
+					progressListener.commitsProgressChange(++idx, commits.size());
+				}*/
+				
+				// Avoids processing again some commits
+				if (!commitsProcessed.contains(hash)) {
+					commitsProcessed.add(hash);
+				} else {
+					continue;
+				}
+				
+				Commit commit = commitsMap.get(hash);
+				scm.checkout(hash);
 
 				for (Parser parser : repositoryMiner.getParsers()) {
 					parser.processSourceFolders(repositoryPath);
 				}
 
 				for (Diff diff : commit.getDiffs()) {
-					processAST(diff.getPath(), diff.getHash(), commit);
+					if (diff.getType() != DiffType.DELETE) {
+						processAST(diff.getPath(), diff.getHash(), commit);
+					}
 				}
-
-				scm.reset();
 			}
 		}
 	}
@@ -97,9 +123,9 @@ public class SourceAnalyzer {
 	private void analyzeTags() {
 		if (repositoryMiner.hasProjectsCodeSmells()) {
 			int idx = 0;
-			for (Reference tag : tags) {
+			for (Reference tag : references) {
 				if (progressListener != null) {
-					progressListener.tagsProgressChange(++idx, tags.size());
+					progressListener.tagsProgressChange(++idx, references.size());
 				}
 
 				String commitId = tag.getCommits().get(0);
@@ -109,18 +135,14 @@ public class SourceAnalyzer {
 					parser.processSourceFolders(repositoryPath);
 				}
 
-				int index = commits.indexOf(new Commit(commitId));
-				Commit commit = commits.get(index);
-				processTag(commit, tag);
-
-				scm.reset();
+				processTag(commitsMap.get(commitId), tag);
 			}
 		}
 	}
 
-	private void processAST(String file, String fileHash, Commit commit) throws UnsupportedEncodingException {
-		int index = file.lastIndexOf(".") + 1;
-		String ext = file.substring(index);
+	private void processAST(String filePath, long fileHash, Commit commit) throws IOException {
+		int index = filePath.lastIndexOf(".") + 1;
+		String ext = filePath.substring(index);
 
 		if (parser == null || !parser.getExtensions().contains(ext)) {
 			for (Parser p : parsers) {
@@ -134,26 +156,34 @@ public class SourceAnalyzer {
 			return;
 		}
 
-		byte[] data = scm.getData(commit.getId(), file.replaceFirst(repositoryPath + "/", ""));
+		File f = new File(repositoryPath, filePath);
+
+		// This used to treat links to folders
+		if (f.isDirectory()) {
+			return;
+		}
+
+		byte[] data = Files.readAllBytes(Paths.get(f.getCanonicalPath()));
+
 		if (data == null) {
 			return;
 		}
 
 		String source = new String(data, repositoryMiner.getCharset());
-		AST ast = parser.generate(file, source);
-		processCommit(commit, file, fileHash, ast);
+		AST ast = parser.generate(filePath, source);
+		processCommit(commit, filePath, fileHash, ast);
 	}
 
 	private void processTag(Commit commit, Reference tag) {
 		Document doc = new Document();
-		doc.append("tag", tag.getName());
-		doc.append("tag_type", tag.getType().toString());
+		doc.append("reference_name", tag.getName());
+		doc.append("reference_type", tag.getType().toString());
 		doc.append("commit", commit.getId());
 		doc.append("commit_date", commit.getCommitDate());
-		doc.append("repository", repositoryId);
+		doc.append("repository", new ObjectId(repositoryId));
 
 		processProjectCodeSmells(doc);
-		persistenceTag.insert(doc);
+		persistenceSnapshot.insert(doc);
 	}
 
 	private void processProjectCodeSmells(Document tagDoc) {
@@ -168,22 +198,20 @@ public class SourceAnalyzer {
 		tagDoc.append("code_smells", codeSmellsDocs);
 	}
 
-	private void processCommit(Commit commit, String file, String hash, AST ast) {
+	private void processCommit(Commit commit, String file, long fileHash, AST ast) {
 		Document doc = new Document();
 		doc.append("commit", commit.getId());
 		doc.append("commit_date", commit.getCommitDate());
 		doc.append("package", ast.getDocument().getPackageDeclaration());
 		doc.append("filename", file);
-		doc.append("repository", repositoryId);
-		doc.append("file_hash", hash);
+		doc.append("repository", new ObjectId(repositoryId));
+		doc.append("file_hash", fileHash);
 
 		List<AbstractTypeDeclaration> types = ast.getDocument().getTypes();
 		List<Document> abstractTypeDocs = new ArrayList<Document>();
 		for (AbstractTypeDeclaration type : types) {
 			Document typeDoc = new Document();
-			String typeHash = file + "/" + type.getName();
-			typeDoc.append("name", type.getName()).append("declaration", type.getArchetype().toString()).append("hash",
-					StringUtils.encodeToSHA1(typeHash));
+			typeDoc.append("name", type.getName()).append("declaration", type.getArchetype().toString());
 
 			List<Document> codeSmellsDocs = new ArrayList<Document>();
 			processCommitMetrics(ast, type, typeDoc);
