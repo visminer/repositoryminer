@@ -21,10 +21,9 @@ public interface SCM {
 	
 	/**
 	 * @param repositoryPath
-	 * @param binaryThreshold
 	 * Initializes the repository analysis.
 	 */
-	public void open(String repositoryPath, int binaryThreshold);
+	public void open(String repositoryPath);
 	
 	/**
 	 * @param repositoryId

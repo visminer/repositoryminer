@@ -53,9 +53,9 @@ public class GitSCM implements SCM {
 	private TreeWalk treeWalk;
 	private DiffFormatter diffFormatter;
 	private String repoPath;
-	
+
 	@Override
-	public void open(String repositoryPath, int binaryThreshold) {
+	public void open(String repositoryPath) {
 		FileRepositoryBuilder repositoryBuilder = new FileRepositoryBuilder();
 		File repoFolder = new File(repositoryPath, ".git");
 
@@ -76,16 +76,13 @@ public class GitSCM implements SCM {
 		revWalk = new RevWalk(repository);
 		treeWalk = new TreeWalk(repository);
 		repoPath = repositoryPath;
-		
+
 		diffFormatter = new DiffFormatter(DisabledOutputStream.INSTANCE);
 		diffFormatter.setRepository(repository);
 		diffFormatter.setContext(0);
 		diffFormatter.setDiffComparator(RawTextComparator.DEFAULT);
 		diffFormatter.setDetectRenames(true);
-
-		if (binaryThreshold != 0) {
-			diffFormatter.setBinaryFileThreshold(binaryThreshold);
-		}
+		diffFormatter.setBinaryFileThreshold(2048);
 	}
 
 	@Override

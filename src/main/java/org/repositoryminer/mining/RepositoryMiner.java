@@ -49,7 +49,6 @@ public class RepositoryMiner {
 	private String description;
 	private SCMType scm;
 	private String charset = "UTF-8";
-	private int binaryThreshold = 2048;
 
 	private List<Parser> parsers;
 	private List<IClassMetric> classMetrics;
@@ -176,15 +175,6 @@ public class RepositoryMiner {
 
 	public RepositoryMiner setCharset(String charset) {
 		this.charset = charset;
-		return this;
-	}
-
-	public int getBinaryThreshold() {
-		return binaryThreshold;
-	}
-
-	public RepositoryMiner setBinaryThreshold(int binaryThreshold) {
-		this.binaryThreshold = binaryThreshold;
 		return this;
 	}
 

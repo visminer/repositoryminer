@@ -118,10 +118,17 @@ public class MiningProcessor {
 	}
 	
 	private void saveTimeReferences(RepositoryMiner rm) {
+		if (rm.getReferences() == null) {
+			return;
+		}
+		
 		boolean proceed = false;
 		for (Entry<Reference, TimeFrameType[]> entry : rm.getReferences().entrySet()) {
 			if (entry.getValue() != null && rm.getProgressListener() != null) {
 				rm.getProgressListener().initTimeFramesProgress();
+				proceed = true;
+				break;
+			} else if (entry.getValue() != null) {
 				proceed = true;
 				break;
 			}
@@ -181,7 +188,7 @@ public class MiningProcessor {
 		String tempRepo = copyRepositoryFolder(repositoryMiner.getPath(), repositoryMiner.getName());
 
 		scm = SCMFactory.getSCM(repositoryMiner.getScm());
-		scm.open(tempRepo, repositoryMiner.getBinaryThreshold());
+		scm.open(tempRepo);
 
 		repository = new Repository(repositoryMiner);
 
@@ -237,8 +244,10 @@ public class MiningProcessor {
 				refs.add(references.get(index));
 			}
 			
-			for (Reference ref : timeReferences) {
-				refs.add(ref);
+			if (timeReferences != null) {
+				for (Reference ref : timeReferences) {
+					refs.add(ref);
+				}
 			}
 		}
 		
