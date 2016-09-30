@@ -95,7 +95,7 @@ public class MiningProcessor {
 		references = scm.getReferences();
 		for (Reference ref : references) {
 			ref.setRepository(repositoryId);
-			ref.setCommits(scm.getReferenceCommits(ref.getName(), ref.getType()));
+			ref.setCommits(scm.getReferenceCommits(ref.getPath(), ref.getType()));
 			refHandler.insert(ref.toDocument());
 		}
 	}

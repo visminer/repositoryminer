@@ -23,7 +23,7 @@ import org.repositoryminer.model.Diff;
 import org.repositoryminer.model.Reference;
 import org.repositoryminer.parser.Parser;
 import org.repositoryminer.persistence.handler.CommitAnalysisDocumentHandler;
-import org.repositoryminer.persistence.handler.TagAnalysisDocumentHandler;
+import org.repositoryminer.persistence.handler.SnapshotAnalysisDocumentHandler;
 import org.repositoryminer.scm.DiffType;
 import org.repositoryminer.scm.ReferenceType;
 import org.repositoryminer.scm.SCM;
@@ -37,7 +37,7 @@ public class SourceAnalyzer {
 	private String repositoryId;
 	private String repositoryPath;
 	private CommitAnalysisDocumentHandler persistenceCommit;
-	private TagAnalysisDocumentHandler persistenceTag;
+	private SnapshotAnalysisDocumentHandler persistenceSnapshot;
 
 	private Map<String, Commit> commitsMap;
 	private List<Reference> references;
@@ -52,7 +52,7 @@ public class SourceAnalyzer {
 		this.repositoryId = repositoryId;
 		this.repositoryPath = repositoryPath;
 		this.persistenceCommit = new CommitAnalysisDocumentHandler();
-		this.persistenceTag = new TagAnalysisDocumentHandler();
+		this.persistenceSnapshot = new SnapshotAnalysisDocumentHandler();
 		this.parsers = repositoryMiner.getParsers();
 		this.commitsProcessed = new HashSet<String>();
 
@@ -176,14 +176,14 @@ public class SourceAnalyzer {
 
 	private void processTag(Commit commit, Reference tag) {
 		Document doc = new Document();
-		doc.append("tag", tag.getName());
-		doc.append("tag_type", tag.getType().toString());
+		doc.append("reference_name", tag.getName());
+		doc.append("reference_type", tag.getType().toString());
 		doc.append("commit", commit.getId());
 		doc.append("commit_date", commit.getCommitDate());
 		doc.append("repository", new ObjectId(repositoryId));
 
 		processProjectCodeSmells(doc);
-		persistenceTag.insert(doc);
+		persistenceSnapshot.insert(doc);
 	}
 
 	private void processProjectCodeSmells(Document tagDoc) {

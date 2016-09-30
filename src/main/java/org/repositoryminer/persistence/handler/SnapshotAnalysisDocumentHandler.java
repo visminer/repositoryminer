@@ -2,11 +2,11 @@ package org.repositoryminer.persistence.handler;
 
 import org.repositoryminer.persistence.Connection;
 
-public class TagAnalysisDocumentHandler extends DocumentHandler{
+public class SnapshotAnalysisDocumentHandler extends DocumentHandler{
 
-	private static final String COLLECTION_NAME = "rm_tags_analysis";
+	private static final String COLLECTION_NAME = "rm_snapshot_analysis";
 	
-	public TagAnalysisDocumentHandler() {
+	public SnapshotAnalysisDocumentHandler() {
 		super.collection = Connection.getInstance().getCollection(COLLECTION_NAME);
 	}
 	
