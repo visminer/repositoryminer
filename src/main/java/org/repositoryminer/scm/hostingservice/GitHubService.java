@@ -11,6 +11,8 @@ import org.eclipse.egit.github.core.service.CollaboratorService;
 import org.eclipse.egit.github.core.service.IssueService;
 import org.eclipse.egit.github.core.service.MilestoneService;
 import org.eclipse.egit.github.core.service.RepositoryService;
+import org.repositoryminer.listener.IHostServiceListener;
+import org.repositoryminer.model.Comment;
 import org.repositoryminer.model.Contributor;
 import org.repositoryminer.model.Issue;
 import org.repositoryminer.model.Label;
@@ -23,59 +25,88 @@ public class GitHubService implements HostingService {
 	private RepositoryId repositoryId;
 	private CollaboratorService collaboratorServ;
 	private RepositoryService repoServ;
+	private IHostServiceListener listener;
 
 	// Initializes repository and needed services.
-	private void init(String name, String owner, GitHubClient client) {
-		repositoryId = new RepositoryId(owner, name);
-		issueServ = new IssueService(client);
-		milestoneServ = new MilestoneService(client);
-		collaboratorServ = new CollaboratorService(client);
-		repoServ = new RepositoryService(client);
+	private void init(String name, String owner, GitHubClient client, IHostServiceListener listener) {
+		this.repositoryId = new RepositoryId(owner, name);
+		this.issueServ = new IssueService(client);
+		this.milestoneServ = new MilestoneService(client);
+		this.collaboratorServ = new CollaboratorService(client);
+		this.repoServ = new RepositoryService(client);
+		this.listener = listener;
 	}
 
 	@Override
-	public void connect(String owner, String name, String login, String password) {
+	public void connect(String owner, String name, String login, String password, IHostServiceListener listener) {
 		GitHubClient client = new GitHubClient();
 		client.setCredentials(login, password);
-		init(name, owner, client);
+		init(name, owner, client, listener);
 	}
 
 	@Override
-	public void connect(String owner, String name, String token) {
+	public void connect(String owner, String name, String token, IHostServiceListener listener) {
 		GitHubClient client = new GitHubClient();
 		client.setOAuth2Token(token);
-		init(name, owner, client);
+		init(name, owner, client, listener);
 	}
 
 	@Override
 	public List<Issue> getAllIssues() {
+		if (listener != null) {
+			listener.initIssuesProcessing();
+		}
+		
 		int number = 1;
 		List<Issue> issues = new ArrayList<Issue>();
 
 		while (true) {
 			try {
-				org.eclipse.egit.github.core.Issue issue = issueServ.getIssue(repositoryId, number++);
-				Issue issueDB = new Issue(issue.getUser().getLogin(), issue.getClosedAt(), issue.getComments(),
-						issue.getCreatedAt(), issue.getNumber(), StatusType.parse(issue.getState()), issue.getTitle(),
-						issue.getUpdatedAt(), issue.getBody());
+				org.eclipse.egit.github.core.Issue izzue = issueServ.getIssue(repositoryId, number);
+				Issue issue = new Issue(izzue.getUser().getLogin(), izzue.getClosedAt(), izzue.getCreatedAt(),
+						izzue.getNumber(), StatusType.parse(izzue.getState()), izzue.getTitle(), izzue.getUpdatedAt(),
+						izzue.getBody());
 
-				if (issue.getAssignee() != null) {
-					issueDB.setAssignee(issue.getAssignee().getLogin());
+				if (izzue.getAssignee() != null) {
+					issue.setAssignee(izzue.getAssignee().getLogin());
 				}
 
-				if (issue.getMilestone() != null) {
-					issueDB.setMilestone(issue.getMilestone().getNumber());
+				if (izzue.getMilestone() != null) {
+					issue.setMilestone(izzue.getMilestone().getNumber());
 				}
 
-				if (issue.getLabels() != null) {
+				if (izzue.getLabels() != null) {
 					List<Label> labels = new ArrayList<Label>();
-					for (org.eclipse.egit.github.core.Label l : issue.getLabels()) {
+					for (org.eclipse.egit.github.core.Label l : izzue.getLabels()) {
 						labels.add(new Label(l.getName(), l.getColor()));
 					}
-					issueDB.setLabels(labels);
+
+					issue.setLabels(labels);
 				}
 
-				issues.add(issueDB);
+				List<org.eclipse.egit.github.core.Comment> commentz = issueServ.getComments(repositoryId.getOwner(),
+						repositoryId.getName(), number++);
+				if (commentz != null) {
+					List<Comment> comments = new ArrayList<Comment>();
+					for (org.eclipse.egit.github.core.Comment c : commentz) {
+						String user = c.getUser().getName();
+						if (user == null) {
+							user = c.getUser().getLogin();
+							if (user == null) {
+								user = c.getUser().getEmail();
+								if (user == null) {
+									user = "UNDEFINED";
+								}
+							}
+						}
+						Comment comment = new Comment(user, c.getBody());
+						comments.add(comment);
+					}
+
+					issue.setComments(comments);
+				}
+
+				issues.add(issue);
 			} catch (IOException e) {
 				break;
 			}
@@ -86,15 +117,18 @@ public class GitHubService implements HostingService {
 
 	@Override
 	public List<Milestone> getAllMilestones() {
+		if (listener != null) {
+			listener.initMilestonesProcessing();
+		}
+		
 		int number = 1;
 		List<Milestone> milesDB = new ArrayList<Milestone>();
-
 		while (true) {
 			try {
 				org.eclipse.egit.github.core.Milestone mile = milestoneServ.getMilestone(repositoryId, number++);
-				Milestone mileDB = new Milestone(mile.getNumber(), StatusType.parse(mile.getState()),
-						mile.getTitle(), mile.getDescription(), mile.getOpenIssues(), mile.getClosedIssues(),
-						mile.getCreatedAt(), mile.getDueOn());
+				Milestone mileDB = new Milestone(mile.getNumber(), StatusType.parse(mile.getState()), mile.getTitle(),
+						mile.getDescription(), mile.getOpenIssues(), mile.getClosedIssues(), mile.getCreatedAt(),
+						mile.getDueOn());
 
 				if (mile.getCreator() != null) {
 					mileDB.setCreator(mile.getCreator().getLogin());
@@ -111,8 +145,11 @@ public class GitHubService implements HostingService {
 
 	@Override
 	public List<Contributor> getAllContributors() {
+		if (listener != null) {
+			listener.initContributorsProcessing();
+		}
+		
 		List<Contributor> contributors = new ArrayList<Contributor>();
-
 		try {
 			for (org.eclipse.egit.github.core.Contributor contributor : repoServ.getContributors(repositoryId, true)) {
 				contributors.add(new Contributor(contributor.getName(), contributor.getLogin(),
