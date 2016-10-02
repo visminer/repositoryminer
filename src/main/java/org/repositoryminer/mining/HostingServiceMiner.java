@@ -6,6 +6,7 @@ import java.util.List;
 import org.bson.Document;
 import org.repositoryminer.exceptions.ErrorMessage;
 import org.repositoryminer.exceptions.VisMinerAPIException;
+import org.repositoryminer.listener.IHostServiceListener;
 import org.repositoryminer.model.Contributor;
 import org.repositoryminer.model.Issue;
 import org.repositoryminer.model.Milestone;
@@ -39,6 +40,8 @@ public class HostingServiceMiner {
 	private HostingServiceType serviceType;
 
 	private HostingService service;
+
+	private IHostServiceListener listener;
 
 	/**
 	 * Use this void constructor if parameters are going to be set later.
@@ -76,14 +79,16 @@ public class HostingServiceMiner {
 	 * <p>
 	 * 
 	 * @param login
-	 *            check the service to know the login options,
-	 *            generally is email or username
+	 *            check the service to know the login options, generally is
+	 *            email or username
 	 * @param password
 	 */
-	public void sync(String login, String password) {
+	public HostingServiceMiner sync(String login, String password) {
 		service = HostingServiceFactory.getHostingService(serviceType);
-		service.connect(owner, name, login, password);
+		service.connect(owner, name, login, password, listener);
 		process();
+		
+		return this;
 	}
 
 	/**
@@ -97,31 +102,47 @@ public class HostingServiceMiner {
 	 * 
 	 * @param token
 	 */
-	public void sync(String token) {
+	public HostingServiceMiner sync(String token) {
 		service = HostingServiceFactory.getHostingService(serviceType);
-		service.connect(owner, name, token);
+		service.connect(owner, name, token, listener);
 		process();
+		
+		return this;
 	}
 
-	@SuppressWarnings("unchecked")
-	private void process() {
+	private HostingServiceMiner process() {
 		RepositoryDocumentHandler repoDocHandler = new RepositoryDocumentHandler();
-		if (!repoDocHandler.checkIfRepositoryExists(repositoryId)) {
+		if (!repoDocHandler.checkIfRepositoryExistsById(repositoryId)) {
 			throw new VisMinerAPIException(ErrorMessage.REPOSITORY_NOT_FOUND.toString());
 		}
 
-		IssueDocumentHandler issueDocHandler = new IssueDocumentHandler();
-		MilestoneDocumentHandler mileDocHandler = new MilestoneDocumentHandler();
+		processContributors(repoDocHandler);
+		
+		List<Issue> issues = service.getAllIssues();
+		List<Milestone> milestones = service.getAllMilestones();
 
-		issueDocHandler.deleteByRepository(repositoryId);
-		mileDocHandler.deleteByRepository(repositoryId);
+		connectMilestonesAndIssues(milestones, issues);
+		processMilestones(milestones);
+		processIssues(issues);
+		
+		return this;
+	}
 
-		Document repoDoc = repoDocHandler.findOnlyContributors(repositoryId);
-		List<Contributor> contributorsDb = service.getAllContributors();
+	@SuppressWarnings("unchecked")
+	private void processContributors(RepositoryDocumentHandler repoDocHandler) {
+		Document repositoryDoc = repoDocHandler.findOnlyContributors(repositoryId);
+		List<Document> contributorsDoc = (List<Document>) repositoryDoc.get("contributors");
+		
+		List<Contributor> contributors = service.getAllContributors();
 
-		for (Document contributorDoc : (List<Document>) repoDoc.get("contributors")) {
+		int contributorIndex = 0;
+		for (Document contributorDoc : contributorsDoc) {
+			if (listener != null) {
+				listener.contributorsProgressChange(++contributorIndex, contributorsDoc.size());
+			}
+			
 			String name = contributorDoc.getString("name");
-			for (Contributor contributorDb : contributorsDb) {
+			for (Contributor contributorDb : contributors) {
 				if (name.equals(contributorDb.getName())) {
 					contributorDoc.put("login", contributorDb.getLogin());
 					contributorDoc.put("avatar_url", contributorDb.getAvatarUrl());
@@ -130,13 +151,17 @@ public class HostingServiceMiner {
 				}
 			}
 		}
-
-		repoDocHandler.updateOnlyContributors(repoDoc);
-		List<Issue> issues = service.getAllIssues();
-		List<Milestone> milestones = service.getAllMilestones();
-
+		
+		repoDocHandler.updateOnlyContributors(repositoryDoc);
+	}
+	
+	private void connectMilestonesAndIssues(List<Milestone> milestones, List<Issue> issues) {
 		// connect issues to milestones
 		if (milestones.size() > 0) {
+			if (listener != null) {
+				listener.initMilestonesIssuesConnection();
+			}
+			
 			for (Milestone m : milestones) {
 				m.setIssues(new ArrayList<Integer>());
 				for (Issue i : issues) {
@@ -146,57 +171,94 @@ public class HostingServiceMiner {
 				}
 			}
 		}
-
+	}
+	
+	private void processIssues(List<Issue> issues) {
+		IssueDocumentHandler issueDocHandler = new IssueDocumentHandler();
 		List<Document> issuesDocs = new ArrayList<Document>(issues.size());
-		List<Document> milesDocs = new ArrayList<Document>(milestones.size());
+
+		issueDocHandler.deleteByRepository(repositoryId);
 
 		if (issues.size() > 0) {
+			int issuesIndex = 0;
 			for (Issue issue : issues) {
+				if (listener != null) {
+					listener.issuesProgressChange(++issuesIndex, issues.size());
+				}
 				issue.setRepository(repositoryId);
 				issuesDocs.add(issue.toDocument());
 			}
 			issueDocHandler.insertMany(issuesDocs);
 		}
+	}
+	
+	private void processMilestones(List<Milestone> milestones) {
+		MilestoneDocumentHandler mileDocHandler = new MilestoneDocumentHandler();
+		List<Document> milesDocs = new ArrayList<Document>(milestones.size());
 
+		mileDocHandler.deleteByRepository(repositoryId);
+		
 		if (milestones.size() > 0) {
+			int milestonesIndex = 0;
 			for (Milestone mile : milestones) {
+				if (listener != null) {
+					listener.milestonesProgressChange(++milestonesIndex, milestones.size());
+				}
 				mile.setRepository(repositoryId);
 				milesDocs.add(mile.toDocument());
 			}
 			mileDocHandler.insertMany(milesDocs);
 		}
 	}
-
+	
 	public String getRepositoryId() {
 		return repositoryId;
 	}
 
-	public void setRepositoryId(String repositoryId) {
+	public HostingServiceMiner setRepositoryId(String repositoryId) {
 		this.repositoryId = repositoryId;
+		
+		return this;
 	}
 
 	public String getOwner() {
 		return owner;
 	}
 
-	public void setOwner(String owner) {
+	public HostingServiceMiner setOwner(String owner) {
 		this.owner = owner;
+		
+		return this;
 	}
 
 	public String getName() {
 		return name;
 	}
 
-	public void setName(String name) {
+	public HostingServiceMiner setName(String name) {
 		this.name = name;
+		
+		return this;
 	}
 
 	public HostingServiceType getServiceType() {
 		return serviceType;
 	}
 
-	public void setServiceType(HostingServiceType serviceType) {
+	public HostingServiceMiner setServiceType(HostingServiceType serviceType) {
 		this.serviceType = serviceType;
+		
+		return this;
+	}
+
+	public IHostServiceListener getListener() {
+		return listener;
+	}
+
+	public HostingServiceMiner setListener(IHostServiceListener listener) {
+		this.listener = listener;
+		
+		return this;
 	}
 
 }
