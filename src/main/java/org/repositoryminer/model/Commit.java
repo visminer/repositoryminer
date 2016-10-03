@@ -49,16 +49,8 @@ public class Commit {
 		return commit;
 	}
 
-	@SuppressWarnings("unchecked")
 	public static Commit parseDocument(Document commitDoc) {
-		Commit commit = new Commit(commitDoc.getString("_id"), commitDoc.getString("message"),
-				commitDoc.getDate("authored_date"), commitDoc.getDate("commit_date"),
-				commitDoc.get("repository").toString(), new ArrayList<String>(),
-				Contributor.parseDocument((Document) commitDoc.get("author")),
-				Contributor.parseDocument((Document) commitDoc.get("committer")),
-				Diff.parseDocuments((List<Document>) commitDoc.get("diffs")));
-
-		return commit;
+		return parseDocument(commitDoc, new ArrayList<String>());
 	}
 
 	public Document toDocument() {
