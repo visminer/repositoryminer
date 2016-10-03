@@ -21,7 +21,7 @@ import org.repositoryminer.persistence.handler.CommitDocumentHandler;
 import org.repositoryminer.persistence.handler.ReferenceDocumentHandler;
 import org.repositoryminer.persistence.handler.RepositoryDocumentHandler;
 import org.repositoryminer.persistence.handler.WorkingDirectoryDocumentHandler;
-import org.repositoryminer.scm.SCM;
+import org.repositoryminer.scm.ISCM;
 import org.repositoryminer.scm.SCMFactory;
 import org.repositoryminer.utility.StringUtils;
 
@@ -71,7 +71,7 @@ import org.repositoryminer.utility.StringUtils;
  */
 public class MiningProcessor {
 
-	private SCM scm;
+	private ISCM scm;
 	private List<Reference> references;
 	private List<Reference> timeReferences;
 	private List<Commit> commits;

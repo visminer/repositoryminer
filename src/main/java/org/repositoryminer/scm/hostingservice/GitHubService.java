@@ -18,7 +18,7 @@ import org.repositoryminer.model.Issue;
 import org.repositoryminer.model.Label;
 import org.repositoryminer.model.Milestone;
 
-public class GitHubService implements HostingService {
+public class GitHubService implements IHostingService {
 
 	private IssueService issueServ;
 	private MilestoneService milestoneServ;

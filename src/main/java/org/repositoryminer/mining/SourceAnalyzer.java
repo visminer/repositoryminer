@@ -26,12 +26,12 @@ import org.repositoryminer.persistence.handler.CommitAnalysisDocumentHandler;
 import org.repositoryminer.persistence.handler.SnapshotAnalysisDocumentHandler;
 import org.repositoryminer.scm.DiffType;
 import org.repositoryminer.scm.ReferenceType;
-import org.repositoryminer.scm.SCM;
+import org.repositoryminer.scm.ISCM;
 import org.repositoryminer.technicaldebt.ITechnicalDebt;
 
 public class SourceAnalyzer {
 
-	private SCM scm;
+	private ISCM scm;
 	private RepositoryMiner repositoryMiner;
 	private List<Parser> parsers;
 	private String repositoryId;
@@ -46,7 +46,7 @@ public class SourceAnalyzer {
 	private Parser parser;
 	private IMiningListener listener;
 
-	public SourceAnalyzer(RepositoryMiner repositoryMiner, SCM scm, String repositoryId, String repositoryPath) {
+	public SourceAnalyzer(RepositoryMiner repositoryMiner, ISCM scm, String repositoryId, String repositoryPath) {
 		this.scm = scm;
 		this.repositoryMiner = repositoryMiner;
 		this.repositoryId = repositoryId;

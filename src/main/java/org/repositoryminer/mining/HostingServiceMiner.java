@@ -13,7 +13,7 @@ import org.repositoryminer.model.Milestone;
 import org.repositoryminer.persistence.handler.IssueDocumentHandler;
 import org.repositoryminer.persistence.handler.MilestoneDocumentHandler;
 import org.repositoryminer.persistence.handler.RepositoryDocumentHandler;
-import org.repositoryminer.scm.hostingservice.HostingService;
+import org.repositoryminer.scm.hostingservice.IHostingService;
 import org.repositoryminer.scm.hostingservice.HostingServiceFactory;
 import org.repositoryminer.scm.hostingservice.HostingServiceType;
 
@@ -39,7 +39,7 @@ public class HostingServiceMiner {
 	private String name;
 	private HostingServiceType serviceType;
 
-	private HostingService service;
+	private IHostingService service;
 
 	private IHostServiceListener listener;
 

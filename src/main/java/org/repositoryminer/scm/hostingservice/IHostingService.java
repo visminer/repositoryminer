@@ -7,7 +7,7 @@ import org.repositoryminer.model.Contributor;
 import org.repositoryminer.model.Issue;
 import org.repositoryminer.model.Milestone;
 
-public interface HostingService {
+public interface IHostingService {
 
 	/**
 	 * @param owner
