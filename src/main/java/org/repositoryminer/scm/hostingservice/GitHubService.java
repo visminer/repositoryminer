@@ -56,7 +56,7 @@ public class GitHubService implements IHostingService {
 		if (listener != null) {
 			listener.initIssuesProcessing();
 		}
-		
+
 		int number = 1;
 		List<Issue> issues = new ArrayList<Issue>();
 
@@ -120,7 +120,7 @@ public class GitHubService implements IHostingService {
 		if (listener != null) {
 			listener.initMilestonesProcessing();
 		}
-		
+
 		int number = 1;
 		List<Milestone> milesDB = new ArrayList<Milestone>();
 		while (true) {
@@ -148,7 +148,7 @@ public class GitHubService implements IHostingService {
 		if (listener != null) {
 			listener.initContributorsProcessing();
 		}
-		
+
 		List<Contributor> contributors = new ArrayList<Contributor>();
 		try {
 			for (org.eclipse.egit.github.core.Contributor contributor : repoServ.getContributors(repositoryId, true)) {

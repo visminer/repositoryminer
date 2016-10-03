@@ -22,6 +22,7 @@ public class Commit {
 	private Contributor author;
 	private Contributor committer;
 	private List<Diff> diffs;
+	private List<IssueReference> issueReferences;
 
 	@SuppressWarnings("unchecked")
 	public static List<Commit> parseDocuments(List<Document> commitsDocs) {
@@ -163,6 +164,14 @@ public class Commit {
 		this.diffs = diffs;
 	}
 
+	public List<IssueReference> getIssueReferences() {
+		return issueReferences;
+	}
+
+	public void setIssueReferences(List<IssueReference> issueReferences) {
+		this.issueReferences = issueReferences;
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
