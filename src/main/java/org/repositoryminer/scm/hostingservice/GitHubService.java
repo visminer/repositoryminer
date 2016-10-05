@@ -80,26 +80,17 @@ public class GitHubService implements IHostingService {
 					for (org.eclipse.egit.github.core.Label l : izzue.getLabels()) {
 						labels.add(new Label(l.getName(), l.getColor()));
 					}
-
 					issue.setLabels(labels);
 				}
 
-				List<org.eclipse.egit.github.core.Comment> commentz = issueServ.getComments(repositoryId.getOwner(),
-						repositoryId.getName(), number++);
+				List<org.eclipse.egit.github.core.Comment> commentz = issueServ.getComments(repositoryId, number);
+
 				if (commentz != null) {
 					List<Comment> comments = new ArrayList<Comment>();
+
 					for (org.eclipse.egit.github.core.Comment c : commentz) {
-						String user = c.getUser().getName();
-						if (user == null) {
-							user = c.getUser().getLogin();
-							if (user == null) {
-								user = c.getUser().getEmail();
-								if (user == null) {
-									user = "UNDEFINED";
-								}
-							}
-						}
-						Comment comment = new Comment(user, c.getBody());
+						Comment comment = new Comment(c.getUser().getLogin(), c.getBody(), c.getCreatedAt(),
+								c.getUpdatedAt());
 						comments.add(comment);
 					}
 
@@ -125,7 +116,7 @@ public class GitHubService implements IHostingService {
 		List<Milestone> milesDB = new ArrayList<Milestone>();
 		while (true) {
 			try {
-				org.eclipse.egit.github.core.Milestone mile = milestoneServ.getMilestone(repositoryId, number++);
+				org.eclipse.egit.github.core.Milestone mile = milestoneServ.getMilestone(repositoryId, number);
 				Milestone mileDB = new Milestone(mile.getNumber(), StatusType.parse(mile.getState()), mile.getTitle(),
 						mile.getDescription(), mile.getOpenIssues(), mile.getClosedIssues(), mile.getCreatedAt(),
 						mile.getDueOn());
@@ -134,6 +125,7 @@ public class GitHubService implements IHostingService {
 					mileDB.setCreator(mile.getCreator().getLogin());
 				}
 
+				number++;
 				milesDB.add(mileDB);
 			} catch (IOException e) {
 				break;
