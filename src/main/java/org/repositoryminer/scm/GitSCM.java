@@ -152,7 +152,7 @@ public class GitSCM implements ISCM {
 			}
 
 			Commit c = new Commit(revCommit.getName(), revCommit.getFullMessage(), author.getWhen(),
-					committer.getWhen(), null, parents, myAuthor, myCommitter, diffs, null);
+					committer.getWhen(), null, parents, myAuthor, myCommitter, diffs);
 			commits.add(c);
 		}
 

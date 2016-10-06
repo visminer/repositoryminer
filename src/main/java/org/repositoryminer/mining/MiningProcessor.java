@@ -153,13 +153,18 @@ public class MiningProcessor {
 	private void saveCommitsAndSnapshots(RepositoryMiner repositoryMiner) {
 		contributors = new HashSet<Contributor>();
 		CommitDocumentHandler commitHandler = new CommitDocumentHandler();
+
 		WorkingDirectory wd = new WorkingDirectory(repository.getId());
 		WorkingDirectoryDocumentHandler wdHandler = new WorkingDirectoryDocumentHandler();
 
+		CommitMessageAnalyzer messageAnalyzer = new CommitMessageAnalyzer();
+
 		commits = scm.getCommits();
 		int idx = 0;
+
 		for (Commit commit : commits) {
 			commit.setRepository(repository.getId());
+			commit.setIssueReferences(messageAnalyzer.analyzeMessage(commit.getMessage()));
 
 			if (repositoryMiner.getMiningListener() != null) {
 				repositoryMiner.getMiningListener().commitsProgressChange(++idx, commits.size());

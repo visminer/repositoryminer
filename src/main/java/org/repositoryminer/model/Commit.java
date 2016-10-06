@@ -22,7 +22,7 @@ public class Commit {
 	private Contributor author;
 	private Contributor committer;
 	private List<Diff> diffs;
-	private List<IssueReference> issuesReferences;
+	private List<IssueReference> issueReferences;
 
 	@SuppressWarnings("unchecked")
 	public static List<Commit> parseDocuments(List<Document> commitsDocs) {
@@ -44,8 +44,7 @@ public class Commit {
 				commitDoc.get("repository").toString(), parents,
 				Contributor.parseDocument((Document) commitDoc.get("author")),
 				Contributor.parseDocument((Document) commitDoc.get("committer")),
-				Diff.parseDocuments((List<Document>) commitDoc.get("diffs")),
-				IssueReference.parseDocuments((List<Document>) commitDoc.get("issues_references")));
+				Diff.parseDocuments((List<Document>) commitDoc.get("diffs")));
 
 		return commit;
 	}
@@ -59,8 +58,7 @@ public class Commit {
 		doc.append("_id", id).append("message", message).append("authored_date", authoredDate)
 				.append("commit_date", commitDate).append("repository", new ObjectId(repository))
 				.append("parents", parents).append("author", author.toDocument())
-				.append("committer", committer.toDocument()).append("diffs", Diff.toDocumentList(diffs))
-				.append("issues_references", IssueReference.toDocumentList(issuesReferences));
+				.append("committer", committer.toDocument()).append("diffs", Diff.toDocumentList(diffs));
 		return doc;
 	}
 
@@ -73,8 +71,7 @@ public class Commit {
 	}
 
 	public Commit(String id, String message, Date authoredDate, Date commitDate, String repository,
-			List<String> parents, Contributor author, Contributor committer, List<Diff> diffs,
-			List<IssueReference> issuesReferences) {
+			List<String> parents, Contributor author, Contributor committer, List<Diff> diffs) {
 		super();
 		this.id = id;
 		this.message = message;
@@ -85,7 +82,6 @@ public class Commit {
 		this.author = author;
 		this.committer = committer;
 		this.diffs = diffs;
-		this.issuesReferences = issuesReferences;
 	}
 
 	public String getId() {
@@ -160,14 +156,14 @@ public class Commit {
 		this.diffs = diffs;
 	}
 
-	public List<IssueReference> getIssuesReferences() {
-		return issuesReferences;
+	public List<IssueReference> getIssueReferences() {
+		return issueReferences;
 	}
 
-	public void setIssuesReferences(List<IssueReference> issuesReferences) {
-		this.issuesReferences = issuesReferences;
+	public void setIssueReferences(List<IssueReference> issueReferences) {
+		this.issueReferences = issueReferences;
 	}
-
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;

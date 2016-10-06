@@ -46,7 +46,6 @@ public enum IssueCommandType {
 	}
 
 	public static IssueCommandType parse(String word){
-
 		if(word == null)
 			return null;
 
@@ -57,17 +56,14 @@ public enum IssueCommandType {
 		}
 
 		return null;
-
 	}
 
 	public static Map<String, IssueCommandType> toMap(){
-
 		Map<String, IssueCommandType> map = new HashMap<String, IssueCommandType>();
 		for(IssueCommandType i : IssueCommandType.values()){
 			map.put(i.getWord(), i);
 		}
 		return map;
-
 	}
 
 }

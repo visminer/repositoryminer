@@ -27,8 +27,6 @@ public class CommitMessageAnalyzer {
 		builder.append("(");
 
 		Iterator<String> it = commandMap.keySet().iterator();
-		it.next(); // the first is the NONE constant, it doesn't should be
-					// considered.
 		while (it.hasNext()) {
 			builder.append(it.next() + "|");
 		}
