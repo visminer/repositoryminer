@@ -96,7 +96,8 @@ public class GitHubService implements IHostingService {
 
 					issue.setComments(comments);
 				}
-
+				
+				number++;
 				issues.add(issue);
 			} catch (IOException e) {
 				break;
