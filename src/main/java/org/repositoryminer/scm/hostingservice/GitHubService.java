@@ -60,7 +60,7 @@ public class GitHubService implements IHostingService {
 		int number = 1;
 		List<Issue> issues = new ArrayList<Issue>();
 
-		while (true) {
+		while (number <= hostingMiner.getIssueMaxHops()) {
 			try {
 				org.eclipse.egit.github.core.Issue izzue = issueServ.getIssue(repositoryId, number);
 				Issue issue = new Issue(izzue.getUser().getLogin(), izzue.getClosedAt(), izzue.getCreatedAt(),
@@ -100,7 +100,8 @@ public class GitHubService implements IHostingService {
 				number++;
 				issues.add(issue);
 			} catch (IOException e) {
-				break;
+				number++;
+				continue;
 			}
 		}
 
@@ -115,7 +116,8 @@ public class GitHubService implements IHostingService {
 
 		int number = 1;
 		List<Milestone> milesDB = new ArrayList<Milestone>();
-		while (true) {
+		
+		while (number <= hostingMiner.getMilestoneMaxHops()) {
 			try {
 				org.eclipse.egit.github.core.Milestone mile = milestoneServ.getMilestone(repositoryId, number);
 				Milestone mileDB = new Milestone(mile.getNumber(), StatusType.parse(mile.getState()), mile.getTitle(),
@@ -129,7 +131,8 @@ public class GitHubService implements IHostingService {
 				number++;
 				milesDB.add(mileDB);
 			} catch (IOException e) {
-				break;
+				number++;
+				continue;
 			}
 		}
 
