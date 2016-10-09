@@ -25,8 +25,8 @@ public class HostingServiceMiner {
 	private String owner;
 	private String name;
 	private HostingServiceType serviceType;
-	private int issueMaxHops;
-	private int milestoneMaxHops;
+	private int issueMaxHops = 1000;
+	private int milestoneMaxHops = 50;
 	private IHostServiceListener listener;
 
 	/**
