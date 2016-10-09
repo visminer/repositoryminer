@@ -2,7 +2,7 @@ package org.repositoryminer.scm.hostingservice;
 
 import java.util.List;
 
-import org.repositoryminer.listener.IHostServiceListener;
+import org.repositoryminer.mining.HostingServiceMiner;
 import org.repositoryminer.model.Contributor;
 import org.repositoryminer.model.Issue;
 import org.repositoryminer.model.Milestone;
@@ -10,25 +10,21 @@ import org.repositoryminer.model.Milestone;
 public interface IHostingService {
 
 	/**
-	 * @param owner
-	 * @param name
+	 * @param hostingMiner
 	 * @param login
 	 * @param password
-	 * @param listener
 	 * 
 	 * Initialize connection with web service using login and password.
 	 */
-	public void connect(String owner, String name, String login, String password, IHostServiceListener listener);
+	public void connect(HostingServiceMiner hostingMiner, String login, String password);
 	
 	/**
-	 * @param owner
-	 * @param name
+	 * @param hostingMiner
 	 * @param token
-	 * @param listener
 	 * 
 	 * Initialize connection with web service using token.
 	 */
-	public void connect(String owner, String name, String token, IHostServiceListener listener);
+	public void connect(HostingServiceMiner hostingMiner, String token);
 	
 	/**
 	 * @return All issues from web repository service.

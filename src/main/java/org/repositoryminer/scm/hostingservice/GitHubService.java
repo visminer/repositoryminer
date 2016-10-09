@@ -11,7 +11,7 @@ import org.eclipse.egit.github.core.service.CollaboratorService;
 import org.eclipse.egit.github.core.service.IssueService;
 import org.eclipse.egit.github.core.service.MilestoneService;
 import org.eclipse.egit.github.core.service.RepositoryService;
-import org.repositoryminer.listener.IHostServiceListener;
+import org.repositoryminer.mining.HostingServiceMiner;
 import org.repositoryminer.model.Comment;
 import org.repositoryminer.model.Contributor;
 import org.repositoryminer.model.Issue;
@@ -25,36 +25,36 @@ public class GitHubService implements IHostingService {
 	private RepositoryId repositoryId;
 	private CollaboratorService collaboratorServ;
 	private RepositoryService repoServ;
-	private IHostServiceListener listener;
-
+	private HostingServiceMiner hostingMiner;
+	
 	// Initializes repository and needed services.
-	private void init(String name, String owner, GitHubClient client, IHostServiceListener listener) {
-		this.repositoryId = new RepositoryId(owner, name);
+	private void init(HostingServiceMiner hostingMiner, GitHubClient client) {
+		this.repositoryId = new RepositoryId(hostingMiner.getOwner(), hostingMiner.getName());
 		this.issueServ = new IssueService(client);
 		this.milestoneServ = new MilestoneService(client);
 		this.collaboratorServ = new CollaboratorService(client);
 		this.repoServ = new RepositoryService(client);
-		this.listener = listener;
+		this.hostingMiner = hostingMiner;
 	}
 
 	@Override
-	public void connect(String owner, String name, String login, String password, IHostServiceListener listener) {
+	public void connect(HostingServiceMiner hostingMiner, String login, String password) {
 		GitHubClient client = new GitHubClient();
 		client.setCredentials(login, password);
-		init(name, owner, client, listener);
+		init(hostingMiner, client);
 	}
 
 	@Override
-	public void connect(String owner, String name, String token, IHostServiceListener listener) {
+	public void connect(HostingServiceMiner hostingMiner, String token) {
 		GitHubClient client = new GitHubClient();
 		client.setOAuth2Token(token);
-		init(name, owner, client, listener);
+		init(hostingMiner, client);
 	}
 
 	@Override
 	public List<Issue> getAllIssues() {
-		if (listener != null) {
-			listener.initIssuesProcessing();
+		if (hostingMiner.getListener() != null) {
+			hostingMiner.getListener().initIssuesProcessing();
 		}
 
 		int number = 1;
@@ -109,8 +109,8 @@ public class GitHubService implements IHostingService {
 
 	@Override
 	public List<Milestone> getAllMilestones() {
-		if (listener != null) {
-			listener.initMilestonesProcessing();
+		if (hostingMiner.getListener() != null) {
+			hostingMiner.getListener().initMilestonesProcessing();
 		}
 
 		int number = 1;
@@ -138,8 +138,8 @@ public class GitHubService implements IHostingService {
 
 	@Override
 	public List<Contributor> getAllContributors() {
-		if (listener != null) {
-			listener.initContributorsProcessing();
+		if (hostingMiner.getListener() != null) {
+			hostingMiner.getListener().initMilestonesProcessing();
 		}
 
 		List<Contributor> contributors = new ArrayList<Contributor>();

@@ -38,6 +38,8 @@ public class HostingServiceMiner {
 	private String owner;
 	private String name;
 	private HostingServiceType serviceType;
+	private int issueMaxHops;
+	private int milestoneMaxHops;
 
 	private IHostingService service;
 
@@ -85,9 +87,9 @@ public class HostingServiceMiner {
 	 */
 	public HostingServiceMiner sync(String login, String password) {
 		service = HostingServiceFactory.getHostingService(serviceType);
-		service.connect(owner, name, login, password, listener);
+		service.connect(this, login, password);
 		process();
-		
+
 		return this;
 	}
 
@@ -104,7 +106,7 @@ public class HostingServiceMiner {
 	 */
 	public HostingServiceMiner sync(String token) {
 		service = HostingServiceFactory.getHostingService(serviceType);
-		service.connect(owner, name, token, listener);
+		service.connect(this, token);
 		process();
 		
 		return this;
@@ -217,7 +219,6 @@ public class HostingServiceMiner {
 
 	public HostingServiceMiner setRepositoryId(String repositoryId) {
 		this.repositoryId = repositoryId;
-		
 		return this;
 	}
 
@@ -227,7 +228,6 @@ public class HostingServiceMiner {
 
 	public HostingServiceMiner setOwner(String owner) {
 		this.owner = owner;
-		
 		return this;
 	}
 
@@ -237,7 +237,6 @@ public class HostingServiceMiner {
 
 	public HostingServiceMiner setName(String name) {
 		this.name = name;
-		
 		return this;
 	}
 
@@ -247,8 +246,23 @@ public class HostingServiceMiner {
 
 	public HostingServiceMiner setServiceType(HostingServiceType serviceType) {
 		this.serviceType = serviceType;
-		
 		return this;
+	}
+
+	public int getIssueMaxHops() {
+		return issueMaxHops;
+	}
+
+	public void setIssueMaxHops(int issueMaxHops) {
+		this.issueMaxHops = issueMaxHops;
+	}
+
+	public int getMilestoneMaxHops() {
+		return milestoneMaxHops;
+	}
+
+	public void setMilestoneMaxHops(int milestoneMaxHops) {
+		this.milestoneMaxHops = milestoneMaxHops;
 	}
 
 	public IHostServiceListener getListener() {
@@ -257,7 +271,6 @@ public class HostingServiceMiner {
 
 	public HostingServiceMiner setListener(IHostServiceListener listener) {
 		this.listener = listener;
-		
 		return this;
 	}
 
