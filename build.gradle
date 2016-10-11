@@ -13,7 +13,6 @@ tasks.withType(JavaCompile) {
 }
 
 repositories {
-        
      maven { url "https://repo.eclipse.org/content/repositories/egit-releases" }
      maven { url "http://repo.maven.apache.org/maven2" }
 }
