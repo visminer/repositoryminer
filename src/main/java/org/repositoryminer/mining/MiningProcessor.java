@@ -192,8 +192,6 @@ public class MiningProcessor {
 
 		String tempRepo = copyRepositoryFolder(repositoryMiner.getPath(), repositoryMiner.getName());
 
-		scm = SCMFactory.getSCM(repositoryMiner.getScm());
-		scm.open(tempRepo);
 
 		repository = new Repository(repositoryMiner);
 
