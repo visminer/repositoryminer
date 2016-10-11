@@ -190,26 +190,34 @@ public class MiningProcessor {
 	public Repository mine(RepositoryMiner repositoryMiner) throws IOException {
 		RepositoryDocumentHandler repoHandler = new RepositoryDocumentHandler();
 
-		String tempRepo = copyRepositoryFolder(repositoryMiner.getPath(), repositoryMiner.getName());
+		List<Document> repos = repoHandler.findRepositoriesByName(repositoryMiner.getName());
+		if (repos != null && !repos.isEmpty()) {
+			repository = Repository.parseDocument(repos.get(0));
+			// TODO we shall implement incremental mining soon! ;)
+		} else {
+			String tempRepo = copyRepositoryFolder(repositoryMiner.getPath(), repositoryMiner.getName());
 
+			scm = SCMFactory.getSCM(repositoryMiner.getScm());
+			scm.open(tempRepo);
 
-		repository = new Repository(repositoryMiner);
+			repository = new Repository(repositoryMiner);
 
-		Document repoDoc = repository.toDocument();
-		repoHandler.insert(repoDoc);
-		repository.setId(repoDoc.get("_id").toString());
+			Document repoDoc = repository.toDocument();
+			repoHandler.insert(repoDoc);
+			repository.setId(repoDoc.get("_id").toString());
 
-		saveReferences(repository.getId());
-		saveCommitsAndSnapshots(repositoryMiner);
-		saveTimeReferences(repositoryMiner);
+			saveReferences(repository.getId());
+			saveCommitsAndSnapshots(repositoryMiner);
+			saveTimeReferences(repositoryMiner);
 
-		calculateAndDetect(repositoryMiner, tempRepo);
+			calculateAndDetect(repositoryMiner, tempRepo);
 
-		repoDoc.append("contributors", Contributor.toDocumentList(contributors));
-		repoHandler.updateOnlyContributors(repoDoc);
+			repoDoc.append("contributors", Contributor.toDocumentList(contributors));
+			repoHandler.updateOnlyContributors(repoDoc);
 
-		scm.close();
-		deleteRepositoryFolder(tempRepo);
+			scm.close();
+			deleteRepositoryFolder(tempRepo);
+		}
 
 		return repository;
 	}
