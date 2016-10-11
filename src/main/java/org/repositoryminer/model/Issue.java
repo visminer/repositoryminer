@@ -21,14 +21,16 @@ public class Issue {
 	private String repository;
 	private List<Label> labels;
 	private List<Comment> comments;
+	private List<Event> events;
 
 	public Document toDocument() {
 		Document doc = new Document();
 		doc.append("creator", creator).append("assignee", assignee).append("closed_at", closedAt)
-				.append("comments", comments).append("created_at", createdAt).append("number", number)
-				.append("status", status.toString()).append("title", title).append("updated_at", updatedAt)
-				.append("body", body).append("milestone", milestone).append("repository", repository)
-				.append("labels", Label.toDocumentList(labels)).append("comments", Comment.toDocumentList(comments));
+				.append("created_at", createdAt).append("number", number).append("status", status.toString())
+				.append("title", title).append("updated_at", updatedAt).append("body", body)
+				.append("milestone", milestone).append("repository", repository)
+				.append("labels", Label.toDocumentList(labels)).append("comments", Comment.toDocumentList(comments))
+				.append("events", Event.toDocumentList(events));
 
 		return doc;
 	}
@@ -151,6 +153,14 @@ public class Issue {
 
 	public void setComments(List<Comment> comments) {
 		this.comments = comments;
+	}
+
+	public List<Event> getEvents() {
+		return events;
+	}
+
+	public void setEvents(List<Event> events) {
+		this.events = events;
 	}
 
 }

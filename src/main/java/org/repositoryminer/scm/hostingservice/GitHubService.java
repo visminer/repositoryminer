@@ -2,11 +2,14 @@ package org.repositoryminer.scm.hostingservice;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
+import org.eclipse.egit.github.core.IssueEvent;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.client.GitHubClient;
+import org.eclipse.egit.github.core.client.PageIterator;
 import org.eclipse.egit.github.core.service.CollaboratorService;
 import org.eclipse.egit.github.core.service.IssueService;
 import org.eclipse.egit.github.core.service.MilestoneService;
@@ -14,6 +17,7 @@ import org.eclipse.egit.github.core.service.RepositoryService;
 import org.repositoryminer.mining.HostingServiceMiner;
 import org.repositoryminer.model.Comment;
 import org.repositoryminer.model.Contributor;
+import org.repositoryminer.model.Event;
 import org.repositoryminer.model.Issue;
 import org.repositoryminer.model.Label;
 import org.repositoryminer.model.Milestone;
@@ -26,7 +30,7 @@ public class GitHubService implements IHostingService {
 	private CollaboratorService collaboratorServ;
 	private RepositoryService repoServ;
 	private HostingServiceMiner hostingMiner;
-	
+
 	// Initializes repository and needed services.
 	private void init(HostingServiceMiner hostingMiner, GitHubClient client) {
 		this.repositoryId = new RepositoryId(hostingMiner.getOwner(), hostingMiner.getName());
@@ -83,20 +87,9 @@ public class GitHubService implements IHostingService {
 					issue.setLabels(labels);
 				}
 
-				List<org.eclipse.egit.github.core.Comment> commentz = issueServ.getComments(repositoryId, number);
+				issue.setComments(getAllComments(number));
+				issue.setEvents(getlAllEvents(number));
 
-				if (commentz != null) {
-					List<Comment> comments = new ArrayList<Comment>();
-
-					for (org.eclipse.egit.github.core.Comment c : commentz) {
-						Comment comment = new Comment(c.getUser().getLogin(), c.getBody(), c.getCreatedAt(),
-								c.getUpdatedAt());
-						comments.add(comment);
-					}
-
-					issue.setComments(comments);
-				}
-				
 				number++;
 				issues.add(issue);
 			} catch (IOException e) {
@@ -116,7 +109,7 @@ public class GitHubService implements IHostingService {
 
 		int number = 1;
 		List<Milestone> milesDB = new ArrayList<Milestone>();
-		
+
 		while (number <= hostingMiner.getMilestoneMaxHops()) {
 			try {
 				org.eclipse.egit.github.core.Milestone mile = milestoneServ.getMilestone(repositoryId, number);
@@ -165,6 +158,47 @@ public class GitHubService implements IHostingService {
 		} catch (IOException e) {
 			return contributors;
 		}
+	}
+
+	private List<Comment> getAllComments(int issueId) throws IOException {
+		List<Comment> comments = new ArrayList<Comment>();
+
+		List<org.eclipse.egit.github.core.Comment> commentz = issueServ.getComments(repositoryId, issueId);
+		if (commentz != null) {
+			for (org.eclipse.egit.github.core.Comment c : commentz) {
+				Comment comment = new Comment(c.getUser().getLogin(), c.getBody(), c.getCreatedAt(), c.getUpdatedAt());
+				comments.add(comment);
+			}
+		}
+
+		return comments;
+	}
+
+	private List<Event> getlAllEvents(int issueId) {
+		List<Event> events = new ArrayList<Event>();
+
+		PageIterator<IssueEvent> eventsPages = issueServ.pageIssueEvents(hostingMiner.getOwner(),
+				hostingMiner.getName(), issueId);
+		if (eventsPages != null) {
+			while (eventsPages.hasNext()) {
+				Collection<IssueEvent> issueEvents = eventsPages.next();
+
+				for (IssueEvent issueEvent : issueEvents) {
+					Event event = new Event();
+					event.setDescription(issueEvent.getEvent());
+					User user = issueEvent.getActor();
+					if (user != null) {
+						event.setCreator(user.getName());
+					}
+					event.setCreatedAt(issueEvent.getCreatedAt());
+					event.setCommitId(issueEvent.getCommitId());
+
+					events.add(event);
+				}
+			}
+		}
+
+		return events;
 	}
 
 }
