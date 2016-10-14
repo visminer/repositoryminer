@@ -1,4 +1,4 @@
-package org.repositoryminer.model.effort;
+package org.repositoryminer.effort.model;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +20,7 @@ import org.bson.Document;
  * The Comparable interface is implemented because it is necessary to rank
  * effort collections according to their overall calculated effort. That is the
  * case with
- * {@link org.repositoryminer.postprocessing.effort.EffortCategoriesMiningTask#processEfforts}
+ * {@link org.repositoryminer.effort.postprocessing.EffortCategoriesMiningTask#processEfforts}
  * <p>
  */
 public class Effort implements Comparable<Effort> {

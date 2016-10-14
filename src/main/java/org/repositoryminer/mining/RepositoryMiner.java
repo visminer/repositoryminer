@@ -6,9 +6,11 @@ import java.util.Map;
 
 import org.repositoryminer.codesmell.clazz.IClassCodeSmell;
 import org.repositoryminer.codesmell.project.IProjectCodeSmell;
-import org.repositoryminer.listener.IProgressListener;
+import org.repositoryminer.listener.IMiningListener;
+import org.repositoryminer.listener.IPostMiningListener;
 import org.repositoryminer.metric.clazz.IClassMetric;
 import org.repositoryminer.model.Reference;
+import org.repositoryminer.model.Repository;
 import org.repositoryminer.parser.Parser;
 import org.repositoryminer.postprocessing.IPostMiningTask;
 import org.repositoryminer.scm.SCMType;
@@ -56,8 +58,10 @@ public class RepositoryMiner {
 	private List<ITechnicalDebt> technicalDebts;
 	private List<IProjectCodeSmell> projectCodeSmells;
 	private List<IPostMiningTask> postMiningTasks;
-	private IProgressListener progressListener;
 	private Map<Reference, TimeFrameType[]> references;
+
+	private IMiningListener miningListener;
+	private IPostMiningListener postMiningListener;
 
 	/**
 	 * Use this void constructor if parameters are going to be set later
@@ -66,7 +70,8 @@ public class RepositoryMiner {
 	 * {@link #RepositoryMiner(String, String, String, SCMType)}) can be used if
 	 * mandatory parameters are known
 	 */
-	public RepositoryMiner() {}
+	public RepositoryMiner() {
+	}
 
 	/**
 	 * Use this non-void constructor if mandatory parameters are known
@@ -98,25 +103,23 @@ public class RepositoryMiner {
 	 * One must make sure that all needed parameters are set prior to calling
 	 * this method
 	 * <p>
-	 * 
-	 * @throws IOException.
+	 * @return instance of repository after mining and post-mining are performed
+	 * @throws IOException
 	 */
-	public void mine() throws IOException {
+	public Repository mine() throws IOException {
 		MiningProcessor processor = new MiningProcessor();
 		PostMiningProcessor postProcessor = new PostMiningProcessor();
-		if (progressListener != null) {
-			progressListener.initMining(name);
-			postProcessor.executeTasks(processor.mine(this), this);
-			progressListener.endOfMining();
-		} else {
-			postProcessor.executeTasks(processor.mine(this), this);
+		if (miningListener != null) {
+			miningListener.initMining(name);
 		}
+
+		return postProcessor.executeTasks(processor.mine(this), this);
 	}
 
 	public boolean hasClassMetrics() {
 		return (classMetrics != null && !classMetrics.isEmpty());
 	}
-	
+
 	public boolean hasTechnicalDebts() {
 		return (technicalDebts != null && !technicalDebts.isEmpty());
 	}
@@ -124,15 +127,15 @@ public class RepositoryMiner {
 	public boolean hasClassCodeSmells() {
 		return (classCodeSmells != null && !classCodeSmells.isEmpty());
 	}
-	
+
 	public boolean hasProjectsCodeSmells() {
 		return (projectCodeSmells != null && !projectCodeSmells.isEmpty());
 	}
-	
+
 	public boolean hasPostMiningTasks() {
 		return (postMiningTasks != null && !postMiningTasks.isEmpty());
 	}
-	
+
 	public String getPath() {
 		return path;
 	}
@@ -222,7 +225,7 @@ public class RepositoryMiner {
 		this.projectCodeSmells = projectCodeSmells;
 		return this;
 	}
-	
+
 	public List<IPostMiningTask> getPostMiningTasks() {
 		return postMiningTasks;
 	}
@@ -231,23 +234,32 @@ public class RepositoryMiner {
 		this.postMiningTasks = postMiningTasks;
 		return this;
 	}
-	
-	public RepositoryMiner setProgressListener(IProgressListener progressListener) {
-		this.progressListener = progressListener;
+
+	public RepositoryMiner setMiningListener(IMiningListener listener) {
+		this.miningListener = listener;
 		return this;
 	}
 
-	public IProgressListener getProgressListener() {
-		return progressListener;
+	public IMiningListener getMiningListener() {
+		return miningListener;
 	}
 
-	public Map<Reference, TimeFrameType[]> getReferences() {
-		return references;
+	public RepositoryMiner setPostMiningListener(IPostMiningListener listener) {
+		this.postMiningListener = listener;
+		return this;
+	}
+
+	public IPostMiningListener getPostMiningListener() {
+		return postMiningListener;
 	}
 
 	public RepositoryMiner setReferences(Map<Reference, TimeFrameType[]> references) {
 		this.references = references;
 		return this;
+	}
+
+	public Map<Reference, TimeFrameType[]> getReferences() {
+		return references;
 	}
 
 }

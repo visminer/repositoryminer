@@ -4,7 +4,7 @@ import org.repositoryminer.exceptions.ErrorMessage;
 
 public class SCMFactory {
 
-	public static SCM getSCM(SCMType type) {
+	public static ISCM getSCM(SCMType type) {
 		switch (type) {
 		case GIT:
 			return new GitSCM();

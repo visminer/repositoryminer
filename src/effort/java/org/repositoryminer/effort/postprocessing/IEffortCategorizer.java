@@ -1,6 +1,6 @@
-package org.repositoryminer.postprocessing.effort;
+package org.repositoryminer.effort.postprocessing;
 
-import org.repositoryminer.model.effort.Effort;
+import org.repositoryminer.effort.model.Effort;
 
 /**
  * <h1>A categorizer of effort agglomeration</h1>

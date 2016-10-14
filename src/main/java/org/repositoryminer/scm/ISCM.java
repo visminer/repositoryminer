@@ -17,7 +17,7 @@ import org.repositoryminer.model.Reference;
  * Do not save your unfinished work or experiment in other branch, this will influence the analysis.
  */
 
-public interface SCM {
+public interface ISCM {
 	
 	/**
 	 * @param repositoryPath

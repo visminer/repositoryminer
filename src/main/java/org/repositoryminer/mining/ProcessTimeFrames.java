@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.bson.Document;
-import org.repositoryminer.listener.IProgressListener;
+import org.repositoryminer.listener.IMiningListener;
 import org.repositoryminer.model.Commit;
 import org.repositoryminer.model.Reference;
 import org.repositoryminer.persistence.handler.ReferenceDocumentHandler;
@@ -21,17 +21,17 @@ public class ProcessTimeFrames {
 	private Map<String, Reference> refs;
 	private String repositoryId;
 	private Map<String, Commit> commitsMap;
-	private IProgressListener progressListener;
+	private IMiningListener listener;
 
-	public ProcessTimeFrames(String repositoryId, Map<String, Commit> commitsMap, IProgressListener progressListener) {
+	public ProcessTimeFrames(String repositoryId, Map<String, Commit> commitsMap, IMiningListener listener) {
 		this.repositoryId = repositoryId;
 		this.commitsMap = commitsMap;
-		this.progressListener = progressListener;
+		this.listener = listener;
 	}
 
 	public Collection<? extends Reference> analyzeCommits(Reference reference, TimeFrameType[] timeFrames) {
 		this.refs = new HashMap<String, Reference>();
-		
+
 		boolean monthFrame = false;
 		boolean trimesterFrame = false;
 		boolean semesterFrame = false;
@@ -64,11 +64,12 @@ public class ProcessTimeFrames {
 			refPath += "heads/" + reference.getName() + "/";
 		}
 
-		for (String hash : reference.getCommits()) {
-			/* FIXME: NEEDS REVISION
-			 * if (progressListener != null) {
-				progressListener.commitsProgressChange(++idx, commits.size());
-			}*/
+		int idx = 0;
+		List<String> commits = reference.getCommits();
+		for (String hash : commits) {
+			if (listener != null) {
+				listener.commitsProgressChange(++idx, commits.size());
+			}
 
 			Commit commit = commitsMap.get(hash);
 
@@ -98,11 +99,11 @@ public class ProcessTimeFrames {
 		List<Document> docs = new ArrayList<Document>();
 		List<Reference> timeRefs = new ArrayList<Reference>(refs.values());
 
+		idx = 0;
 		for (Reference r : timeRefs) {
-			/* FIXME: NEEDS REVISION
-			if (progressListener != null) {
-				progressListener.timeFramesProgressChange(++idx, timeRefs.size());
-			}*/
+			if (listener != null) {
+				listener.timeFramesProgressChange(reference.getName(), ++idx, timeRefs.size());
+			}
 			docs.add(r.toDocument());
 		}
 
@@ -154,7 +155,8 @@ public class ProcessTimeFrames {
 			Reference tempRef = refs.get(name);
 			tempRef.getCommits().add(hash);
 		} else {
-			Reference r = new Reference(null, repositoryId, name, path, ReferenceType.TIME_TAG, new ArrayList<String>());
+			Reference r = new Reference(null, repositoryId, name, path, ReferenceType.TIME_TAG,
+					new ArrayList<String>());
 			r.getCommits().add(hash);
 			refs.put(name, r);
 		}

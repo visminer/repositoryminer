@@ -41,9 +41,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * @see SCM This class supports git repositories.
+ * @see ISCM This class supports git repositories.
  */
-public class GitSCM implements SCM {
+public class GitSCM implements ISCM {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(GitSCM.class);
 

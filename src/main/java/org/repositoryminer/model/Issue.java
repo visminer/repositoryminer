@@ -4,7 +4,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.bson.Document;
-import org.bson.types.ObjectId;
 import org.repositoryminer.scm.hostingservice.StatusType;
 
 public class Issue {
@@ -12,35 +11,38 @@ public class Issue {
 	private String creator;
 	private String assignee;
 	private Date closedAt;
-	private int comments;
 	private Date createdAt;
 	private int number;
 	private StatusType status;
 	private String title;
 	private Date updatedAt;
-	private String body; 
+	private String body;
 	private int milestone;
 	private String repository;
 	private List<Label> labels;
-	
+	private List<Comment> comments;
+	private List<Event> events;
+
 	public Document toDocument() {
 		Document doc = new Document();
 		doc.append("creator", creator).append("assignee", assignee).append("closed_at", closedAt)
-				.append("comments", comments).append("created_at", createdAt).append("number", number)
-				.append("status", status.toString()).append("title", title).append("updated_at", updatedAt)
-				.append("body", body).append("milestone", milestone).append("repository", new ObjectId(repository))
-				.append("labels", Label.toDocumentList(labels));
+				.append("created_at", createdAt).append("number", number).append("status", status.toString())
+				.append("title", title).append("updated_at", updatedAt).append("body", body)
+				.append("milestone", milestone).append("repository", repository)
+				.append("labels", Label.toDocumentList(labels)).append("comments", Comment.toDocumentList(comments))
+				.append("events", Event.toDocumentList(events));
+
 		return doc;
 	}
 
-	public Issue() {}
+	public Issue() {
+	}
 
-	public Issue(String creator, Date closedAt, int comments, Date createdAt, int number, StatusType status,
-			String title, Date updatedAt, String body) {
+	public Issue(String creator, Date closedAt, Date createdAt, int number, StatusType status, String title,
+			Date updatedAt, String body) {
 		super();
 		this.creator = creator;
 		this.closedAt = closedAt;
-		this.comments = comments;
 		this.createdAt = createdAt;
 		this.number = number;
 		this.status = status;
@@ -71,14 +73,6 @@ public class Issue {
 
 	public void setClosedAt(Date closedAt) {
 		this.closedAt = closedAt;
-	}
-
-	public int getComments() {
-		return comments;
-	}
-
-	public void setComments(int comments) {
-		this.comments = comments;
 	}
 
 	public Date getCreatedAt() {
@@ -152,6 +146,21 @@ public class Issue {
 	public void setLabels(List<Label> labels) {
 		this.labels = labels;
 	}
-	
-	
+
+	public List<Comment> getComments() {
+		return comments;
+	}
+
+	public void setComments(List<Comment> comments) {
+		this.comments = comments;
+	}
+
+	public List<Event> getEvents() {
+		return events;
+	}
+
+	public void setEvents(List<Event> events) {
+		this.events = events;
+	}
+
 }
