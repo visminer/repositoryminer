@@ -22,6 +22,7 @@ public class Commit {
 	private Contributor author;
 	private Contributor committer;
 	private List<Diff> diffs;
+	private List<IssueReference> issueReferences;
 
 	@SuppressWarnings("unchecked")
 	public static List<Commit> parseDocuments(List<Document> commitsDocs) {
@@ -48,16 +49,8 @@ public class Commit {
 		return commit;
 	}
 
-	@SuppressWarnings("unchecked")
 	public static Commit parseDocument(Document commitDoc) {
-		Commit commit = new Commit(commitDoc.getString("_id"), commitDoc.getString("message"),
-				commitDoc.getDate("authored_date"), commitDoc.getDate("commit_date"),
-				commitDoc.get("repository").toString(), new ArrayList<String>(),
-				Contributor.parseDocument((Document) commitDoc.get("author")),
-				Contributor.parseDocument((Document) commitDoc.get("committer")),
-				Diff.parseDocuments((List<Document>) commitDoc.get("diffs")));
-
-		return commit;
+		return parseDocument(commitDoc, new ArrayList<String>());
 	}
 
 	public Document toDocument() {
@@ -163,6 +156,14 @@ public class Commit {
 		this.diffs = diffs;
 	}
 
+	public List<IssueReference> getIssueReferences() {
+		return issueReferences;
+	}
+
+	public void setIssueReferences(List<IssueReference> issueReferences) {
+		this.issueReferences = issueReferences;
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;

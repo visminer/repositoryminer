@@ -1,4 +1,4 @@
-package org.repositoryminer.model.effort;
+package org.repositoryminer.effort.model;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +13,7 @@ import org.bson.Document;
  * classifications: MAJOR, MINOR, SUB-MAJOR, etc.
  * <p>
  * An example of categorization of efforts can be found in
- * {@link org.repositoryminer.postprocessing.effort.EffortCategoriesMiningTask}
+ * {@link org.repositoryminer.effort.postprocessing.EffortCategoriesMiningTask}
  */
 public class EffortCategory {
 

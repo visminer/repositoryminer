@@ -1,4 +1,4 @@
-package org.repositoryminer.persistence.handler.effort;
+package org.repositoryminer.effort.persistence.handler;
 
 import org.bson.Document;
 import org.repositoryminer.persistence.Connection;

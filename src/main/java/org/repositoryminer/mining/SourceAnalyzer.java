@@ -16,7 +16,7 @@ import org.repositoryminer.ast.AST;
 import org.repositoryminer.ast.AbstractTypeDeclaration;
 import org.repositoryminer.codesmell.clazz.IClassCodeSmell;
 import org.repositoryminer.codesmell.project.IProjectCodeSmell;
-import org.repositoryminer.listener.IProgressListener;
+import org.repositoryminer.listener.IMiningListener;
 import org.repositoryminer.metric.clazz.IClassMetric;
 import org.repositoryminer.model.Commit;
 import org.repositoryminer.model.Diff;
@@ -26,12 +26,12 @@ import org.repositoryminer.persistence.handler.CommitAnalysisDocumentHandler;
 import org.repositoryminer.persistence.handler.SnapshotAnalysisDocumentHandler;
 import org.repositoryminer.scm.DiffType;
 import org.repositoryminer.scm.ReferenceType;
-import org.repositoryminer.scm.SCM;
+import org.repositoryminer.scm.ISCM;
 import org.repositoryminer.technicaldebt.ITechnicalDebt;
 
 public class SourceAnalyzer {
 
-	private SCM scm;
+	private ISCM scm;
 	private RepositoryMiner repositoryMiner;
 	private List<Parser> parsers;
 	private String repositoryId;
@@ -44,9 +44,9 @@ public class SourceAnalyzer {
 	private Set<String> commitsProcessed;
 
 	private Parser parser;
-	private IProgressListener progressListener;
+	private IMiningListener listener;
 
-	public SourceAnalyzer(RepositoryMiner repositoryMiner, SCM scm, String repositoryId, String repositoryPath) {
+	public SourceAnalyzer(RepositoryMiner repositoryMiner, ISCM scm, String repositoryId, String repositoryPath) {
 		this.scm = scm;
 		this.repositoryMiner = repositoryMiner;
 		this.repositoryId = repositoryId;
@@ -55,6 +55,7 @@ public class SourceAnalyzer {
 		this.persistenceSnapshot = new SnapshotAnalysisDocumentHandler();
 		this.parsers = repositoryMiner.getParsers();
 		this.commitsProcessed = new HashSet<String>();
+		this.listener = repositoryMiner.getMiningListener();
 
 		for (Parser parser : repositoryMiner.getParsers()) {
 			parser.setCharSet(repositoryMiner.getCharset());
@@ -70,12 +71,6 @@ public class SourceAnalyzer {
 	}
 
 	public void analyze() throws IOException {
-		progressListener = repositoryMiner.getProgressListener();
-
-		if (progressListener != null) {
-			progressListener.initSourceAnalysisProgress();
-		}
-
 		analyzeCommits();
 		analyzeTags();
 	}
@@ -91,11 +86,12 @@ public class SourceAnalyzer {
 				continue;
 			}
 
-			for (String hash : ref.getCommits()) {
-				/* FIXME: NEEDS REVISION
-				 * if (progressListener != null) {
-					progressListener.commitsProgressChange(++idx, commits.size());
-				}*/
+			List<String> commits = ref.getCommits();
+			int idx = 0;
+			for (String hash : commits) {
+				if (listener != null) {
+					listener.commitsProgressChange(ref.getName(), ++idx, commits.size());
+				}
 				
 				// Avoids processing again some commits
 				if (!commitsProcessed.contains(hash)) {
@@ -124,8 +120,8 @@ public class SourceAnalyzer {
 		if (repositoryMiner.hasProjectsCodeSmells()) {
 			int idx = 0;
 			for (Reference tag : references) {
-				if (progressListener != null) {
-					progressListener.tagsProgressChange(++idx, references.size());
+				if (listener != null) {
+					listener.tagsProgressChange(tag.getName(), ++idx, references.size());
 				}
 
 				String commitId = tag.getCommits().get(0);

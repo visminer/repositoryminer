@@ -2,7 +2,7 @@ package org.repositoryminer.mining;
 
 import java.util.List;
 
-import org.repositoryminer.listener.IProgressListener;
+import org.repositoryminer.listener.IPostMiningListener;
 import org.repositoryminer.model.Repository;
 import org.repositoryminer.postprocessing.IPostMiningTask;
 
@@ -36,18 +36,21 @@ public class PostMiningProcessor {
 	 *            the repository being mined
 	 * @param repositoryMiner
 	 *            the entry point to the mining parameters
+	 * @return instance of repository after post processing
 	 */
-	public void executeTasks(Repository repository, RepositoryMiner repositoryMiner) {
+	public Repository executeTasks(Repository repository, RepositoryMiner repositoryMiner) {
 		if (repositoryMiner.hasPostMiningTasks()) {
 			List<IPostMiningTask> tasks = repositoryMiner.getPostMiningTasks();
-			IProgressListener progressListener = repositoryMiner.getProgressListener();
+			IPostMiningListener listener = repositoryMiner.getPostMiningListener();
 			for (IPostMiningTask task : tasks) {
-				if (progressListener != null) {
-					progressListener.initPostMiningTaskProgress(task.getTaskName());
+				if (listener != null) {
+					listener.initPostMiningTaskProgress(task.getTaskName());
 				}
-				task.execute(repository, progressListener);
+				task.execute(repositoryMiner, repository, listener);
 			}
 		}
+		
+		return repository;
 	}
 
 }

@@ -34,24 +34,40 @@ public class DocumentHandler {
 	public Document findById(String id){
 		return findById(id, null);
 	}
-	
+
+	public Document findOne(BasicDBObject whereClause) {
+		Document doc = collection.find(whereClause).first();
+		
+		return doc;
+	}
+
 	public Document findOne(BasicDBObject whereClause, Bson projection) {
 		Document doc = collection.find(whereClause).projection(projection).first();
+		
 		return doc;
 	}
 
 	public List<Document> findAll() {
 		MongoCursor<Document> cursor = collection.find().iterator();
+		
 		return fromCursorToList(cursor);
 	}
 
 	public List<Document> findAll(Bson projection) {
 		MongoCursor<Document> cursor = collection.find().projection(projection).iterator();
+		
+		return fromCursorToList(cursor);
+	}
+
+	public List<Document> findMany(BasicDBObject whereClause) {
+		MongoCursor<Document> cursor = collection.find(whereClause).iterator();
+		
 		return fromCursorToList(cursor);
 	}
 
 	public List<Document> findMany(BasicDBObject whereClause, Bson projection) {
 		MongoCursor<Document> cursor = collection.find(whereClause).projection(projection).iterator();
+		
 		return fromCursorToList(cursor);
 	}
 
@@ -62,6 +78,7 @@ public class DocumentHandler {
 			list.add(cursor.next());
 
 		cursor.close();
+		
 		return list;
 	}
 

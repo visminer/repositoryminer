@@ -1,4 +1,4 @@
-package org.repositoryminer.postprocessing.effort;
+package org.repositoryminer.effort.postprocessing;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -7,14 +7,15 @@ import java.util.List;
 import java.util.Map;
 
 import org.bson.Document;
-import org.repositoryminer.listener.IProgressListener;
+import org.repositoryminer.effort.model.Effort;
+import org.repositoryminer.effort.model.EffortCategoriesByReference;
+import org.repositoryminer.effort.model.EffortCategory;
+import org.repositoryminer.effort.model.EffortsByReference;
+import org.repositoryminer.effort.persistence.handler.EffortCategoriesDocumentHandler;
+import org.repositoryminer.effort.persistence.handler.EffortsDocumentHandler;
+import org.repositoryminer.listener.IPostMiningListener;
+import org.repositoryminer.mining.RepositoryMiner;
 import org.repositoryminer.model.Repository;
-import org.repositoryminer.model.effort.Effort;
-import org.repositoryminer.model.effort.EffortCategoriesByReference;
-import org.repositoryminer.model.effort.EffortCategory;
-import org.repositoryminer.model.effort.EffortsByReference;
-import org.repositoryminer.persistence.handler.effort.EffortCategoriesDocumentHandler;
-import org.repositoryminer.persistence.handler.effort.EffortsDocumentHandler;
 import org.repositoryminer.postprocessing.IPostMiningTask;
 
 /**
@@ -52,7 +53,7 @@ public class EffortCategoriesMiningTask implements IPostMiningTask {
 	}
 
 	@Override
-	public void execute(Repository repository, IProgressListener progressListener) {
+	public void execute(RepositoryMiner repositoryMiner, Repository repository, IPostMiningListener listener) {
 		EffortsDocumentHandler handler = new EffortsDocumentHandler();
 		// let's get all efforts previously save in the database...
 		List<Document> effortDocs = handler.findAll();
@@ -60,7 +61,7 @@ public class EffortCategoriesMiningTask implements IPostMiningTask {
 			List<EffortsByReference> effortsByReference = EffortsByReference.parseDocuments(effortDocs);
 			if (effortsByReference != null) {
 				// and process each effort
-				processEfforts(effortsByReference, progressListener);
+				processEfforts(effortsByReference, listener);
 			}
 		}
 	}
@@ -78,11 +79,11 @@ public class EffortCategoriesMiningTask implements IPostMiningTask {
 	 *            instance of progress listener to provide info about the
 	 *            processing steps
 	 */
-	private void processEfforts(List<EffortsByReference> effortsByReference, IProgressListener progressListener) {
+	private void processEfforts(List<EffortsByReference> effortsByReference, IPostMiningListener listener) {
 		int idx = 0;
 		for (EffortsByReference effortsByRef : effortsByReference) {
-			if (progressListener != null) {
-				progressListener.postMiningTaskProgressChange(++idx, effortsByReference.size());
+			if (listener != null) {
+				listener.postMiningTaskProgressChange("effort categories", ++idx, effortsByReference.size());
 			}
 			// let's get the list of efforts...
 			List<Effort> efforts = effortsByRef.getEfforts();

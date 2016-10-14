@@ -1,4 +1,4 @@
-package org.repositoryminer.model.effort;
+package org.repositoryminer.effort.model;
 
 import java.util.ArrayList;
 import java.util.List;

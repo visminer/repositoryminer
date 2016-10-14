@@ -1,6 +1,7 @@
 package org.repositoryminer.postprocessing;
 
-import org.repositoryminer.listener.IProgressListener;
+import org.repositoryminer.listener.IPostMiningListener;
+import org.repositoryminer.mining.RepositoryMiner;
 import org.repositoryminer.model.Repository;
 
 /**
@@ -24,12 +25,14 @@ public interface IPostMiningTask {
 	/**
 	 * Executes the post-mining task
 	 * 
+	 * @param repositoryMiner
+	 *            instance of miner
 	 * @param repository
 	 *            the repository being mined
-	 * @param progressListener
+	 * @param PostMiningListener's
 	 *            instance of the listener to track the steps performed by the
 	 *            mining
 	 */
-	public void execute(Repository repository, IProgressListener progressListener);
+	public void execute(RepositoryMiner miner, Repository repository, IPostMiningListener listener);
 
 }

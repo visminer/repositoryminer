@@ -1,19 +1,6 @@
 package org.repositoryminer.mining;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.bson.Document;
-import org.repositoryminer.exceptions.ErrorMessage;
-import org.repositoryminer.exceptions.VisMinerAPIException;
-import org.repositoryminer.model.Contributor;
-import org.repositoryminer.model.Issue;
-import org.repositoryminer.model.Milestone;
-import org.repositoryminer.persistence.handler.IssueDocumentHandler;
-import org.repositoryminer.persistence.handler.MilestoneDocumentHandler;
-import org.repositoryminer.persistence.handler.RepositoryDocumentHandler;
-import org.repositoryminer.scm.hostingservice.HostingService;
-import org.repositoryminer.scm.hostingservice.HostingServiceFactory;
+import org.repositoryminer.listener.IHostServiceListener;
 import org.repositoryminer.scm.hostingservice.HostingServiceType;
 
 /**
@@ -31,14 +18,16 @@ import org.repositoryminer.scm.hostingservice.HostingServiceType;
  * Check if the user has the enough rights in the repository, otherwise the
  * synchronization will not retrieve some data
  */
+// TODO: Documentation needs refactoring
 public class HostingServiceMiner {
 
 	private String repositoryId;
 	private String owner;
 	private String name;
 	private HostingServiceType serviceType;
-
-	private HostingService service;
+	private int issueMaxHops = 1000;
+	private int milestoneMaxHops = 50;
+	private IHostServiceListener listener;
 
 	/**
 	 * Use this void constructor if parameters are going to be set later.
@@ -76,14 +65,14 @@ public class HostingServiceMiner {
 	 * <p>
 	 * 
 	 * @param login
-	 *            check the service to know the login options,
-	 *            generally is email or username
+	 *            check the service to know the login options, generally is
+	 *            email or username
 	 * @param password
 	 */
 	public void sync(String login, String password) {
-		service = HostingServiceFactory.getHostingService(serviceType);
-		service.connect(owner, name, login, password);
-		process();
+		HostingProcessor hp = new HostingProcessor();
+		hp.connectToService(this, login, password);
+		hp.mine();
 	}
 
 	/**
@@ -98,105 +87,70 @@ public class HostingServiceMiner {
 	 * @param token
 	 */
 	public void sync(String token) {
-		service = HostingServiceFactory.getHostingService(serviceType);
-		service.connect(owner, name, token);
-		process();
-	}
-
-	@SuppressWarnings("unchecked")
-	private void process() {
-		RepositoryDocumentHandler repoDocHandler = new RepositoryDocumentHandler();
-		if (!repoDocHandler.checkIfRepositoryExists(repositoryId)) {
-			throw new VisMinerAPIException(ErrorMessage.REPOSITORY_NOT_FOUND.toString());
-		}
-
-		IssueDocumentHandler issueDocHandler = new IssueDocumentHandler();
-		MilestoneDocumentHandler mileDocHandler = new MilestoneDocumentHandler();
-
-		issueDocHandler.deleteByRepository(repositoryId);
-		mileDocHandler.deleteByRepository(repositoryId);
-
-		Document repoDoc = repoDocHandler.findOnlyContributors(repositoryId);
-		List<Contributor> contributorsDb = service.getAllContributors();
-
-		for (Document contributorDoc : (List<Document>) repoDoc.get("contributors")) {
-			String name = contributorDoc.getString("name");
-			for (Contributor contributorDb : contributorsDb) {
-				if (name.equals(contributorDb.getName())) {
-					contributorDoc.put("login", contributorDb.getLogin());
-					contributorDoc.put("avatar_url", contributorDb.getAvatarUrl());
-					contributorDoc.put("collaborator", contributorDb.isCollaborator());
-					break;
-				}
-			}
-		}
-
-		repoDocHandler.updateOnlyContributors(repoDoc);
-		List<Issue> issues = service.getAllIssues();
-		List<Milestone> milestones = service.getAllMilestones();
-
-		// connect issues to milestones
-		if (milestones.size() > 0) {
-			for (Milestone m : milestones) {
-				m.setIssues(new ArrayList<Integer>());
-				for (Issue i : issues) {
-					if (i.getMilestone() == m.getNumber()) {
-						m.getIssues().add(i.getNumber());
-					}
-				}
-			}
-		}
-
-		List<Document> issuesDocs = new ArrayList<Document>(issues.size());
-		List<Document> milesDocs = new ArrayList<Document>(milestones.size());
-
-		if (issues.size() > 0) {
-			for (Issue issue : issues) {
-				issue.setRepository(repositoryId);
-				issuesDocs.add(issue.toDocument());
-			}
-			issueDocHandler.insertMany(issuesDocs);
-		}
-
-		if (milestones.size() > 0) {
-			for (Milestone mile : milestones) {
-				mile.setRepository(repositoryId);
-				milesDocs.add(mile.toDocument());
-			}
-			mileDocHandler.insertMany(milesDocs);
-		}
+		HostingProcessor hp = new HostingProcessor();
+		hp.connectToService(this, token);
+		hp.mine();
 	}
 
 	public String getRepositoryId() {
 		return repositoryId;
 	}
 
-	public void setRepositoryId(String repositoryId) {
+	public HostingServiceMiner setRepositoryId(String repositoryId) {
 		this.repositoryId = repositoryId;
+		return this;
 	}
 
 	public String getOwner() {
 		return owner;
 	}
 
-	public void setOwner(String owner) {
+	public HostingServiceMiner setOwner(String owner) {
 		this.owner = owner;
+		return this;
 	}
 
 	public String getName() {
 		return name;
 	}
 
-	public void setName(String name) {
+	public HostingServiceMiner setName(String name) {
 		this.name = name;
+		return this;
 	}
 
 	public HostingServiceType getServiceType() {
 		return serviceType;
 	}
 
-	public void setServiceType(HostingServiceType serviceType) {
+	public HostingServiceMiner setServiceType(HostingServiceType serviceType) {
 		this.serviceType = serviceType;
+		return this;
+	}
+
+	public int getIssueMaxHops() {
+		return issueMaxHops;
+	}
+
+	public void setIssueMaxHops(int issueMaxHops) {
+		this.issueMaxHops = issueMaxHops;
+	}
+
+	public int getMilestoneMaxHops() {
+		return milestoneMaxHops;
+	}
+
+	public void setMilestoneMaxHops(int milestoneMaxHops) {
+		this.milestoneMaxHops = milestoneMaxHops;
+	}
+
+	public IHostServiceListener getListener() {
+		return listener;
+	}
+
+	public HostingServiceMiner setListener(IHostServiceListener listener) {
+		this.listener = listener;
+		return this;
 	}
 
 }

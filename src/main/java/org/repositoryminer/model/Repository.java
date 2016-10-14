@@ -18,12 +18,23 @@ public class Repository {
 		doc.append("name", name).append("description", description).append("scm", scm.toString());
 		return doc;
 	}
-	
+
+	public static Repository parseDocument(Document repositoryDoc) {
+		Repository repository = new Repository(repositoryDoc.getObjectId("_id").toString(), repositoryDoc.getString("name"),
+				repositoryDoc.getString("description"), SCMType.valueOf(repositoryDoc.getString("scm")));
+
+		return repository;
+	}
+
 	public Repository(org.repositoryminer.mining.RepositoryMiner repo) {
-		super();
-		this.name = repo.getName();
-		this.description = repo.getDescription();
-		this.scm = repo.getScm();
+		this(null, repo.getName(), repo.getDescription(), repo.getScm());
+	}
+
+	public Repository(String id, String name, String description, SCMType scm) {
+		this.id = id;
+		this.name = name;
+		this.description = description;
+		this.scm = scm;
 	}
 
 	public String getId() {

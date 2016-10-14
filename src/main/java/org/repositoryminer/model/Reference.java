@@ -39,21 +39,26 @@ public class Reference {
 		return refs;
 	}
 
-	@SuppressWarnings("unchecked")
 	public static List<Reference> parseDocuments(List<Document> refsDocs) {
 		List<Reference> refs = new ArrayList<Reference>();
 		for (Document doc : refsDocs) {
-			List<String> commits = new ArrayList<String>();
-			for (String o : (List<String>) doc.get("commits")) {
-				commits.add(o);
-			}
-			Reference r = new Reference(doc.get("_id").toString(), doc.get("repository").toString(), doc.getString("name"),
-					doc.getString("path"), ReferenceType.valueOf(doc.getString("type")), commits);
-			refs.add(r);
+			refs.add(parseDocument(doc));
 		}
 		return refs;
 	}
 
+	@SuppressWarnings("unchecked")
+	public static Reference parseDocument(Document refDoc) {
+		List<String> commits = new ArrayList<String>();
+		for (String o : (List<String>) refDoc.get("commits")) {
+			commits.add(o);
+		}
+		Reference r = new Reference(refDoc.get("_id").toString(), refDoc.get("repository").toString(), refDoc.getString("name"),
+				refDoc.getString("path"), ReferenceType.valueOf(refDoc.getString("type")), commits);
+		
+		return r;
+	}
+	
 	public Document toDocument() {
 		Document doc = new Document();
 		doc.append("repository", new ObjectId(repository)).append("name", name).append("path", path)

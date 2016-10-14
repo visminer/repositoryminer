@@ -129,7 +129,7 @@ public class DuplicatedCode implements IProjectCodeSmell {
 			double percentage = (double) lineCount / sloc;
 			DecimalFormat df = new DecimalFormat("#.####");
 			df.setRoundingMode(RoundingMode.CEILING);
-			return Double.valueOf(df.format(percentage));
+			return Double.valueOf(df.format(percentage).replaceAll(",", "."));
 
 		} catch (IOException e) {
 			return 0.0;
