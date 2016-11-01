@@ -63,7 +63,8 @@ public class TCC extends MethodBasedMetricTemplate {
 				String exp = stm.getExpression();
 				String type = exp.substring(0, exp.lastIndexOf("."));
 				String field = exp.substring(exp.lastIndexOf(".") + 1);
-				if (currType.getName().equals(type))
+				String currTypeName = currType.getName();
+				if (currTypeName.equals(type))
 					accessedFields.add(field);
 			} else if (stm.getNodeType().equals(NodeType.METHOD_INVOCATION)) {
 				String exp = stm.getExpression();

@@ -57,9 +57,7 @@ public class ATFD extends MethodBasedMetricTemplate {
 				String type = exp.substring(0, exp.lastIndexOf("."));
 				if (!currType.getName().equals(type))
 					accessedFields.add(exp.toLowerCase());
-
 			} else if (stm.getNodeType().equals(NodeType.METHOD_INVOCATION)) {
-
 				String exp = stm.getExpression();
 				String type = exp.substring(0, exp.lastIndexOf("."));
 				String methodInv = exp.substring(exp.lastIndexOf(".") + 1);
@@ -69,9 +67,7 @@ public class ATFD extends MethodBasedMetricTemplate {
 					} else if (methodInv.startsWith("is") && methodInv.length() > 2)
 						accessedFields.add((type + "." + methodInv.substring(2)).toLowerCase());
 				}
-
 			}
-
 		}
 
 		return accessedFields.size();

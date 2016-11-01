@@ -2,14 +2,13 @@ package org.repositoryminer.metric.clazz;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.bson.Document;
 import org.repositoryminer.ast.AST;
 import org.repositoryminer.ast.AbstractTypeDeclaration;
 import org.repositoryminer.ast.MethodDeclaration;
 import org.repositoryminer.metric.MetricId;
+import org.repositoryminer.utility.StringUtils;
 
 /**
  * <h1>Method Lines of Code</h1>
@@ -19,11 +18,6 @@ import org.repositoryminer.metric.MetricId;
 public class MLOC extends MethodBasedMetricTemplate {
 	
 	private List<Document> methodsDoc;
-	private Pattern pattern;
-
-	public MLOC(){
-		pattern = Pattern.compile("(\r\n)|(\r)|(\n)");
-	}
 
 	@Override
 	public void calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast, Document document) {
@@ -48,16 +42,7 @@ public class MLOC extends MethodBasedMetricTemplate {
 		if(methodSourceCode == null || methodSourceCode.length() == 0)
 			return 0;
 
-		//TODO ignore blank lines and comments
-		Matcher m = pattern.matcher(methodSourceCode);
-
-		//starts from 1 because the matcher doesn't count the last line (only line breaks)
-		int i = 1;
-
-		while(m.find())
-			i++;
-
-		return i;
+		return StringUtils.countNonEmptyLines(methodSourceCode);
 	}
 
 }

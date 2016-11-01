@@ -17,6 +17,8 @@ import org.repositoryminer.metric.MetricId;
  */
 public class NOA implements IClassMetric {
 
+	private static final String[] UNACCEPTED_TYPES = new String[] { "enum", "class" };
+
 	@Override
 	public void calculate(AbstractTypeDeclaration type, AST ast, Document document) {
 		if (Archetype.CLASS_OR_INTERFACE == type.getArchetype()) {
@@ -26,7 +28,28 @@ public class NOA implements IClassMetric {
 	}
 
 	public int calculate(List<FieldDeclaration> fields) {
-		return (fields != null) ? fields.size() : 0;
+		int noa = 0;
+		for (FieldDeclaration field : fields) {
+			if (accept(field.getType())) {
+				noa++;
+			}
+ 		}
+		
+		return noa;
+	}
+	
+	private boolean accept(String type) {
+		boolean accept = true;
+		
+		for (String unaccepted : UNACCEPTED_TYPES) {
+			if (type.equals(unaccepted)) {
+				accept = false;
+				
+				break;
+			}
+		}
+		
+		return accept;
 	}
 
 }
