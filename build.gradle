@@ -24,4 +24,5 @@ dependencies {
     compile group: 'org.eclipse.mylyn.github', name: 'org.eclipse.egit.github.core', version:'4.4.0.201606070830-r'
     compile group: 'org.slf4j', name: 'slf4j-simple', version:'1.7.21'
     compile group: 'net.sourceforge.pmd', name: 'pmd-java', version:'5.5.0'
+    compile group: 'com.google.code.findbugs', name: 'findbugs', version: '3.0.1'
 }
