@@ -12,7 +12,7 @@ public class LOC implements IClassMetric {
 	public void calculate(AbstractTypeDeclaration type, AST ast, Document document) {
 		int sloc = calculate(ast.getSourceCode());
 
-		document.append("name", MetricId.LOC).append("accumulated", new Integer(sloc));
+		document.append("name", MetricId.LOC).append("value", new Integer(sloc));
 	}
 
 	public int calculate(String source) {

@@ -23,7 +23,7 @@ public class NOA implements IClassMetric {
 	public void calculate(AbstractTypeDeclaration type, AST ast, Document document) {
 		if (Archetype.CLASS_OR_INTERFACE == type.getArchetype()) {
 			TypeDeclaration cls = (TypeDeclaration) type;
-			document.append("name", MetricId.NOA).append("accumulated", new Integer(calculate(cls.getFields())));
+			document.append("name", MetricId.NOA).append("value", new Integer(calculate(cls.getFields())));
 		}
 	}
 
