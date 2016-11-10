@@ -13,7 +13,6 @@ import org.repositoryminer.effort.model.EffortsByReference;
 import org.repositoryminer.effort.persistence.handler.EffortsDocumentHandler;
 import org.repositoryminer.listener.IPostMiningListener;
 import org.repositoryminer.mining.RepositoryMiner;
-import org.repositoryminer.mining.TimeFrameType;
 import org.repositoryminer.model.Commit;
 import org.repositoryminer.model.Diff;
 import org.repositoryminer.model.Reference;
@@ -65,16 +64,16 @@ public class EffortsMiningTask implements IPostMiningTask {
 	public void execute(RepositoryMiner repositoryMiner, Repository repository, IPostMiningListener listener) {
 		ReferenceDocumentHandler handler = new ReferenceDocumentHandler();
 		// prior to calculating effort, we must retrieve selected references from the miner
-		Map<Reference, TimeFrameType[]> refs = repositoryMiner.getReferences();
-		if (refs != null) {
+		List<String> refs = repositoryMiner.getReferences();
+		if (!refs.isEmpty()) {
 			int idx = 0;
 			// for each reference of the repository...
-			for (Reference ref : refs.keySet()) {
+			for (String path : refs) {
 				if (listener != null) {
 					listener.postMiningTaskProgressChange("efforts", ++idx, refs.size());
 				}
 				// we must retrieve the reference from the database prior to processing it
-				Document refDoc = handler.findByPathAndName(ref.getPath(), ref.getName());
+				Document refDoc = handler.findByPath(path, repository.getId());
 				Reference reference = Reference.parseDocument(refDoc);
 				// let's process the reference...
 				processReference(reference);

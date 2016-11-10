@@ -21,6 +21,11 @@ public class LVAR extends MethodBasedMetricTemplate {
 	private List<Document> methodsDoc;
 	
 	@Override
+	public String getId() {
+		return MetricId.LVAR;
+	}
+	
+	@Override
 	public void calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast, Document document) {
 		
 		methodsDoc = new ArrayList<Document>();

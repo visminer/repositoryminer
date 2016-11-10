@@ -1,10 +1,8 @@
 package org.repositoryminer.codesmell.project;
 
 import java.util.List;
-import java.util.TreeMap;
 
 import org.bson.Document;
-import org.repositoryminer.ast.AST;
 import org.repositoryminer.parser.Parser;
 
 /**
@@ -12,8 +10,22 @@ import org.repositoryminer.parser.Parser;
  */
 public interface IProjectCodeSmell {
 
-	TreeMap<String, AST> astMap = new TreeMap<String, AST>();
-
+	/**
+	 * Activates the code smell detection
+	 * 
+	 * @param parsers
+	 * 				the source code parsers ({@link org.repositoryminer.parser.Parser}})
+	 * @param repositoryPath
+	 * 				the repository path
+	 * @param document
+	 * 				the root of mongodb document in which metrics values must be
+	 *            	filled
+	 */
 	public void detect(List<Parser> parsers, String repositoryPath, Document document);
 
+	/**
+	 * @return The code smell ID
+	 */
+	public String getId();
+	
 }

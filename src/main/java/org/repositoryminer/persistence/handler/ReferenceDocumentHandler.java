@@ -16,11 +16,10 @@ public class ReferenceDocumentHandler extends DocumentHandler {
 		super.collection = Connection.getInstance().getCollection(COLLECTION_NAME);
 	}
 	
-	public Document findByPathAndName(String path, String name) {
+	public Document findByPath(String path, String repositoryId) {
 		BasicDBObject whereClause = new BasicDBObject();
 		whereClause.put("path", path);
-		whereClause.put("name", name);
-
+		whereClause.put("repository", new ObjectId(repositoryId));
 		return findOne(whereClause);
 	}
 

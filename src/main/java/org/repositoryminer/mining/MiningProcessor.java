@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
@@ -57,7 +56,7 @@ import org.repositoryminer.utility.StringUtils;
  * </ul>
  * At least one of the lists must be populated so to get the mining process
  * started. The lists are then injected in a instance of
- * {@link org.repositoryminer.mining.SourceAnalyzer} which is capable of
+ * {@link org.repositoryminer.mining.CommitProcessor} which is capable of
  * performing the actual calculations and detections.
  * <p>
  * Raised exceptions are:
@@ -73,7 +72,6 @@ public class MiningProcessor {
 
 	private ISCM scm;
 	private List<Reference> references;
-	private List<Reference> timeReferences;
 	private List<Commit> commits;
 	private Repository repository;
 	private Set<Contributor> contributors;
@@ -100,56 +98,6 @@ public class MiningProcessor {
 		}
 	}
 
-	/*
-	 * This method is used to create a hash map using the commit hash as key and
-	 * the commit object as value. The main objective of the method is to make
-	 * faster the time frame processing. This processing will require a lot of
-	 * searches in some structure, and a hash map is perfect for this job,
-	 * because its average time complexity is O(1). It is preferable use this
-	 * process instead of bring back the commits in the reference, because get
-	 * the commits with the changes made and other data require more resources
-	 * and requires disk I/O. And these data is already in the class, so making
-	 * N searches in O(1) time complexity will costs O(N).
-	 */
-	private Map<String, Commit> createCommitsMap() {
-		Map<String, Commit> commitsMap = new HashMap<String, Commit>(commits.size());
-		for (Commit c : commits) {
-			commitsMap.put(c.getId(), c);
-		}
-		return commitsMap;
-	}
-
-	private void saveTimeReferences(RepositoryMiner rm) {
-		if (rm.getReferences() == null) {
-			return;
-		}
-
-		boolean proceed = false;
-		for (Entry<Reference, TimeFrameType[]> entry : rm.getReferences().entrySet()) {
-			if (entry.getValue() != null) {
-				proceed = true;
-				break;
-			}
-		}
-
-		if (!proceed) {
-			return;
-		}
-
-		Map<String, Commit> commitsMap = createCommitsMap();
-		ProcessTimeFrames procTimeFrames = new ProcessTimeFrames(repository.getId(), commitsMap,
-				rm.getMiningListener());
-		timeReferences = new ArrayList<Reference>();
-
-		for (Entry<Reference, TimeFrameType[]> entry : rm.getReferences().entrySet()) {
-			if (entry.getValue() != null) {
-				int index = references.indexOf(entry.getKey());
-				timeReferences.addAll(procTimeFrames.analyzeCommits(references.get(index), entry.getValue()));
-			}
-		}
-
-	}
-
 	private void saveCommitsAndSnapshots(RepositoryMiner repositoryMiner) {
 		contributors = new HashSet<Contributor>();
 		CommitDocumentHandler commitHandler = new CommitDocumentHandler();
@@ -157,7 +105,7 @@ public class MiningProcessor {
 		WorkingDirectory wd = new WorkingDirectory(repository.getId());
 		WorkingDirectoryDocumentHandler wdHandler = new WorkingDirectoryDocumentHandler();
 
-		CommitMessageAnalyzer messageAnalyzer = new CommitMessageAnalyzer();
+		IssueExtractor messageAnalyzer = new IssueExtractor();
 
 		commits = scm.getCommits();
 		int idx = 0;
@@ -190,7 +138,7 @@ public class MiningProcessor {
 	public Repository mine(RepositoryMiner repositoryMiner) throws IOException {
 		RepositoryDocumentHandler repoHandler = new RepositoryDocumentHandler();
 		List<Document> repos = repoHandler.findRepositoriesByName(repositoryMiner.getName());
-		
+
 		if (repos != null && !repos.isEmpty()) {
 			repository = Repository.parseDocument(repos.get(0));
 		} else {
@@ -207,7 +155,6 @@ public class MiningProcessor {
 
 			saveReferences(repository.getId());
 			saveCommitsAndSnapshots(repositoryMiner);
-			saveTimeReferences(repositoryMiner);
 
 			calculateAndDetect(repositoryMiner, tempRepo);
 
@@ -223,10 +170,7 @@ public class MiningProcessor {
 
 	/**
 	 * Performs both the calculation (metrics) and detections (smells/debts) on
-	 * the artifacts of a targeted project. An instance of
-	 * {@link org.repositoryminer.mining.SourceAnalyzer} is prepared/configured
-	 * and put into action (
-	 * {@link org.repositoryminer.mining.SourceAnalyzer#analyze()})
+	 * the targeted project.
 	 * 
 	 * @param repositoryMiner
 	 *            instance of {@link org.repositoryminer.mining.RepositoryMiner}
@@ -234,35 +178,106 @@ public class MiningProcessor {
 	 *            temporary repository path to access the files content
 	 * @throws IOException
 	 */
-	private void calculateAndDetect(RepositoryMiner repositoryMiner, String tempPath) throws IOException {
-
-		if (!repositoryMiner.hasClassCodeSmells() && !repositoryMiner.hasClassMetrics()
-				&& !repositoryMiner.hasTechnicalDebts() && !repositoryMiner.hasProjectsCodeSmells()) {
+	private void calculateAndDetect(RepositoryMiner repositoryMiner, String tempRepo) throws IOException {
+		if (!repositoryMiner.shouldProcessCommits() && !repositoryMiner.shouldProcessReferences())
 			return;
+
+		List<Reference> refs = getReferencesToAnalyze(repositoryMiner.getReferences());
+		Map<String, Commit> commitsMap = createCommitsMap();
+
+		if (repositoryMiner.shouldProcessCommits())
+			processCommits(commitsMap, refs, repositoryMiner, tempRepo);
+
+		if (repositoryMiner.shouldProcessReferences())
+			processSnapshots(commitsMap, refs, repositoryMiner, tempRepo);
+	}
+
+	/**
+	 * Performs both the calculation (metrics) and detections (smells/debts) on
+	 * the targeted project snapshots. An instance of
+	 * {@link org.repositoryminer.mining.SnapshotProcessor} is prepared and put
+	 * into action (
+	 * {@link org.repositoryminer.mining.SnapshotProcessor#start()})
+	 * 
+	 * @param refs
+	 *            selected references for analysis
+	 * @param repositoryMiner
+	 *            instance of {@link org.repositoryminer.mining.RepositoryMiner}
+	 * @param tempPath
+	 *            temporary repository path to access the files content
+	 * @throws IOException
+	 */
+	private void processSnapshots(Map<String, Commit> commitsMap, List<Reference> refs, RepositoryMiner repositoryMiner,
+			String tempPath) throws IOException {
+		Map<String, Commit> newCommitsMap = new HashMap<String, Commit>(refs.size());
+		for (Reference r : refs) {
+			String commitId = r.getCommits().get(0);
+			newCommitsMap.put(commitId, commitsMap.get(commitId));
 		}
 
-		List<Reference> refs = null;
-		if (repositoryMiner.hasProjectsCodeSmells()) {
-			refs = new ArrayList<Reference>();
+		SnapshotProcessor snapshotProcessor = new SnapshotProcessor();
+		snapshotProcessor.setCommitsMap(newCommitsMap);
+		snapshotProcessor.setReferences(refs);
+		snapshotProcessor.setRepositoryData(repository.getId(), tempPath);
+		snapshotProcessor.setRepositoryMiner(repositoryMiner);
+		snapshotProcessor.setSCM(scm);
+		snapshotProcessor.start();
+	}
 
-			for (Reference ref : repositoryMiner.getReferences().keySet()) {
-				int index = references.indexOf(ref);
-				refs.add(references.get(index));
-			}
+	/**
+	 * Performs both the calculation (metrics) and detections (smells/debts) on
+	 * the commits made in the targeted project. An instance of
+	 * {@link org.repositoryminer.mining.CommitProcessor} is prepared and put
+	 * into action ( {@link org.repositoryminer.mining.CommitProcessor#start()})
+	 * 
+	 * @param refs
+	 *            selected references for analysis
+	 * @param repositoryMiner
+	 *            instance of {@link org.repositoryminer.mining.RepositoryMiner}
+	 * @param tempPath
+	 *            temporary repository path to access the files content
+	 * @throws IOException
+	 */
+	private void processCommits(Map<String, Commit> commitsMap, List<Reference> refs, RepositoryMiner repositoryMiner,
+			String tempPath) throws IOException {
+		CommitProcessor commitProcessor = new CommitProcessor();
+		commitProcessor.setCommitsMap(commitsMap);
+		commitProcessor.setReferences(refs);
+		commitProcessor.setSCM(scm);
+		commitProcessor.setRepositoryMiner(repositoryMiner);
+		commitProcessor.setRepositoryData(repository.getId(), tempPath);
+		commitProcessor.start();
+	}
 
-			if (timeReferences != null) {
-				for (Reference ref : timeReferences) {
+	private List<Reference> getReferencesToAnalyze(List<String> paths) {
+		List<Reference> refs = new ArrayList<Reference>();
+		for (String path : paths) {
+			for (Reference ref : this.references) {
+				if (ref.getPath().equals(path)) {
 					refs.add(ref);
 				}
 			}
 		}
+		return refs;
+	}
 
-		Map<String, Commit> commitsMap = createCommitsMap();
-		SourceAnalyzer sourceAnalyzer = new SourceAnalyzer(repositoryMiner, scm, repository.getId(), tempPath);
-
-		sourceAnalyzer.setCommitsMap(commitsMap);
-		sourceAnalyzer.setReferences(refs);
-		sourceAnalyzer.analyze();
+	/*
+	 * This method is used to create a hash map using the commit hash as key and
+	 * the commit object as value. The main objective of the method is to make
+	 * faster the time frame processing. This processing will require a lot of
+	 * searches in some structure, and a hash map is perfect for this job,
+	 * because its average time complexity is O(1). It is preferable use this
+	 * process instead of bring back the commits in the reference, because get
+	 * the commits with the changes made and other data require more resources
+	 * and requires disk I/O. And these data is already in the class, so making
+	 * N searches in O(1) time complexity will costs O(N).
+	 */
+	private Map<String, Commit> createCommitsMap() {
+		Map<String, Commit> commitsMap = new HashMap<String, Commit>(commits.size());
+		for (Commit c : commits) {
+			commitsMap.put(c.getId(), c);
+		}
+		return commitsMap;
 	}
 
 }

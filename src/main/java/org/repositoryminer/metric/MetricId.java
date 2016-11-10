@@ -8,6 +8,7 @@ public interface MetricId {
 	public static final String LVAR = "LVAR";
 	public static final String MAXNESTING = "MAXNESTING";
 	public static final String MLOC = "MLOC";
+	public static final String NOM = "NOM";
 	public static final String NOA = "NOA";
 	public static final String NOAV = "NOAV";
 	public static final String PAR = "PAR";

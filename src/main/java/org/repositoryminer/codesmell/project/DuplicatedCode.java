@@ -44,6 +44,11 @@ public class DuplicatedCode implements IProjectCodeSmell {
 	}
 
 	@Override
+	public String getId() {
+		return CodeSmellId.DUPLICATED_CODE;
+	}
+	
+	@Override
 	public void detect(List<Parser> parsers, String repositoryPath, Document document) {
 		document.append("name", CodeSmellId.DUPLICATED_CODE).append("occurrences", calculate(parsers, repositoryPath));
 	}

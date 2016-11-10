@@ -20,6 +20,11 @@ public class NOA implements IClassMetric {
 	private static final String[] UNACCEPTED_TYPES = new String[] { "enum", "class" };
 
 	@Override
+	public String getId() {
+		return MetricId.NOA;
+	}
+	
+	@Override
 	public void calculate(AbstractTypeDeclaration type, AST ast, Document document) {
 		if (Archetype.CLASS_OR_INTERFACE == type.getArchetype()) {
 			TypeDeclaration cls = (TypeDeclaration) type;

@@ -11,7 +11,7 @@ import org.repositoryminer.ast.AbstractTypeDeclaration;
  * not amount much into methods (to better justify its existence), it helps out
  * other classes in encapsulating generic collections of metrics, as in, for
  * instance,
- * {@link org.repositoryminer.mining.SourceAnalyzer#processCommitMetrics}.
+ * {@link org.repositoryminer.mining.CommitProcessor#processCommitMetrics}.
  * <p>
  * We also aim for any future necessary evolution of the class to contain
  * further processing beyond the calculation of the metrics.
@@ -38,5 +38,10 @@ public interface IClassMetric {
 	 *            filled
 	 */
 	public void calculate(AbstractTypeDeclaration type, AST ast, Document document);
+	
+	/**
+	 * @return The metric ID
+	 */
+	public String getId();
 
 }

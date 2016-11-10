@@ -9,5 +9,24 @@ import org.repositoryminer.ast.AbstractTypeDeclaration;
  */
 public interface IClassCodeSmell {
 	
+	/**
+	 * Activates the code smell detection
+	 * 
+	 * @param type
+	 *            the abstract representation of a type (
+	 *            {@link org.repositoryminer.ast.AbstractTypeDeclaration}).
+	 * @param ast
+	 *            an instance of an abstract syntactic tree (
+	 *            {@link org.repositoryminer.ast.AST})
+	 * @param document
+	 *            the root of mongodb document in which metrics values must be
+	 *            filled
+	 */
 	public void detect(AbstractTypeDeclaration type, AST ast, Document document);
+	
+	/**
+	 * @return The code smell ID
+	 */
+	public String getId();
+	
 }

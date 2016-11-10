@@ -11,11 +11,16 @@ import org.repositoryminer.metric.MetricId;
 /**
  * <h1>Weighted Method Count</h1>
  * <p>
- * The sum of the statical complexity of all methods of a class. The CYCLO
+ * The sum of the complexity of all methods of a class. The CYCLO
  * metric is used to quantify the method’s complexity.
  */
 public class WMC extends MethodBasedMetricTemplate {
 
+	@Override
+	public String getId() {
+		return MetricId.WMC;
+	}
+	
 	@Override
 	public void calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast, Document document) {
 		int wmc = calculate(methods);

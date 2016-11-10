@@ -63,6 +63,11 @@ public class BrainClass implements IClassCodeSmell {
 	}
 
 	@Override
+	public String getId() {
+		return CodeSmellId.BRAIN_CLASS;
+	}
+	
+	@Override
 	public void detect(AbstractTypeDeclaration type, AST ast, Document document) {
 		if (type.getArchetype() == Archetype.CLASS_OR_INTERFACE) {
 			TypeDeclaration cls = (TypeDeclaration) type;

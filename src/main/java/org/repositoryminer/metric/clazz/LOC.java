@@ -9,6 +9,11 @@ import org.repositoryminer.utility.StringUtils;
 public class LOC implements IClassMetric {
 
 	@Override
+	public String getId() {
+		return MetricId.LOC;
+	}
+	
+	@Override
 	public void calculate(AbstractTypeDeclaration type, AST ast, Document document) {
 		int sloc = calculate(ast.getSourceCode());
 

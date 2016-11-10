@@ -44,6 +44,11 @@ public class CYCLO extends MethodBasedMetricTemplate {
 
 	private List<Document> methodsDoc;
 
+	@Override
+	public String getId() {
+		return MetricId.CYCLO;
+	}
+	
 	/**
 	 * @see MethodBasedMetricTemplate#calculate(AbstractTypeDeclaration, List,
 	 *      AST, Document)
