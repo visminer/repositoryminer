@@ -56,27 +56,27 @@ public class SnapshotProcessor {
 	private void processSnapshots() {
 		if (repositoryMiner.hasProjectsCodeSmells()) {
 			int idx = 0;
-			for (Reference tag : references) {
+			for (Reference ref : references) {
 				if (repositoryMiner.getMiningListener() != null) {
-					repositoryMiner.getMiningListener().tagsProgressChange(tag.getName(), ++idx, references.size());
+					repositoryMiner.getMiningListener().tagsProgressChange(ref.getName(), ++idx, references.size());
 				}
 
-				String commitId = tag.getCommits().get(0);
+				String commitId = ref.getCommits().get(0);
 				scm.checkout(commitId);
 
 				for (Parser parser : repositoryMiner.getParsers()) {
 					parser.processSourceFolders(repositoryPath);
 				}
 
-				processSnapshot(commitsMap.get(commitId), tag);
+				processSnapshot(commitsMap.get(commitId), ref);
 			}
 		}
 	}
 
-	private void processSnapshot(Commit commit, Reference tag) {
+	private void processSnapshot(Commit commit, Reference ref) {
 		Document doc = new Document();
-		doc.append("reference_name", tag.getName());
-		doc.append("reference_type", tag.getType().toString());
+		doc.append("reference_name", ref.getName());
+		doc.append("reference_type", ref.getType().toString());
 		doc.append("commit", commit.getId());
 		doc.append("commit_date", commit.getCommitDate());
 		doc.append("repository", new ObjectId(repositoryId));

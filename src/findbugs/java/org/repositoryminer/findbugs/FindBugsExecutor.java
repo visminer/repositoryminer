@@ -11,40 +11,45 @@ import org.apache.commons.io.FilenameUtils;
 
 import edu.umd.cs.findbugs.BugInstance;
 import edu.umd.cs.findbugs.DetectorFactoryCollection;
-import edu.umd.cs.findbugs.FindBugs;
 import edu.umd.cs.findbugs.FindBugs2;
-import edu.umd.cs.findbugs.Priorities;
 import edu.umd.cs.findbugs.Project;
 import edu.umd.cs.findbugs.XMLBugReporter;
+import edu.umd.cs.findbugs.config.AnalysisFeatureSetting;
 import edu.umd.cs.findbugs.config.UserPreferences;
 
 public class FindBugsExecutor {
 
 	private String rootDir;
+	private int bugPriority;
+	private AnalysisFeatureSetting[] effort;
+	private String userPrefsEffort;
 
-	public FindBugsExecutor(String rootDir) {
+	public FindBugsExecutor(String rootDir, int bugPriority, AnalysisFeatureSetting[] effort, String userPrefsEffort) {
 		this.rootDir = rootDir;
+		this.bugPriority = bugPriority;
+		this.effort = effort;
+		this.userPrefsEffort = userPrefsEffort;
 	}
 
-	public List<ReportedBug> execute() throws IOException, InterruptedException {
+	public List<ReportedBug> execute() throws IOException, InterruptedException, IllegalStateException {
 		FindBugs2 findBugs = new FindBugs2();
 		Project project = getProject();
 
 		findBugs.setProject(project);
 
 		XMLBugReporter reporter = new XMLBugReporter(project);
-		reporter.setPriorityThreshold(Priorities.NORMAL_PRIORITY);
+		reporter.setPriorityThreshold(bugPriority);
 		reporter.setAddMessages(true);
 		reporter.setUseLongBugCodes(true);
 
 		findBugs.setBugReporter(reporter);
 
 		UserPreferences userPrefs = UserPreferences.createDefaultUserPreferences();
-		userPrefs.setEffort(UserPreferences.EFFORT_MAX);
+		userPrefs.setEffort(userPrefsEffort);
 		findBugs.setUserPreferences(userPrefs);
 
 		findBugs.setDetectorFactoryCollection(DetectorFactoryCollection.instance());
-		findBugs.setAnalysisFeatureSettings(FindBugs.DEFAULT_EFFORT);
+		findBugs.setAnalysisFeatureSettings(effort);
 		findBugs.finishSettings();
 
 		findBugs.execute();
@@ -69,7 +74,7 @@ public class FindBugsExecutor {
 		return new ArrayList<File>(files);
 	}
 
-	private Project getProject() throws IOException {
+	private Project getProject() throws IOException, IllegalStateException {
 		Project findBugsProject = new Project();
 		List<File> files = getFilesToAnalyze();
 
@@ -84,7 +89,7 @@ public class FindBugsExecutor {
 		}
 
 		if (!hasClass) {
-			throw new IllegalStateException("Findbugs needs compiled sources.");
+			throw new IllegalStateException("Findbugs needs compiled source codes.");
 		}
 
 		return findBugsProject;

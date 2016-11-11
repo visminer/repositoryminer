@@ -1,5 +1,10 @@
 package org.repositoryminer.findbugs;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.bson.Document;
+
 public class ReportedBug {
 
 	private String filename;
@@ -12,10 +17,10 @@ public class ReportedBug {
 	private int startline;
 	private String shortMessage;
 	private String longMessage;
-	
+
 	public ReportedBug() {
 	}
-	
+
 	public ReportedBug(String filename, int rank, int priority, String type, String abbreviation,
 			String patternCategory, String className, int startline, String shortMessage, String longMessage) {
 		super();
@@ -110,5 +115,19 @@ public class ReportedBug {
 	public void setLongMessage(String longMessage) {
 		this.longMessage = longMessage;
 	}
-	
+
+	public static List<Document> toDocumentList(List<ReportedBug> reportedBugs) {
+		List<Document> list = new ArrayList<Document>();
+		for (ReportedBug rb : reportedBugs) {
+			Document doc = new Document();
+			doc.append("filename", rb.getFilename()).append("rank", rb.getRank()).append("priority", rb.getPriority())
+					.append("type", rb.getType()).append("abbreviation", rb.getAbbreviation())
+					.append("pattern_category", rb.getPatternCategory()).append("classname", rb.getClassName())
+					.append("startline", rb.getStartline()).append("short_message", rb.getShortMessage())
+					.append("long_message", rb.getLongMessage());
+			list.add(doc);
+		}
+		return list;
+	}
+
 }

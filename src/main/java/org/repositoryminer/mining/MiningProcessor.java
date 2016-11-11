@@ -183,6 +183,10 @@ public class MiningProcessor {
 			return;
 
 		List<Reference> refs = getReferencesToAnalyze(repositoryMiner.getReferences());
+		
+		if (refs.size() == 0)
+			return;
+		
 		Map<String, Commit> commitsMap = createCommitsMap();
 
 		if (repositoryMiner.shouldProcessCommits())

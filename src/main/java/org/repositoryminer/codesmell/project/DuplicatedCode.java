@@ -29,8 +29,8 @@ import net.sourceforge.pmd.cpd.Match;
  * significant amount of duplication.
  * <p>
  * The only threshold of this code smell is the number of tokens, in other
- * words, the amount of duplication that a portion of code must have to be considered
- * duplicate.
+ * words, the amount of duplication that a portion of code must have to be
+ * considered duplicate.
  */
 public class DuplicatedCode implements IProjectCodeSmell {
 
@@ -47,7 +47,7 @@ public class DuplicatedCode implements IProjectCodeSmell {
 	public String getId() {
 		return CodeSmellId.DUPLICATED_CODE;
 	}
-	
+
 	@Override
 	public void detect(List<Parser> parsers, String repositoryPath, Document document) {
 		document.append("name", CodeSmellId.DUPLICATED_CODE).append("occurrences", calculate(parsers, repositoryPath));
@@ -93,7 +93,7 @@ public class DuplicatedCode implements IProjectCodeSmell {
 					Document fileDoc = new Document();
 					fileDoc.append("begin_line", mark.getBeginLine());
 					fileDoc.append("end_line", mark.getEndLine());
-					fileDoc.append("file_name", mark.getFilename());
+					fileDoc.append("file_name", mark.getFilename().substring(repositoryPath.length()+1).replace("\\", "/"));
 					fileDoc.append("percentage", getDuplicatedPercentage(mark.getFilename(), m.getLineCount()));
 					filesDoc.add(fileDoc);
 				}
