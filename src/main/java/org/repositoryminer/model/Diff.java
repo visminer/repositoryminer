@@ -21,6 +21,9 @@ public class Diff {
 
 	public static List<Diff> parseDocuments(List<Document> docs) {
 		List<Diff> diffs = new ArrayList<Diff>();
+		if (docs == null)
+			return diffs;
+		
 		for (Document doc : docs) {
 			Diff diff = new Diff(doc.getString("path"), doc.getString("old_path"),
 				doc.getLong("hash"), doc.getInteger("lines_added", 0), doc.getInteger("lines_removed", 0),

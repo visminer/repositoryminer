@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.repositoryminer.findbugs.model.ReportedBug;
 
 import edu.umd.cs.findbugs.BugInstance;
 import edu.umd.cs.findbugs.DetectorFactoryCollection;
@@ -24,11 +25,8 @@ public class FindBugsExecutor {
 	private AnalysisFeatureSetting[] effort;
 	private String userPrefsEffort;
 
-	public FindBugsExecutor(String rootDir, int bugPriority, AnalysisFeatureSetting[] effort, String userPrefsEffort) {
+	public FindBugsExecutor(String rootDir) {
 		this.rootDir = rootDir;
-		this.bugPriority = bugPriority;
-		this.effort = effort;
-		this.userPrefsEffort = userPrefsEffort;
 	}
 
 	public List<ReportedBug> execute() throws IOException, InterruptedException, IllegalStateException {
@@ -93,6 +91,18 @@ public class FindBugsExecutor {
 		}
 
 		return findBugsProject;
+	}
+
+	public void setBugPriority(int bugPriority) {
+		this.bugPriority = bugPriority;
+	}
+
+	public void setEffort(AnalysisFeatureSetting[] effort) {
+		this.effort = effort;
+	}
+
+	public void setUserPrefsEffort(String userPrefsEffort) {
+		this.userPrefsEffort = userPrefsEffort;
 	}
 
 }

@@ -3,6 +3,7 @@ package org.repositoryminer.persistence.handler;
 import java.util.List;
 
 import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.repositoryminer.persistence.Connection;
 
@@ -16,11 +17,11 @@ public class ReferenceDocumentHandler extends DocumentHandler {
 		super.collection = Connection.getInstance().getCollection(COLLECTION_NAME);
 	}
 	
-	public Document findByPath(String path, String repositoryId) {
+	public Document findByPath(String path, String repositoryId, Bson projection) {
 		BasicDBObject whereClause = new BasicDBObject();
 		whereClause.put("path", path);
 		whereClause.put("repository", new ObjectId(repositoryId));
-		return findOne(whereClause);
+		return findOne(whereClause, projection);
 	}
 
 	public List<Document> getByRepository(String repository) {

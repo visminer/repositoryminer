@@ -1,4 +1,4 @@
-package org.repositoryminer.findbugs;
+package org.repositoryminer.findbugs.model;
 
 import java.util.ArrayList;
 import java.util.List;

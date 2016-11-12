@@ -1,6 +1,5 @@
 package org.repositoryminer.mining;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.io.FileUtils;
 import org.bson.Document;
 import org.repositoryminer.model.Commit;
 import org.repositoryminer.model.Contributor;
@@ -22,6 +20,7 @@ import org.repositoryminer.persistence.handler.RepositoryDocumentHandler;
 import org.repositoryminer.persistence.handler.WorkingDirectoryDocumentHandler;
 import org.repositoryminer.scm.ISCM;
 import org.repositoryminer.scm.SCMFactory;
+import org.repositoryminer.utility.FileUtils;
 import org.repositoryminer.utility.StringUtils;
 
 /**
@@ -75,18 +74,6 @@ public class MiningProcessor {
 	private List<Commit> commits;
 	private Repository repository;
 	private Set<Contributor> contributors;
-
-	String copyRepositoryFolder(String srcFolder, String destFolderName) throws IOException {
-		File src = new File(srcFolder);
-		File dest = new File(System.getProperty("java.io.tmpdir"), destFolderName);
-		FileUtils.copyDirectory(src, dest);
-		return StringUtils.normalizePath(dest.getCanonicalPath());
-	}
-
-	private void deleteRepositoryFolder(String folderName) throws IOException {
-		File folder = new File(folderName);
-		FileUtils.deleteDirectory(folder);
-	}
 
 	private void saveReferences(String repositoryId) {
 		ReferenceDocumentHandler refHandler = new ReferenceDocumentHandler();
@@ -142,12 +129,13 @@ public class MiningProcessor {
 		if (repos != null && !repos.isEmpty()) {
 			repository = Repository.parseDocument(repos.get(0));
 		} else {
-			String tempRepo = copyRepositoryFolder(repositoryMiner.getPath(), repositoryMiner.getName());
+			String tempRepo = FileUtils.copyFolderToTmp(repositoryMiner.getPath(), repositoryMiner.getName());
 
 			scm = SCMFactory.getSCM(repositoryMiner.getScm());
 			scm.open(tempRepo);
 
 			repository = new Repository(repositoryMiner);
+			repository.setPath(StringUtils.normalizePath(repositoryMiner.getPath()));
 
 			Document repoDoc = repository.toDocument();
 			repoHandler.insert(repoDoc);
@@ -162,7 +150,7 @@ public class MiningProcessor {
 			repoHandler.updateOnlyContributors(repoDoc);
 
 			scm.close();
-			deleteRepositoryFolder(tempRepo);
+			FileUtils.deleteFolder(tempRepo);
 		}
 
 		return repository;

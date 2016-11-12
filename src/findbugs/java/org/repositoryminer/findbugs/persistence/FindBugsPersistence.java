@@ -1,4 +1,4 @@
-package org.repositoryminer.findbugs;
+package org.repositoryminer.findbugs.persistence;
 
 import org.repositoryminer.persistence.Connection;
 import org.repositoryminer.persistence.handler.DocumentHandler;
