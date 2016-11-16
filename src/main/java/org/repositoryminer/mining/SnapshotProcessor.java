@@ -10,7 +10,7 @@ import org.bson.types.ObjectId;
 import org.repositoryminer.codesmell.project.IProjectCodeSmell;
 import org.repositoryminer.model.Commit;
 import org.repositoryminer.model.Reference;
-import org.repositoryminer.parser.Parser;
+import org.repositoryminer.parser.IParser;
 import org.repositoryminer.persistence.handler.SnapshotAnalysisDocumentHandler;
 import org.repositoryminer.scm.ISCM;
 
@@ -64,7 +64,7 @@ public class SnapshotProcessor {
 				String commitId = ref.getCommits().get(0);
 				scm.checkout(commitId);
 
-				for (Parser parser : repositoryMiner.getParsers()) {
+				for (IParser parser : repositoryMiner.getParsers()) {
 					parser.processSourceFolders(repositoryPath);
 				}
 
@@ -89,7 +89,7 @@ public class SnapshotProcessor {
 		List<Document> codeSmellsDocs = new ArrayList<Document>();
 		for (IProjectCodeSmell codeSmell : repositoryMiner.getProjectCodeSmells()) {
 			Document doc = new Document();
-			codeSmell.detect(repositoryMiner.getParsers(), repositoryPath, doc);
+			codeSmell.detect(repositoryMiner.getParsers(), repositoryPath, repositoryMiner.getCharset(), doc);
 			if (!doc.isEmpty()) {
 				codeSmellsDocs.add(doc);
 			}

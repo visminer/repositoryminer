@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.repositoryminer.ast.AST;
@@ -19,7 +20,7 @@ import org.repositoryminer.metric.clazz.IClassMetric;
 import org.repositoryminer.model.Commit;
 import org.repositoryminer.model.Diff;
 import org.repositoryminer.model.Reference;
-import org.repositoryminer.parser.Parser;
+import org.repositoryminer.parser.IParser;
 import org.repositoryminer.persistence.handler.CommitAnalysisDocumentHandler;
 import org.repositoryminer.scm.DiffType;
 import org.repositoryminer.scm.ReferenceType;
@@ -37,7 +38,7 @@ public class CommitProcessor {
 	private List<Reference> references;
 	private Set<String> commitsProcessed;
 
-	private Parser currParser;
+	private IParser currParser;
 
 	public CommitProcessor() {
 		this.persistenceCommit = new CommitAnalysisDocumentHandler();
@@ -96,7 +97,7 @@ public class CommitProcessor {
 				Commit commit = commitsMap.get(hash);
 				scm.checkout(hash);
 
-				for (Parser parser : repositoryMiner.getParsers()) {
+				for (IParser parser : repositoryMiner.getParsers()) {
 					parser.processSourceFolders(repositoryPath);
 				}
 
@@ -113,9 +114,9 @@ public class CommitProcessor {
 		int index = filePath.lastIndexOf(".") + 1;
 		String ext = filePath.substring(index);
 
-		if (currParser == null || !currParser.getExtensions().contains(ext)) {
-			for (Parser p : repositoryMiner.getParsers()) {
-				if (p.getExtensions().contains(ext)) {
+		if (currParser == null || !ArrayUtils.contains(currParser.getExtensions(), ext)) {
+			for (IParser p : repositoryMiner.getParsers()) {
+				if (ArrayUtils.contains(p.getExtensions(), ext)) {
 					currParser = p;
 				}
 			}
@@ -139,7 +140,7 @@ public class CommitProcessor {
 		}
 
 		String source = new String(data, repositoryMiner.getCharset());
-		AST ast = currParser.generate(filePath, source);
+		AST ast = currParser.generate(filePath, source, repositoryMiner.getCharset());
 		processFile(commit, filePath, fileHash, ast);
 	}
 

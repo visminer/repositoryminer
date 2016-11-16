@@ -27,7 +27,7 @@ public class ATFD extends MethodBasedMetricTemplate {
 	public String getId() {
 		return MetricId.ATFD;
 	}
-	
+
 	@Override
 	public void calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast, Document document) {
 		methodsDoc = new ArrayList<Document>();
@@ -57,14 +57,13 @@ public class ATFD extends MethodBasedMetricTemplate {
 
 		for (Statement stm : method.getStatements()) {
 
+			String exp = stm.getExpression();
+			String type = exp.substring(0, exp.lastIndexOf("."));
+
 			if (stm.getNodeType().equals(NodeType.FIELD_ACCESS)) {
-				String exp = stm.getExpression();
-				String type = exp.substring(0, exp.lastIndexOf("."));
 				if (!currType.getName().equals(type))
 					accessedFields.add(exp.toLowerCase());
 			} else if (stm.getNodeType().equals(NodeType.METHOD_INVOCATION)) {
-				String exp = stm.getExpression();
-				String type = exp.substring(0, exp.lastIndexOf("."));
 				String methodInv = exp.substring(exp.lastIndexOf(".") + 1);
 				if (!currType.getName().equals(type)) {
 					if ((methodInv.startsWith("get") || methodInv.startsWith("set")) && methodInv.length() > 3) {

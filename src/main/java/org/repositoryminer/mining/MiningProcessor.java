@@ -1,5 +1,6 @@
 package org.repositoryminer.mining;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.io.FilenameUtils;
 import org.bson.Document;
 import org.repositoryminer.model.Commit;
 import org.repositoryminer.model.Contributor;
@@ -21,7 +23,6 @@ import org.repositoryminer.persistence.handler.WorkingDirectoryDocumentHandler;
 import org.repositoryminer.scm.ISCM;
 import org.repositoryminer.scm.SCMFactory;
 import org.repositoryminer.utility.FileUtils;
-import org.repositoryminer.utility.StringUtils;
 
 /**
  * <h1>The actual mining processor behind
@@ -129,13 +130,14 @@ public class MiningProcessor {
 		if (repos != null && !repos.isEmpty()) {
 			repository = Repository.parseDocument(repos.get(0));
 		} else {
-			String tempRepo = FileUtils.copyFolderToTmp(repositoryMiner.getPath(), repositoryMiner.getName());
+			File repositoryFolder = new File(repositoryMiner.getPath());
+			String tempRepo = FileUtils.copyFolderToTmp(repositoryFolder.getAbsolutePath(), repositoryMiner.getName());
 
 			scm = SCMFactory.getSCM(repositoryMiner.getScm());
 			scm.open(tempRepo);
 
 			repository = new Repository(repositoryMiner);
-			repository.setPath(StringUtils.normalizePath(repositoryMiner.getPath()));
+			repository.setPath(FilenameUtils.normalize(repositoryFolder.getAbsolutePath(), true));
 
 			Document repoDoc = repository.toDocument();
 			repoHandler.insert(repoDoc);

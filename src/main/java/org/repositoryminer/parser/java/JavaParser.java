@@ -1,12 +1,15 @@
 package org.repositoryminer.parser.java;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.Modifier.ModifierKeyword;
@@ -17,10 +20,11 @@ import org.repositoryminer.ast.AST;
 import org.repositoryminer.ast.Document;
 import org.repositoryminer.ast.FieldDeclaration;
 import org.repositoryminer.ast.ImportDeclaration;
+import org.repositoryminer.ast.Language;
 import org.repositoryminer.ast.MethodDeclaration;
 import org.repositoryminer.ast.ParameterDeclaration;
 import org.repositoryminer.ast.TypeDeclaration;
-import org.repositoryminer.parser.Parser;
+import org.repositoryminer.parser.IParser;
 
 /**
  * Java AST generator
@@ -29,67 +33,45 @@ import org.repositoryminer.parser.Parser;
  * underlining API is the JDT, the same used by Eclipse IDE.
  * 
  * The extensions accepted for this generator are: java
- * 
  */
 
-public class JavaParser extends Parser {
+public class JavaParser implements IParser {
 
-	public JavaParser() {
-		extensions = new HashSet<String>(1);
-		extensions.add("java");
+	private String[] sourceFolders;
+	
+	@Override
+	public String[] getExtensions() {
+		String[] exts = {"java"};
+		return exts;
 	}
 
+	@Override
+	public String[] getSourceFolders() {
+		return sourceFolders;
+	}
+	
 	@Override
 	public void processSourceFolders(String repositoryPath) {
-		sourceFolders = new ArrayList<String>();
-		scanRepository(repositoryPath);
+		Set<String> folders = new HashSet<String>();
+		final String[] exts = getExtensions();
+		
+		File root = new File(repositoryPath);
+		Collection<File> files = FileUtils.listFiles(root, exts, true);
+		
+		for (File f : files) {
+			String absPath = FilenameUtils.getFullPathNoEndSeparator(f.getAbsolutePath());
+			folders.add(FilenameUtils.normalize(absPath, true));
+		}
+		
+		sourceFolders = folders.toArray(new String[folders.size()]);
 	}
 
 	@Override
-	public String getLanguage() {
-		return "java";
+	public Language getLanguage() {
+		return Language.JAVA;
 	}
 
-	private void scanRepository(String path) {
-		File directory = new File(path);
-
-		File[] fList = directory.listFiles(new FileFilter() {
-			public boolean accept(File file) {
-				return file.isDirectory() && !file.isHidden();
-			}
-		});
-
-		for (File file : fList) {
-			if (validateSourceFolder(file)) {
-				sourceFolders.add(file.getAbsolutePath());
-				scanRepository(file.getAbsolutePath());
-			}
-		}
-	}
-
-	private boolean validateSourceFolder(File f) {
-
-		File[] fList = f.listFiles(new FileFilter() {
-			public boolean accept(File file) {
-				return (file.isDirectory() && !file.isHidden()) || file.getName().endsWith(".java");
-			}
-		});
-
-		if (fList == null)
-			return false;
-
-		for (File f2 : fList) {
-			if (f2.getName().endsWith(".java")) {
-				return true;
-			} else if (validateSourceFolder(f2)) {
-				return true;
-			}
-		}
-		return false;
-
-	}
-
-	public AST generate(String filePath, String source) {
+	public AST generate(String filePath, String source, String charset) {
 		Document document = new Document();
 		document.setName(filePath);
 
@@ -101,10 +83,10 @@ public class JavaParser extends Parser {
 		parser.setUnitName(filePath.substring(filePath.lastIndexOf("/") + 1));
 
 		String[] classpath = { System.getProperty("java.home").replace("\\", "/") + "/lib/rt.jar" };
-		String[] encoding = new String[sourceFolders.size()];
+		String[] encoding = new String[sourceFolders.length];
 		Arrays.fill(encoding, charset);
 
-		parser.setEnvironment(classpath, sourceFolders.toArray(new String[sourceFolders.size()]), encoding, true);
+		parser.setEnvironment(classpath, sourceFolders, encoding, true);
 		CompilationUnit root = null;
 
 		try {

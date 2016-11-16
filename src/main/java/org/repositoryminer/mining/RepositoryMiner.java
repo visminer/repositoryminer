@@ -10,7 +10,7 @@ import org.repositoryminer.listener.IMiningListener;
 import org.repositoryminer.listener.IPostMiningListener;
 import org.repositoryminer.metric.clazz.IClassMetric;
 import org.repositoryminer.model.Repository;
-import org.repositoryminer.parser.Parser;
+import org.repositoryminer.parser.IParser;
 import org.repositoryminer.postprocessing.IPostMiningTask;
 import org.repositoryminer.scm.SCMType;
 
@@ -50,7 +50,7 @@ public class RepositoryMiner {
 	private SCMType scm;
 	private String charset = "UTF-8";
 
-	private List<Parser> parsers = new ArrayList<Parser>();
+	private List<IParser> parsers = new ArrayList<IParser>();
 	private List<IClassMetric> classMetrics = new ArrayList<IClassMetric>();
 	private List<IClassCodeSmell> classCodeSmells = new ArrayList<IClassCodeSmell>();
 	private List<IProjectCodeSmell> projectCodeSmells = new ArrayList<IProjectCodeSmell>();
@@ -165,9 +165,9 @@ public class RepositoryMiner {
 	 * @param parser
 	 * @return true if the parser was added and false otherwise
 	 */
-	public boolean addParser(Parser parser) {
-		for (Parser p : this.parsers) {
-			if (p.getLanguage().equals(parser.getLanguage()))
+	public boolean addParser(IParser parser) {
+		for (IParser p : this.parsers) {
+			if (p.getLanguage() == parser.getLanguage())
 				return false;
 		}
 		this.parsers.add(parser);
@@ -280,11 +280,11 @@ public class RepositoryMiner {
 		return this;
 	}
 
-	public List<Parser> getParsers() {
+	public List<IParser> getParsers() {
 		return parsers;
 	}
 
-	public RepositoryMiner setParsers(List<Parser> parsers) {
+	public RepositoryMiner setParsers(List<IParser> parsers) {
 		this.parsers = parsers;
 		return this;
 	}
