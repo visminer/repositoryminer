@@ -24,7 +24,7 @@ public class TCC extends MethodBasedMetricTemplate {
 	public String getId() {
 		return MetricId.TCC;
 	}
-	
+
 	@Override
 	public void calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast, Document document) {
 		float tcc = calculate(type, methods);
@@ -45,6 +45,7 @@ public class TCC extends MethodBasedMetricTemplate {
 					ndc++;
 			}
 		}
+
 		float tcc = 0;
 		if (npc > 0) {
 			tcc = (float) ndc / npc;
@@ -63,27 +64,24 @@ public class TCC extends MethodBasedMetricTemplate {
 
 	private List<String> processAccessedFields(AbstractTypeDeclaration currType, MethodDeclaration method) {
 		List<String> accessedFields = new ArrayList<String>();
-		for (Statement stm : method.getStatements()) {
-			if (stm.getNodeType().equals(NodeType.FIELD_ACCESS)) {
-				String exp = stm.getExpression();
-				String type = exp.substring(0, exp.lastIndexOf("."));
-				String field = exp.substring(exp.lastIndexOf(".") + 1);
-				String currTypeName = currType.getName();
-				if (currTypeName.equals(type))
-					accessedFields.add(field);
-			} else if (stm.getNodeType().equals(NodeType.METHOD_INVOCATION)) {
-				String exp = stm.getExpression();
-				String type = exp.substring(0, exp.lastIndexOf("."));
-				String methodInv = exp.substring(exp.lastIndexOf(".") + 1);
-				if (currType.getName().equals(type)) {
-					if (isGetterOrSetter(methodInv)) {
-						String field = methodInv.substring(3);
+		for (Statement stmt : method.getStatements()) {
+			String exp = stmt.getExpression();
+			String type = exp.substring(0, exp.lastIndexOf("."));
+			String target = exp.substring(exp.lastIndexOf(".") + 1);
+
+			if (currType.getName().equals(type)) {
+				if (stmt.getNodeType().equals(NodeType.FIELD_ACCESS)) {
+					accessedFields.add(target);
+				} else if (stmt.getNodeType().equals(NodeType.METHOD_INVOCATION)) {
+					if (isGetterOrSetter(target)) {
+						String field = target.substring(3);
 						accessedFields.add(Character.toLowerCase(field.charAt(0))
 								+ (field.length() > 1 ? field.substring(1) : ""));
 						accessedFields.add(field);
 					}
 				}
 			}
+
 		}
 		return accessedFields;
 	}
@@ -97,16 +95,23 @@ public class TCC extends MethodBasedMetricTemplate {
 	}
 
 	private boolean isGetterOrSetter(String methodInv) {
-		if ((methodInv.startsWith("get") || methodInv.startsWith("set")) && methodInv.length() > 3) {
-			for (FieldDeclaration fd : currentFields) {
-				String field = methodInv.substring(3);
-				if (fd.getName().equals(field) || fd.getName().equals(
-						Character.toLowerCase(field.charAt(0)) + (field.length() > 1 ? field.substring(1) : ""))) {
-					return true;
-				}
-			}
+		String field;
 
+		if ((methodInv.startsWith("get") || methodInv.startsWith("set")) && methodInv.length() > 3) {
+			field = methodInv.substring(3);
+		} else if (methodInv.startsWith("is") && methodInv.length() > 2) {
+			field = methodInv.substring(2);
+		} else {
+			return false;
 		}
+		
+		for (FieldDeclaration fd : currentFields) {
+			if (fd.getName().equals(field) || fd.getName()
+					.equals(Character.toLowerCase(field.charAt(0)) + (field.length() > 1 ? field.substring(1) : ""))) {
+				return true;
+			}
+		}
+		
 		return false;
 	}
 

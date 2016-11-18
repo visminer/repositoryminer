@@ -21,10 +21,6 @@ public class LOC implements IClassMetric {
 	}
 
 	public int calculate(String source) {
-		
-		System.out.println(source);
-		System.out.println("---------------------------------------------");
-		
 		if (source == null || source.length() == 0)
 			return 0;
 
