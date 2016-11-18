@@ -45,16 +45,14 @@ public class NOAV extends MethodBasedMetricTemplate {
 		PAR parMetric = new PAR();
 
 		for (Statement stmt : method.getStatements()) {
-			if (NodeType.VARIABLE_ACCESS.equals(stmt.getNodeType()))
+			if (stmt.getNodeType() == NodeType.VARIABLE_ACCESS)
 				noav++;
 		}
 		
-		// removing variable declarations from count
-		noav = noav - lvarMetric.calculate(method);
-		// removing method parameters from count
-		noav = noav - parMetric.calculate(method);
+		// removing variable declarations from count and method parameters from count
+		noav = noav - lvarMetric.calculate(method) - parMetric.calculate(method);
 
-		return noav;
+		return Math.max(noav, 0);
 	}
 
 }

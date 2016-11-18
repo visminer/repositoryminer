@@ -30,7 +30,7 @@ import org.repositoryminer.ast.Statement.NodeType;
 public class MethodVisitor extends ASTVisitor {
 
 	private List<Statement> statements = new ArrayList<Statement>();
-	private int nesting = 1;
+	private int nesting = 0;
 
 	@Override
 	public boolean visit(BreakStatement node) {

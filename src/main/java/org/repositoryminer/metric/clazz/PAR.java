@@ -38,7 +38,7 @@ public class PAR extends MethodBasedMetricTemplate {
 	}
 	
 	public int calculate(MethodDeclaration method){
-		return method.getParameters()!=null && !method.getParameters().isEmpty() ? method.getParameters().size() : 0;
+		return method.getParameters() != null ? method.getParameters().size() : 0;
 	}
 
 }

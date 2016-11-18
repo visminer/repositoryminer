@@ -44,7 +44,7 @@ public class LVAR extends MethodBasedMetricTemplate {
 		List<String> lvar = new ArrayList<String>();
 
 		for(Statement statement : method.getStatements()){
-			if(NodeType.VARIABLE.equals(statement.getNodeType()) && !lvar.contains(statement.getExpression()))
+			if(statement.getNodeType() == NodeType.VARIABLE && !lvar.contains(statement.getExpression()))
 				lvar.add(statement.getExpression());
 		}
 		
