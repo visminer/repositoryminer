@@ -7,6 +7,7 @@ public class Statement {
 		RETURN,
 		IF,
 		ELSE,
+		SWITCH,
 		SWITCH_CASE,
 		SWITCH_DEFAULT,
 		FOR,
@@ -27,31 +28,30 @@ public class Statement {
 	
 	private NodeType nodeType;
 	private String expression;
+	private int nesting;
 	
-	/**
-	 * @return the nodeType
-	 */
 	public NodeType getNodeType() {
 		return nodeType;
 	}
-	/**
-	 * @param nodeType the nodeType to set
-	 */
+
 	public void setNodeType(NodeType nodeType) {
 		this.nodeType = nodeType;
 	}
-	/**
-	 * @return the expression
-	 */
+
 	public String getExpression() {
 		return expression;
 	}
-	/**
-	 * @param expression the expression to set
-	 */
+
 	public void setExpression(String expression) {
 		this.expression = expression;
 	}
 
-	
+	public int getNesting() {
+		return nesting;
+	}
+
+	public void setNesting(int nesting) {
+		this.nesting = nesting;
+	}
+
 }

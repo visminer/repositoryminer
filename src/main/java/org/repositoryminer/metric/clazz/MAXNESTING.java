@@ -7,6 +7,7 @@ import org.bson.Document;
 import org.repositoryminer.ast.AST;
 import org.repositoryminer.ast.AbstractTypeDeclaration;
 import org.repositoryminer.ast.MethodDeclaration;
+import org.repositoryminer.ast.Statement;
 import org.repositoryminer.metric.MetricId;
 
 /**
@@ -28,15 +29,17 @@ public class MAXNESTING extends MethodBasedMetricTemplate {
 	public void calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast, Document document) {
 		methodsDoc = new ArrayList<Document>();
 		for (MethodDeclaration method : methods) {
-			int maxNesting = calculate(method);
-			methodsDoc.add(new Document("method", method.getName()).append("value", new Integer(maxNesting)));
+			methodsDoc.add(new Document("method", method.getName()).append("value", calculate(method)));
 		}
 		document.append("name", MetricId.MAXNESTING).append("methods", methodsDoc);
 	}
 
-	// FIXME: solve inconsistency of the values found
 	public int calculate(MethodDeclaration method) {
-		return method.getMaxNesting(); 
+		int max = 0;
+		for (Statement stmt : method.getStatements()) {
+			max = Math.max(max, stmt.getNesting());
+		}
+		return max;
 	}
-
+	
 }

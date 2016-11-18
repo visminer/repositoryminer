@@ -48,7 +48,7 @@ public class NOAV extends MethodBasedMetricTemplate {
 			if (NodeType.VARIABLE_ACCESS.equals(stmt.getNodeType()))
 				noav++;
 		}
-
+		
 		// removing variable declarations from count
 		noav = noav - lvarMetric.calculate(method);
 		// removing method parameters from count
