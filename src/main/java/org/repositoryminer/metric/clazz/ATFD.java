@@ -55,15 +55,20 @@ public class ATFD extends MethodBasedMetricTemplate {
 	private int countForeignAccessedFields(AbstractTypeDeclaration currType, MethodDeclaration method) {
 		Set<String> accessedFields = new HashSet<String>();
 
-		for (Statement stm : method.getStatements()) {
+		for (Statement stmt : method.getStatements()) {
+			String exp, type;
 
-			String exp = stm.getExpression();
-			String type = exp.substring(0, exp.lastIndexOf("."));
+			if (stmt.getNodeType() == NodeType.FIELD_ACCESS || stmt.getNodeType() == NodeType.METHOD_INVOCATION) {
+				exp = stmt.getExpression();
+				type = exp.substring(0, exp.lastIndexOf("."));
+			} else {
+				continue;
+			}
 
-			if (stm.getNodeType().equals(NodeType.FIELD_ACCESS)) {
+			if (stmt.getNodeType().equals(NodeType.FIELD_ACCESS)) {
 				if (!currType.getName().equals(type))
 					accessedFields.add(exp.toLowerCase());
-			} else if (stm.getNodeType().equals(NodeType.METHOD_INVOCATION)) {
+			} else if (stmt.getNodeType().equals(NodeType.METHOD_INVOCATION)) {
 				String methodInv = exp.substring(exp.lastIndexOf(".") + 1);
 				if (!currType.getName().equals(type)) {
 					if ((methodInv.startsWith("get") || methodInv.startsWith("set")) && methodInv.length() > 3) {

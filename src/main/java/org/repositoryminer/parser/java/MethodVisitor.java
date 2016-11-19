@@ -153,7 +153,6 @@ public class MethodVisitor extends ASTVisitor {
 				if (variable.getDeclaringClass() != null) {
 					if (variable.isField() && variable.getDeclaringClass().isFromSource()) {
 						String expression = variable.getDeclaringClass().getQualifiedName() + "." + variable.getName();
-						System.out.println(expression);
 						return addStatement(NodeType.FIELD_ACCESS, expression, node.getNodeType());
 					}
 				}

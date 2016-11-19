@@ -56,7 +56,7 @@ public class TCC extends MethodBasedMetricTemplate {
 		return tcc;
 	}
 
-	public List<MethodDeclaration> filterMethods(List<MethodDeclaration> methods) {
+	private List<MethodDeclaration> filterMethods(List<MethodDeclaration> methods) {
 		List<MethodDeclaration> methodList = new ArrayList<MethodDeclaration>();
 		for (MethodDeclaration m : methods) {
 			if (!(m.getModifiers().contains("abstract") || m.isConstructor()))
@@ -69,9 +69,15 @@ public class TCC extends MethodBasedMetricTemplate {
 		Set<String> fields = new HashSet<String>();
 		
 		for (Statement stmt : method.getStatements()) {
-			String exp = stmt.getExpression();
-			String type = exp.substring(0, exp.lastIndexOf("."));
-			String target = exp.substring(exp.lastIndexOf(".") + 1);
+			String exp, type, target;
+			
+			if (stmt.getNodeType() == NodeType.FIELD_ACCESS || stmt.getNodeType() == NodeType.METHOD_INVOCATION) {
+				exp = stmt.getExpression();
+				type = exp.substring(0, exp.lastIndexOf("."));
+				target = exp.substring(exp.lastIndexOf(".") + 1);
+			} else {
+				continue;
+			}
 
 			if (currType.getName().equals(type)) {
 				if (stmt.getNodeType().equals(NodeType.FIELD_ACCESS)) {
@@ -82,7 +88,6 @@ public class TCC extends MethodBasedMetricTemplate {
 			}
 
 		}
-		
 		return new ArrayList<String>(fields);
 	}
 
