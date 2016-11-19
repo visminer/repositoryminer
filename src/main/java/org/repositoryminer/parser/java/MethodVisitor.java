@@ -136,7 +136,7 @@ public class MethodVisitor extends ASTVisitor {
 			addStatement(NodeType.VARIABLE_DECLARATION, type + " " + f.toString(), node.getNodeType());
 		return true;
 	}
-	
+
 	@Override
 	public boolean visit(VariableDeclarationStatement node) {
 		String type = node.getType().toString();
@@ -144,7 +144,7 @@ public class MethodVisitor extends ASTVisitor {
 			addStatement(NodeType.VARIABLE_DECLARATION, type + " " + f.toString(), node.getNodeType());
 		return true;
 	}
-	
+
 	@Override
 	public boolean visit(SimpleName node) {
 		if (node.resolveBinding() != null) {
@@ -153,6 +153,7 @@ public class MethodVisitor extends ASTVisitor {
 				if (variable.getDeclaringClass() != null) {
 					if (variable.isField() && variable.getDeclaringClass().isFromSource()) {
 						String expression = variable.getDeclaringClass().getQualifiedName() + "." + variable.getName();
+						System.out.println(expression);
 						return addStatement(NodeType.FIELD_ACCESS, expression, node.getNodeType());
 					}
 				}

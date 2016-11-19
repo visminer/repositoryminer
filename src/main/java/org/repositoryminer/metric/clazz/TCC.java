@@ -53,7 +53,7 @@ public class TCC extends MethodBasedMetricTemplate {
 		return tcc;
 	}
 
-	private List<MethodDeclaration> filterMethods(List<MethodDeclaration> methods) {
+	public List<MethodDeclaration> filterMethods(List<MethodDeclaration> methods) {
 		List<MethodDeclaration> methodList = new ArrayList<MethodDeclaration>();
 		for (MethodDeclaration m : methods) {
 			if (!(m.getModifiers().contains("abstract") || m.isConstructor()))
@@ -62,7 +62,7 @@ public class TCC extends MethodBasedMetricTemplate {
 		return methodList;
 	}
 
-	private List<String> processAccessedFields(AbstractTypeDeclaration currType, MethodDeclaration method) {
+	public List<String> processAccessedFields(AbstractTypeDeclaration currType, MethodDeclaration method) {
 		List<String> accessedFields = new ArrayList<String>();
 		for (Statement stmt : method.getStatements()) {
 			String exp = stmt.getExpression();

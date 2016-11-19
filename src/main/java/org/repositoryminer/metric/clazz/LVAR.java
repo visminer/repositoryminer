@@ -45,7 +45,7 @@ public class LVAR extends MethodBasedMetricTemplate {
 			if(statement.getNodeType() == NodeType.VARIABLE_DECLARATION && !lvar.contains(statement.getExpression()))
 				lvar.add(statement.getExpression());
 		}
-		return lvar.size() + method.getParameters().size();
+		return lvar.size();
 	}
 
 }
