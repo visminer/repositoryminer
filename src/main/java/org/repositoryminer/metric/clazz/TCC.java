@@ -1,7 +1,10 @@
 package org.repositoryminer.metric.clazz;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.bson.Document;
 import org.repositoryminer.ast.AST;
@@ -63,7 +66,8 @@ public class TCC extends MethodBasedMetricTemplate {
 	}
 
 	public List<String> processAccessedFields(AbstractTypeDeclaration currType, MethodDeclaration method) {
-		List<String> accessedFields = new ArrayList<String>();
+		Set<String> fields = new HashSet<String>();
+		
 		for (Statement stmt : method.getStatements()) {
 			String exp = stmt.getExpression();
 			String type = exp.substring(0, exp.lastIndexOf("."));
@@ -71,19 +75,15 @@ public class TCC extends MethodBasedMetricTemplate {
 
 			if (currType.getName().equals(type)) {
 				if (stmt.getNodeType().equals(NodeType.FIELD_ACCESS)) {
-					accessedFields.add(target);
+					fields.add(target);
 				} else if (stmt.getNodeType().equals(NodeType.METHOD_INVOCATION)) {
-					if (isGetterOrSetter(target)) {
-						String field = target.substring(3);
-						accessedFields.add(Character.toLowerCase(field.charAt(0))
-								+ (field.length() > 1 ? field.substring(1) : ""));
-						accessedFields.add(field);
-					}
+					fields.addAll(processGetOrSetOrIs(target));
 				}
 			}
 
 		}
-		return accessedFields;
+		
+		return new ArrayList<String>(fields);
 	}
 
 	private boolean isConnected(List<String> method1, List<String> method2) {
@@ -94,25 +94,33 @@ public class TCC extends MethodBasedMetricTemplate {
 		return false;
 	}
 
-	private boolean isGetterOrSetter(String methodInv) {
+	private Collection<String> processGetOrSetOrIs(String methodInv) {
 		String field;
-
+		List<String> fields = new ArrayList<String>(2);
+		
 		if ((methodInv.startsWith("get") || methodInv.startsWith("set")) && methodInv.length() > 3) {
 			field = methodInv.substring(3);
 		} else if (methodInv.startsWith("is") && methodInv.length() > 2) {
 			field = methodInv.substring(2);
 		} else {
-			return false;
+			return fields;
 		}
 		
+		char c[] = field.toCharArray();
+		c[0] = Character.toLowerCase(c[0]);
+		String field2 = new String(c);
+		
 		for (FieldDeclaration fd : currentFields) {
-			if (fd.getName().equals(field) || fd.getName()
-					.equals(Character.toLowerCase(field.charAt(0)) + (field.length() > 1 ? field.substring(1) : ""))) {
-				return true;
+			if (fd.getName().equals(field)) {
+				fields.add(field);
+			} else if (fd.getName().equals(field2)) {
+				fields.add(field2);
+			} else if (fields.size() == 2) {
+				break;
 			}
 		}
 		
-		return false;
+		return fields;
 	}
 
 }
