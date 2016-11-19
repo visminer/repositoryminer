@@ -90,7 +90,7 @@ public class BrainMethod implements IClassCodeSmell {
 
 		int cc = ccMetric.calculate(method);
 		int mloc = mlocMetric.calculate(method, ast);
-		int noav = noavMetric.calculate(method);
+		int noav = 0;//noavMetric.calculate(method);
 		int maxNesting = maxNestingMetric.calculate(method);
 
 		brainMethod = (mloc > mlocThreshold) && (cc / mloc >= ccMlocThreshold)

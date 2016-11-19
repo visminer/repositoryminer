@@ -23,6 +23,8 @@ import org.eclipse.jdt.core.dom.SwitchCase;
 import org.eclipse.jdt.core.dom.SwitchStatement;
 import org.eclipse.jdt.core.dom.ThrowStatement;
 import org.eclipse.jdt.core.dom.TryStatement;
+import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
+import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
 import org.repositoryminer.ast.Statement;
 import org.repositoryminer.ast.Statement.NodeType;
@@ -127,6 +129,22 @@ public class MethodVisitor extends ASTVisitor {
 		return true;
 	}
 
+	@Override
+	public boolean visit(VariableDeclarationExpression node) {
+		String type = node.getType().toString();
+		for (Object f : node.fragments())
+			addStatement(NodeType.VARIABLE_DECLARATION, type + " " + f.toString(), node.getNodeType());
+		return true;
+	}
+	
+	@Override
+	public boolean visit(VariableDeclarationStatement node) {
+		String type = node.getType().toString();
+		for (Object f : node.fragments())
+			addStatement(NodeType.VARIABLE_DECLARATION, type + " " + f.toString(), node.getNodeType());
+		return true;
+	}
+	
 	@Override
 	public boolean visit(SimpleName node) {
 		if (node.resolveBinding() != null) {

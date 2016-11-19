@@ -22,8 +22,7 @@ public class Statement {
 		CONDITIONAL_EXPRESSION,
 		METHOD_INVOCATION,
 		FIELD_ACCESS,
-		VARIABLE,
-		VARIABLE_ACCESS;
+		VARIABLE_DECLARATION,
 	}
 	
 	private NodeType nodeType;

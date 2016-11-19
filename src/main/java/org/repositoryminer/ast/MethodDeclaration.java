@@ -14,7 +14,6 @@ public class MethodDeclaration {
 	private boolean isConstructor;
 	private boolean isVarargs;
 	private List<String> thrownsExceptions;
-	private int maxNesting;
 
 	public String getName() {
 		return name;
@@ -94,14 +93,6 @@ public class MethodDeclaration {
 
 	public void setEndPositionInSourceCode(int endPositionInSourceCode) {
 		this.endPositionInSourceCode = endPositionInSourceCode;
-	}
-
-	public void setMaxNestssdfsdfinsg(int maxNesting) {
-		this.maxNesting = maxNesting;
-	}
-
-	public int getMaxsdfdsfdsfdsNesting() {
-		return maxNesting;
 	}
 
 }

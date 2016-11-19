@@ -32,14 +32,14 @@ public class NOAV extends MethodBasedMetricTemplate {
 		methodsDoc = new ArrayList<Document>();
 
 		for (MethodDeclaration method : methods) {
-			int noav = calculate(method);
+			int noav = 0;//calculate(method);
 			methodsDoc.add(new Document("method", method.getName()).append("value", new Integer(noav)));
 		}
 
 		document.append("name", MetricId.NOAV).append("methods", methodsDoc);
 	}
 
-	public int calculate(MethodDeclaration method) {
+	 /*public int calculate(MethodDeclaration method) {
 		int noav = 0;
 		LVAR lvarMetric = new LVAR();
 		PAR parMetric = new PAR();
@@ -53,6 +53,6 @@ public class NOAV extends MethodBasedMetricTemplate {
 		noav = noav - lvarMetric.calculate(method) - parMetric.calculate(method);
 
 		return Math.max(noav, 0);
-	}
+	}*/
 
 }
