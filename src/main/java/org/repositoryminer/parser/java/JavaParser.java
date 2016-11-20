@@ -1,15 +1,11 @@
 package org.repositoryminer.parser.java;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.Modifier.ModifierKeyword;
@@ -52,20 +48,50 @@ public class JavaParser implements IParser {
 	
 	@Override
 	public void processSourceFolders(String repositoryPath) {
-		Set<String> folders = new HashSet<String>();
-		final String[] exts = getExtensions();
-		
-		File root = new File(repositoryPath);
-		Collection<File> files = FileUtils.listFiles(root, exts, true);
-		
-		for (File f : files) {
-			String absPath = FilenameUtils.getFullPathNoEndSeparator(f.getAbsolutePath());
-			folders.add(FilenameUtils.normalize(absPath, true));
-		}
-		
+		List<String> folders = new ArrayList<String>();
+		scanRepository(repositoryPath, folders);
 		sourceFolders = folders.toArray(new String[folders.size()]);
 	}
 
+	private void scanRepository(String path, List<String> folders) {
+		File directory = new File(path);
+
+		File[] fList = directory.listFiles(new FileFilter() {
+			public boolean accept(File file) {
+				return file.isDirectory() && !file.isHidden();
+			}
+		});
+
+		for (File file : fList) {
+			if (validateSourceFolder(file)) {
+				folders.add(file.getAbsolutePath());
+				scanRepository(file.getAbsolutePath(), folders);
+			}
+		}
+	}
+	
+	private boolean validateSourceFolder(File f) {
+
+		File[] fList = f.listFiles(new FileFilter() {
+			public boolean accept(File file) {
+				return (file.isDirectory() && !file.isHidden()) || file.getName().endsWith(".java");
+			}
+		});
+
+		if (fList == null)
+			return false;
+
+		for (File f2 : fList) {
+			if (f2.getName().endsWith(".java")) {
+				return true;
+			} else if (validateSourceFolder(f2)) {
+				return true;
+			}
+		}
+		return false;
+
+	}
+	
 	@Override
 	public Language getLanguage() {
 		return Language.JAVA;
