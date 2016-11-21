@@ -16,6 +16,12 @@ import org.repositoryminer.metric.MetricId;
  */
 public class WMC extends MethodBasedMetricTemplate {
 
+	private CYCLO cc;
+	
+	public WMC() {
+		cc = new CYCLO();
+	}
+	
 	@Override
 	public String getId() {
 		return MetricId.WMC;
@@ -29,7 +35,6 @@ public class WMC extends MethodBasedMetricTemplate {
 
 	public int calculate(List<MethodDeclaration> methods) {
 		int wmc = 0;
-		CYCLO cc = new CYCLO();
 
 		for (MethodDeclaration method : methods) {
 			wmc += cc.calculate(method);

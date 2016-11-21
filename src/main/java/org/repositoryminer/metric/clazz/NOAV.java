@@ -22,6 +22,11 @@ public class NOAV extends MethodBasedMetricTemplate {
 	private LVAR lvarMetric;
 	private TCC tccMetric; // TCC and NOAV processes accessed fields the same way
 	
+	public NOAV() {
+		lvarMetric = new LVAR();
+		tccMetric = new TCC();
+	}
+	
 	@Override
 	public String getId() {
 		return MetricId.NOAV;
@@ -29,9 +34,6 @@ public class NOAV extends MethodBasedMetricTemplate {
 
 	@Override
 	public void calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast, Document document) {
-		lvarMetric = new LVAR();
-		tccMetric = new TCC();
-		
 		methodsDoc = new ArrayList<Document>();
 		List<MethodDeclaration> filteredMethods = filterMethods(methods);
 		
