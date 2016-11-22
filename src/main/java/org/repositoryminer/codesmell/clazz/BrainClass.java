@@ -7,7 +7,7 @@ import org.repositoryminer.ast.AbstractTypeDeclaration.Archetype;
 import org.repositoryminer.ast.MethodDeclaration;
 import org.repositoryminer.ast.TypeDeclaration;
 import org.repositoryminer.codesmell.CodeSmellId;
-import org.repositoryminer.metric.clazz.LOC;
+import org.repositoryminer.metric.clazz.MLOC;
 import org.repositoryminer.metric.clazz.TCC;
 import org.repositoryminer.metric.clazz.WMC;
 
@@ -23,29 +23,13 @@ import org.repositoryminer.metric.clazz.WMC;
  * like quite similar, this is partially true because they refer to complex
  * classes. But the two problems are distinct.
  * <p>
- * The expression used to evaluate if a class is affected by Brain Class is:<br>
- * <i>IS_GOD_CLASS && (WMC >= wmcThreshold && TCC < tccThreshold) && ((NBM >
- * nbmThreshold && LOC >= locThreshold) || (NBM == nbmThreshold && LOC >=
- * (2 * locThreshold) && WMC >= (2 * wmcThreshold)))</i>
- * <p>
- * The parameters used are:
- * <ul>
- * <li>IS_GOD_CLASS: true if the class is a god class or false otherwise</li>
- * <li>WMC: weighted methods per class</li>
- * <li>TCC: tight class cohesion</li>
- * <li>NBM: number of brain methods</li>
- * <li>LOC: lines of code</li>
- * </ul>
- * The default thresholds used are:
- * <ul>
- * <li>wmcThreshold = 47</li>
- * <li>tccThreshold = 0.5</li>
- * <li>nbmThreshold = 1</li>
- * <li>locThreshold = 197</li>
- * </ul>
- * <p>
  */
 public class BrainClass implements IClassCodeSmell {
+
+	private WMC wmcMetric;
+	private BrainMethod brainMethod;
+	private TCC tccMetric;
+	private MLOC mlocMetric;
 
 	private int wmcThreshold = 47;
 	private float tccThreshold = 0.5f;
@@ -53,9 +37,14 @@ public class BrainClass implements IClassCodeSmell {
 	private int locThreshold = 197;
 
 	public BrainClass() {
+		wmcMetric = new WMC();
+		brainMethod = new BrainMethod();
+		tccMetric = new TCC();
+		mlocMetric = new MLOC();
 	}
 
 	public BrainClass(int wmcThreshold, float tccThreshold, int nbmThreshold, int locThreshold) {
+		super();
 		this.wmcThreshold = wmcThreshold;
 		this.tccThreshold = tccThreshold;
 		this.nbmThreshold = nbmThreshold;
@@ -66,7 +55,7 @@ public class BrainClass implements IClassCodeSmell {
 	public String getId() {
 		return CodeSmellId.BRAIN_CLASS;
 	}
-	
+
 	@Override
 	public void detect(AbstractTypeDeclaration type, AST ast, Document document) {
 		if (type.getArchetype() == Archetype.CLASS_OR_INTERFACE) {
@@ -77,29 +66,29 @@ public class BrainClass implements IClassCodeSmell {
 	}
 
 	public boolean detect(AST ast, AbstractTypeDeclaration type, TypeDeclaration cls) {
-		boolean brainClass = false;
-		WMC wmcMetric = new WMC();
-		GodClass godClass = new GodClass();
-		BrainMethod brainMethod = new BrainMethod();
-		TCC tccMetric = new TCC();
-		LOC locMetric = new LOC();
-
 		int wmc = wmcMetric.calculate(cls.getMethods());
-		boolean isGodClass = godClass.detect(type, cls);
-		int nbm = 0; // number of brain methods
 		float tcc = tccMetric.calculate(type, cls.getMethods());
-		int loc = locMetric.calculate(ast.getSourceCode());
+
+		int nbm = 0; // number of brain methods
+		int totalMloc = 0; // total number of lines of code from methods
 
 		for (MethodDeclaration method : cls.getMethods()) {
-			if (brainMethod.detect(method, ast))
+			totalMloc += mlocMetric.calculate(method, ast);
+			if (brainMethod.detect(type, method, ast))
 				nbm++;
 		}
 
-		brainClass = isGodClass && (wmc >= wmcThreshold && tcc < tccThreshold)
-				&& ((nbm > nbmThreshold && loc >= locThreshold)
-						|| (nbm == nbmThreshold && loc >= (2 * locThreshold) && wmc >= (2 * wmcThreshold)));
+		// Class contains more than one Brain Method and is very large
+		boolean exp1 = nbm > nbmThreshold && totalMloc >= locThreshold;
 
-		return brainClass;
+		// Class contains only one BrainMethod but is extremely large and
+		// complex
+		boolean exp2 = nbm == nbmThreshold && totalMloc >= (2 * locThreshold) && wmc >= (2 * wmcThreshold);
+
+		// Class is very complex and non-cohesive
+		boolean exp3 = wmc >= wmcThreshold && tcc < tccThreshold;
+
+		return (exp1 || exp2) && exp3;
 	}
 
 }

@@ -54,6 +54,7 @@ public class GodClass implements IClassCodeSmell {
 	}
 
 	public GodClass(int atfdThreshold, int wmcThreshold, float tccThreshold, int noaThreshold, boolean useNoa) {
+		super();
 		this.atfdThreshold = atfdThreshold;
 		this.wmcThreshold = wmcThreshold;
 		this.tccThreshold = tccThreshold;

@@ -49,11 +49,10 @@ public class NOAV extends MethodBasedMetricTemplate {
 		int accessFields = tccMetric.processAccessedFields(currType, method).size();
 		int nVar = lvarMetric.calculate(method);
 		int nParams = method.getParameters() != null ? method.getParameters().size() : 0;
-		
 		return accessFields + nVar + nParams;
 	}
 	
-	public List<MethodDeclaration> filterMethods(List<MethodDeclaration> methods) {
+	private List<MethodDeclaration> filterMethods(List<MethodDeclaration> methods) {
 		List<MethodDeclaration> methodList = new ArrayList<MethodDeclaration>();
 		for (MethodDeclaration m : methods) {
 			if (!(m.getModifiers().contains("abstract")))
