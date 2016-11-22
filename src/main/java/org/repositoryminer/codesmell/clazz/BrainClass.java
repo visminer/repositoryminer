@@ -52,7 +52,7 @@ public class BrainClass implements IClassCodeSmell {
 	}
 
 	@Override
-	public String getId() {
+	public CodeSmellId getId() {
 		return CodeSmellId.BRAIN_CLASS;
 	}
 
@@ -61,7 +61,7 @@ public class BrainClass implements IClassCodeSmell {
 		if (type.getArchetype() == Archetype.CLASS_OR_INTERFACE) {
 			TypeDeclaration cls = (TypeDeclaration) type;
 			boolean brainClass = detect(ast, type, cls);
-			document.append("name", new String(CodeSmellId.BRAIN_CLASS)).append("value", new Boolean(brainClass));
+			document.append("name", new String(CodeSmellId.BRAIN_CLASS.toString())).append("value", brainClass);
 		}
 	}
 

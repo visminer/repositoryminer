@@ -29,7 +29,7 @@ public class LongMethod implements IClassCodeSmell {
 	}
 
 	@Override
-	public String getId() {
+	public CodeSmellId getId() {
 		return CodeSmellId.LONG_METHOD;
 	}
 	
@@ -43,7 +43,7 @@ public class LongMethod implements IClassCodeSmell {
 				methodsDoc.add(new Document("method", method.getName()).append("value", detect(method, ast)));
 			}
 
-			document.append("name", CodeSmellId.LONG_METHOD).append("methods", methodsDoc);
+			document.append("name", CodeSmellId.LONG_METHOD.toString()).append("methods", methodsDoc);
 		}
 	}
 	

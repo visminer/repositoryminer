@@ -38,7 +38,7 @@ public class ComplexMethod implements IClassCodeSmell {
 	}
 
 	@Override
-	public String getId() {
+	public CodeSmellId getId() {
 		return CodeSmellId.COMPLEX_METHOD;
 	}
 	
@@ -54,7 +54,7 @@ public class ComplexMethod implements IClassCodeSmell {
 				methodsDoc.add(new Document("method", method.getName()).append("value", complexMethod));
 			}
 
-			document.append("name", CodeSmellId.COMPLEX_METHOD).append("methods", methodsDoc);
+			document.append("name", CodeSmellId.COMPLEX_METHOD.toString()).append("methods", methodsDoc);
 		}
 	}
 

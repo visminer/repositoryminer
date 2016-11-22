@@ -21,7 +21,7 @@ public class LVAR extends MethodBasedMetricTemplate {
 	private List<Document> methodsDoc;
 	
 	@Override
-	public String getId() {
+	public MetricId getId() {
 		return MetricId.LVAR;
 	}
 	
@@ -36,7 +36,7 @@ public class LVAR extends MethodBasedMetricTemplate {
 			methodsDoc.add(new Document("method", method.getName()).append("value", new Integer(lvar)));
 		}
 		
-		document.append("name", MetricId.LVAR).append("accumulated", new Integer(accumulated)).append("methods", methodsDoc);
+		document.append("name", MetricId.LVAR.toString()).append("accumulated", new Integer(accumulated)).append("methods", methodsDoc);
 	}
 	
 	public int calculate(MethodDeclaration method){

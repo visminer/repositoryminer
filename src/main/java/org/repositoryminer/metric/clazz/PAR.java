@@ -19,7 +19,7 @@ public class PAR extends MethodBasedMetricTemplate {
 	private List<Document> methodsDoc;
 	
 	@Override
-	public String getId() {
+	public MetricId getId() {
 		return MetricId.PAR;
 	}
 	
@@ -34,7 +34,7 @@ public class PAR extends MethodBasedMetricTemplate {
 			methodsDoc.add(new Document("method", method.getName()).append("value", new Integer(par)));
 		}
 	
-		document.append("name", MetricId.PAR).append("accumulated", new Integer(accumulated)).append("methods", methodsDoc);
+		document.append("name", MetricId.PAR.toString()).append("accumulated", new Integer(accumulated)).append("methods", methodsDoc);
 	}
 	
 	public int calculate(MethodDeclaration method){

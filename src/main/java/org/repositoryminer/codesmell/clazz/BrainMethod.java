@@ -71,7 +71,7 @@ public class BrainMethod implements IClassCodeSmell {
 	}
 
 	@Override
-	public String getId() {
+	public CodeSmellId getId() {
 		return CodeSmellId.BRAIN_METHOD;
 	}
 
@@ -84,10 +84,10 @@ public class BrainMethod implements IClassCodeSmell {
 
 			for (MethodDeclaration method : cls.getMethods()) {
 				boolean brainMethod = detect(type, method, ast);
-				methodsDoc.add(new Document("method", method.getName()).append("value", new Boolean(brainMethod)));
+				methodsDoc.add(new Document("method", method.getName()).append("value", brainMethod));
 			}
 
-			document.append("name", CodeSmellId.BRAIN_METHOD).append("methods", methodsDoc);
+			document.append("name", CodeSmellId.BRAIN_METHOD.toString()).append("methods", methodsDoc);
 		}
 	}
 

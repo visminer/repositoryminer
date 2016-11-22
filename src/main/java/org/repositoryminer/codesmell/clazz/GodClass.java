@@ -61,7 +61,7 @@ public class GodClass implements IClassCodeSmell {
 	}
 
 	@Override
-	public String getId() {
+	public CodeSmellId getId() {
 		return CodeSmellId.GOD_CLASS;
 	}
 
@@ -69,7 +69,7 @@ public class GodClass implements IClassCodeSmell {
 	public void detect(AbstractTypeDeclaration type, AST ast, Document document) {
 		if (type.getArchetype() == Archetype.CLASS_OR_INTERFACE) {
 			TypeDeclaration cls = (TypeDeclaration) type;
-			document.append("name", CodeSmellId.GOD_CLASS).append("value", detect(type, cls));
+			document.append("name", CodeSmellId.GOD_CLASS.toString()).append("value", detect(type, cls));
 		}
 	}
 

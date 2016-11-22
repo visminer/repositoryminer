@@ -17,14 +17,14 @@ public class LOC implements IClassMetric {
 	}
 	
 	@Override
-	public String getId() {
+	public MetricId getId() {
 		return MetricId.LOC;
 	}
 	
 	@Override
 	public void calculate(AbstractTypeDeclaration type, AST ast, Document document) {
 		int sloc = calculate(ast.getSourceCode());
-		document.append("name", MetricId.LOC).append("value", new Integer(sloc));
+		document.append("name", MetricId.LOC.toString()).append("value", new Integer(sloc));
 	}
 
 	public int calculate(String source) {

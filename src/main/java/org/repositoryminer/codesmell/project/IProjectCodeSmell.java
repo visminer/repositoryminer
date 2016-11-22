@@ -3,6 +3,7 @@ package org.repositoryminer.codesmell.project;
 import java.util.List;
 
 import org.bson.Document;
+import org.repositoryminer.codesmell.CodeSmellId;
 import org.repositoryminer.parser.IParser;
 
 /**
@@ -30,6 +31,6 @@ public interface IProjectCodeSmell {
 	/**
 	 * @return The code smell ID
 	 */
-	public String getId();
+	public CodeSmellId getId();
 
 }

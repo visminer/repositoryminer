@@ -16,13 +16,13 @@ import org.repositoryminer.metric.MetricId;
 public class NOM extends MethodBasedMetricTemplate {
 
 	@Override
-	public String getId() {
+	public MetricId getId() {
 		return MetricId.NOM;
 	}
 
 	@Override
 	public void calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast, Document document) {
-		document.append("name", MetricId.NOM).append("value", methods.size());
+		document.append("name", MetricId.NOM.toString()).append("value", methods.size());
 	}
 
 }

@@ -28,7 +28,7 @@ public class NOAV extends MethodBasedMetricTemplate {
 	}
 	
 	@Override
-	public String getId() {
+	public MetricId getId() {
 		return MetricId.NOAV;
 	}
 
@@ -42,7 +42,7 @@ public class NOAV extends MethodBasedMetricTemplate {
 			methodsDoc.add(new Document("method", method.getName()).append("value", new Integer(noav)));
 		}
 
-		document.append("name", MetricId.NOAV).append("methods", methodsDoc);
+		document.append("name", MetricId.NOAV.toString()).append("methods", methodsDoc);
 	}
 
 	public int calculate(AbstractTypeDeclaration currType, MethodDeclaration method) {

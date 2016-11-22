@@ -3,6 +3,7 @@ package org.repositoryminer.codesmell.clazz;
 import org.bson.Document;
 import org.repositoryminer.ast.AST;
 import org.repositoryminer.ast.AbstractTypeDeclaration;
+import org.repositoryminer.codesmell.CodeSmellId;
 
 /**
  * This interface defines how to implement code smell detection in class level.
@@ -27,6 +28,6 @@ public interface IClassCodeSmell {
 	/**
 	 * @return The code smell ID
 	 */
-	public String getId();
+	public CodeSmellId getId();
 	
 }

@@ -45,7 +45,7 @@ public class CYCLO extends MethodBasedMetricTemplate {
 	private List<Document> methodsDoc;
 
 	@Override
-	public String getId() {
+	public MetricId getId() {
 		return MetricId.CYCLO;
 	}
 
@@ -57,7 +57,7 @@ public class CYCLO extends MethodBasedMetricTemplate {
 	public void calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast, Document document) {
 		methodsDoc = new ArrayList<Document>();
 		calculate(methods);
-		document.append("name", MetricId.CYCLO).append("methods", methodsDoc);
+		document.append("name", MetricId.CYCLO.toString()).append("methods", methodsDoc);
 	}
 
 	/**

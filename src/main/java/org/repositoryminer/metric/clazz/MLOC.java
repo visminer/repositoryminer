@@ -24,7 +24,7 @@ public class MLOC extends MethodBasedMetricTemplate {
 	}
 	
 	@Override
-	public String getId() {
+	public MetricId getId() {
 		return MetricId.MLOC;
 	}
 	
@@ -39,7 +39,7 @@ public class MLOC extends MethodBasedMetricTemplate {
 			methodsDoc.add(new Document("method", method.getName()).append("value", new Integer(mloc)));
 		}
 		
-		document.append("name", MetricId.MLOC).append("accumulated", new Integer(accumulated)).append("methods", methodsDoc);
+		document.append("name", MetricId.MLOC.toString()).append("accumulated", new Integer(accumulated)).append("methods", methodsDoc);
 	}
 	
 	public int calculate(MethodDeclaration method, AST ast){

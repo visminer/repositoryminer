@@ -3,6 +3,7 @@ package org.repositoryminer.metric.clazz;
 import org.bson.Document;
 import org.repositoryminer.ast.AST;
 import org.repositoryminer.ast.AbstractTypeDeclaration;
+import org.repositoryminer.metric.MetricId;
 
 /**
  * <h1>Top class for all metrics to inherit from</h1>
@@ -42,6 +43,6 @@ public interface IClassMetric {
 	/**
 	 * @return The metric ID
 	 */
-	public String getId();
+	public MetricId getId();
 
 }
