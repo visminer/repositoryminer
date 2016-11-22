@@ -87,7 +87,7 @@ public class DuplicatedCode implements IProjectCodeSmell {
 				auxDoc.append("line_count", m.getLineCount());
 				auxDoc.append("token_count", m.getTokenCount());
 				auxDoc.append("source_code_slice", m.getSourceCodeSlice());
-				auxDoc.append("language", parser.getLanguage());
+				auxDoc.append("language", parser.getLanguage().toString());
 
 				List<Document> filesDoc = new ArrayList<Document>();
 				for (Mark mark : m.getMarkSet()) {

@@ -284,11 +284,6 @@ public class RepositoryMiner {
 		return parsers;
 	}
 
-	public RepositoryMiner setParsers(List<IParser> parsers) {
-		this.parsers = parsers;
-		return this;
-	}
-
 	public List<IClassMetric> getClassMetrics() {
 		return classMetrics;
 	}
