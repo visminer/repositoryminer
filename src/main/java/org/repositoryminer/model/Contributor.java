@@ -28,6 +28,9 @@ public class Contributor {
 	}
 	
 	public static Contributor parseDocument(Document doc) {
+		if (doc == null)
+			return null;
+		
 		Contributor c = new Contributor(doc.getString("name"), doc.getString("email"));
 		return c;
 	}
