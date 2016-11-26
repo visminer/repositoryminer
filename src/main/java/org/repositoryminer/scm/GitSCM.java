@@ -211,12 +211,10 @@ public class GitSCM implements ISCM {
 		AnyObjectId oldCommit = revCommit.getParentCount() > 0 ? repository.resolve(revCommit.getParent(0).getName())
 				: null;
 
-		List<DiffEntry> diffs = null;
-		diffs = diffFormatter.scan(oldCommit, currentCommit);
-
+		List<DiffEntry> diffs = diffFormatter.scan(oldCommit, currentCommit);
 		List<Diff> changes = new ArrayList<Diff>();
+		
 		for (DiffEntry entry : diffs) {
-
 			RevCommit parentCommit = oldCommit == null ? null
 					: revWalk.parseCommit(ObjectId.fromString(oldCommit.getName()));
 

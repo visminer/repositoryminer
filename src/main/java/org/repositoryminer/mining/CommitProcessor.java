@@ -77,10 +77,6 @@ public class CommitProcessor {
 	}
 
 	private void processReferences() throws IOException {
-		if (!repositoryMiner.hasClassMetrics() && !repositoryMiner.hasClassCodeSmells()) {
-			return;
-		}
-
 		for (Reference ref : references) {
 			Document refDoc = referenceHandler.findById(ref.getId(), Projections.include("commits"));
 			@SuppressWarnings("unchecked")
@@ -178,8 +174,11 @@ public class CommitProcessor {
 			Document typeDoc = new Document();
 			typeDoc.append("name", type.getName()).append("declaration", type.getArchetype().toString());
 
-			processClassMetrics(ast, type, typeDoc);
-			processClassCodeSmells(ast, type, typeDoc);
+			if (repositoryMiner.hasClassMetrics())
+				processClassMetrics(ast, type, typeDoc);
+			
+			if (repositoryMiner.hasClassCodeSmells())
+				processClassCodeSmells(ast, type, typeDoc);
 
 			abstractTypeDocs.add(typeDoc);
 		}
@@ -189,10 +188,6 @@ public class CommitProcessor {
 	}
 
 	private void processClassMetrics(AST ast, AbstractTypeDeclaration type, Document typeDoc) {
-		if (!repositoryMiner.hasClassMetrics()) {
-			return;
-		}
-
 		List<Document> metricsDoc = new ArrayList<Document>();
 		for (IClassMetric metric : repositoryMiner.getClassMetrics()) {
 			Document mDoc = new Document();
@@ -200,14 +195,11 @@ public class CommitProcessor {
 			if (!mDoc.isEmpty()) 
 				metricsDoc.add(mDoc);
 		}
+		
 		typeDoc.append("metrics", metricsDoc);
 	}
 
 	private void processClassCodeSmells(AST ast, AbstractTypeDeclaration type, Document typeDoc) {
-		if (!repositoryMiner.hasClassCodeSmells()) {
-			return;
-		}
-
 		List<Document> codeSmellsDoc = new ArrayList<Document>();
 		for (IClassCodeSmell codeSmell : repositoryMiner.getClassCodeSmells()) {
 			Document cDoc = new Document();
@@ -215,6 +207,7 @@ public class CommitProcessor {
 			if (!cDoc.isEmpty()) 
 				codeSmellsDoc.add(cDoc);
 		}
+		
 		typeDoc.append("codesmells", codeSmellsDoc);
 	}
 

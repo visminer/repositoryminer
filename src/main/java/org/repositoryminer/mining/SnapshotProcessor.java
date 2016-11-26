@@ -24,6 +24,7 @@ public class SnapshotProcessor {
 	private String repositoryId;
 	private String repositoryPath;
 	private List<Reference> references;
+	private List<String> snapshots;
 
 	private SnapshotAnalysisDocumentHandler snapshotPersistence;
 	private ReferenceDocumentHandler referencePersistence;
@@ -52,45 +53,69 @@ public class SnapshotProcessor {
 		this.repositoryPath = repositoryPath;
 	}
 
-	public void start() throws IOException {
-		processSnapshots();
+	public void setSnapshots(List<String> snapshots) {
+		this.snapshots = snapshots;
 	}
 
-	private void processSnapshots() {
-		if (repositoryMiner.hasProjectsCodeSmells()) {
-			int idx = 0;
-			for (Reference ref : references) {
-				if (repositoryMiner.getMiningListener() != null) {
-					repositoryMiner.getMiningListener().tagsProgressChange(ref.getName(), ++idx, references.size());
-				}
+	public void start() throws IOException {
+		processReferences();
+		processCommits();
+	}
 
-				Document doc = referencePersistence.findById(ref.getId(),
-						Projections.fields(Projections.include("commits"), Projections.slice("commits", 1)));
-				
-				@SuppressWarnings("unchecked")
-				String commitId = ((List<String>) doc.get("commits")).get(0);
-				scm.checkout(commitId);
+	private void processCommits() {
+		for (String snapshot : snapshots) {
+			Commit commit = Commit
+					.parseDocument(commitPersistence.findById(snapshot, Projections.include("commit_date")));
 
-				Commit commit = Commit.parseDocument(commitPersistence.findById(commitId, Projections.include("commit_date")));
-				
-				for (IParser parser : repositoryMiner.getParsers()) {
-					parser.processSourceFolders(repositoryPath);
-				}
-
-				processSnapshot(commit, ref);
+			scm.checkout(snapshot);
+			for (IParser parser : repositoryMiner.getParsers()) {
+				parser.processSourceFolders(repositoryPath);
 			}
+
+			processSnapshot(commit, null);
+		}
+	}
+
+	private void processReferences() {
+		int idx = 0;
+		for (Reference ref : references) {
+			if (repositoryMiner.getMiningListener() != null) {
+				repositoryMiner.getMiningListener().tagsProgressChange(ref.getName(), ++idx, references.size());
+			}
+
+			Document doc = referencePersistence.findById(ref.getId(),
+					Projections.fields(Projections.include("commits"), Projections.slice("commits", 1)));
+
+			@SuppressWarnings("unchecked")
+			String commitId = ((List<String>) doc.get("commits")).get(0);
+
+			Commit commit = Commit
+					.parseDocument(commitPersistence.findById(commitId, Projections.include("commit_date")));
+
+			scm.checkout(commitId);
+			for (IParser parser : repositoryMiner.getParsers()) {
+				parser.processSourceFolders(repositoryPath);
+			}
+
+			processSnapshot(commit, ref);
 		}
 	}
 
 	private void processSnapshot(Commit commit, Reference ref) {
 		Document doc = new Document();
-		doc.append("reference_name", ref.getName());
-		doc.append("reference_type", ref.getType().toString());
+		
+		if (ref != null) {
+			doc.append("reference_name", ref.getName());
+			doc.append("reference_type", ref.getType().toString());
+		}
+		
 		doc.append("commit", commit.getId());
 		doc.append("commit_date", commit.getCommitDate());
 		doc.append("repository", new ObjectId(repositoryId));
 
-		processProjectCodeSmells(doc);
+		if (repositoryMiner.hasProjectsCodeSmells())
+			processProjectCodeSmells(doc);
+		
 		snapshotPersistence.insert(doc);
 	}
 

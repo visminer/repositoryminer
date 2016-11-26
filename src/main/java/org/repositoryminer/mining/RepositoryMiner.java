@@ -60,6 +60,7 @@ public class RepositoryMiner {
 	private List<IProjectCodeSmell> projectCodeSmells = new ArrayList<IProjectCodeSmell>();
 	private List<IPostMiningTask> postMiningTasks = new ArrayList<IPostMiningTask>();
 	private List<Entry<String, ReferenceType>> references = new ArrayList<Entry<String, ReferenceType>>();
+	private List<String> snapshots = new ArrayList<String>();
 
 	private IMiningListener miningListener;
 	private IPostMiningListener postMiningListener;
@@ -201,13 +202,27 @@ public class RepositoryMiner {
 	 */
 	public boolean addReference(String name, ReferenceType type) {
 		Entry<String, ReferenceType> entry = new AbstractMap.SimpleEntry<String, ReferenceType>(name, type);
-		if (this.references.contains(entry)) {
+		if (this.references.contains(entry))
 			return false;
-		}
-		this.references.add(entry);
+
+		references.add(entry);
 		return true;
 	}
 
+	/**
+	 * Adds a snapshot without duplicates
+	 * 
+	 * @param snapshot
+	 * @return
+	 */
+	public boolean addSnapshot(String snapshot) {
+		if (snapshots.contains(snapshot))
+			return false;
+		
+		snapshots.add(snapshot);
+		return true;
+	}
+	
 	public boolean hasClassMetrics() {
 		return !classMetrics.isEmpty();
 	}
@@ -333,6 +348,10 @@ public class RepositoryMiner {
 
 	public List<Entry<String, ReferenceType>> getReferences() {
 		return references;
+	}
+
+	public List<String> getSnapshots() {
+		return snapshots;
 	}
 
 }

@@ -202,6 +202,7 @@ public class MiningProcessor {
 		if (repositoryMiner.shouldProcessReferences()) {
 			SnapshotProcessor snapshotProcessor = new SnapshotProcessor();
 			snapshotProcessor.setReferences(selectedReferences);
+			snapshotProcessor.setSnapshots(repositoryMiner.getSnapshots());
 			snapshotProcessor.setRepositoryData(repositoryId, tempRepo);
 			snapshotProcessor.setRepositoryMiner(repositoryMiner);
 			snapshotProcessor.setSCM(scm);
