@@ -165,10 +165,48 @@ public class MiningProcessor {
 		repoHandler.updateOnlyContributors(repoDoc);
 		repository.setContributors(new ArrayList<Contributor>(contributors));
 
+		calculateAndDetect(tempRepo, repository.getId());
+		
 		scm.close();
 		FileUtils.deleteFolder(tempRepo);
 
 		return repository;
+	}
+
+	/**
+	 * Performs both the calculation (metrics) and detections (smells/debts) on
+	 * the targeted project.
+	 * 
+	 * @param repositoryMiner
+	 *            instance of {@link org.repositoryminer.mining.RepositoryMiner}
+	 * @param tempPath
+	 *            temporary repository path to access the files content
+	 * @throws IOException
+	 */
+	private void calculateAndDetect(String tempRepo, String repositoryId) throws IOException {
+		if (!repositoryMiner.shouldProcessCommits() && !repositoryMiner.shouldProcessReferences())
+			return;
+
+		if (selectedReferences.size() == 0)
+			return;
+		
+		if (repositoryMiner.shouldProcessCommits()) {
+			CommitProcessor commitProcessor = new CommitProcessor();
+			commitProcessor.setReferences(selectedReferences);
+			commitProcessor.setSCM(scm);
+			commitProcessor.setRepositoryMiner(repositoryMiner);
+			commitProcessor.setRepositoryData(repositoryId, tempRepo);
+			commitProcessor.start();
+		}
+
+		if (repositoryMiner.shouldProcessReferences()) {
+			SnapshotProcessor snapshotProcessor = new SnapshotProcessor();
+			snapshotProcessor.setReferences(selectedReferences);
+			snapshotProcessor.setRepositoryData(repositoryId, tempRepo);
+			snapshotProcessor.setRepositoryMiner(repositoryMiner);
+			snapshotProcessor.setSCM(scm);
+			snapshotProcessor.start();
+		}
 	}
 
 }
