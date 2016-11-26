@@ -28,6 +28,8 @@ import org.repositoryminer.scm.DiffType;
 
 import org.repositoryminer.scm.ISCM;
 
+import com.mongodb.client.model.Projections;
+
 public class CommitProcessor {
 
 	private static final int COMMIT_RANGE = 500;
@@ -80,7 +82,7 @@ public class CommitProcessor {
 		}
 
 		for (Reference ref : references) {
-			Document refDoc = referenceHandler.findByPath(ref.getPath(), repositoryId, null);
+			Document refDoc = referenceHandler.findById(ref.getId(), Projections.include("commits"));
 			@SuppressWarnings("unchecked")
 			List<String> commits = (List<String>) refDoc.get("commits");
 			int begin = 0;
