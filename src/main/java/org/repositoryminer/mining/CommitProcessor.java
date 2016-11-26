@@ -23,6 +23,7 @@ import org.repositoryminer.model.Reference;
 import org.repositoryminer.parser.IParser;
 import org.repositoryminer.persistence.handler.CommitAnalysisDocumentHandler;
 import org.repositoryminer.persistence.handler.CommitDocumentHandler;
+import org.repositoryminer.persistence.handler.ReferenceDocumentHandler;
 import org.repositoryminer.scm.DiffType;
 
 import org.repositoryminer.scm.ISCM;
@@ -35,8 +36,10 @@ public class CommitProcessor {
 	private RepositoryMiner repositoryMiner;
 	private String repositoryId;
 	private String repositoryPath;
+	
 	private CommitAnalysisDocumentHandler commitAnalysisPersistence;
 	private CommitDocumentHandler commitPersistence;
+	private ReferenceDocumentHandler referenceHandler;
 
 	private List<Reference> references;
 	private Set<String> commitsProcessed;
@@ -45,6 +48,7 @@ public class CommitProcessor {
 
 	public CommitProcessor() {
 		commitAnalysisPersistence = new CommitAnalysisDocumentHandler();
+		referenceHandler = new ReferenceDocumentHandler();
 		commitPersistence = new CommitDocumentHandler();
 		commitsProcessed = new HashSet<String>();
 	}
@@ -76,7 +80,9 @@ public class CommitProcessor {
 		}
 
 		for (Reference ref : references) {
-			List<String> commits = ref.getCommits();
+			Document refDoc = referenceHandler.findByPath(ref.getPath(), repositoryId, null);
+			@SuppressWarnings("unchecked")
+			List<String> commits = (List<String>) refDoc.get("commits");
 			int begin = 0;
 			int end = Math.min(commits.size(), COMMIT_RANGE);
 
@@ -165,6 +171,7 @@ public class CommitProcessor {
 
 		List<AbstractTypeDeclaration> types = ast.getDocument().getTypes();
 		List<Document> abstractTypeDocs = new ArrayList<Document>();
+		
 		for (AbstractTypeDeclaration type : types) {
 			Document typeDoc = new Document();
 			typeDoc.append("name", type.getName()).append("declaration", type.getArchetype().toString());

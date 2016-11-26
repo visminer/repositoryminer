@@ -2,10 +2,12 @@ package org.repositoryminer.mining;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import org.apache.commons.io.FilenameUtils;
 import org.bson.Document;
@@ -17,6 +19,7 @@ import org.repositoryminer.persistence.handler.CommitDocumentHandler;
 import org.repositoryminer.persistence.handler.ReferenceDocumentHandler;
 import org.repositoryminer.persistence.handler.RepositoryDocumentHandler;
 import org.repositoryminer.scm.ISCM;
+import org.repositoryminer.scm.ReferenceType;
 import org.repositoryminer.scm.SCMFactory;
 import org.repositoryminer.utility.FileUtils;
 
@@ -68,33 +71,42 @@ public class MiningProcessor {
 
 	private ISCM scm;
 	private RepositoryMiner repositoryMiner;
+	private List<Reference> selectedReferences;
 
 	private void saveReferences(String repositoryId) {
-		List<Reference> references = scm.getReferences();
-		List<Document> referencesDocs = new ArrayList<Document>();
-		
-		for (Reference ref : references) {
+		selectedReferences = new ArrayList<Reference>();
+		ReferenceDocumentHandler refDocumentHandler = new ReferenceDocumentHandler();
+
+		for (Reference ref : scm.getReferences()) {
 			ref.setRepository(repositoryId);
 			ref.setCommits(scm.getReferenceCommits(ref.getPath(), ref.getType()));
-			referencesDocs.add(ref.toDocument());
+
+			Document refDoc = ref.toDocument();
+			refDocumentHandler.insert(refDoc);
+
+			ref.setCommits(null);
+			ref.setId(refDoc.getObjectId("_id").toString());
+			
+			Entry<String, ReferenceType> entry = new AbstractMap.SimpleEntry<String, ReferenceType>(ref.getName(),
+					ref.getType());
+			if (repositoryMiner.getReferences().contains(entry))
+				selectedReferences.add(ref);
 		}
-		
-		new ReferenceDocumentHandler().insertMany(referencesDocs);
 	}
 
 	private Set<Contributor> saveCommits(String repositoryId) {
-		Set<Contributor>contributors = new HashSet<Contributor>();
+		Set<Contributor> contributors = new HashSet<Contributor>();
 		IssueExtractor messageAnalyzer = new IssueExtractor();
 		CommitDocumentHandler documentHandler = new CommitDocumentHandler();
-		
+
 		int skip = 0;
 		int idx = 0;
 
 		List<Commit> commits = scm.getCommits(skip, repositoryMiner.getCommitCount());
-		
+
 		while (commits != null) {
 			List<Document> commitsDoc = new ArrayList<Document>();
-			
+
 			for (Commit commit : commits) {
 				commit.setRepository(repositoryId);
 				commit.setIssueReferences(messageAnalyzer.analyzeMessage(commit.getMessage()));
@@ -106,12 +118,12 @@ public class MiningProcessor {
 				contributors.add(commit.getCommitter());
 				commitsDoc.add(commit.toDocument());
 			}
-			
+
 			documentHandler.insertMany(commitsDoc);
 			skip += repositoryMiner.getCommitCount();
 			commits = scm.getCommits(skip, repositoryMiner.getCommitCount());
 		}
-		
+
 		return contributors;
 	}
 
@@ -128,7 +140,7 @@ public class MiningProcessor {
 		RepositoryDocumentHandler repoHandler = new RepositoryDocumentHandler();
 		List<Document> repos = repoHandler.findRepositoriesByName(repositoryMiner.getName());
 		Repository repository = Repository.parseDocument(repos.get(0));
-		
+
 		if (repository != null) {
 			return repository;
 		}
@@ -155,7 +167,7 @@ public class MiningProcessor {
 
 		scm.close();
 		FileUtils.deleteFolder(tempRepo);
-		
+
 		return repository;
 	}
 

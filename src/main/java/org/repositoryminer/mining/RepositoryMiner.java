@@ -1,8 +1,10 @@
 package org.repositoryminer.mining;
 
 import java.io.IOException;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map.Entry;
 
 import org.repositoryminer.codesmell.clazz.IClassCodeSmell;
 import org.repositoryminer.codesmell.project.IProjectCodeSmell;
@@ -12,6 +14,7 @@ import org.repositoryminer.metric.clazz.IClassMetric;
 import org.repositoryminer.model.Repository;
 import org.repositoryminer.parser.IParser;
 import org.repositoryminer.postprocessing.IPostMiningTask;
+import org.repositoryminer.scm.ReferenceType;
 import org.repositoryminer.scm.SCMType;
 
 /**
@@ -56,7 +59,7 @@ public class RepositoryMiner {
 	private List<IClassCodeSmell> classCodeSmells = new ArrayList<IClassCodeSmell>();
 	private List<IProjectCodeSmell> projectCodeSmells = new ArrayList<IProjectCodeSmell>();
 	private List<IPostMiningTask> postMiningTasks = new ArrayList<IPostMiningTask>();
-	private List<String> references = new ArrayList<String>();
+	private List<Entry<String, ReferenceType>> references = new ArrayList<Entry<String, ReferenceType>>();
 
 	private IMiningListener miningListener;
 	private IPostMiningListener postMiningListener;
@@ -196,11 +199,12 @@ public class RepositoryMiner {
 	 * @param reference
 	 * @return true if the reference was added and false otherwise
 	 */
-	public boolean addReference(String reference) {
-		if (this.references.contains(reference)) {
+	public boolean addReference(String name, ReferenceType type) {
+		Entry<String, ReferenceType> entry = new AbstractMap.SimpleEntry<String, ReferenceType>(name, type);
+		if (this.references.contains(entry)) {
 			return false;
 		}
-		this.references.add(reference);
+		this.references.add(entry);
 		return true;
 	}
 
@@ -327,7 +331,7 @@ public class RepositoryMiner {
 		return postMiningListener;
 	}
 
-	public List<String> getReferences() {
+	public List<Entry<String, ReferenceType>> getReferences() {
 		return references;
 	}
 

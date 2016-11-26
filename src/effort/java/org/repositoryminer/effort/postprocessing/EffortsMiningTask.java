@@ -5,6 +5,7 @@ import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import org.bson.Document;
@@ -21,6 +22,7 @@ import org.repositoryminer.persistence.handler.CommitAnalysisDocumentHandler;
 import org.repositoryminer.persistence.handler.CommitDocumentHandler;
 import org.repositoryminer.persistence.handler.ReferenceDocumentHandler;
 import org.repositoryminer.postprocessing.IPostMiningTask;
+import org.repositoryminer.scm.ReferenceType;
 
 /**
  * <h1>A task to mine effort</h1>
@@ -63,23 +65,24 @@ public class EffortsMiningTask implements IPostMiningTask {
 	@Override
 	public void execute(RepositoryMiner repositoryMiner, Repository repository, IPostMiningListener listener) {
 		ReferenceDocumentHandler handler = new ReferenceDocumentHandler();
-		// prior to calculating effort, we must retrieve selected references from the miner
-		List<String> refs = repositoryMiner.getReferences();
+		// prior to calculating effort, we must retrieve selected references
+		// from the miner
+		List<Entry<String, ReferenceType>> refs = repositoryMiner.getReferences();
 		if (!refs.isEmpty()) {
 			int idx = 0;
 			// for each reference of the repository...
-			for (String path : refs) {
+			for (Entry<String, ReferenceType> ref : refs) {
 				if (listener != null) {
 					listener.postMiningTaskProgressChange("efforts", ++idx, refs.size());
 				}
 				// we must retrieve the reference from the database prior to processing it
-				Document refDoc = handler.findByPath(path, repository.getId(), null);
+				Document refDoc = handler.findByNameAndType(ref.getKey(), ref.getValue(), repository.getId(), null);
 				Reference reference = Reference.parseDocument(refDoc);
 				// let's process the reference...
 				processReference(reference);
 				// ...and save the calculated efforts
 				save(repository.getId(), reference);
-				
+
 				effortsMap.clear();
 			}
 		}
