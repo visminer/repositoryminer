@@ -49,6 +49,7 @@ public class RepositoryMiner {
 	private String description;
 	private SCMType scm;
 	private String charset = "UTF-8";
+	private int commitCount = 500;
 
 	private List<IParser> parsers = new ArrayList<IParser>();
 	private List<IClassMetric> classMetrics = new ArrayList<IClassMetric>();
@@ -278,6 +279,14 @@ public class RepositoryMiner {
 	public RepositoryMiner setCharset(String charset) {
 		this.charset = charset;
 		return this;
+	}
+
+	public int getCommitCount() {
+		return commitCount;
+	}
+
+	public void setCommitCount(int commitCount) {
+		this.commitCount = commitCount;
 	}
 
 	public List<IParser> getParsers() {

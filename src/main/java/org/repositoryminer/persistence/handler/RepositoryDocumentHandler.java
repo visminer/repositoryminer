@@ -25,7 +25,6 @@ public class RepositoryDocumentHandler extends DocumentHandler {
 	public List<Document> findRepositoriesByName(String name) {
 		BasicDBObject whereClause = new BasicDBObject();
 		whereClause.put("name", name);
-
 		return findMany(whereClause);
 	}
 

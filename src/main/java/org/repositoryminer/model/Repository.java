@@ -21,6 +21,9 @@ public class Repository {
 	}
 
 	public static Repository parseDocument(Document repositoryDoc) {
+		if (repositoryDoc == null)
+			return null;
+		
 		Repository repository = new Repository(repositoryDoc.getObjectId("_id").toString(),
 				repositoryDoc.getString("name"), repositoryDoc.getString("path"),
 				repositoryDoc.getString("description"), SCMType.valueOf(repositoryDoc.getString("scm")));

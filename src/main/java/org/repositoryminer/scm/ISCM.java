@@ -32,10 +32,12 @@ public interface ISCM {
 	public List<Reference> getReferences();
 
 	/**
+	 * @param skip defines how many commits should be skipped before the fetch 
+	 * @param maxCount defines how many commits should be fetch
 	 * @return A list with all commits in the repository.
 	 * This method iterates through all commits.
 	 */
-	public List<Commit> getCommits();
+	public List<Commit> getCommits(int skip, int maxCount);
 	
 	/**
 	 * @param fullName
@@ -46,7 +48,7 @@ public interface ISCM {
 	
 	/**
 	 * @param treeName
-	 * Makes a checkout to a give reference.
+	 * Makes a checkout to a given point or reference.
 	 */
 	public void checkout(String hash);
 	
