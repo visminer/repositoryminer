@@ -6,8 +6,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.ArrayUtils;
@@ -22,36 +22,36 @@ import org.repositoryminer.model.Diff;
 import org.repositoryminer.model.Reference;
 import org.repositoryminer.parser.IParser;
 import org.repositoryminer.persistence.handler.CommitAnalysisDocumentHandler;
+import org.repositoryminer.persistence.handler.CommitDocumentHandler;
 import org.repositoryminer.scm.DiffType;
-import org.repositoryminer.scm.ReferenceType;
+
 import org.repositoryminer.scm.ISCM;
 
 public class CommitProcessor {
+
+	private static final int COMMIT_RANGE = 500;
 
 	private ISCM scm;
 	private RepositoryMiner repositoryMiner;
 	private String repositoryId;
 	private String repositoryPath;
-	private CommitAnalysisDocumentHandler persistenceCommit;
+	private CommitAnalysisDocumentHandler commitAnalysisPersistence;
+	private CommitDocumentHandler commitPersistence;
 
-	private Map<String, Commit> commitsMap;
 	private List<Reference> references;
 	private Set<String> commitsProcessed;
 
 	private IParser currParser;
 
 	public CommitProcessor() {
-		this.persistenceCommit = new CommitAnalysisDocumentHandler();
-		this.commitsProcessed = new HashSet<String>();
+		commitAnalysisPersistence = new CommitAnalysisDocumentHandler();
+		commitPersistence = new CommitDocumentHandler();
+		commitsProcessed = new HashSet<String>();
 	}
 
 	public void setRepositoryData(String repositoryId, String repositoryPath) {
 		this.repositoryId = repositoryId;
 		this.repositoryPath = repositoryPath;
-	}
-
-	public void setCommitsMap(Map<String, Commit> commitsMap) {
-		this.commitsMap = commitsMap;
 	}
 
 	public void setReferences(List<Reference> references) {
@@ -67,45 +67,60 @@ public class CommitProcessor {
 	}
 
 	public void start() throws IOException {
-		processCommits();
+		processReferences();
 	}
 
-	private void processCommits() throws IOException {
+	private void processReferences() throws IOException {
 		if (!repositoryMiner.hasClassMetrics() && !repositoryMiner.hasClassCodeSmells()) {
 			return;
 		}
 
 		for (Reference ref : references) {
-			if (ref.getType() == ReferenceType.TIME_TAG) {
-				continue;
+			List<String> commits = ref.getCommits();
+			int begin = 0;
+			int end = Math.min(commits.size(), COMMIT_RANGE);
+
+			while (end < commits.size()) {
+				processCommits(commits.subList(begin, end), ref.getName(), begin, commits.size());
+				begin = end;
+				end = Math.min(commits.size(), COMMIT_RANGE + end);
 			}
 
-			List<String> commits = ref.getCommits();
-			int idx = 0;
-			for (String hash : commits) {
-				if (repositoryMiner.getMiningListener() != null) {
-					repositoryMiner.getMiningListener().commitsProgressChange(ref.getName(), ++idx, commits.size());
-				}
+			processCommits(commits.subList(begin, end), ref.getName(), begin, commits.size());
+		}
+	}
 
-				// Avoids processing again some commits
-				if (!commitsProcessed.contains(hash)) {
-					commitsProcessed.add(hash);
-				} else {
-					continue;
-				}
+	private void processCommits(List<String> commits, String refName, int progress, int qtdCommits) throws IOException {
+		// removes commits already processed
+		int oldSize = commits.size();
+		Iterator<String> it = commits.iterator();
+		while (it.hasNext()) {
+			if (commitsProcessed.contains(it.next()))
+				it.remove();
+		}
 
-				Commit commit = commitsMap.get(hash);
-				scm.checkout(hash);
+		progress += oldSize - commits.size();
+		if (repositoryMiner.getMiningListener() != null)
+			repositoryMiner.getMiningListener().commitsProgressChange(refName, ++progress, qtdCommits);
+		
+		if (commits.size() == 0)
+			return;
 
-				for (IParser parser : repositoryMiner.getParsers()) {
-					parser.processSourceFolders(repositoryPath);
-				}
+		for (Document doc : commitPersistence.findByIdColl(repositoryId, commits, null)) {
+			if (repositoryMiner.getMiningListener() != null)
+				repositoryMiner.getMiningListener().commitsProgressChange(refName, ++progress, qtdCommits);
 
-				for (Diff diff : commit.getDiffs()) {
-					if (diff.getType() != DiffType.DELETE) {
-						processDiff(diff.getPath(), diff.getHash(), commit);
-					}
-				}
+			Commit commit = Commit.parseDocument(doc);
+			commitsProcessed.add(commit.getId());
+
+			scm.checkout(commit.getId());
+
+			for (IParser parser : repositoryMiner.getParsers()) 
+				parser.processSourceFolders(repositoryPath);
+
+			for (Diff diff : commit.getDiffs()) {
+				if (diff.getType() != DiffType.DELETE)
+					processDiff(diff.getPath(), diff.getHash(), commit);
 			}
 		}
 	}
@@ -115,29 +130,24 @@ public class CommitProcessor {
 		String ext = filePath.substring(index);
 
 		if (currParser == null || !ArrayUtils.contains(currParser.getExtensions(), ext)) {
-			for (IParser p : repositoryMiner.getParsers()) {
-				if (ArrayUtils.contains(p.getExtensions(), ext)) {
+			for (IParser p : repositoryMiner.getParsers())
+				if (ArrayUtils.contains(p.getExtensions(), ext)) 
 					currParser = p;
-				}
-			}
 		}
 
-		if (currParser == null) {
+		if (currParser == null)
 			return;
-		}
 
 		File f = new File(repositoryPath, filePath);
 
 		// This used to treat links to folders
-		if (f.isDirectory()) {
+		if (f.isDirectory())
 			return;
-		}
 
 		byte[] data = Files.readAllBytes(Paths.get(f.getCanonicalPath()));
 
-		if (data == null) {
+		if (data == null) 
 			return;
-		}
 
 		String source = new String(data, repositoryMiner.getCharset());
 		AST ast = currParser.generate(filePath, source, repositoryMiner.getCharset());
@@ -166,7 +176,7 @@ public class CommitProcessor {
 		}
 
 		doc.append("abstract_types", abstractTypeDocs);
-		persistenceCommit.insert(doc);
+		commitAnalysisPersistence.insert(doc);
 	}
 
 	private void processClassMetrics(AST ast, AbstractTypeDeclaration type, Document typeDoc) {
@@ -178,9 +188,8 @@ public class CommitProcessor {
 		for (IClassMetric metric : repositoryMiner.getClassMetrics()) {
 			Document mDoc = new Document();
 			metric.calculate(type, ast, mDoc);
-			if (!mDoc.isEmpty()) {
+			if (!mDoc.isEmpty()) 
 				metricsDoc.add(mDoc);
-			}
 		}
 		typeDoc.append("metrics", metricsDoc);
 	}
@@ -194,9 +203,8 @@ public class CommitProcessor {
 		for (IClassCodeSmell codeSmell : repositoryMiner.getClassCodeSmells()) {
 			Document cDoc = new Document();
 			codeSmell.detect(type, ast, cDoc);
-			if (!cDoc.isEmpty()) {
+			if (!cDoc.isEmpty()) 
 				codeSmellsDoc.add(cDoc);
-			}
 		}
 		typeDoc.append("codesmells", codeSmellsDoc);
 	}
