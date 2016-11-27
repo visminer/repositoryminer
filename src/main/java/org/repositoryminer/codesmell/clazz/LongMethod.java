@@ -34,7 +34,7 @@ public class LongMethod implements IClassCodeSmell {
 	}
 	
 	@Override
-	public void detect(AbstractTypeDeclaration type, AST ast, Document document) {
+	public Document detect(AbstractTypeDeclaration type, AST ast) {
 		if (type.getArchetype() == Archetype.CLASS_OR_INTERFACE) {
 			TypeDeclaration cls = (TypeDeclaration) type;
 			methodsDoc = new ArrayList<Document>();
@@ -43,8 +43,9 @@ public class LongMethod implements IClassCodeSmell {
 				methodsDoc.add(new Document("method", method.getName()).append("value", detect(method, ast)));
 			}
 
-			document.append("name", CodeSmellId.LONG_METHOD.toString()).append("methods", methodsDoc);
+			return new Document("name", CodeSmellId.LONG_METHOD.toString()).append("methods", methodsDoc);
 		}
+		return null;
 	}
 	
 	public boolean detect(MethodDeclaration method, AST ast){

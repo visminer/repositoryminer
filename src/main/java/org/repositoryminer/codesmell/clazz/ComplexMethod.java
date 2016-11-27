@@ -43,7 +43,7 @@ public class ComplexMethod implements IClassCodeSmell {
 	}
 	
 	@Override
-	public void detect(AbstractTypeDeclaration type, AST ast, Document document) {
+	public Document detect(AbstractTypeDeclaration type, AST ast) {
 		if (type.getArchetype() == Archetype.CLASS_OR_INTERFACE) {
 			TypeDeclaration cls = (TypeDeclaration) type;
 
@@ -54,8 +54,9 @@ public class ComplexMethod implements IClassCodeSmell {
 				methodsDoc.add(new Document("method", method.getName()).append("value", complexMethod));
 			}
 
-			document.append("name", CodeSmellId.COMPLEX_METHOD.toString()).append("methods", methodsDoc);
+			return new Document("name", CodeSmellId.COMPLEX_METHOD.toString()).append("methods", methodsDoc);
 		}
+		return null;
 	}
 
 	public boolean detect(MethodDeclaration method) {

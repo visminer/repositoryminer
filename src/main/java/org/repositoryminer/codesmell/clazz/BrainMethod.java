@@ -76,7 +76,7 @@ public class BrainMethod implements IClassCodeSmell {
 	}
 
 	@Override
-	public void detect(AbstractTypeDeclaration type, AST ast, Document document) {
+	public Document detect(AbstractTypeDeclaration type, AST ast) {
 		if (type.getArchetype() == Archetype.CLASS_OR_INTERFACE) {
 			TypeDeclaration cls = (TypeDeclaration) type;
 
@@ -87,8 +87,9 @@ public class BrainMethod implements IClassCodeSmell {
 				methodsDoc.add(new Document("method", method.getName()).append("value", brainMethod));
 			}
 
-			document.append("name", CodeSmellId.BRAIN_METHOD.toString()).append("methods", methodsDoc);
+			return new Document("name", CodeSmellId.BRAIN_METHOD.toString()).append("methods", methodsDoc);
 		}
+		return null;
 	}
 
 	public boolean detect(AbstractTypeDeclaration type, MethodDeclaration method, AST ast) {

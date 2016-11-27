@@ -202,9 +202,9 @@ public class CommitProcessor {
 	private void processClassCodeSmells(AST ast, AbstractTypeDeclaration type, Document typeDoc) {
 		List<Document> codeSmellsDoc = new ArrayList<Document>();
 		for (IClassCodeSmell codeSmell : repositoryMiner.getClassCodeSmells()) {
-			Document cDoc = new Document();
-			codeSmell.detect(type, ast, cDoc);
-			codeSmellsDoc.add(cDoc);
+			Document cDoc = codeSmell.detect(type, ast);
+			if (cDoc != null)
+				codeSmellsDoc.add(cDoc);
 		}
 		
 		typeDoc.append("codesmells", codeSmellsDoc);

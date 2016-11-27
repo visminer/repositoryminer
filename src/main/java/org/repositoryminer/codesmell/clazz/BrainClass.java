@@ -57,12 +57,13 @@ public class BrainClass implements IClassCodeSmell {
 	}
 
 	@Override
-	public void detect(AbstractTypeDeclaration type, AST ast, Document document) {
+	public Document detect(AbstractTypeDeclaration type, AST ast) {
 		if (type.getArchetype() == Archetype.CLASS_OR_INTERFACE) {
 			TypeDeclaration cls = (TypeDeclaration) type;
 			boolean brainClass = detect(ast, type, cls);
-			document.append("name", new String(CodeSmellId.BRAIN_CLASS.toString())).append("value", brainClass);
+			return new Document("name", new String(CodeSmellId.BRAIN_CLASS.toString())).append("value", brainClass);
 		}
+		return null;
 	}
 
 	public boolean detect(AST ast, AbstractTypeDeclaration type, TypeDeclaration cls) {
