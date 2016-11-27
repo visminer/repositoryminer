@@ -104,7 +104,7 @@ public class WorkingDirectoryProcessor {
 		List<Document> wdDocs = new ArrayList<Document>(commits.size());
 		
 		for (Document doc : commitHandler.findByIdColl(repositoryId, commits, Projections.include("diffs"))) {
-			String commitId = doc.getObjectId("_id").toString();
+			String commitId = doc.get("_id").toString();
 			
 			if (listener != null)
 				listener.workingDirectoryProgressChange(refName, commitId, ++progress, qtdCommits);

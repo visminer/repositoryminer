@@ -107,7 +107,7 @@ public class MiningProcessor {
 
 		List<Commit> commits = scm.getCommits(skip, repositoryMiner.getCommitCount());
 
-		while (commits != null) {
+		while (commits.size() > 0) {
 			List<Document> commitsDoc = new ArrayList<Document>();
 
 			for (Commit commit : commits) {
@@ -141,10 +141,13 @@ public class MiningProcessor {
 	 */
 	public Repository mine(RepositoryMiner repositoryMiner) throws IOException {
 		RepositoryDocumentHandler repoHandler = new RepositoryDocumentHandler();
-		List<Document> repos = repoHandler.findRepositoriesByName(repositoryMiner.getName());
-		Repository repository = Repository.parseDocument(repos.get(0));
+		Repository repository;
+		this.repositoryMiner = repositoryMiner;
 
-		if (repository != null) {
+		List<Document> repos = repoHandler.findRepositoriesByName(repositoryMiner.getName());
+		
+		if (repos.size() > 0) {
+			repository = Repository.parseDocument(repos.get(0));
 			return repository;
 		}
 

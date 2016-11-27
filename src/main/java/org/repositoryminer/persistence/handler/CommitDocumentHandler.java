@@ -1,5 +1,6 @@
 package org.repositoryminer.persistence.handler;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.bson.Document;
@@ -26,9 +27,9 @@ public class CommitDocumentHandler extends DocumentHandler {
 	}
 	
 	public List<Document> findByIdColl(String repository, List<String> ids, Bson projection) {
-		BasicDBObject where = new BasicDBObject(2);
-		where.append("repository", new ObjectId(repository));
-		where.append("_id", new BasicDBObject("$in", ids));
+		List<BasicDBObject> where = new ArrayList<BasicDBObject>(2);
+		where.add(new BasicDBObject("repository", new ObjectId(repository)));
+		where.add(new BasicDBObject("_id", new BasicDBObject("$in", ids)));
 		return findMany(new BasicDBObject("$and", where), projection);
 	}
 	
