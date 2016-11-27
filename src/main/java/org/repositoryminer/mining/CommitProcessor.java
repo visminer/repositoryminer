@@ -96,27 +96,28 @@ public class CommitProcessor {
 
 	private void processCommits(List<String> commits, String refName, int progress, int qtdCommits) throws IOException {
 		// removes commits already processed
-		int oldSize = commits.size();
 		Iterator<String> it = commits.iterator();
+		
 		while (it.hasNext()) {
-			if (commitsProcessed.contains(it.next()))
+			String name = it.next();
+			if (commitsProcessed.contains(name)) {
 				it.remove();
+				if (repositoryMiner.getMiningListener() != null)
+					repositoryMiner.getMiningListener().commitsProgressChange(refName, name, ++progress, qtdCommits);
+			} else 
+				break;
 		}
 
-		progress += oldSize - commits.size();
-		if (repositoryMiner.getMiningListener() != null)
-			repositoryMiner.getMiningListener().commitsProgressChange(refName, ++progress, qtdCommits);
-		
 		if (commits.size() == 0)
 			return;
 
-		for (Document doc : commitPersistence.findByIdColl(repositoryId, commits, null)) {
-			if (repositoryMiner.getMiningListener() != null)
-				repositoryMiner.getMiningListener().commitsProgressChange(refName, ++progress, qtdCommits);
-
+		for (Document doc : commitPersistence.findByIdColl(repositoryId, commits, Projections.include("diffs", "commit_date"))) {
 			Commit commit = Commit.parseDocument(doc);
-			commitsProcessed.add(commit.getId());
+			
+			if (repositoryMiner.getMiningListener() != null)
+				repositoryMiner.getMiningListener().commitsProgressChange(refName, commit.getId(), ++progress, qtdCommits);
 
+			commitsProcessed.add(commit.getId());
 			scm.checkout(commit.getId());
 
 			for (IParser parser : repositoryMiner.getParsers()) 

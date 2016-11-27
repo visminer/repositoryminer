@@ -1,10 +1,5 @@
 package org.repositoryminer.model;
 
-import static org.repositoryminer.scm.DiffType.ADD;
-import static org.repositoryminer.scm.DiffType.COPY;
-import static org.repositoryminer.scm.DiffType.DELETE;
-import static org.repositoryminer.scm.DiffType.MODIFY;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,40 +14,56 @@ public class WorkingDirectory {
 	private String id;
 	private String repository;
 	private Map<String, String> files;
-	
-	public WorkingDirectory() {}
-	
+
+	public WorkingDirectory() {
+	}
+
 	public WorkingDirectory(String repository) {
 		this.repository = repository;
 		this.files = new HashMap<String, String>();
-	}
-	
-	public void processDiff(List<Diff> diffs) {
-		for (Diff d : diffs) {
-			if (d.getType() == ADD || d.getType() == MODIFY || d.getType() == COPY) {
-				files.put(d.getPath(), id);
-			} else if(d.getType() == DELETE) {
-				files.remove(d.getPath());
-			} else { // d.getType() == RENAME
-				files.remove(d.getOldPath());
-				files.put(d.getPath(), id);
-			}
-		}
 	}
 
 	public Document toDocument() {
 		Document doc = new Document();
 		doc.append("_id", id).append("repository", new ObjectId(repository));
-		
+
 		List<Document> filesDoc = new ArrayList<Document>();
 		for (Entry<String, String> f : files.entrySet()) {
 			Document doc2 = new Document();
 			doc2.append("file", f.getKey()).append("checkout", f.getValue());
 			filesDoc.add(doc2);
 		}
-		
+
 		doc.append("files", filesDoc);
 		return doc;
+	}
+
+	public WorkingDirectory copy() {
+		WorkingDirectory wd = new WorkingDirectory();
+
+		wd.id = this.id;
+		wd.repository = this.repository;
+
+		Map<String, String> files2 = new HashMap<String, String>(
+				this.files != null ? this.files : new HashMap<String, String>());
+		wd.setFiles(files2);
+
+		return wd;
+	}
+
+	@SuppressWarnings("unchecked")
+	public static WorkingDirectory parseDocument(Document doc) {
+		WorkingDirectory wd = new WorkingDirectory();
+
+		wd.setRepository(doc.getObjectId("repository").toString());
+		wd.setId(doc.getString("_id"));
+
+		Map<String, String> files = new HashMap<String, String>();
+		for (Document d : (List<Document>) doc.get("files"))
+			files.put(d.getString("file"), d.getString("checkout"));
+
+		wd.setFiles(files);
+		return wd;
 	}
 
 	public String getId() {
@@ -78,5 +89,5 @@ public class WorkingDirectory {
 	public void setFiles(Map<String, String> files) {
 		this.files = files;
 	}
-	
+
 }

@@ -73,11 +73,12 @@ public class MiningProcessor {
 	private RepositoryMiner repositoryMiner;
 	private List<Reference> selectedReferences;
 
-	private void saveReferences(String repositoryId) {
+	private List<Reference> saveReferences(String repositoryId) {
 		selectedReferences = new ArrayList<Reference>();
 		ReferenceDocumentHandler refDocumentHandler = new ReferenceDocumentHandler();
-
-		for (Reference ref : scm.getReferences()) {
+		List<Reference> references = scm.getReferences();
+		
+		for (Reference ref : references) {
 			ref.setRepository(repositoryId);
 			ref.setCommits(scm.getReferenceCommits(ref.getPath(), ref.getType()));
 
@@ -92,6 +93,8 @@ public class MiningProcessor {
 			if (repositoryMiner.getReferences().contains(entry))
 				selectedReferences.add(ref);
 		}
+		
+		return references;
 	}
 
 	private Set<Contributor> saveCommits(String repositoryId) {
@@ -158,18 +161,25 @@ public class MiningProcessor {
 		repoHandler.insert(repoDoc);
 		repository.setId(repoDoc.get("_id").toString());
 
-		saveReferences(repository.getId());
 		Set<Contributor> contributors = saveCommits(repository.getId());
-
+		
 		repoDoc.append("contributors", Contributor.toDocumentList(contributors));
 		repoHandler.updateOnlyContributors(repoDoc);
 		repository.setContributors(new ArrayList<Contributor>(contributors));
 
+		List<Reference> allRefs = saveReferences(repository.getId());
+		
+		WorkingDirectoryProcessor wdProcessor = new WorkingDirectoryProcessor();
+		wdProcessor.setListener(repositoryMiner.getMiningListener());
+		wdProcessor.setReferences(allRefs);
+		wdProcessor.setRepositoryId(repository.getId());
+		wdProcessor.processWorkingDirectories();
+		
 		calculateAndDetect(tempRepo, repository.getId());
 		
 		scm.close();
 		FileUtils.deleteFolder(tempRepo);
-
+		
 		return repository;
 	}
 

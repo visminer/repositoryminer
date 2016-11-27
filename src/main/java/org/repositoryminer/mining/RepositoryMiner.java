@@ -52,7 +52,7 @@ public class RepositoryMiner {
 	private String description;
 	private SCMType scm;
 	private String charset = "UTF-8";
-	private int commitCount = 500;
+	private int commitCount = 2000;
 
 	private List<IParser> parsers = new ArrayList<IParser>();
 	private List<IClassMetric> classMetrics = new ArrayList<IClassMetric>();
