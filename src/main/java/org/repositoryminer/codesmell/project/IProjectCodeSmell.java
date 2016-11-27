@@ -22,11 +22,9 @@ public interface IProjectCodeSmell {
 	 *            the repository path.
 	 * @param charset
 	 *            the charset.
-	 * @param document
-	 *            the root of mongodb document in which metrics values must be
-	 *            filled.
+	 * @return the document with the data to persist in database
 	 */
-	public void detect(List<IParser> parsers, String repositoryPath, String charset, Document document);
+	public Document detect(List<IParser> parsers, String repositoryPath, String charset);
 
 	/**
 	 * @return The code smell ID

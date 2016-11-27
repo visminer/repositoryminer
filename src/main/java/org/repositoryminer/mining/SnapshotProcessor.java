@@ -121,9 +121,9 @@ public class SnapshotProcessor {
 	private void processProjectCodeSmells(Document tagDoc) {
 		List<Document> codeSmellsDocs = new ArrayList<Document>();
 		for (IProjectCodeSmell codeSmell : repositoryMiner.getProjectCodeSmells()) {
-			Document doc = new Document();
-			codeSmell.detect(repositoryMiner.getParsers(), repositoryPath, repositoryMiner.getCharset(), doc);
-			codeSmellsDocs.add(doc);
+			Document doc = codeSmell.detect(repositoryMiner.getParsers(), repositoryPath, repositoryMiner.getCharset());
+			if (doc != null)
+				codeSmellsDocs.add(doc);
 		}
 		tagDoc.append("code_smells", codeSmellsDocs);
 	}
