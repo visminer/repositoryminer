@@ -14,6 +14,8 @@ public enum MetricId {
 	PAR,
 	LOC,
 	TCC,
-	WMC;
+	WMC,
+	NOP,
+	NOC;
 	
 }
