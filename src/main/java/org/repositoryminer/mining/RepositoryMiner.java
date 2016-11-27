@@ -11,6 +11,7 @@ import org.repositoryminer.codesmell.project.IProjectCodeSmell;
 import org.repositoryminer.listener.IMiningListener;
 import org.repositoryminer.listener.IPostMiningListener;
 import org.repositoryminer.metric.clazz.IClassMetric;
+import org.repositoryminer.metric.project.IProjectMetric;
 import org.repositoryminer.model.Repository;
 import org.repositoryminer.parser.IParser;
 import org.repositoryminer.postprocessing.IPostMiningTask;
@@ -56,6 +57,7 @@ public class RepositoryMiner {
 
 	private List<IParser> parsers = new ArrayList<IParser>();
 	private List<IClassMetric> classMetrics = new ArrayList<IClassMetric>();
+	private List<IProjectMetric> projectMetrics = new ArrayList<IProjectMetric>();
 	private List<IClassCodeSmell> classCodeSmells = new ArrayList<IClassCodeSmell>();
 	private List<IProjectCodeSmell> projectCodeSmells = new ArrayList<IProjectCodeSmell>();
 	private List<IPostMiningTask> postMiningTasks = new ArrayList<IPostMiningTask>();
@@ -134,6 +136,21 @@ public class RepositoryMiner {
 		return true;
 	}
 
+	/**
+	 * Adds a project metric without duplicates
+	 * 
+	 * @param projectMetric
+	 * @return true if the metric was added and false otherwise
+	 */
+	public boolean addProjectMetric(IProjectMetric projectMetric) {
+		for (IProjectMetric p : projectMetrics) {
+			if (p.getId().equals(projectMetric.getId()))
+				return false;
+		}
+		this.projectMetrics.add(projectMetric);
+		return true;
+	}
+	
 	/**
 	 * Adds a class code smell without duplicates
 	 * 
@@ -227,6 +244,10 @@ public class RepositoryMiner {
 		return !classMetrics.isEmpty();
 	}
 
+	public boolean hasProjectMetrics() {
+		return !projectMetrics.isEmpty();
+	}
+	
 	public boolean hasClassCodeSmells() {
 		return !classCodeSmells.isEmpty();
 	}
@@ -252,7 +273,7 @@ public class RepositoryMiner {
 	 *         should be performed in references and False otherwise
 	 */
 	public boolean shouldProcessReferences() {
-		return hasProjectsCodeSmells();
+		return hasProjectsCodeSmells() || hasProjectMetrics();
 	}
 
 	public String getPath() {
@@ -314,6 +335,10 @@ public class RepositoryMiner {
 
 	public List<IClassMetric> getClassMetrics() {
 		return classMetrics;
+	}
+
+	public List<IProjectMetric> getProjectMetrics() {
+		return projectMetrics;
 	}
 
 	public List<IClassCodeSmell> getClassCodeSmells() {

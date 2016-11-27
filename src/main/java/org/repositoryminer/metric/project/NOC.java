@@ -16,7 +16,7 @@ import org.repositoryminer.ast.AbstractTypeDeclaration;
 import org.repositoryminer.metric.MetricId;
 import org.repositoryminer.parser.IParser;
 
-public class NOC implements IProjectClass {
+public class NOC implements IProjectMetric {
 
 	private Map<String, String> classes;
 
@@ -42,7 +42,7 @@ public class NOC implements IProjectClass {
 			classDocs.add(doc);
 		}
 
-		document.append("name", MetricId.NOP.toString()).append("value", classDocs);
+		document.append("name", MetricId.NOC.toString()).append("value", classDocs);
 	}
 
 	private void analyzeFile(IParser parser, File file, String charset) {

@@ -7,6 +7,7 @@ import java.util.List;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.repositoryminer.codesmell.project.IProjectCodeSmell;
+import org.repositoryminer.metric.project.IProjectMetric;
 import org.repositoryminer.model.Commit;
 import org.repositoryminer.model.Reference;
 import org.repositoryminer.parser.IParser;
@@ -24,7 +25,6 @@ public class SnapshotProcessor {
 	private String repositoryId;
 	private String repositoryPath;
 	private List<Reference> references;
-	private List<String> snapshots;
 
 	private SnapshotAnalysisDocumentHandler snapshotPersistence;
 	private ReferenceDocumentHandler referencePersistence;
@@ -53,17 +53,13 @@ public class SnapshotProcessor {
 		this.repositoryPath = repositoryPath;
 	}
 
-	public void setSnapshots(List<String> snapshots) {
-		this.snapshots = snapshots;
-	}
-
 	public void start() throws IOException {
 		processReferences();
 		processCommits();
 	}
 
 	private void processCommits() {
-		for (String snapshot : snapshots) {
+		for (String snapshot : repositoryMiner.getSnapshots()) {
 			Commit commit = Commit
 					.parseDocument(commitPersistence.findById(snapshot, Projections.include("commit_date")));
 
@@ -116,6 +112,9 @@ public class SnapshotProcessor {
 		if (repositoryMiner.hasProjectsCodeSmells())
 			processProjectCodeSmells(doc);
 		
+		if (repositoryMiner.hasProjectMetrics())
+			processProjectMetrics(doc);
+		
 		snapshotPersistence.insert(doc);
 	}
 
@@ -124,11 +123,19 @@ public class SnapshotProcessor {
 		for (IProjectCodeSmell codeSmell : repositoryMiner.getProjectCodeSmells()) {
 			Document doc = new Document();
 			codeSmell.detect(repositoryMiner.getParsers(), repositoryPath, repositoryMiner.getCharset(), doc);
-			if (!doc.isEmpty()) {
-				codeSmellsDocs.add(doc);
-			}
+			codeSmellsDocs.add(doc);
 		}
 		tagDoc.append("code_smells", codeSmellsDocs);
 	}
 
+	private void processProjectMetrics(Document tagDoc) {
+		List<Document> metricDocs = new ArrayList<Document>();
+		for (IProjectMetric metric : repositoryMiner.getProjectMetrics()) {
+			Document doc = new Document();
+			metric.calculate(repositoryMiner.getParsers(), repositoryPath, repositoryMiner.getCharset(), doc);
+			metricDocs.add(doc);
+		}
+		tagDoc.append("metrics", metricDocs);
+	}
+	
 }

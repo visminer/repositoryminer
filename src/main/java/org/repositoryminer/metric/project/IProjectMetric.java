@@ -10,7 +10,7 @@ import org.repositoryminer.parser.IParser;
  * This interface defines how to implement metric calculation in project
  * level.
  */
-public interface IProjectClass {
+public interface IProjectMetric {
 
 	/**
 	 * Activates the metric calculation

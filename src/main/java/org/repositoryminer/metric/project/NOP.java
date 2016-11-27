@@ -14,7 +14,7 @@ import org.repositoryminer.ast.AST;
 import org.repositoryminer.metric.MetricId;
 import org.repositoryminer.parser.IParser;
 
-public class NOP implements IProjectClass {
+public class NOP implements IProjectMetric {
 
 	private Set<String> packages;
 	
