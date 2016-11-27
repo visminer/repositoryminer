@@ -126,11 +126,10 @@ public class JavaParser implements IParser {
 			root = (CompilationUnit) parser.createAST(null);
 		}
 
-		String packageName = null;
 		if (root.getPackage() != null) {
-			packageName = root.getPackage().getName().getFullyQualifiedName();
+			String packageName = root.getPackage().getName().getFullyQualifiedName();
+			document.setPackageDeclaration(packageName);
 		}
-		document.setPackageDeclaration(packageName);
 
 		List<ImportDeclaration> importsDecls = new ArrayList<ImportDeclaration>();
 		for (int i = 0; i < root.imports().size(); i++) {
@@ -149,7 +148,7 @@ public class JavaParser implements IParser {
 			Object obj = root.types().get(i);
 			if (obj instanceof org.eclipse.jdt.core.dom.TypeDeclaration) {
 				org.eclipse.jdt.core.dom.TypeDeclaration typeAux = (org.eclipse.jdt.core.dom.TypeDeclaration) obj;
-				typesDecls.add(processType(packageName, typeAux));
+				typesDecls.add(processType(typeAux));
 			}
 		}
 		document.setTypes(typesDecls);
@@ -161,12 +160,11 @@ public class JavaParser implements IParser {
 		return ast;
 	}
 
-	private static org.repositoryminer.ast.AbstractTypeDeclaration processType(String packageName, 
-			org.eclipse.jdt.core.dom.TypeDeclaration type) {
+	private static org.repositoryminer.ast.AbstractTypeDeclaration processType(org.eclipse.jdt.core.dom.TypeDeclaration type) {
 		TypeDeclaration clsDecl = new TypeDeclaration();
 		clsDecl.setInterface(type.isInterface());
 
-		clsDecl.setName(packageName + "." + type.getName().getIdentifier());
+		clsDecl.setName(type.getName().getFullyQualifiedName());
 
 		List<FieldDeclaration> fields = new ArrayList<FieldDeclaration>();
 		for (org.eclipse.jdt.core.dom.FieldDeclaration field : type.getFields()) {
