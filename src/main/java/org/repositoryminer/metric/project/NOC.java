@@ -21,7 +21,7 @@ public class NOC implements IProjectMetric {
 	private Map<String, String> classes;
 
 	@Override
-	public void calculate(List<IParser> parsers, String repositoryPath, String charset, Document document) {
+	public Document calculate(List<IParser> parsers, String repositoryPath, String charset) {
 		List<Document> classDocs = new ArrayList<Document>();
 		
 		for (IParser parser : parsers) {
@@ -42,7 +42,7 @@ public class NOC implements IProjectMetric {
 			classDocs.add(doc);
 		}
 
-		document.append("name", MetricId.NOC.toString()).append("value", classDocs);
+		return new Document("name", MetricId.NOC.toString()).append("value", classDocs);
 	}
 
 	private void analyzeFile(IParser parser, File file, String charset) {

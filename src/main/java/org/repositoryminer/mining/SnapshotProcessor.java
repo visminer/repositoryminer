@@ -125,17 +125,21 @@ public class SnapshotProcessor {
 			if (doc != null)
 				codeSmellsDocs.add(doc);
 		}
-		tagDoc.append("code_smells", codeSmellsDocs);
+		
+		if (codeSmellsDocs.size() > 0)
+			tagDoc.append("code_smells", codeSmellsDocs);
 	}
 
 	private void processProjectMetrics(Document tagDoc) {
 		List<Document> metricDocs = new ArrayList<Document>();
 		for (IProjectMetric metric : repositoryMiner.getProjectMetrics()) {
-			Document doc = new Document();
-			metric.calculate(repositoryMiner.getParsers(), repositoryPath, repositoryMiner.getCharset(), doc);
-			metricDocs.add(doc);
+			Document doc = metric.calculate(repositoryMiner.getParsers(), repositoryPath, repositoryMiner.getCharset());
+			if (doc != null)
+				metricDocs.add(doc);
 		}
-		tagDoc.append("metrics", metricDocs);
+		
+		if (metricDocs.size() > 0)
+			tagDoc.append("metrics", metricDocs);
 	}
 	
 }

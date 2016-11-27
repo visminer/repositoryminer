@@ -196,7 +196,8 @@ public class CommitProcessor {
 				metricsDoc.add(mDoc);
 		}
 		
-		typeDoc.append("metrics", metricsDoc);
+		if (metricsDoc.size() > 0)
+			typeDoc.append("metrics", metricsDoc);
 	}
 
 	private void processClassCodeSmells(AST ast, AbstractTypeDeclaration type, Document typeDoc) {
@@ -207,7 +208,8 @@ public class CommitProcessor {
 				codeSmellsDoc.add(cDoc);
 		}
 		
-		typeDoc.append("codesmells", codeSmellsDoc);
+		if (codeSmellsDoc.size() > 0)
+			typeDoc.append("codesmells", codeSmellsDoc);
 	}
 
 }

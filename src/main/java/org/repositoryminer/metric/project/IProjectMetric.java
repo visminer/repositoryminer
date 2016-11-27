@@ -22,11 +22,9 @@ public interface IProjectMetric {
 	 *            the repository path.
 	 * @param charset
 	 *            the charset.
-	 * @param document
-	 *            the root of mongodb document in which metrics values must be
-	 *            filled.
+	 * @return the document with the data to persist in database
 	 */
-	public void calculate(List<IParser> parsers, String repositoryPath, String charset, Document document);
+	public Document calculate(List<IParser> parsers, String repositoryPath, String charset);
 	
 	/**
 	 * @return The metric ID

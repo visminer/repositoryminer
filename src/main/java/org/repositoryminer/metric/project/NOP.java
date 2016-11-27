@@ -19,7 +19,7 @@ public class NOP implements IProjectMetric {
 	private Set<String> packages;
 	
 	@Override
-	public void calculate(List<IParser> parsers, String repositoryPath, String charset, Document document) {
+	public Document calculate(List<IParser> parsers, String repositoryPath, String charset) {
 		List<Document> packageDocs = new ArrayList<Document>();
 		
 		for (IParser parser : parsers) {
@@ -34,7 +34,7 @@ public class NOP implements IProjectMetric {
 			packageDocs.add(doc);
 		}
 		
-		document.append("name", MetricId.NOP.toString()).append("value", packageDocs);
+		return new Document("name", MetricId.NOP.toString()).append("value", packageDocs);
 	}
 
 	private void analyzeFile(IParser parser, File file, String charset) {
