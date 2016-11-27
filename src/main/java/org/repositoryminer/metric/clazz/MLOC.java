@@ -29,7 +29,7 @@ public class MLOC extends MethodBasedMetricTemplate {
 	}
 	
 	@Override
-	public void calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast, Document document) {
+	public Document calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast) {
 		methodsDoc = new ArrayList<Document>();
 		int accumulated = 0;
 		
@@ -39,7 +39,7 @@ public class MLOC extends MethodBasedMetricTemplate {
 			methodsDoc.add(new Document("method", method.getName()).append("value", new Integer(mloc)));
 		}
 		
-		document.append("name", MetricId.MLOC.toString()).append("accumulated", new Integer(accumulated)).append("methods", methodsDoc);
+		return new Document("name", MetricId.MLOC.toString()).append("accumulated", new Integer(accumulated)).append("methods", methodsDoc);
 	}
 	
 	public int calculate(MethodDeclaration method, AST ast){

@@ -26,7 +26,7 @@ public class LVAR extends MethodBasedMetricTemplate {
 	}
 	
 	@Override
-	public void calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast, Document document) {
+	public Document calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast) {
 		methodsDoc = new ArrayList<Document>();
 		int accumulated = 0;
 		
@@ -36,7 +36,7 @@ public class LVAR extends MethodBasedMetricTemplate {
 			methodsDoc.add(new Document("method", method.getName()).append("value", new Integer(lvar)));
 		}
 		
-		document.append("name", MetricId.LVAR.toString()).append("accumulated", new Integer(accumulated)).append("methods", methodsDoc);
+		return new Document("name", MetricId.LVAR.toString()).append("accumulated", new Integer(accumulated)).append("methods", methodsDoc);
 	}
 	
 	public int calculate(MethodDeclaration method){

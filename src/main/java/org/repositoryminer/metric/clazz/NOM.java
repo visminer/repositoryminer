@@ -21,8 +21,8 @@ public class NOM extends MethodBasedMetricTemplate {
 	}
 
 	@Override
-	public void calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast, Document document) {
-		document.append("name", MetricId.NOM.toString()).append("value", methods.size());
+	public Document calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast) {
+		return new Document("name", MetricId.NOM.toString()).append("value", methods.size());
 	}
 
 }

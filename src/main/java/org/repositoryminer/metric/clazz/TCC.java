@@ -29,9 +29,9 @@ public class TCC extends MethodBasedMetricTemplate {
 	}
 
 	@Override
-	public void calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast, Document document) {
+	public Document calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast) {
 		float tcc = calculate(type, methods);
-		document.append("name", MetricId.TCC.toString()).append("value", new Float(tcc));
+		return new Document("name", MetricId.TCC.toString()).append("value", new Float(tcc));
 	}
 
 	public float calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods) {

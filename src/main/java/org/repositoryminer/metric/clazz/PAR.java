@@ -24,7 +24,7 @@ public class PAR extends MethodBasedMetricTemplate {
 	}
 	
 	@Override
-	public void calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast, Document document) {
+	public Document calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast) {
 		methodsDoc = new ArrayList<Document>();
 		int accumulated = 0;
 		
@@ -34,7 +34,7 @@ public class PAR extends MethodBasedMetricTemplate {
 			methodsDoc.add(new Document("method", method.getName()).append("value", new Integer(par)));
 		}
 	
-		document.append("name", MetricId.PAR.toString()).append("accumulated", new Integer(accumulated)).append("methods", methodsDoc);
+		return new Document("name", MetricId.PAR.toString()).append("accumulated", new Integer(accumulated)).append("methods", methodsDoc);
 	}
 	
 	public int calculate(MethodDeclaration method){

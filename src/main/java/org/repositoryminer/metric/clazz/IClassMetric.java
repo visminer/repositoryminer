@@ -34,12 +34,10 @@ public interface IClassMetric {
 	 * @param ast
 	 *            an instance of an abstract syntactic tree (
 	 *            {@link org.repositoryminer.ast.AST})
-	 * @param document
-	 *            the root of mongodb document in which metrics values must be
-	 *            filled
+	 * @return the document with the data to persist in database
 	 */
-	public void calculate(AbstractTypeDeclaration type, AST ast, Document document);
-	
+	public Document calculate(AbstractTypeDeclaration type, AST ast);
+
 	/**
 	 * @return The metric ID
 	 */

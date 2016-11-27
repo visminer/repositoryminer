@@ -25,11 +25,12 @@ public class NOA implements IClassMetric {
 	}
 	
 	@Override
-	public void calculate(AbstractTypeDeclaration type, AST ast, Document document) {
+	public Document calculate(AbstractTypeDeclaration type, AST ast) {
 		if (Archetype.CLASS_OR_INTERFACE == type.getArchetype()) {
 			TypeDeclaration cls = (TypeDeclaration) type;
-			document.append("name", MetricId.NOA.toString()).append("value", new Integer(calculate(cls.getFields())));
+			new Document("name", MetricId.NOA.toString()).append("value", new Integer(calculate(cls.getFields())));
 		}
+		return null;
 	}
 
 	public int calculate(List<FieldDeclaration> fields) {
@@ -39,7 +40,6 @@ public class NOA implements IClassMetric {
 				noa++;
 			}
  		}
-		
 		return noa;
 	}
 	

@@ -191,9 +191,8 @@ public class CommitProcessor {
 	private void processClassMetrics(AST ast, AbstractTypeDeclaration type, Document typeDoc) {
 		List<Document> metricsDoc = new ArrayList<Document>();
 		for (IClassMetric metric : repositoryMiner.getClassMetrics()) {
-			Document mDoc = new Document();
-			metric.calculate(type, ast, mDoc);
-			if (!mDoc.isEmpty()) 
+			Document mDoc = metric.calculate(type, ast);
+			if (mDoc != null)
 				metricsDoc.add(mDoc);
 		}
 		
@@ -205,8 +204,7 @@ public class CommitProcessor {
 		for (IClassCodeSmell codeSmell : repositoryMiner.getClassCodeSmells()) {
 			Document cDoc = new Document();
 			codeSmell.detect(type, ast, cDoc);
-			if (!cDoc.isEmpty()) 
-				codeSmellsDoc.add(cDoc);
+			codeSmellsDoc.add(cDoc);
 		}
 		
 		typeDoc.append("codesmells", codeSmellsDoc);

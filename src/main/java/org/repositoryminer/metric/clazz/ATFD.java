@@ -29,11 +29,10 @@ public class ATFD extends MethodBasedMetricTemplate {
 	}
 
 	@Override
-	public void calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast, Document document) {
+	public Document calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast) {
 		methodsDoc = new ArrayList<Document>();
-
 		int atfdClass = calculate(type, methods, true);
-		document.append("name", MetricId.ATFD.toString()).append("accumulated", new Integer(atfdClass)).append("methods",
+		return new Document("name", MetricId.ATFD.toString()).append("accumulated", new Integer(atfdClass)).append("methods",
 				methodsDoc);
 	}
 

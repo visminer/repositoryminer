@@ -54,10 +54,10 @@ public class CYCLO extends MethodBasedMetricTemplate {
 	 *      AST, Document)
 	 */
 	@Override
-	public void calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast, Document document) {
+	public Document calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast) {
 		methodsDoc = new ArrayList<Document>();
 		calculate(methods);
-		document.append("name", MetricId.CYCLO.toString()).append("methods", methodsDoc);
+		return new Document("name", MetricId.CYCLO.toString()).append("methods", methodsDoc);
 	}
 
 	/**

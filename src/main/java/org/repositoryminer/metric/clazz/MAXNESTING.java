@@ -26,12 +26,12 @@ public class MAXNESTING extends MethodBasedMetricTemplate {
 	}
 	
 	@Override
-	public void calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast, Document document) {
+	public Document calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast) {
 		methodsDoc = new ArrayList<Document>();
 		for (MethodDeclaration method : methods) {
 			methodsDoc.add(new Document("method", method.getName()).append("value", calculate(method)));
 		}
-		document.append("name", MetricId.MAXNESTING.toString()).append("methods", methodsDoc);
+		return new Document("name", MetricId.MAXNESTING.toString()).append("methods", methodsDoc);
 	}
 
 	public int calculate(MethodDeclaration method) {
