@@ -25,7 +25,7 @@ import com.mongodb.client.model.Projections;
 
 public class WorkingDirectoryProcessor {
 
-	private static final int COMMIT_RANGE = 2000;
+	private static final int COMMIT_RANGE = 1000;
 
 	private CommitDocumentHandler commitHandler;
 	private ReferenceDocumentHandler referenceHandler;
@@ -56,12 +56,12 @@ public class WorkingDirectoryProcessor {
 		this.listener = listener;
 	}
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void processWorkingDirectories() {
 		for (Reference ref : references) {
 			workingDirectory = new WorkingDirectory(repositoryId);
 			Document refDoc = referenceHandler.findById(ref.getId(), Projections.include("commits"));
 
-			@SuppressWarnings("unchecked")
 			List<String> commits = (List<String>) refDoc.get("commits");
 			Collections.reverse(commits);
 
@@ -69,12 +69,12 @@ public class WorkingDirectoryProcessor {
 			int end = Math.min(commits.size(), COMMIT_RANGE);
 
 			while (end < commits.size()) {
-				processCommits(commits.subList(begin, end), ref.getName(), begin, commits.size());
+				processCommits(new ArrayList(commits.subList(begin, end)), ref.getName(), begin, commits.size());
 				begin = end;
 				end = Math.min(commits.size(), COMMIT_RANGE + end);
 			}
 
-			processCommits(commits.subList(begin, end), ref.getName(), begin, commits.size());
+			processCommits(new ArrayList(commits.subList(begin, end)), ref.getName(), begin, commits.size());
 		}
 	}
 
@@ -91,8 +91,7 @@ public class WorkingDirectoryProcessor {
 				it.remove();
 				if (listener != null)
 					listener.workingDirectoryProgressChange(refName, name, ++progress, qtdCommits);
-			} else 
-				break;
+			}
 		}
 		
 		if (commits.size() == 0)
@@ -100,8 +99,6 @@ public class WorkingDirectoryProcessor {
 		
 		if (prevCommit != null)
 			workingDirectory = WorkingDirectory.parseDocument(wdHandler.findById(prevCommit));
-		
-		List<Document> wdDocs = new ArrayList<Document>(commits.size());
 		
 		for (Document doc : commitHandler.findByIdColl(repositoryId, commits, Projections.include("diffs"))) {
 			String commitId = doc.get("_id").toString();
@@ -113,10 +110,8 @@ public class WorkingDirectoryProcessor {
 			workingDirectory.setId(commitId);
 			
 			processDiff(Diff.parseDocuments((List<Document>) doc.get("diffs")));
-			wdDocs.add(workingDirectory.copy().toDocument());
+			wdHandler.insert(workingDirectory.toDocument());
 		}
-		
-		wdHandler.insertMany(wdDocs);
 	}
 
 	private void processDiff(List<Diff> diffs) {

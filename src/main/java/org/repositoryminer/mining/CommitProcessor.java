@@ -76,21 +76,22 @@ public class CommitProcessor {
 		processReferences();
 	}
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private void processReferences() throws IOException {
 		for (Reference ref : references) {
 			Document refDoc = referenceHandler.findById(ref.getId(), Projections.include("commits"));
-			@SuppressWarnings("unchecked")
+
 			List<String> commits = (List<String>) refDoc.get("commits");
 			int begin = 0;
 			int end = Math.min(commits.size(), COMMIT_RANGE);
 
 			while (end < commits.size()) {
-				processCommits(commits.subList(begin, end), ref.getName(), begin, commits.size());
+				processCommits(new ArrayList(commits.subList(begin, end)), ref.getName(), begin, commits.size());
 				begin = end;
 				end = Math.min(commits.size(), COMMIT_RANGE + end);
 			}
 
-			processCommits(commits.subList(begin, end), ref.getName(), begin, commits.size());
+			processCommits(new ArrayList(commits.subList(begin, end)), ref.getName(), begin, commits.size());
 		}
 	}
 
@@ -104,8 +105,7 @@ public class CommitProcessor {
 				it.remove();
 				if (repositoryMiner.getMiningListener() != null)
 					repositoryMiner.getMiningListener().commitsProgressChange(refName, name, ++progress, qtdCommits);
-			} else 
-				break;
+			}
 		}
 
 		if (commits.size() == 0)
