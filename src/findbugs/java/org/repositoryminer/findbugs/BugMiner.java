@@ -18,6 +18,7 @@ import org.repositoryminer.persistence.handler.CommitDocumentHandler;
 import org.repositoryminer.persistence.handler.ReferenceDocumentHandler;
 import org.repositoryminer.persistence.handler.RepositoryDocumentHandler;
 import org.repositoryminer.scm.ISCM;
+import org.repositoryminer.scm.ReferenceType;
 import org.repositoryminer.scm.SCMFactory;
 import org.repositoryminer.utility.FileUtils;
 
@@ -125,6 +126,16 @@ public class BugMiner {
 
 	public void checkout(String ref) {
 		scm.checkout(ref);
+	}
+	
+	public void checkout(String reference, ReferenceType type) {
+		List<Reference> references = scm.getReferences();
+		for (Reference r : references) {
+			if (r.getName().equals(reference) && r.getType().equals(type)) {
+				scm.checkout(r.getPath());
+				break;
+			}
+		}
 	}
 	
 	public void dispose() throws IOException {
