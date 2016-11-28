@@ -90,8 +90,8 @@ public class BugMiner {
 		findBugsPersist.insert(doc);
 	}
 
-	public void findInReference(String path) throws IllegalStateException, IOException, InterruptedException {
-		Document refDoc = refPersist.findByPath(path, repository.getId(), Projections.slice("commits", 1));
+	public void findInReference(String name, ReferenceType type) throws IllegalStateException, IOException, InterruptedException {
+		Document refDoc = refPersist.findByNameAndType(name, type, repository.getId(), Projections.slice("commits", 1));
 		Reference reference = Reference.parseDocument(refDoc);
 
 		configureFindBugs();
