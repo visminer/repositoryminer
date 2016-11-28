@@ -44,18 +44,19 @@ public abstract class MethodBasedMetricTemplate implements IClassMetric {
 	 * @see IClassMetric#calculate(AbstractTypeDeclaration, AST, Document)
 	 */
 	@Override
-	public void calculate(AbstractTypeDeclaration type, AST ast, Document document) {
+	public Document calculate(AbstractTypeDeclaration type, AST ast) {
 		TypeDeclaration cls = null;
 		if (type.getArchetype() == Archetype.CLASS_OR_INTERFACE) {
 			cls = (TypeDeclaration) type;
 
 			if (cls.getMethods() != null) {
-				if (cls.getFields() != null) {
+				if (cls.getFields() != null) 
 					currentFields = cls.getFields();
-				}
-				calculate(type, cls.getMethods(), ast, document);
+
+				return calculate(type, cls.getMethods(), ast);
 			}
 		}
+		return null;
 	}
 
 	/**
@@ -74,11 +75,8 @@ public abstract class MethodBasedMetricTemplate implements IClassMetric {
 	 *            the list of methods obtained from the abstracted type
 	 * @param ast
 	 *            the AST obtained from the type
-	 * @param document
-	 *            root element of a mongodb document from which all
-	 *            metrics-values pairs must be arranged
+	 * @return the document with the data to persist in database
 	 */
-	public abstract void calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast,
-			Document document);
+	public abstract Document calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast);
 
 }

@@ -1,7 +1,10 @@
 package org.repositoryminer.metric.clazz;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.bson.Document;
 import org.repositoryminer.ast.AST;
@@ -21,9 +24,14 @@ import org.repositoryminer.metric.MetricId;
 public class TCC extends MethodBasedMetricTemplate {
 
 	@Override
-	public void calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast, Document document) {
+	public MetricId getId() {
+		return MetricId.TCC;
+	}
+
+	@Override
+	public Document calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast) {
 		float tcc = calculate(type, methods);
-		document.append("name", MetricId.TCC).append("accumulated", new Float(tcc));
+		return new Document("name", MetricId.TCC.toString()).append("value", new Float(tcc));
 	}
 
 	public float calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods) {
@@ -40,6 +48,7 @@ public class TCC extends MethodBasedMetricTemplate {
 					ndc++;
 			}
 		}
+
 		float tcc = 0;
 		if (npc > 0) {
 			tcc = (float) ndc / npc;
@@ -56,31 +65,30 @@ public class TCC extends MethodBasedMetricTemplate {
 		return methodList;
 	}
 
-	private List<String> processAccessedFields(AbstractTypeDeclaration currType, MethodDeclaration method) {
-		List<String> accessedFields = new ArrayList<String>();
-		for (Statement stm : method.getStatements()) {
-			if (stm.getNodeType().equals(NodeType.FIELD_ACCESS)) {
-				String exp = stm.getExpression();
-				String type = exp.substring(0, exp.lastIndexOf("."));
-				String field = exp.substring(exp.lastIndexOf(".") + 1);
-				String currTypeName = currType.getName();
-				if (currTypeName.equals(type))
-					accessedFields.add(field);
-			} else if (stm.getNodeType().equals(NodeType.METHOD_INVOCATION)) {
-				String exp = stm.getExpression();
-				String type = exp.substring(0, exp.lastIndexOf("."));
-				String methodInv = exp.substring(exp.lastIndexOf(".") + 1);
-				if (currType.getName().equals(type)) {
-					if (isGetterOrSetter(methodInv)) {
-						String field = methodInv.substring(3);
-						accessedFields.add(Character.toLowerCase(field.charAt(0))
-								+ (field.length() > 1 ? field.substring(1) : ""));
-						accessedFields.add(field);
-					}
+	public List<String> processAccessedFields(AbstractTypeDeclaration currType, MethodDeclaration method) {
+		Set<String> fields = new HashSet<String>();
+		
+		for (Statement stmt : method.getStatements()) {
+			String exp, type, target;
+			
+			if (stmt.getNodeType() == NodeType.FIELD_ACCESS || stmt.getNodeType() == NodeType.METHOD_INVOCATION) {
+				exp = stmt.getExpression();
+				type = exp.substring(0, exp.lastIndexOf("."));
+				target = exp.substring(exp.lastIndexOf(".") + 1);
+			} else {
+				continue;
+			}
+
+			if (currType.getName().equals(type)) {
+				if (stmt.getNodeType().equals(NodeType.FIELD_ACCESS)) {
+					fields.add(target);
+				} else if (stmt.getNodeType().equals(NodeType.METHOD_INVOCATION)) {
+					fields.addAll(processGetOrSetOrIs(target));
 				}
 			}
+
 		}
-		return accessedFields;
+		return new ArrayList<String>(fields);
 	}
 
 	private boolean isConnected(List<String> method1, List<String> method2) {
@@ -91,18 +99,33 @@ public class TCC extends MethodBasedMetricTemplate {
 		return false;
 	}
 
-	private boolean isGetterOrSetter(String methodInv) {
+	private Collection<String> processGetOrSetOrIs(String methodInv) {
+		String field;
+		List<String> fields = new ArrayList<String>(2);
+		
 		if ((methodInv.startsWith("get") || methodInv.startsWith("set")) && methodInv.length() > 3) {
-			for (FieldDeclaration fd : currentFields) {
-				String field = methodInv.substring(3);
-				if (fd.getName().equals(field) || fd.getName().equals(
-						Character.toLowerCase(field.charAt(0)) + (field.length() > 1 ? field.substring(1) : ""))) {
-					return true;
-				}
-			}
-
+			field = methodInv.substring(3);
+		} else if (methodInv.startsWith("is") && methodInv.length() > 2) {
+			field = methodInv.substring(2);
+		} else {
+			return fields;
 		}
-		return false;
+		
+		char c[] = field.toCharArray();
+		c[0] = Character.toLowerCase(c[0]);
+		String field2 = new String(c);
+		
+		for (FieldDeclaration fd : currentFields) {
+			if (fd.getName().equals(field)) {
+				fields.add(field);
+			} else if (fd.getName().equals(field2)) {
+				fields.add(field2);
+			} else if (fields.size() == 2) {
+				break;
+			}
+		}
+		
+		return fields;
 	}
 
 }

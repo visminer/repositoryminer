@@ -5,6 +5,7 @@ import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import org.bson.Document;
@@ -13,7 +14,6 @@ import org.repositoryminer.effort.model.EffortsByReference;
 import org.repositoryminer.effort.persistence.handler.EffortsDocumentHandler;
 import org.repositoryminer.listener.IPostMiningListener;
 import org.repositoryminer.mining.RepositoryMiner;
-import org.repositoryminer.mining.TimeFrameType;
 import org.repositoryminer.model.Commit;
 import org.repositoryminer.model.Diff;
 import org.repositoryminer.model.Reference;
@@ -22,6 +22,7 @@ import org.repositoryminer.persistence.handler.CommitAnalysisDocumentHandler;
 import org.repositoryminer.persistence.handler.CommitDocumentHandler;
 import org.repositoryminer.persistence.handler.ReferenceDocumentHandler;
 import org.repositoryminer.postprocessing.IPostMiningTask;
+import org.repositoryminer.scm.ReferenceType;
 
 /**
  * <h1>A task to mine effort</h1>
@@ -64,23 +65,24 @@ public class EffortsMiningTask implements IPostMiningTask {
 	@Override
 	public void execute(RepositoryMiner repositoryMiner, Repository repository, IPostMiningListener listener) {
 		ReferenceDocumentHandler handler = new ReferenceDocumentHandler();
-		// prior to calculating effort, we must retrieve selected references from the miner
-		Map<Reference, TimeFrameType[]> refs = repositoryMiner.getReferences();
-		if (refs != null) {
+		// prior to calculating effort, we must retrieve selected references
+		// from the miner
+		List<Entry<String, ReferenceType>> refs = repositoryMiner.getReferences();
+		if (!refs.isEmpty()) {
 			int idx = 0;
 			// for each reference of the repository...
-			for (Reference ref : refs.keySet()) {
+			for (Entry<String, ReferenceType> ref : refs) {
 				if (listener != null) {
 					listener.postMiningTaskProgressChange("efforts", ++idx, refs.size());
 				}
 				// we must retrieve the reference from the database prior to processing it
-				Document refDoc = handler.findByPathAndName(ref.getPath(), ref.getName());
+				Document refDoc = handler.findByNameAndType(ref.getKey(), ref.getValue(), repository.getId(), null);
 				Reference reference = Reference.parseDocument(refDoc);
 				// let's process the reference...
 				processReference(reference);
 				// ...and save the calculated efforts
 				save(repository.getId(), reference);
-				
+
 				effortsMap.clear();
 			}
 		}

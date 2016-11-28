@@ -24,11 +24,15 @@ public class ATFD extends MethodBasedMetricTemplate {
 	private List<Document> methodsDoc;
 
 	@Override
-	public void calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast, Document document) {
-		methodsDoc = new ArrayList<Document>();
+	public MetricId getId() {
+		return MetricId.ATFD;
+	}
 
+	@Override
+	public Document calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast) {
+		methodsDoc = new ArrayList<Document>();
 		int atfdClass = calculate(type, methods, true);
-		document.append("name", MetricId.ATFD).append("accumulated", new Integer(atfdClass)).append("methods",
+		return new Document("name", MetricId.ATFD.toString()).append("accumulated", new Integer(atfdClass)).append("methods",
 				methodsDoc);
 	}
 
@@ -50,16 +54,20 @@ public class ATFD extends MethodBasedMetricTemplate {
 	private int countForeignAccessedFields(AbstractTypeDeclaration currType, MethodDeclaration method) {
 		Set<String> accessedFields = new HashSet<String>();
 
-		for (Statement stm : method.getStatements()) {
+		for (Statement stmt : method.getStatements()) {
+			String exp, type;
 
-			if (stm.getNodeType().equals(NodeType.FIELD_ACCESS)) {
-				String exp = stm.getExpression();
-				String type = exp.substring(0, exp.lastIndexOf("."));
+			if (stmt.getNodeType() == NodeType.FIELD_ACCESS || stmt.getNodeType() == NodeType.METHOD_INVOCATION) {
+				exp = stmt.getExpression();
+				type = exp.substring(0, exp.lastIndexOf("."));
+			} else {
+				continue;
+			}
+
+			if (stmt.getNodeType().equals(NodeType.FIELD_ACCESS)) {
 				if (!currType.getName().equals(type))
 					accessedFields.add(exp.toLowerCase());
-			} else if (stm.getNodeType().equals(NodeType.METHOD_INVOCATION)) {
-				String exp = stm.getExpression();
-				String type = exp.substring(0, exp.lastIndexOf("."));
+			} else if (stmt.getNodeType().equals(NodeType.METHOD_INVOCATION)) {
 				String methodInv = exp.substring(exp.lastIndexOf(".") + 1);
 				if (!currType.getName().equals(type)) {
 					if ((methodInv.startsWith("get") || methodInv.startsWith("set")) && methodInv.length() > 3) {

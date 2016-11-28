@@ -1,10 +1,7 @@
 package org.repositoryminer.utility;
 
-import java.io.File;
-import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Scanner;
 import java.util.zip.CRC32;
 import java.util.zip.Checksum;
 
@@ -32,27 +29,6 @@ public class StringUtils {
 		Checksum checksum = new CRC32();
 		checksum.update(bytes, 0, bytes.length);
 		return checksum.getValue();
-	}
-	
-	public static String normalizePath(String path) throws IOException {
-		File file = new File(path);
-		String treatedPath = file.getCanonicalPath();
-		return treatedPath.replace("\\", "/");
-	}
-	
-	public static int countNonEmptyLines(String text) {
-		int lines = 0;
-		
-		Scanner scanner = new Scanner(text);
-		while (scanner.hasNextLine()) {
-		  String line = scanner.nextLine();
-		  if (!line.trim().equals("")) {
-			  lines++;
-		  }
-		}
-		scanner.close();
-
-		return lines;
 	}
 	
 }

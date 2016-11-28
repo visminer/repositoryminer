@@ -1,20 +1,22 @@
 package org.repositoryminer.mining;
 
 import java.io.IOException;
+import java.util.AbstractMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import java.util.Map.Entry;
 
 import org.repositoryminer.codesmell.clazz.IClassCodeSmell;
 import org.repositoryminer.codesmell.project.IProjectCodeSmell;
 import org.repositoryminer.listener.IMiningListener;
 import org.repositoryminer.listener.IPostMiningListener;
 import org.repositoryminer.metric.clazz.IClassMetric;
-import org.repositoryminer.model.Reference;
+import org.repositoryminer.metric.project.IProjectMetric;
 import org.repositoryminer.model.Repository;
-import org.repositoryminer.parser.Parser;
+import org.repositoryminer.parser.IParser;
 import org.repositoryminer.postprocessing.IPostMiningTask;
+import org.repositoryminer.scm.ReferenceType;
 import org.repositoryminer.scm.SCMType;
-import org.repositoryminer.technicaldebt.ITechnicalDebt;
 
 /**
  * <h1>A facade for the repository miner API</h1>
@@ -51,14 +53,16 @@ public class RepositoryMiner {
 	private String description;
 	private SCMType scm;
 	private String charset = "UTF-8";
+	private int commitCount = 2000;
 
-	private List<Parser> parsers;
-	private List<IClassMetric> classMetrics;
-	private List<IClassCodeSmell> classCodeSmells;
-	private List<ITechnicalDebt> technicalDebts;
-	private List<IProjectCodeSmell> projectCodeSmells;
-	private List<IPostMiningTask> postMiningTasks;
-	private Map<Reference, TimeFrameType[]> references;
+	private List<IParser> parsers = new ArrayList<IParser>();
+	private List<IClassMetric> classMetrics = new ArrayList<IClassMetric>();
+	private List<IProjectMetric> projectMetrics = new ArrayList<IProjectMetric>();
+	private List<IClassCodeSmell> classCodeSmells = new ArrayList<IClassCodeSmell>();
+	private List<IProjectCodeSmell> projectCodeSmells = new ArrayList<IProjectCodeSmell>();
+	private List<IPostMiningTask> postMiningTasks = new ArrayList<IPostMiningTask>();
+	private List<Entry<String, ReferenceType>> references = new ArrayList<Entry<String, ReferenceType>>();
+	private List<String> snapshots = new ArrayList<String>();
 
 	private IMiningListener miningListener;
 	private IPostMiningListener postMiningListener;
@@ -103,6 +107,7 @@ public class RepositoryMiner {
 	 * One must make sure that all needed parameters are set prior to calling
 	 * this method
 	 * <p>
+	 * 
 	 * @return instance of repository after mining and post-mining are performed
 	 * @throws IOException
 	 */
@@ -116,24 +121,159 @@ public class RepositoryMiner {
 		return postProcessor.executeTasks(processor.mine(this), this);
 	}
 
+	/**
+	 * Adds a class metric without duplicates
+	 * 
+	 * @param classMetric
+	 * @return true if the metric was added and false otherwise
+	 */
+	public boolean addClassMetric(IClassMetric classMetric) {
+		for (IClassMetric c : this.classMetrics) {
+			if (c.getId().equals(classMetric.getId()))
+				return false;
+		}
+		this.classMetrics.add(classMetric);
+		return true;
+	}
+
+	/**
+	 * Adds a project metric without duplicates
+	 * 
+	 * @param projectMetric
+	 * @return true if the metric was added and false otherwise
+	 */
+	public boolean addProjectMetric(IProjectMetric projectMetric) {
+		for (IProjectMetric p : projectMetrics) {
+			if (p.getId().equals(projectMetric.getId()))
+				return false;
+		}
+		this.projectMetrics.add(projectMetric);
+		return true;
+	}
+	
+	/**
+	 * Adds a class code smell without duplicates
+	 * 
+	 * @param classCodeSmell
+	 * @return true if the code smell was added and false otherwise
+	 */
+	public boolean addClassCodeSmell(IClassCodeSmell classCodeSmell) {
+		for (IClassCodeSmell c : this.classCodeSmells) {
+			if (c.getId().equals(classCodeSmell.getId()))
+				return false;
+		}
+		this.classCodeSmells.add(classCodeSmell);
+		return true;
+	}
+
+	/**
+	 * Adds a project code smell without duplicates
+	 * 
+	 * @param projectCodeSmell
+	 * @return true if the code smell was added and false otherwise
+	 */
+	public boolean addProjectCodeSmell(IProjectCodeSmell projectCodeSmell) {
+		for (IProjectCodeSmell c : this.projectCodeSmells) {
+			if (c.getId().equals(projectCodeSmell.getId()))
+				return false;
+		}
+		this.projectCodeSmells.add(projectCodeSmell);
+		return true;
+	}
+
+	/**
+	 * Adds a parser without duplicates
+	 * 
+	 * @param parser
+	 * @return true if the parser was added and false otherwise
+	 */
+	public boolean addParser(IParser parser) {
+		for (IParser p : this.parsers) {
+			if (p.getLanguage() == parser.getLanguage())
+				return false;
+		}
+		this.parsers.add(parser);
+		return true;
+	}
+
+	/**
+	 * Adds a post mining task without duplicates
+	 * 
+	 * @param postMiningTask
+	 * @return true if the task was added and false otherwise
+	 */
+	public boolean addPostMiningTask(IPostMiningTask postMiningTask) {
+		for (IPostMiningTask p : this.postMiningTasks) {
+			if (p.getTaskName().equals(postMiningTask.getTaskName()))
+				return false;
+		}
+		this.postMiningTasks.add(postMiningTask);
+		return true;
+	}
+
+	/**
+	 * Adds a reference without duplicates
+	 * 
+	 * @param reference
+	 * @return true if the reference was added and false otherwise
+	 */
+	public boolean addReference(String name, ReferenceType type) {
+		Entry<String, ReferenceType> entry = new AbstractMap.SimpleEntry<String, ReferenceType>(name, type);
+		if (this.references.contains(entry))
+			return false;
+
+		references.add(entry);
+		return true;
+	}
+
+	/**
+	 * Adds a snapshot without duplicates
+	 * 
+	 * @param snapshot
+	 * @return
+	 */
+	public boolean addSnapshot(String snapshot) {
+		if (snapshots.contains(snapshot))
+			return false;
+		
+		snapshots.add(snapshot);
+		return true;
+	}
+	
 	public boolean hasClassMetrics() {
-		return (classMetrics != null && !classMetrics.isEmpty());
+		return !classMetrics.isEmpty();
 	}
 
-	public boolean hasTechnicalDebts() {
-		return (technicalDebts != null && !technicalDebts.isEmpty());
+	public boolean hasProjectMetrics() {
+		return !projectMetrics.isEmpty();
 	}
-
+	
 	public boolean hasClassCodeSmells() {
-		return (classCodeSmells != null && !classCodeSmells.isEmpty());
+		return !classCodeSmells.isEmpty();
 	}
 
 	public boolean hasProjectsCodeSmells() {
-		return (projectCodeSmells != null && !projectCodeSmells.isEmpty());
+		return !projectCodeSmells.isEmpty();
 	}
 
 	public boolean hasPostMiningTasks() {
-		return (postMiningTasks != null && !postMiningTasks.isEmpty());
+		return !postMiningTasks.isEmpty();
+	}
+
+	/**
+	 * @return True if calculation (metrics) and detections (smells/debts)
+	 *         should be performed in commits and False otherwise
+	 */
+	public boolean shouldProcessCommits() {
+		return hasClassCodeSmells() || hasClassMetrics();
+	}
+
+	/**
+	 * @return True if calculation (metrics) and detections (smells/debts)
+	 *         should be performed in references and False otherwise
+	 */
+	public boolean shouldProcessReferences() {
+		return hasProjectsCodeSmells() || hasProjectMetrics();
 	}
 
 	public String getPath() {
@@ -181,58 +321,36 @@ public class RepositoryMiner {
 		return this;
 	}
 
-	public List<Parser> getParsers() {
-		return parsers;
+	public int getCommitCount() {
+		return commitCount;
 	}
 
-	public RepositoryMiner setParsers(List<Parser> parsers) {
-		this.parsers = parsers;
-		return this;
+	public void setCommitCount(int commitCount) {
+		this.commitCount = commitCount;
+	}
+
+	public List<IParser> getParsers() {
+		return parsers;
 	}
 
 	public List<IClassMetric> getClassMetrics() {
 		return classMetrics;
 	}
 
-	public RepositoryMiner setClassMetrics(List<IClassMetric> classMetrics) {
-		this.classMetrics = classMetrics;
-		return this;
+	public List<IProjectMetric> getProjectMetrics() {
+		return projectMetrics;
 	}
 
 	public List<IClassCodeSmell> getClassCodeSmells() {
 		return classCodeSmells;
 	}
 
-	public RepositoryMiner setClassCodeSmells(List<IClassCodeSmell> classCodeSmells) {
-		this.classCodeSmells = classCodeSmells;
-		return this;
-	}
-
-	public List<ITechnicalDebt> getTechnicalDebts() {
-		return technicalDebts;
-	}
-
-	public RepositoryMiner setTechnicalDebts(List<ITechnicalDebt> technicalDebts) {
-		this.technicalDebts = technicalDebts;
-		return this;
-	}
-
 	public List<IProjectCodeSmell> getProjectCodeSmells() {
 		return projectCodeSmells;
 	}
 
-	public RepositoryMiner setProjectCodeSmells(List<IProjectCodeSmell> projectCodeSmells) {
-		this.projectCodeSmells = projectCodeSmells;
-		return this;
-	}
-
 	public List<IPostMiningTask> getPostMiningTasks() {
 		return postMiningTasks;
-	}
-
-	public RepositoryMiner setPostMiningTasks(List<IPostMiningTask> postMiningTasks) {
-		this.postMiningTasks = postMiningTasks;
-		return this;
 	}
 
 	public RepositoryMiner setMiningListener(IMiningListener listener) {
@@ -253,13 +371,12 @@ public class RepositoryMiner {
 		return postMiningListener;
 	}
 
-	public RepositoryMiner setReferences(Map<Reference, TimeFrameType[]> references) {
-		this.references = references;
-		return this;
+	public List<Entry<String, ReferenceType>> getReferences() {
+		return references;
 	}
 
-	public Map<Reference, TimeFrameType[]> getReferences() {
-		return references;
+	public List<String> getSnapshots() {
+		return snapshots;
 	}
 
 }

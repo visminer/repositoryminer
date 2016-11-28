@@ -7,8 +7,6 @@ import org.bson.Document;
 import org.repositoryminer.ast.AST;
 import org.repositoryminer.ast.AbstractTypeDeclaration;
 import org.repositoryminer.ast.MethodDeclaration;
-import org.repositoryminer.ast.Statement;
-import org.repositoryminer.ast.Statement.NodeType;
 import org.repositoryminer.metric.MetricId;
 
 /**
@@ -21,35 +19,46 @@ import org.repositoryminer.metric.MetricId;
 public class NOAV extends MethodBasedMetricTemplate {
 
 	private List<Document> methodsDoc;
+	private LVAR lvarMetric;
+	private TCC tccMetric; // TCC and NOAV processes accessed fields the same way
+	
+	public NOAV() {
+		lvarMetric = new LVAR();
+		tccMetric = new TCC();
+	}
+	
+	@Override
+	public MetricId getId() {
+		return MetricId.NOAV;
+	}
 
 	@Override
-	public void calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast, Document document) {
+	public Document calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast) {
 		methodsDoc = new ArrayList<Document>();
-
-		for (MethodDeclaration method : methods) {
-			int noav = calculate(method);
+		List<MethodDeclaration> filteredMethods = filterMethods(methods);
+		
+		for (MethodDeclaration method : filteredMethods) {
+			int noav = calculate(type, method);
 			methodsDoc.add(new Document("method", method.getName()).append("value", new Integer(noav)));
 		}
 
-		document.append("name", MetricId.NOAV).append("methods", methodsDoc);
+		return new Document("name", MetricId.NOAV.toString()).append("methods", methodsDoc);
 	}
 
-	public int calculate(MethodDeclaration method) {
-		int noav = 0;
-		LVAR lvarMetric = new LVAR();
-		PAR parMetric = new PAR();
-
-		for (Statement stmt : method.getStatements()) {
-			if (NodeType.VARIABLE_ACCESS.equals(stmt.getNodeType()))
-				noav++;
+	public int calculate(AbstractTypeDeclaration currType, MethodDeclaration method) {
+		int accessFields = tccMetric.processAccessedFields(currType, method).size();
+		int nVar = lvarMetric.calculate(method);
+		int nParams = method.getParameters() != null ? method.getParameters().size() : 0;
+		return accessFields + nVar + nParams;
+	}
+	
+	private List<MethodDeclaration> filterMethods(List<MethodDeclaration> methods) {
+		List<MethodDeclaration> methodList = new ArrayList<MethodDeclaration>();
+		for (MethodDeclaration m : methods) {
+			if (!(m.getModifiers().contains("abstract")))
+				methodList.add(m);
 		}
-
-		// removing variable declarations from count
-		noav = noav - lvarMetric.calculate(method);
-		// removing method parameters from count
-		noav = noav - parMetric.calculate(method);
-
-		return noav;
+		return methodList;
 	}
 
 }

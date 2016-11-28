@@ -3,8 +3,10 @@ package org.repositoryminer.persistence.handler;
 import java.util.List;
 
 import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.repositoryminer.persistence.Connection;
+import org.repositoryminer.scm.ReferenceType;
 
 import com.mongodb.BasicDBObject;
 
@@ -16,12 +18,11 @@ public class ReferenceDocumentHandler extends DocumentHandler {
 		super.collection = Connection.getInstance().getCollection(COLLECTION_NAME);
 	}
 	
-	public Document findByPathAndName(String path, String name) {
+	public Document findByPath(String path, String repositoryId, Bson projection) {
 		BasicDBObject whereClause = new BasicDBObject();
 		whereClause.put("path", path);
-		whereClause.put("name", name);
-
-		return findOne(whereClause);
+		whereClause.put("repository", new ObjectId(repositoryId));
+		return findOne(whereClause, projection);
 	}
 
 	public List<Document> getByRepository(String repository) {
@@ -30,4 +31,12 @@ public class ReferenceDocumentHandler extends DocumentHandler {
 		return findMany(whereClause, null);
 	}
 
+	public Document findByNameAndType(String name, ReferenceType type, String repositoryId, Bson projection) {
+		BasicDBObject whereClause = new BasicDBObject();
+		whereClause.put("name", name);
+		whereClause.put("type", type.toString());
+		whereClause.put("repository", new ObjectId(repositoryId));
+		return findOne(whereClause, projection);
+	}
+	
 }

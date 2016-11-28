@@ -20,11 +20,17 @@ public class NOA implements IClassMetric {
 	private static final String[] UNACCEPTED_TYPES = new String[] { "enum", "class" };
 
 	@Override
-	public void calculate(AbstractTypeDeclaration type, AST ast, Document document) {
+	public MetricId getId() {
+		return MetricId.NOA;
+	}
+	
+	@Override
+	public Document calculate(AbstractTypeDeclaration type, AST ast) {
 		if (Archetype.CLASS_OR_INTERFACE == type.getArchetype()) {
 			TypeDeclaration cls = (TypeDeclaration) type;
-			document.append("name", MetricId.NOA).append("accumulated", new Integer(calculate(cls.getFields())));
+			new Document("name", MetricId.NOA.toString()).append("value", new Integer(calculate(cls.getFields())));
 		}
+		return null;
 	}
 
 	public int calculate(List<FieldDeclaration> fields) {
@@ -34,7 +40,6 @@ public class NOA implements IClassMetric {
 				noa++;
 			}
  		}
-		
 		return noa;
 	}
 	

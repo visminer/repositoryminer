@@ -19,22 +19,31 @@ import org.repositoryminer.ast.TypeDeclaration;
  * methods causes negative impact in software understandability and maintenance.
  * <p>
  * A method is considered too complex when it has McCabe’s cyclomatic number too high.
- * The default threshold for cyclomatic complexity is 4.
+ * The default threshold for cyclomatic complexity is 10.
  */
 public class ComplexMethod implements IClassCodeSmell {
 
 	private List<Document> methodsDoc;
-	private int ccThreshold = 4;
+	private CYCLO ccMetric;
+	
+	private int ccThreshold = 10;
 
 	public ComplexMethod() {
+		ccMetric = new CYCLO();
 	}
 
 	public ComplexMethod(int ccThreshold) {
+		super();
 		this.ccThreshold = ccThreshold;
 	}
 
 	@Override
-	public void detect(AbstractTypeDeclaration type, AST ast, Document document) {
+	public CodeSmellId getId() {
+		return CodeSmellId.COMPLEX_METHOD;
+	}
+	
+	@Override
+	public Document detect(AbstractTypeDeclaration type, AST ast) {
 		if (type.getArchetype() == Archetype.CLASS_OR_INTERFACE) {
 			TypeDeclaration cls = (TypeDeclaration) type;
 
@@ -42,18 +51,16 @@ public class ComplexMethod implements IClassCodeSmell {
 
 			for (MethodDeclaration method : cls.getMethods()) {
 				boolean complexMethod = detect(method);
-				methodsDoc.add(new Document("method", method.getName()).append("value", new Boolean(complexMethod)));
+				methodsDoc.add(new Document("method", method.getName()).append("value", complexMethod));
 			}
 
-			document.append("name", CodeSmellId.COMPLEX_METHOD).append("methods", methodsDoc);
+			return new Document("name", CodeSmellId.COMPLEX_METHOD.toString()).append("methods", methodsDoc);
 		}
+		return null;
 	}
 
 	public boolean detect(MethodDeclaration method) {
-		boolean complexMethod = false;
-		CYCLO ccMetric = new CYCLO();
-		complexMethod = ccMetric.calculate(method) > ccThreshold;
-		return complexMethod;
+		return ccMetric.calculate(method) > ccThreshold;
 	}
 
 }

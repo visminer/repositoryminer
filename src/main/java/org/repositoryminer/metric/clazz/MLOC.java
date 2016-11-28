@@ -8,7 +8,6 @@ import org.repositoryminer.ast.AST;
 import org.repositoryminer.ast.AbstractTypeDeclaration;
 import org.repositoryminer.ast.MethodDeclaration;
 import org.repositoryminer.metric.MetricId;
-import org.repositoryminer.utility.StringUtils;
 
 /**
  * <h1>Method Lines of Code</h1>
@@ -18,10 +17,19 @@ import org.repositoryminer.utility.StringUtils;
 public class MLOC extends MethodBasedMetricTemplate {
 	
 	private List<Document> methodsDoc;
+	private LOC locMetric;
 
+	public MLOC() {
+		locMetric = new LOC();
+	}
+	
 	@Override
-	public void calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast, Document document) {
-		
+	public MetricId getId() {
+		return MetricId.MLOC;
+	}
+	
+	@Override
+	public Document calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast) {
 		methodsDoc = new ArrayList<Document>();
 		int accumulated = 0;
 		
@@ -31,18 +39,13 @@ public class MLOC extends MethodBasedMetricTemplate {
 			methodsDoc.add(new Document("method", method.getName()).append("value", new Integer(mloc)));
 		}
 		
-		document.append("name", MetricId.MLOC).append("accumulated", new Integer(accumulated)).append("methods", methodsDoc);
+		return new Document("name", MetricId.MLOC.toString()).append("accumulated", new Integer(accumulated)).append("methods", methodsDoc);
 	}
-	
 	
 	public int calculate(MethodDeclaration method, AST ast){
 		String sourceCode = ast.getSourceCode();
 		String methodSourceCode = sourceCode.substring(method.getStartPositionInSourceCode(), method.getEndPositionInSourceCode());
-
-		if(methodSourceCode == null || methodSourceCode.length() == 0)
-			return 0;
-
-		return StringUtils.countNonEmptyLines(methodSourceCode);
+		return locMetric.calculate(methodSourceCode);
 	}
 
 }

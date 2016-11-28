@@ -1,25 +1,43 @@
 package org.repositoryminer.metric.clazz;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.bson.Document;
 import org.repositoryminer.ast.AST;
 import org.repositoryminer.ast.AbstractTypeDeclaration;
 import org.repositoryminer.metric.MetricId;
-import org.repositoryminer.utility.StringUtils;
 
 public class LOC implements IClassMetric {
 
+	private Pattern pattern;
+	
+	public LOC() {
+		pattern = Pattern.compile("(\r\n)|(\n)|(\r)");
+	}
+	
 	@Override
-	public void calculate(AbstractTypeDeclaration type, AST ast, Document document) {
+	public MetricId getId() {
+		return MetricId.LOC;
+	}
+	
+	@Override
+	public Document calculate(AbstractTypeDeclaration type, AST ast) {
 		int sloc = calculate(ast.getSourceCode());
-
-		document.append("name", MetricId.LOC).append("accumulated", new Integer(sloc));
+		return new Document("name", MetricId.LOC.toString()).append("value", new Integer(sloc));
 	}
 
 	public int calculate(String source) {
 		if (source == null || source.length() == 0)
 			return 0;
 
-		return StringUtils.countNonEmptyLines(source);
+		int lines = 1;
+		Matcher matcher = pattern.matcher(source);
+		
+		while (matcher.find())
+			lines++;
+		
+		return lines;
 	}
 
 }

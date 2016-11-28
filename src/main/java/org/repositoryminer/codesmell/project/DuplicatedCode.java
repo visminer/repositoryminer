@@ -10,10 +10,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.io.FilenameUtils;
 import org.bson.Document;
 import org.repositoryminer.codesmell.CodeSmellId;
 import org.repositoryminer.metric.clazz.LOC;
-import org.repositoryminer.parser.Parser;
+import org.repositoryminer.parser.IParser;
 
 import net.sourceforge.pmd.cpd.CPD;
 import net.sourceforge.pmd.cpd.CPDConfiguration;
@@ -29,8 +30,8 @@ import net.sourceforge.pmd.cpd.Match;
  * significant amount of duplication.
  * <p>
  * The only threshold of this code smell is the number of tokens, in other
- * words, the amount of duplication that a portion of code must have to be considered
- * duplicate.
+ * words, the amount of duplication that a portion of code must have to be
+ * considered duplicate.
  */
 public class DuplicatedCode implements IProjectCodeSmell {
 
@@ -44,19 +45,24 @@ public class DuplicatedCode implements IProjectCodeSmell {
 	}
 
 	@Override
-	public void detect(List<Parser> parsers, String repositoryPath, Document document) {
-		document.append("name", CodeSmellId.DUPLICATED_CODE).append("occurrences", calculate(parsers, repositoryPath));
+	public CodeSmellId getId() {
+		return CodeSmellId.DUPLICATED_CODE;
 	}
 
-	public List<Document> calculate(List<Parser> parsers, String repositoryPath) {
+	@Override
+	public Document detect(List<IParser> parsers, String repositoryPath, String charset) {
+		return new Document("name", CodeSmellId.DUPLICATED_CODE.toString()).append("occurrences", calculate(parsers, repositoryPath, charset));
+	}
+
+	public List<Document> calculate(List<IParser> parsers, String repositoryPath, String charset) {
 		List<Document> docs = new ArrayList<Document>();
 
-		for (Parser parser : parsers) {
+		for (IParser parser : parsers) {
 			CPDConfiguration config = new CPDConfiguration();
-			config.setEncoding(parser.getCharset());
+			config.setEncoding(charset);
 			config.setLanguage(languageFactory(parser.getLanguage()));
 			config.setSkipLexicalErrors(true);
-			config.setSourceEncoding(parser.getCharset());
+			config.setSourceEncoding(charset);
 			config.setMinimumTileSize(tokensThreshold);
 			config.setNonRecursive(true);
 
@@ -81,14 +87,19 @@ public class DuplicatedCode implements IProjectCodeSmell {
 				auxDoc.append("line_count", m.getLineCount());
 				auxDoc.append("token_count", m.getTokenCount());
 				auxDoc.append("source_code_slice", m.getSourceCodeSlice());
-				auxDoc.append("language", parser.getLanguage());
+				auxDoc.append("language", parser.getLanguage().toString());
 
 				List<Document> filesDoc = new ArrayList<Document>();
 				for (Mark mark : m.getMarkSet()) {
+					// removes the repository path from file path
+					String filePath = FilenameUtils.normalize(mark.getFilename());
+					filePath = repositoryPath.endsWith("/") ? filePath.substring(repositoryPath.length()+1) :
+						filePath.substring(repositoryPath.length()+2);
+
 					Document fileDoc = new Document();
 					fileDoc.append("begin_line", mark.getBeginLine());
 					fileDoc.append("end_line", mark.getEndLine());
-					fileDoc.append("file_name", mark.getFilename());
+					fileDoc.append("file_name", filePath);
 					fileDoc.append("percentage", getDuplicatedPercentage(mark.getFilename(), m.getLineCount()));
 					filesDoc.add(fileDoc);
 				}
@@ -111,9 +122,9 @@ public class DuplicatedCode implements IProjectCodeSmell {
 		}
 	}
 
-	private Language languageFactory(String lang) {
+	private Language languageFactory(org.repositoryminer.ast.Language lang) {
 		switch (lang) {
-		case "java":
+		case JAVA:
 			return new JavaLanguage();
 		default:
 			return null;

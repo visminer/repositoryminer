@@ -21,8 +21,12 @@ public class LVAR extends MethodBasedMetricTemplate {
 	private List<Document> methodsDoc;
 	
 	@Override
-	public void calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast, Document document) {
-		
+	public MetricId getId() {
+		return MetricId.LVAR;
+	}
+	
+	@Override
+	public Document calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast) {
 		methodsDoc = new ArrayList<Document>();
 		int accumulated = 0;
 		
@@ -32,17 +36,15 @@ public class LVAR extends MethodBasedMetricTemplate {
 			methodsDoc.add(new Document("method", method.getName()).append("value", new Integer(lvar)));
 		}
 		
-		document.append("name", MetricId.LVAR).append("accumulated", new Integer(accumulated)).append("methods", methodsDoc);
+		return new Document("name", MetricId.LVAR.toString()).append("accumulated", new Integer(accumulated)).append("methods", methodsDoc);
 	}
 	
 	public int calculate(MethodDeclaration method){
 		List<String> lvar = new ArrayList<String>();
-
 		for(Statement statement : method.getStatements()){
-			if(NodeType.VARIABLE.equals(statement.getNodeType()) && !lvar.contains(statement.getExpression()))
+			if(statement.getNodeType() == NodeType.VARIABLE_DECLARATION && !lvar.contains(statement.getExpression()))
 				lvar.add(statement.getExpression());
 		}
-		
 		return lvar.size();
 	}
 

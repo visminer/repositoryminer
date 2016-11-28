@@ -39,28 +39,32 @@ public interface IMiningListener {
 	public void commitsProgressChange(int commitIndex, int numberOfCommits);
 
 	/**
-	 * Notifies the progress of commits processing
-	 *
+	 * Notifies the progress of working directory states processing
+	 * 
 	 * @param reference
 	 *            the name of the reference which the commit belongs to
+	 * @param commit
+	 *            the commit name being processed
 	 * @param commitIndex
 	 *            the current index of the commit being processed
 	 * @param numberOfCommits
 	 *            total amount of commits to be processed
 	 */
-	public void commitsProgressChange(String reference, int commitIndex, int numberOfCommits);
+	public void workingDirectoryProgressChange(String reference, String commit, int commitIndex, int numberOfCommits);
 
 	/**
-	 * Notifies the progress of timeframes processing
-	 * 
+	 * Notifies the progress of commits processing
+	 *
 	 * @param reference
-	 *            the name of the reference which the timeframe refers to
-	 * @param timeFrameIndex
-	 *            the current index of the timeframe being processed
-	 * @param numberOfTimeFrames
-	 *            total number of time frames to be processed
+	 *            the name of the reference which the commit belongs to
+	 * @param commit
+	 *            the commit name
+	 * @param commitIndex
+	 *            the current index of the commit being processed
+	 * @param numberOfCommits
+	 *            total amount of commits to be processed
 	 */
-	public void timeFramesProgressChange(String reference, int timeFrameIndex, int numberOfTimeFrames);
+	public void commitsProgressChange(String reference, String commit, int commitIndex, int numberOfCommits);
 
 	/**
 	 * Notifies the progress of tags processing

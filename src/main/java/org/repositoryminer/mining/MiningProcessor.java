@@ -2,28 +2,26 @@ package org.repositoryminer.mining;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.AbstractMap;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
+import java.util.Map.Entry;
 
-import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.bson.Document;
 import org.repositoryminer.model.Commit;
 import org.repositoryminer.model.Contributor;
 import org.repositoryminer.model.Reference;
 import org.repositoryminer.model.Repository;
-import org.repositoryminer.model.WorkingDirectory;
 import org.repositoryminer.persistence.handler.CommitDocumentHandler;
 import org.repositoryminer.persistence.handler.ReferenceDocumentHandler;
 import org.repositoryminer.persistence.handler.RepositoryDocumentHandler;
-import org.repositoryminer.persistence.handler.WorkingDirectoryDocumentHandler;
 import org.repositoryminer.scm.ISCM;
+import org.repositoryminer.scm.ReferenceType;
 import org.repositoryminer.scm.SCMFactory;
-import org.repositoryminer.utility.StringUtils;
+import org.repositoryminer.utility.FileUtils;
 
 /**
  * <h1>The actual mining processor behind
@@ -57,7 +55,7 @@ import org.repositoryminer.utility.StringUtils;
  * </ul>
  * At least one of the lists must be populated so to get the mining process
  * started. The lists are then injected in a instance of
- * {@link org.repositoryminer.mining.SourceAnalyzer} which is capable of
+ * {@link org.repositoryminer.mining.CommitProcessor} which is capable of
  * performing the actual calculations and detections.
  * <p>
  * Raised exceptions are:
@@ -72,110 +70,64 @@ import org.repositoryminer.utility.StringUtils;
 public class MiningProcessor {
 
 	private ISCM scm;
-	private List<Reference> references;
-	private List<Reference> timeReferences;
-	private List<Commit> commits;
-	private Repository repository;
-	private Set<Contributor> contributors;
+	private RepositoryMiner repositoryMiner;
+	private List<Reference> selectedReferences;
 
-	String copyRepositoryFolder(String srcFolder, String destFolderName) throws IOException {
-		File src = new File(srcFolder);
-		File dest = new File(System.getProperty("java.io.tmpdir"), destFolderName);
-		FileUtils.copyDirectory(src, dest);
-		return StringUtils.normalizePath(dest.getCanonicalPath());
-	}
-
-	private void deleteRepositoryFolder(String folderName) throws IOException {
-		File folder = new File(folderName);
-		FileUtils.deleteDirectory(folder);
-	}
-
-	private void saveReferences(String repositoryId) {
-		ReferenceDocumentHandler refHandler = new ReferenceDocumentHandler();
-		references = scm.getReferences();
+	private List<Reference> saveReferences(String repositoryId) {
+		selectedReferences = new ArrayList<Reference>();
+		ReferenceDocumentHandler refDocumentHandler = new ReferenceDocumentHandler();
+		List<Reference> references = scm.getReferences();
+		
 		for (Reference ref : references) {
 			ref.setRepository(repositoryId);
 			ref.setCommits(scm.getReferenceCommits(ref.getPath(), ref.getType()));
-			refHandler.insert(ref.toDocument());
+
+			Document refDoc = ref.toDocument();
+			refDocumentHandler.insert(refDoc);
+
+			ref.setCommits(null);
+			ref.setId(refDoc.getObjectId("_id").toString());
+			
+			Entry<String, ReferenceType> entry = new AbstractMap.SimpleEntry<String, ReferenceType>(ref.getName(),
+					ref.getType());
+			if (repositoryMiner.getReferences().contains(entry))
+				selectedReferences.add(ref);
 		}
+		
+		return references;
 	}
 
-	/*
-	 * This method is used to create a hash map using the commit hash as key and
-	 * the commit object as value. The main objective of the method is to make
-	 * faster the time frame processing. This processing will require a lot of
-	 * searches in some structure, and a hash map is perfect for this job,
-	 * because its average time complexity is O(1). It is preferable use this
-	 * process instead of bring back the commits in the reference, because get
-	 * the commits with the changes made and other data require more resources
-	 * and requires disk I/O. And these data is already in the class, so making
-	 * N searches in O(1) time complexity will costs O(N).
-	 */
-	private Map<String, Commit> createCommitsMap() {
-		Map<String, Commit> commitsMap = new HashMap<String, Commit>(commits.size());
-		for (Commit c : commits) {
-			commitsMap.put(c.getId(), c);
-		}
-		return commitsMap;
-	}
+	private Set<Contributor> saveCommits(String repositoryId) {
+		Set<Contributor> contributors = new HashSet<Contributor>();
+		IssueExtractor messageAnalyzer = new IssueExtractor();
+		CommitDocumentHandler documentHandler = new CommitDocumentHandler();
 
-	private void saveTimeReferences(RepositoryMiner rm) {
-		if (rm.getReferences() == null) {
-			return;
-		}
-
-		boolean proceed = false;
-		for (Entry<Reference, TimeFrameType[]> entry : rm.getReferences().entrySet()) {
-			if (entry.getValue() != null) {
-				proceed = true;
-				break;
-			}
-		}
-
-		if (!proceed) {
-			return;
-		}
-
-		Map<String, Commit> commitsMap = createCommitsMap();
-		ProcessTimeFrames procTimeFrames = new ProcessTimeFrames(repository.getId(), commitsMap,
-				rm.getMiningListener());
-		timeReferences = new ArrayList<Reference>();
-
-		for (Entry<Reference, TimeFrameType[]> entry : rm.getReferences().entrySet()) {
-			if (entry.getValue() != null) {
-				int index = references.indexOf(entry.getKey());
-				timeReferences.addAll(procTimeFrames.analyzeCommits(references.get(index), entry.getValue()));
-			}
-		}
-
-	}
-
-	private void saveCommitsAndSnapshots(RepositoryMiner repositoryMiner) {
-		contributors = new HashSet<Contributor>();
-		CommitDocumentHandler commitHandler = new CommitDocumentHandler();
-
-		WorkingDirectory wd = new WorkingDirectory(repository.getId());
-		WorkingDirectoryDocumentHandler wdHandler = new WorkingDirectoryDocumentHandler();
-
-		CommitMessageAnalyzer messageAnalyzer = new CommitMessageAnalyzer();
-
-		commits = scm.getCommits();
+		int skip = 0;
 		int idx = 0;
 
-		for (Commit commit : commits) {
-			commit.setRepository(repository.getId());
-			commit.setIssueReferences(messageAnalyzer.analyzeMessage(commit.getMessage()));
+		List<Commit> commits = scm.getCommits(skip, repositoryMiner.getCommitCount());
 
-			if (repositoryMiner.getMiningListener() != null) {
-				repositoryMiner.getMiningListener().commitsProgressChange(++idx, commits.size());
+		while (commits.size() > 0) {
+			List<Document> commitsDoc = new ArrayList<Document>();
+
+			for (Commit commit : commits) {
+				commit.setRepository(repositoryId);
+				commit.setIssueReferences(messageAnalyzer.analyzeMessage(commit.getMessage()));
+
+				if (repositoryMiner.getMiningListener() != null) {
+					repositoryMiner.getMiningListener().commitsProgressChange(++idx, commits.size());
+				}
+
+				contributors.add(commit.getCommitter());
+				commitsDoc.add(commit.toDocument());
 			}
 
-			contributors.add(commit.getCommitter());
-			wd.setId(commit.getId());
-			wd.processDiff(commit.getDiffs());
-			wdHandler.insert(wd.toDocument());
-			commitHandler.insert(commit.toDocument());
+			documentHandler.insertMany(commitsDoc);
+			skip += repositoryMiner.getCommitCount();
+			commits = scm.getCommits(skip, repositoryMiner.getCommitCount());
 		}
+
+		return contributors;
 	}
 
 	/**
@@ -189,44 +141,54 @@ public class MiningProcessor {
 	 */
 	public Repository mine(RepositoryMiner repositoryMiner) throws IOException {
 		RepositoryDocumentHandler repoHandler = new RepositoryDocumentHandler();
+		Repository repository;
+		this.repositoryMiner = repositoryMiner;
+
 		List<Document> repos = repoHandler.findRepositoriesByName(repositoryMiner.getName());
 		
-		if (repos != null && !repos.isEmpty()) {
+		if (repos.size() > 0) {
 			repository = Repository.parseDocument(repos.get(0));
-		} else {
-			String tempRepo = copyRepositoryFolder(repositoryMiner.getPath(), repositoryMiner.getName());
-
-			scm = SCMFactory.getSCM(repositoryMiner.getScm());
-			scm.open(tempRepo);
-
-			repository = new Repository(repositoryMiner);
-
-			Document repoDoc = repository.toDocument();
-			repoHandler.insert(repoDoc);
-			repository.setId(repoDoc.get("_id").toString());
-
-			saveReferences(repository.getId());
-			saveCommitsAndSnapshots(repositoryMiner);
-			saveTimeReferences(repositoryMiner);
-
-			calculateAndDetect(repositoryMiner, tempRepo);
-
-			repoDoc.append("contributors", Contributor.toDocumentList(contributors));
-			repoHandler.updateOnlyContributors(repoDoc);
-
-			scm.close();
-			deleteRepositoryFolder(tempRepo);
+			return repository;
 		}
 
+		File repositoryFolder = new File(repositoryMiner.getPath());
+		String tempRepo = FileUtils.copyFolderToTmp(repositoryFolder.getAbsolutePath(), repositoryMiner.getName());
+
+		scm = SCMFactory.getSCM(repositoryMiner.getScm());
+		scm.open(tempRepo);
+
+		repository = new Repository(repositoryMiner);
+		repository.setPath(FilenameUtils.normalize(repositoryFolder.getAbsolutePath(), true));
+
+		Document repoDoc = repository.toDocument();
+		repoHandler.insert(repoDoc);
+		repository.setId(repoDoc.get("_id").toString());
+
+		Set<Contributor> contributors = saveCommits(repository.getId());
+		
+		repoDoc.append("contributors", Contributor.toDocumentList(contributors));
+		repoHandler.updateOnlyContributors(repoDoc);
+		repository.setContributors(new ArrayList<Contributor>(contributors));
+
+		List<Reference> allRefs = saveReferences(repository.getId());
+		
+		WorkingDirectoryProcessor wdProcessor = new WorkingDirectoryProcessor();
+		wdProcessor.setListener(repositoryMiner.getMiningListener());
+		wdProcessor.setReferences(allRefs);
+		wdProcessor.setRepositoryId(repository.getId());
+		wdProcessor.processWorkingDirectories();
+		
+		calculateAndDetect(tempRepo, repository.getId());
+		
+		scm.close();
+		FileUtils.deleteFolder(tempRepo);
+		
 		return repository;
 	}
 
 	/**
 	 * Performs both the calculation (metrics) and detections (smells/debts) on
-	 * the artifacts of a targeted project. An instance of
-	 * {@link org.repositoryminer.mining.SourceAnalyzer} is prepared/configured
-	 * and put into action (
-	 * {@link org.repositoryminer.mining.SourceAnalyzer#analyze()})
+	 * the targeted project.
 	 * 
 	 * @param repositoryMiner
 	 *            instance of {@link org.repositoryminer.mining.RepositoryMiner}
@@ -234,35 +196,30 @@ public class MiningProcessor {
 	 *            temporary repository path to access the files content
 	 * @throws IOException
 	 */
-	private void calculateAndDetect(RepositoryMiner repositoryMiner, String tempPath) throws IOException {
-
-		if (!repositoryMiner.hasClassCodeSmells() && !repositoryMiner.hasClassMetrics()
-				&& !repositoryMiner.hasTechnicalDebts() && !repositoryMiner.hasProjectsCodeSmells()) {
+	private void calculateAndDetect(String tempRepo, String repositoryId) throws IOException {
+		if (!repositoryMiner.shouldProcessCommits() && !repositoryMiner.shouldProcessReferences())
 			return;
+
+		if (selectedReferences.size() == 0)
+			return;
+		
+		if (repositoryMiner.shouldProcessCommits()) {
+			CommitProcessor commitProcessor = new CommitProcessor();
+			commitProcessor.setReferences(selectedReferences);
+			commitProcessor.setSCM(scm);
+			commitProcessor.setRepositoryMiner(repositoryMiner);
+			commitProcessor.setRepositoryData(repositoryId, tempRepo);
+			commitProcessor.start();
 		}
 
-		List<Reference> refs = null;
-		if (repositoryMiner.hasProjectsCodeSmells()) {
-			refs = new ArrayList<Reference>();
-
-			for (Reference ref : repositoryMiner.getReferences().keySet()) {
-				int index = references.indexOf(ref);
-				refs.add(references.get(index));
-			}
-
-			if (timeReferences != null) {
-				for (Reference ref : timeReferences) {
-					refs.add(ref);
-				}
-			}
+		if (repositoryMiner.shouldProcessReferences()) {
+			SnapshotProcessor snapshotProcessor = new SnapshotProcessor();
+			snapshotProcessor.setReferences(selectedReferences);
+			snapshotProcessor.setRepositoryData(repositoryId, tempRepo);
+			snapshotProcessor.setRepositoryMiner(repositoryMiner);
+			snapshotProcessor.setSCM(scm);
+			snapshotProcessor.start();
 		}
-
-		Map<String, Commit> commitsMap = createCommitsMap();
-		SourceAnalyzer sourceAnalyzer = new SourceAnalyzer(repositoryMiner, scm, repository.getId(), tempPath);
-
-		sourceAnalyzer.setCommitsMap(commitsMap);
-		sourceAnalyzer.setReferences(refs);
-		sourceAnalyzer.analyze();
 	}
 
 }

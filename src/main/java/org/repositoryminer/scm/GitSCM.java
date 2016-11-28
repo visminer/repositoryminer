@@ -4,7 +4,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
 
@@ -45,6 +44,10 @@ import org.slf4j.LoggerFactory;
  */
 public class GitSCM implements ISCM {
 
+	private class LinesInfo {
+		public int added = 0, removed = 0;
+	}
+	
 	private static final Logger LOGGER = LoggerFactory.getLogger(GitSCM.class);
 
 	private Repository repository;
@@ -122,10 +125,10 @@ public class GitSCM implements ISCM {
 	}
 
 	@Override
-	public List<Commit> getCommits() {
+	public List<Commit> getCommits(int skip, int maxCount) {
 		Iterable<RevCommit> revCommits = null;
 		try {
-			revCommits = git.log().all().call();
+			revCommits = git.log().all().setSkip(skip).setMaxCount(maxCount).call();
 		} catch (GitAPIException | IOException e) {
 			errorHandler(ErrorMessage.GIT_LOG_COMMIT_ERROR.toString(), e);
 		}
@@ -156,7 +159,6 @@ public class GitSCM implements ISCM {
 			commits.add(c);
 		}
 
-		Collections.reverse(commits);
 		return commits;
 	}
 
@@ -209,12 +211,10 @@ public class GitSCM implements ISCM {
 		AnyObjectId oldCommit = revCommit.getParentCount() > 0 ? repository.resolve(revCommit.getParent(0).getName())
 				: null;
 
-		List<DiffEntry> diffs = null;
-		diffs = diffFormatter.scan(oldCommit, currentCommit);
-
+		List<DiffEntry> diffs = diffFormatter.scan(oldCommit, currentCommit);
 		List<Diff> changes = new ArrayList<Diff>();
+		
 		for (DiffEntry entry : diffs) {
-
 			RevCommit parentCommit = oldCommit == null ? null
 					: revWalk.parseCommit(ObjectId.fromString(oldCommit.getName()));
 
@@ -251,15 +251,15 @@ public class GitSCM implements ISCM {
 				break;
 			}
 
-			int[] lines = getLinesAddedAndDeleted(path, parentCommit, revCommit);
-			Diff change = new Diff(path, oldPath, StringUtils.encodeToCRC32(path), lines[0], lines[1], type);
+			LinesInfo linesInfo = getLinesAddedAndDeleted(path, parentCommit, revCommit);
+			Diff change = new Diff(path, oldPath, StringUtils.encodeToCRC32(path), linesInfo.added, linesInfo.removed, type);
 			changes.add(change);
 		}
 
 		return changes;
 	}
 
-	private int[] getLinesAddedAndDeleted(String path, RevCommit oldCommit, RevCommit currentCommit)
+	private LinesInfo getLinesAddedAndDeleted(String path, RevCommit oldCommit, RevCommit currentCommit)
 			throws IOException {
 		ByteArrayOutputStream output = new ByteArrayOutputStream();
 		DiffFormatter formatter = new DiffFormatter(output);
@@ -270,22 +270,21 @@ public class GitSCM implements ISCM {
 		formatter.format(oldCommit, currentCommit);
 
 		Scanner scanner = new Scanner(output.toString());
-		int added = 0, removed = 0;
+		LinesInfo linesInfo = new LinesInfo();
 
 		while (scanner.hasNextLine()) {
 			String line = scanner.nextLine();
 			if (line.startsWith("+") && !line.startsWith("+++"))
-				added++;
+				linesInfo.added++;
 			else if (line.startsWith("-") && !line.startsWith("---"))
-				removed++;
+				linesInfo.removed++;
 		}
 
 		output.close();
 		formatter.close();
 		scanner.close();
-
-		int[] vet = { added, removed };
-		return vet;
+		
+		return linesInfo;
 	}
 
 	private void makeCheckout(String point) {

@@ -44,15 +44,20 @@ public class CYCLO extends MethodBasedMetricTemplate {
 
 	private List<Document> methodsDoc;
 
+	@Override
+	public MetricId getId() {
+		return MetricId.CYCLO;
+	}
+
 	/**
 	 * @see MethodBasedMetricTemplate#calculate(AbstractTypeDeclaration, List,
 	 *      AST, Document)
 	 */
 	@Override
-	public void calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast, Document document) {
+	public Document calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast) {
 		methodsDoc = new ArrayList<Document>();
-		int ccClass = calculate(methods);
-		document.append("name", MetricId.CYCLO).append("accumulated", new Integer(ccClass)).append("methods", methodsDoc);
+		calculate(methods);
+		return new Document("name", MetricId.CYCLO.toString()).append("methods", methodsDoc);
 	}
 
 	/**
@@ -63,17 +68,12 @@ public class CYCLO extends MethodBasedMetricTemplate {
 	 * 
 	 * @param methods
 	 *            list of methods from which the CC metric must be extracted
-	 * @return an integer representing the total amount of CC in the class
 	 */
-	public int calculate(List<MethodDeclaration> methods) {
-		int ccClass = 0;
+	public void calculate(List<MethodDeclaration> methods) {
 		for (MethodDeclaration method : methods) {
-
 			int cc = calculate(method);
-			ccClass += cc;
 			methodsDoc.add(new Document("method", method.getName()).append("value", new Integer(cc)));
 		}
-		return ccClass;
 	}
 
 	/**
@@ -96,8 +96,11 @@ public class CYCLO extends MethodBasedMetricTemplate {
 		int cc = 1;
 		for (Statement statement : method.getStatements()) {
 			switch (statement.getNodeType()) {
-			case IF:
 			case SWITCH_CASE:
+				cc++;
+				break;
+
+			case IF:
 			case FOR:
 			case DO_WHILE:
 			case WHILE:
@@ -105,6 +108,7 @@ public class CYCLO extends MethodBasedMetricTemplate {
 			case CONDITIONAL_EXPRESSION:
 				cc += calculateExpression(statement.getExpression(), statement.getNodeType());
 				break;
+
 			default:
 				break;
 			}

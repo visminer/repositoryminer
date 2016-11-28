@@ -5,36 +5,32 @@ import org.bson.Document;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
 
 public class Connection {
 
-	private static Connection conn;
+	private static MongoClient client;
 
-	private MongoClient client;
-	private MongoDatabase database;
+	private String dbName;
 
 	private Connection() {
 	}
 
-	synchronized public static Connection getInstance() {
-		if (conn == null)
-			conn = new Connection();
-		return conn;
+	private static class LazyHelper {
+		private static final Connection INSTANCE = new Connection();
+	}
+
+	public static Connection getInstance() {
+		return LazyHelper.INSTANCE;
 	}
 
 	public void connect(String uri, String dbName) {
 		MongoClientURI mongoURI = new MongoClientURI(uri);
 		client = new MongoClient(mongoURI);
-		database = client.getDatabase(dbName);
-	}
-
-	public MongoDatabase getDatabase() {
-		return database;
+		this.dbName = dbName;
 	}
 
 	public MongoCollection<Document> getCollection(String collName) {
-		return database.getCollection(collName);
+		return client.getDatabase(dbName).getCollection(collName);
 	}
 
 	public void close() {

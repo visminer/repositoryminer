@@ -11,12 +11,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.repositoryminer.model.IssueReference;
 import org.repositoryminer.scm.hostingservice.IssueCommandType;
 
-public class CommitMessageAnalyzer {
+public class IssueExtractor {
 
 	Map<String, IssueCommandType> commandMap;
 	Pattern pattern;
 
-	public CommitMessageAnalyzer() {
+	public IssueExtractor() {
 		commandMap = IssueCommandType.toMap();
 		createPattern();
 	}

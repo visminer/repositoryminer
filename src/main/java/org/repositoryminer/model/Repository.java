@@ -9,30 +9,36 @@ public class Repository {
 
 	private String id;
 	private String name;
+	private String path;
 	private String description;
 	private SCMType scm;
 	private List<Contributor> contributors;
 
 	public Document toDocument() {
 		Document doc = new Document();
-		doc.append("name", name).append("description", description).append("scm", scm.toString());
+		doc.append("name", name).append("path", path).append("description", description).append("scm", scm.toString());
 		return doc;
 	}
 
 	public static Repository parseDocument(Document repositoryDoc) {
-		Repository repository = new Repository(repositoryDoc.getObjectId("_id").toString(), repositoryDoc.getString("name"),
+		if (repositoryDoc == null)
+			return null;
+		
+		Repository repository = new Repository(repositoryDoc.getObjectId("_id").toString(),
+				repositoryDoc.getString("name"), repositoryDoc.getString("path"),
 				repositoryDoc.getString("description"), SCMType.valueOf(repositoryDoc.getString("scm")));
 
 		return repository;
 	}
 
 	public Repository(org.repositoryminer.mining.RepositoryMiner repo) {
-		this(null, repo.getName(), repo.getDescription(), repo.getScm());
+		this(null, repo.getName(), repo.getPath(), repo.getDescription(), repo.getScm());
 	}
 
-	public Repository(String id, String name, String description, SCMType scm) {
+	public Repository(String id, String name, String path, String description, SCMType scm) {
 		this.id = id;
 		this.name = name;
+		this.path = path;
 		this.description = description;
 		this.scm = scm;
 	}
@@ -51,6 +57,14 @@ public class Repository {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public String getPath() {
+		return path;
+	}
+
+	public void setPath(String path) {
+		this.path = path;
 	}
 
 	public String getDescription() {

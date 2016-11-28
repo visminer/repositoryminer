@@ -41,11 +41,12 @@ public class Commit {
 	public static Commit parseDocument(Document commitDoc, List<String> parents) {
 		Commit commit = new Commit(commitDoc.getString("_id"), commitDoc.getString("message"),
 				commitDoc.getDate("authored_date"), commitDoc.getDate("commit_date"),
-				commitDoc.get("repository").toString(), parents,
+				null, parents,
 				Contributor.parseDocument((Document) commitDoc.get("author")),
 				Contributor.parseDocument((Document) commitDoc.get("committer")),
 				Diff.parseDocuments((List<Document>) commitDoc.get("diffs")));
 
+		commit.setRepository(commitDoc.get("repository") != null ? commitDoc.get("repository").toString() : "");
 		return commit;
 	}
 

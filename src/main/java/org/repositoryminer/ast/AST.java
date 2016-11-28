@@ -4,51 +4,32 @@ public class AST {
 
 	private Document document;
 	private String sourceCode;
+	private Language language;
 	private String project;
-
-	/**
-	 * @return the document
-	 */
+	
 	public Document getDocument() {
 		return document;
 	}
-
-	/**
-	 * @param document
-	 *            the document to set
-	 */
 	public void setDocument(Document document) {
 		this.document = document;
 	}
-
-	/**
-	 * @return the sourceCode
-	 */
 	public String getSourceCode() {
 		return sourceCode;
 	}
-
-	/**
-	 * @param sourceCode
-	 *            the sourceCode to set
-	 */
 	public void setSourceCode(String sourceCode) {
 		this.sourceCode = sourceCode;
 	}
-
-	/**
-	 * @return the project
-	 */
+	public Language getLanguage() {
+		return language;
+	}
+	public void setLanguage(Language language) {
+		this.language = language;
+	}
 	public String getProject() {
 		return project;
 	}
-
-	/**
-	 * @param project the project to set
-	 */
 	public void setProject(String project) {
 		this.project = project;
 	}
-
 
 }
