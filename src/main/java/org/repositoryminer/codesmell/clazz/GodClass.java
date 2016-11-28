@@ -34,8 +34,6 @@ import org.repositoryminer.metric.clazz.WMC;
  * <li>wmcThreshold = 47</li>
  * <li>tccThreshold = 1/3</li>
  * </ul>
- * <b>P.S.</b> The "useNoa" is a flag to define if the NOA metric will be
- * considered or not. The default value of "useNoa" is false.
  */
 public class GodClass implements IClassCodeSmell {
 
@@ -53,7 +51,7 @@ public class GodClass implements IClassCodeSmell {
 		tccMetric = new TCC();
 	}
 
-	public GodClass(int atfdThreshold, int wmcThreshold, float tccThreshold, int noaThreshold, boolean useNoa) {
+	public GodClass(int atfdThreshold, int wmcThreshold, float tccThreshold, int noaThreshold) {
 		super();
 		this.atfdThreshold = atfdThreshold;
 		this.wmcThreshold = wmcThreshold;
