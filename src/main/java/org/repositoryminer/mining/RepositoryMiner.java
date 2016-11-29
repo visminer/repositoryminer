@@ -10,6 +10,8 @@ import org.repositoryminer.codesmell.clazz.IClassCodeSmell;
 import org.repositoryminer.codesmell.project.IProjectCodeSmell;
 import org.repositoryminer.listener.IMiningListener;
 import org.repositoryminer.listener.IPostMiningListener;
+import org.repositoryminer.listener.impl.MiningListener;
+import org.repositoryminer.listener.impl.PostMiningListener;
 import org.repositoryminer.metric.clazz.IClassMetric;
 import org.repositoryminer.metric.project.IProjectMetric;
 import org.repositoryminer.model.Repository;
@@ -64,8 +66,8 @@ public class RepositoryMiner {
 	private List<Entry<String, ReferenceType>> references = new ArrayList<Entry<String, ReferenceType>>();
 	private List<String> snapshots = new ArrayList<String>();
 
-	private IMiningListener miningListener;
-	private IPostMiningListener postMiningListener;
+	private IMiningListener miningListener =  MiningListener.getDefault();
+	private IPostMiningListener postMiningListener = PostMiningListener.getDefault();
 
 	/**
 	 * Use this void constructor if parameters are going to be set later
@@ -354,6 +356,10 @@ public class RepositoryMiner {
 	}
 
 	public RepositoryMiner setMiningListener(IMiningListener listener) {
+		if (listener == null) {
+			throw new NullPointerException("Listener cannot be null");
+		}
+		
 		this.miningListener = listener;
 		return this;
 	}
@@ -363,6 +369,10 @@ public class RepositoryMiner {
 	}
 
 	public RepositoryMiner setPostMiningListener(IPostMiningListener listener) {
+		if (listener == null) {
+			throw new NullPointerException("Listener cannot be null");
+		}
+		
 		this.postMiningListener = listener;
 		return this;
 	}
