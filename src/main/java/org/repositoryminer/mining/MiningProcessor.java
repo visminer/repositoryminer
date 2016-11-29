@@ -102,8 +102,9 @@ public class MiningProcessor {
 		IssueExtractor messageAnalyzer = new IssueExtractor();
 		CommitDocumentHandler documentHandler = new CommitDocumentHandler();
 
+		repositoryMiner.getMiningListener().initCommitsMining();
+
 		int skip = 0;
-		int idx = 0;
 
 		List<Commit> commits = scm.getCommits(skip, repositoryMiner.getCommitCount());
 
@@ -113,10 +114,6 @@ public class MiningProcessor {
 			for (Commit commit : commits) {
 				commit.setRepository(repositoryId);
 				commit.setIssueReferences(messageAnalyzer.analyzeMessage(commit.getMessage()));
-
-				if (repositoryMiner.getMiningListener() != null) {
-					repositoryMiner.getMiningListener().commitsProgressChange(++idx, commits.size());
-				}
 
 				contributors.add(commit.getCommitter());
 				commitsDoc.add(commit.toDocument());

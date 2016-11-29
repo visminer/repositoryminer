@@ -15,11 +15,9 @@ package org.repositoryminer.listener;
  * {@link org.repositoryminer.mining.RepositoryMiner#setMiningListener(IMiningListener)}
  * in order to be activated.
  * <p>
- * 
- * @since 2016-07-27
  */
 public interface IMiningListener {
-
+	
 	/**
 	 * Notifies the initiation of mining
 	 * 
@@ -36,21 +34,7 @@ public interface IMiningListener {
 	 * @param numberOfCommits
 	 *            total amount of commits to be processed
 	 */
-	public void commitsProgressChange(int commitIndex, int numberOfCommits);
-
-	/**
-	 * Notifies the progress of working directory states processing
-	 * 
-	 * @param reference
-	 *            the name of the reference which the commit belongs to
-	 * @param commit
-	 *            the commit name being processed
-	 * @param commitIndex
-	 *            the current index of the commit being processed
-	 * @param numberOfCommits
-	 *            total amount of commits to be processed
-	 */
-	public void workingDirectoryProgressChange(String reference, String commit, int commitIndex, int numberOfCommits);
+	public void initCommitsMining();
 
 	/**
 	 * Notifies the progress of commits processing
@@ -65,6 +49,21 @@ public interface IMiningListener {
 	 *            total amount of commits to be processed
 	 */
 	public void commitsProgressChange(String reference, String commit, int commitIndex, int numberOfCommits);
+
+
+	/**
+	 * Notifies the progress of working directory states processing
+	 * 
+	 * @param reference
+	 *            the name of the reference which the commit belongs to
+	 * @param commit
+	 *            the commit name being processed
+	 * @param commitIndex
+	 *            the current index of the commit being processed
+	 * @param numberOfCommits
+	 *            total amount of commits to be processed
+	 */
+	public void workingDirectoryProgressChange(String reference, String commit, int commitIndex, int numberOfCommits);
 
 	/**
 	 * Notifies the progress of tags processing
