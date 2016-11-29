@@ -72,9 +72,7 @@ public class EffortsMiningTask implements IPostMiningTask {
 			int idx = 0;
 			// for each reference of the repository...
 			for (Entry<String, ReferenceType> ref : refs) {
-				if (listener != null) {
-					listener.postMiningTaskProgressChange("efforts", ++idx, refs.size());
-				}
+				listener.postMiningTaskProgressChange("efforts", ++idx, refs.size());
 				// we must retrieve the reference from the database prior to processing it
 				Document refDoc = handler.findByNameAndType(ref.getKey(), ref.getValue(), repository.getId(), null);
 				Reference reference = Reference.parseDocument(refDoc);

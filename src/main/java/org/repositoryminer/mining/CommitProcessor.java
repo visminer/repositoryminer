@@ -103,8 +103,7 @@ public class CommitProcessor {
 			String name = it.next();
 			if (commitsProcessed.contains(name)) {
 				it.remove();
-				if (repositoryMiner.getMiningListener() != null)
-					repositoryMiner.getMiningListener().commitsProgressChange(refName, name, ++progress, qtdCommits);
+				repositoryMiner.getMiningListener().commitsProgressChange(refName, name, ++progress, qtdCommits);
 			}
 		}
 

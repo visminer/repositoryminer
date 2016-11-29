@@ -43,13 +43,11 @@ public class PostMiningProcessor {
 			List<IPostMiningTask> tasks = repositoryMiner.getPostMiningTasks();
 			IPostMiningListener listener = repositoryMiner.getPostMiningListener();
 			for (IPostMiningTask task : tasks) {
-				if (listener != null) {
-					listener.initPostMiningTaskProgress(task.getTaskName());
-				}
+				listener.initPostMiningTaskProgress(task.getTaskName());
 				task.execute(repositoryMiner, repository, listener);
 			}
 		}
-		
+
 		return repository;
 	}
 

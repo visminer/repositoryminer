@@ -57,9 +57,7 @@ public class GitHubService implements IHostingService {
 
 	@Override
 	public List<Issue> getAllIssues() {
-		if (hostingMiner.getListener() != null) {
-			hostingMiner.getListener().initIssuesProcessing();
-		}
+		hostingMiner.getListener().initIssuesProcessing();
 
 		int number = 1;
 		List<Issue> issues = new ArrayList<Issue>();
@@ -103,9 +101,7 @@ public class GitHubService implements IHostingService {
 
 	@Override
 	public List<Milestone> getAllMilestones() {
-		if (hostingMiner.getListener() != null) {
-			hostingMiner.getListener().initMilestonesProcessing();
-		}
+		hostingMiner.getListener().initMilestonesProcessing();
 
 		int number = 1;
 		List<Milestone> milesDB = new ArrayList<Milestone>();
@@ -134,9 +130,7 @@ public class GitHubService implements IHostingService {
 
 	@Override
 	public List<Contributor> getAllContributors() {
-		if (hostingMiner.getListener() != null) {
-			hostingMiner.getListener().initMilestonesProcessing();
-		}
+		hostingMiner.getListener().initMilestonesProcessing();
 
 		List<Contributor> contributors = new ArrayList<Contributor>();
 		try {

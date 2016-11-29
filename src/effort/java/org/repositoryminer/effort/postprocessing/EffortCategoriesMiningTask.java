@@ -82,22 +82,22 @@ public class EffortCategoriesMiningTask implements IPostMiningTask {
 	private void processEfforts(List<EffortsByReference> effortsByReference, IPostMiningListener listener) {
 		int idx = 0;
 		for (EffortsByReference effortsByRef : effortsByReference) {
-			if (listener != null) {
-				listener.postMiningTaskProgressChange("effort categories", ++idx, effortsByReference.size());
-			}
+			listener.postMiningTaskProgressChange("effort categories", ++idx, effortsByReference.size());
 			// let's get the list of efforts...
 			List<Effort> efforts = effortsByRef.getEfforts();
 			if (efforts != null && !efforts.isEmpty()) {
 				// ...and sort them based on the overall effort value
 				Collections.sort(efforts);
 
-				// after sorting, the min effort value is the obtained from the firts element...
+				// after sorting, the min effort value is the obtained from the
+				// firts element...
 				double minEffort = efforts.get(0).calculateOverallEffort();
 				// ...and the max from the last item
 				double maxEffort = efforts.get(efforts.size() - 1).calculateOverallEffort();
 
 				for (Effort effort : efforts) {
-					// that given, let's categorize each effort within the min and max thresholds
+					// that given, let's categorize each effort within the min
+					// and max thresholds
 					String category = categorizer.getCategory(effort, minEffort, maxEffort);
 					if (categoriesMap.containsKey(category)) {
 						categoriesMap.get(category).add(effort);

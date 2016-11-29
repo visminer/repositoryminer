@@ -65,9 +65,7 @@ public class HostingProcessor {
 
 		int contributorIndex = 0;
 		for (Document contributorDoc : contributorsDoc) {
-			if (listener != null) {
-				listener.contributorsProgressChange(++contributorIndex, contributorsDoc.size());
-			}
+			listener.contributorsProgressChange(++contributorIndex, contributorsDoc.size());
 
 			String name = contributorDoc.getString("name");
 			for (Contributor contributorDb : contributors) {
@@ -86,9 +84,7 @@ public class HostingProcessor {
 	private void connectMilestonesAndIssues(List<Milestone> milestones, List<Issue> issues) {
 		// connect issues to milestones
 		if (milestones.size() > 0) {
-			if (listener != null) {
-				listener.initMilestonesIssuesConnection();
-			}
+			listener.initMilestonesIssuesConnection();
 
 			for (Milestone m : milestones) {
 				m.setIssues(new ArrayList<Integer>());
@@ -110,9 +106,8 @@ public class HostingProcessor {
 		if (issues.size() > 0) {
 			int issuesIndex = 0;
 			for (Issue issue : issues) {
-				if (listener != null) {
-					listener.issuesProgressChange(++issuesIndex, issues.size());
-				}
+				listener.issuesProgressChange(++issuesIndex, issues.size());
+
 				issue.setRepository(repositoryId);
 				issuesDocs.add(issue.toDocument());
 			}
@@ -129,9 +124,8 @@ public class HostingProcessor {
 		if (milestones.size() > 0) {
 			int milestonesIndex = 0;
 			for (Milestone mile : milestones) {
-				if (listener != null) {
-					listener.milestonesProgressChange(++milestonesIndex, milestones.size());
-				}
+				listener.milestonesProgressChange(++milestonesIndex, milestones.size());
+
 				mile.setRepository(repositoryId);
 				milesDocs.add(mile.toDocument());
 			}

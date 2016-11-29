@@ -75,9 +75,7 @@ public class SnapshotProcessor {
 	private void processReferences() {
 		int idx = 0;
 		for (Reference ref : references) {
-			if (repositoryMiner.getMiningListener() != null) {
-				repositoryMiner.getMiningListener().tagsProgressChange(ref.getName(), ++idx, references.size());
-			}
+			repositoryMiner.getMiningListener().tagsProgressChange(ref.getName(), ++idx, references.size());
 
 			Document doc = referencePersistence.findById(ref.getId(),
 					Projections.fields(Projections.include("commits"), Projections.slice("commits", 1)));
@@ -99,22 +97,22 @@ public class SnapshotProcessor {
 
 	private void processSnapshot(Commit commit, Reference ref) {
 		Document doc = new Document();
-		
+
 		if (ref != null) {
 			doc.append("reference_name", ref.getName());
 			doc.append("reference_type", ref.getType().toString());
 		}
-		
+
 		doc.append("commit", commit.getId());
 		doc.append("commit_date", commit.getCommitDate());
 		doc.append("repository", new ObjectId(repositoryId));
 
 		if (repositoryMiner.hasProjectsCodeSmells())
 			processProjectCodeSmells(doc);
-		
+
 		if (repositoryMiner.hasProjectMetrics())
 			processProjectMetrics(doc);
-		
+
 		snapshotPersistence.insert(doc);
 	}
 
@@ -125,7 +123,7 @@ public class SnapshotProcessor {
 			if (doc != null)
 				codeSmellsDocs.add(doc);
 		}
-		
+
 		if (codeSmellsDocs.size() > 0)
 			tagDoc.append("code_smells", codeSmellsDocs);
 	}
@@ -137,9 +135,9 @@ public class SnapshotProcessor {
 			if (doc != null)
 				metricDocs.add(doc);
 		}
-		
+
 		if (metricDocs.size() > 0)
 			tagDoc.append("metrics", metricDocs);
 	}
-	
+
 }
