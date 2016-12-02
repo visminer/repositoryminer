@@ -135,6 +135,7 @@ public class CommitProcessor {
 		String ext = filePath.substring(index);
 
 		if (currParser == null || !ArrayUtils.contains(currParser.getExtensions(), ext)) {
+			currParser = null;
 			for (IParser p : repositoryMiner.getParsers()) {
 				if (ArrayUtils.contains(p.getExtensions(), ext)) {
 					currParser = p;
