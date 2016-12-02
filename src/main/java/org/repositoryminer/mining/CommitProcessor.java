@@ -6,7 +6,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -32,7 +31,7 @@ import com.mongodb.client.model.Projections;
 
 public class CommitProcessor {
 
-	private static final int COMMIT_RANGE = 500;
+	private static final int COMMIT_RANGE = 1000;
 
 	private ISCM scm;
 	private RepositoryMiner repositoryMiner;
@@ -96,35 +95,37 @@ public class CommitProcessor {
 	}
 
 	private void processCommits(List<String> commits, String refName, int progress, int qtdCommits) throws IOException {
-		// removes commits already processed
-		Iterator<String> it = commits.iterator();
+		// not selects already processed commits
+		List<String> newCommits = new ArrayList<String>();
 		
-		while (it.hasNext()) {
-			String name = it.next();
-			if (commitsProcessed.contains(name)) {
-				it.remove();
-				repositoryMiner.getMiningListener().commitsProgressChange(refName, name, ++progress, qtdCommits);
+		for (String commit : commits) {
+			if (commitsProcessed.contains(commit)) {
+				repositoryMiner.getMiningListener().commitsProgressChange(refName, commit, ++progress, qtdCommits);
+			} else {
+				newCommits.add(commit);
 			}
 		}
-
-		if (commits.size() == 0)
+		
+		if (newCommits.size() == 0) {
 			return;
-
-		for (Document doc : commitPersistence.findByIdColl(repositoryId, commits, Projections.include("diffs", "commit_date"))) {
+		}
+		
+		for (Document doc : commitPersistence.findByIdColl(repositoryId, newCommits, Projections.include("diffs", "commit_date"))) {
 			Commit commit = Commit.parseDocument(doc);
 			
-			if (repositoryMiner.getMiningListener() != null)
-				repositoryMiner.getMiningListener().commitsProgressChange(refName, commit.getId(), ++progress, qtdCommits);
+			repositoryMiner.getMiningListener().commitsProgressChange(refName, commit.getId(), ++progress, qtdCommits);
 
 			commitsProcessed.add(commit.getId());
 			scm.checkout(commit.getId());
 
-			for (IParser parser : repositoryMiner.getParsers()) 
+			for (IParser parser : repositoryMiner.getParsers()) {
 				parser.processSourceFolders(repositoryPath);
+			}
 
 			for (Diff diff : commit.getDiffs()) {
-				if (diff.getType() != DiffType.DELETE)
+				if (diff.getType() != DiffType.DELETE) {
 					processDiff(diff.getPath(), diff.getHash(), commit);
+				}
 			}
 		}
 	}
@@ -134,24 +135,29 @@ public class CommitProcessor {
 		String ext = filePath.substring(index);
 
 		if (currParser == null || !ArrayUtils.contains(currParser.getExtensions(), ext)) {
-			for (IParser p : repositoryMiner.getParsers())
-				if (ArrayUtils.contains(p.getExtensions(), ext)) 
+			for (IParser p : repositoryMiner.getParsers()) {
+				if (ArrayUtils.contains(p.getExtensions(), ext)) {
 					currParser = p;
+				}
+			}
 		}
 
-		if (currParser == null)
+		if (currParser == null) {
 			return;
+		}
 
 		File f = new File(repositoryPath, filePath);
 
 		// This used to treat links to folders
-		if (f.isDirectory())
+		if (f.isDirectory()) {
 			return;
+		}
 
 		byte[] data = Files.readAllBytes(Paths.get(f.getCanonicalPath()));
 
-		if (data == null) 
+		if (data == null) {
 			return;
+		}
 
 		String source = new String(data, repositoryMiner.getCharset());
 		AST ast = currParser.generate(filePath, source, repositoryMiner.getCharset());
@@ -174,11 +180,13 @@ public class CommitProcessor {
 			Document typeDoc = new Document();
 			typeDoc.append("name", type.getName()).append("declaration", type.getArchetype().toString());
 
-			if (repositoryMiner.hasClassMetrics())
+			if (repositoryMiner.hasClassMetrics()) {
 				processClassMetrics(ast, type, typeDoc);
+			}
 			
-			if (repositoryMiner.hasClassCodeSmells())
+			if (repositoryMiner.hasClassCodeSmells()) {
 				processClassCodeSmells(ast, type, typeDoc);
+			}
 
 			abstractTypeDocs.add(typeDoc);
 		}
