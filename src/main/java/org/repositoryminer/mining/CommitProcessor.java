@@ -31,7 +31,7 @@ import com.mongodb.client.model.Projections;
 
 public class CommitProcessor {
 
-	private static final int COMMIT_RANGE = 1000;
+	private static final int COMMIT_RANGE = 3000;
 
 	private ISCM scm;
 	private RepositoryMiner repositoryMiner;

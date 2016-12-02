@@ -100,6 +100,7 @@ public class WorkingDirectoryProcessor {
 			workingDirectory = WorkingDirectory.parseDocument(wdHandler.findById(prevCommit));
 		}
 		
+		List<Document> wdDocs = new ArrayList<Document>();
 		for (Document doc : commitHandler.findByIdColl(repositoryId, newCommits, Projections.include("diffs"))) {
 			String commitId = doc.get("_id").toString();
 			
@@ -109,8 +110,10 @@ public class WorkingDirectoryProcessor {
 			workingDirectory.setId(commitId);
 			
 			processDiff(Diff.parseDocuments((List<Document>) doc.get("diffs")));
-			wdHandler.insert(workingDirectory.toDocument());
+			wdDocs.add(workingDirectory.toDocument());
 		}
+		
+		wdHandler.insertMany(wdDocs);
 	}
 
 	private void processDiff(List<Diff> diffs) {
