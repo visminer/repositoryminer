@@ -5,11 +5,12 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.repositoryminer.ast.AST;
@@ -24,7 +25,6 @@ import org.repositoryminer.persistence.handler.CommitAnalysisDocumentHandler;
 import org.repositoryminer.persistence.handler.CommitDocumentHandler;
 import org.repositoryminer.persistence.handler.ReferenceDocumentHandler;
 import org.repositoryminer.scm.DiffType;
-
 import org.repositoryminer.scm.ISCM;
 
 import com.mongodb.client.model.Projections;
@@ -44,8 +44,8 @@ public class CommitProcessor {
 
 	private List<Reference> references;
 	private Set<String> commitsProcessed;
-
-	private IParser currParser;
+	
+	private Map<String, IParser> parsers;
 
 	public CommitProcessor() {
 		commitAnalysisPersistence = new CommitAnalysisDocumentHandler();
@@ -72,6 +72,13 @@ public class CommitProcessor {
 	}
 
 	public void start() throws IOException {
+		parsers = new HashMap<String, IParser>();
+		for (IParser p : repositoryMiner.getParsers()) {
+			for (String ext : p.getExtensions()) {
+				parsers.put(ext, p);
+			}
+		}
+		
 		processReferences();
 	}
 
@@ -134,15 +141,8 @@ public class CommitProcessor {
 		int index = filePath.lastIndexOf(".") + 1;
 		String ext = filePath.substring(index);
 
-		if (currParser == null || !ArrayUtils.contains(currParser.getExtensions(), ext)) {
-			currParser = null;
-			for (IParser p : repositoryMiner.getParsers()) {
-				if (ArrayUtils.contains(p.getExtensions(), ext)) {
-					currParser = p;
-				}
-			}
-		}
-
+		IParser currParser = parsers.get(ext);
+		
 		if (currParser == null) {
 			return;
 		}
@@ -200,24 +200,28 @@ public class CommitProcessor {
 		List<Document> metricsDoc = new ArrayList<Document>();
 		for (IClassMetric metric : repositoryMiner.getClassMetrics()) {
 			Document mDoc = metric.calculate(type, ast);
-			if (mDoc != null)
+			if (mDoc != null) {
 				metricsDoc.add(mDoc);
+			}
 		}
 		
-		if (metricsDoc.size() > 0)
+		if (metricsDoc.size() > 0) {
 			typeDoc.append("metrics", metricsDoc);
+		}
 	}
 
 	private void processClassCodeSmells(AST ast, AbstractTypeDeclaration type, Document typeDoc) {
 		List<Document> codeSmellsDoc = new ArrayList<Document>();
 		for (IClassCodeSmell codeSmell : repositoryMiner.getClassCodeSmells()) {
 			Document cDoc = codeSmell.detect(type, ast);
-			if (cDoc != null)
+			if (cDoc != null) {
 				codeSmellsDoc.add(cDoc);
+			}
 		}
 		
-		if (codeSmellsDoc.size() > 0)
+		if (codeSmellsDoc.size() > 0) {
 			typeDoc.append("codesmells", codeSmellsDoc);
+		}
 	}
 
 }
