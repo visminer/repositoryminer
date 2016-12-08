@@ -116,9 +116,7 @@ public class RepositoryMiner {
 	public Repository mine() throws IOException {
 		MiningProcessor processor = new MiningProcessor();
 		PostMiningProcessor postProcessor = new PostMiningProcessor();
-		if (miningListener != null) {
-			miningListener.initMining(name);
-		}
+		miningListener.initMining(name);
 
 		return postProcessor.executeTasks(processor.mine(this), this);
 	}
