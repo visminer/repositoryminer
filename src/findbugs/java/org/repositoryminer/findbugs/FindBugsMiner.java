@@ -10,7 +10,7 @@ import org.bson.types.ObjectId;
 import org.repositoryminer.findbugs.configuration.Effort;
 import org.repositoryminer.findbugs.configuration.Priority;
 import org.repositoryminer.findbugs.model.ReportedBug;
-import org.repositoryminer.findbugs.persistence.FindBugsPersistence;
+import org.repositoryminer.findbugs.persistence.FindBugsDocumentHandler;
 import org.repositoryminer.model.Commit;
 import org.repositoryminer.model.Reference;
 import org.repositoryminer.model.Repository;
@@ -29,7 +29,7 @@ import edu.umd.cs.findbugs.Priorities;
 import edu.umd.cs.findbugs.config.AnalysisFeatureSetting;
 import edu.umd.cs.findbugs.config.UserPreferences;
 
-public class BugMiner {
+public class FindBugsMiner {
 
 	private static Map<Priority, Integer> prioritiesMap = new HashMap<Priority, Integer>();
 	private static Map<Effort, AnalysisFeatureSetting[]> effortsMap = new HashMap<Effort, AnalysisFeatureSetting[]>();
@@ -58,20 +58,12 @@ public class BugMiner {
 	private String tmpRepository;
 	private FindBugsExecutor findBugsExecutor;
 
-	private FindBugsPersistence findBugsPersist;
+	private FindBugsDocumentHandler findBugsPersist;
 	private CommitDocumentHandler commitPersist;
 	private ReferenceDocumentHandler refPersist;
 
 	private Priority priority = Priority.NORMAL;
 	private Effort effort = Effort.DEFAULT;
-
-	public BugMiner(String repositoryId) {
-		this.repository = Repository.parseDocument(new RepositoryDocumentHandler().findById(repositoryId));
-	}
-
-	public BugMiner(Repository repository) {
-		this.repository = repository;
-	}
 
 	public void findInCommit(String hash) throws IllegalStateException, IOException, InterruptedException {
 		Document commitDoc = commitPersist.findById(hash, Projections.include("commit_date"));
@@ -85,7 +77,7 @@ public class BugMiner {
 		doc.append("commit", commit.getId());
 		doc.append("commit_date", commit.getCommitDate());
 		doc.append("repository", new ObjectId(repository.getId()));
-		doc.append("bug_collection", ReportedBug.toDocumentList(reportedBugs));
+		doc.append("bugs", ReportedBug.toDocumentList(reportedBugs));
 
 		findBugsPersist.insert(doc);
 	}
@@ -107,7 +99,7 @@ public class BugMiner {
 		doc.append("commit", commit.getId());
 		doc.append("commit_date", commit.getCommitDate());
 		doc.append("repository", new ObjectId(repository.getId()));
-		doc.append("bug_collection", ReportedBug.toDocumentList(reportedBugs));
+		doc.append("bugs", ReportedBug.toDocumentList(reportedBugs));
 
 		findBugsPersist.insert(doc);
 	}
@@ -116,7 +108,7 @@ public class BugMiner {
 		tmpRepository = FileUtils.copyFolderToTmp(repository.getPath(), repository.getId());
 		findBugsExecutor = new FindBugsExecutor(tmpRepository);
 
-		findBugsPersist = new FindBugsPersistence();
+		findBugsPersist = new FindBugsDocumentHandler();
 		commitPersist = new CommitDocumentHandler();
 		refPersist = new ReferenceDocumentHandler();
 
@@ -151,10 +143,19 @@ public class BugMiner {
 		this.priority = priority;
 	}
 
+	public void setRepository(Repository repository) {
+		this.repository = repository;
+	}
+	
+	public void setRepository(String repositoryId) {
+		RepositoryDocumentHandler repoHandler = new RepositoryDocumentHandler();
+		this.repository = Repository.parseDocument(repoHandler.findById(repositoryId, Projections.include("scm")));
+	}
+	
 	private void configureFindBugs() {
 		findBugsExecutor.setBugPriority(prioritiesMap.getOrDefault(priority, DEFAULT_PRIORITY));
 		findBugsExecutor.setEffort(effortsMap.getOrDefault(effort, DEFAULT_EFFORT));
 		findBugsExecutor.setUserPrefsEffort(userPrefsEffortMap.getOrDefault(effort, DEFAULT_USER_PREFS_EFFORT));
 	}
-
+	
 }

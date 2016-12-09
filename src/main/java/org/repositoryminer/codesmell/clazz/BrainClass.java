@@ -44,7 +44,7 @@ public class BrainClass implements IClassCodeSmell {
 	}
 
 	public BrainClass(int wmcThreshold, float tccThreshold, int nbmThreshold, int locThreshold) {
-		super();
+		this();
 		this.wmcThreshold = wmcThreshold;
 		this.tccThreshold = tccThreshold;
 		this.nbmThreshold = nbmThreshold;

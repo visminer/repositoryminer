@@ -55,7 +55,7 @@ public class RepositoryMiner {
 	private String description;
 	private SCMType scm;
 	private String charset = "UTF-8";
-	private int commitCount = 2000;
+	private int commitCount = 3000;
 
 	private List<IParser> parsers = new ArrayList<IParser>();
 	private List<IClassMetric> classMetrics = new ArrayList<IClassMetric>();
@@ -116,9 +116,7 @@ public class RepositoryMiner {
 	public Repository mine() throws IOException {
 		MiningProcessor processor = new MiningProcessor();
 		PostMiningProcessor postProcessor = new PostMiningProcessor();
-		if (miningListener != null) {
-			miningListener.initMining(name);
-		}
+		miningListener.initMining(name);
 
 		return postProcessor.executeTasks(processor.mine(this), this);
 	}

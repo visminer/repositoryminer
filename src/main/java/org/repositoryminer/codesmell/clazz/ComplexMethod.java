@@ -33,7 +33,7 @@ public class ComplexMethod implements IClassCodeSmell {
 	}
 
 	public ComplexMethod(int ccThreshold) {
-		super();
+		this();
 		this.ccThreshold = ccThreshold;
 	}
 

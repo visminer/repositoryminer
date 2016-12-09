@@ -24,7 +24,7 @@ public class LongMethod implements IClassCodeSmell {
 	}
 	
 	public LongMethod(int mlocThreshold) {
-		super();
+		this();
 		this.mlocThreshold = mlocThreshold;
 	}
 

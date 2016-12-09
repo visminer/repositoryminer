@@ -63,7 +63,7 @@ public class BrainMethod implements IClassCodeSmell {
 	}
 
 	public BrainMethod(int mlocThreshold, float ccMlocThreshold, int maxNestingThreshold, int noavThreshold) {
-		super();
+		this();
 		this.mlocThreshold = mlocThreshold;
 		this.ccThreshold = ccMlocThreshold;
 		this.maxNestingThreshold = maxNestingThreshold;

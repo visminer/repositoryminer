@@ -38,19 +38,6 @@ public class WorkingDirectory {
 		return doc;
 	}
 
-	public WorkingDirectory copy() {
-		WorkingDirectory wd = new WorkingDirectory();
-
-		wd.id = this.id;
-		wd.repository = this.repository;
-
-		Map<String, String> files2 = new HashMap<String, String>(
-				this.files != null ? this.files : new HashMap<String, String>());
-		wd.setFiles(files2);
-
-		return wd;
-	}
-
 	@SuppressWarnings("unchecked")
 	public static WorkingDirectory parseDocument(Document doc) {
 		WorkingDirectory wd = new WorkingDirectory();

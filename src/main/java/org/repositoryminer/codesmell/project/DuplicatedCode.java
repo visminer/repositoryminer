@@ -93,8 +93,7 @@ public class DuplicatedCode implements IProjectCodeSmell {
 				for (Mark mark : m.getMarkSet()) {
 					// removes the repository path from file path
 					String filePath = FilenameUtils.normalize(mark.getFilename());
-					filePath = repositoryPath.endsWith("/") ? filePath.substring(repositoryPath.length()+1) :
-						filePath.substring(repositoryPath.length()+2);
+					filePath = filePath.substring(repositoryPath.length()+1);
 
 					Document fileDoc = new Document();
 					fileDoc.append("begin_line", mark.getBeginLine());

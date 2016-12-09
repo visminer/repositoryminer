@@ -8,7 +8,6 @@ import static org.repositoryminer.scm.DiffType.MODIFY;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -80,38 +79,41 @@ public class WorkingDirectoryProcessor {
 
 	@SuppressWarnings("unchecked")
 	private void processCommits(List<String> commits, String refName, int progress, int qtdCommits) {
-		// removes commits already processed
-		Iterator<String> it = commits.iterator();
+		// not selects already processed commits
+		List<String> newCommits = new ArrayList<String>();
 		String prevCommit = null;
 		
-		while (it.hasNext()) {
-			String name = it.next();
-			if (commitsProcessed.contains(name)) {
-				prevCommit = name;
-				it.remove();
-				if (listener != null)
-					listener.workingDirectoryProgressChange(refName, name, ++progress, qtdCommits);
+		for (String commit : commits) {
+			if (commitsProcessed.contains(commit)) {
+				prevCommit = commit;
+				listener.workingDirectoryProgressChange(refName, commit, ++progress, qtdCommits);
+			} else {
+				newCommits.add(commit);
 			}
 		}
 		
-		if (commits.size() == 0)
+		if (newCommits.size() == 0) {
 			return;
+		}
 		
-		if (prevCommit != null)
+		if (prevCommit != null) {
 			workingDirectory = WorkingDirectory.parseDocument(wdHandler.findById(prevCommit));
+		}
 		
-		for (Document doc : commitHandler.findByIdColl(repositoryId, commits, Projections.include("diffs"))) {
+		List<Document> wdDocs = new ArrayList<Document>();
+		for (Document doc : commitHandler.findByIdColl(repositoryId, newCommits, Projections.include("diffs"))) {
 			String commitId = doc.get("_id").toString();
 			
-			if (listener != null)
-				listener.workingDirectoryProgressChange(refName, commitId, ++progress, qtdCommits);
+			listener.workingDirectoryProgressChange(refName, commitId, ++progress, qtdCommits);
 			
 			commitsProcessed.add(commitId);
 			workingDirectory.setId(commitId);
 			
 			processDiff(Diff.parseDocuments((List<Document>) doc.get("diffs")));
-			wdHandler.insert(workingDirectory.toDocument());
+			wdDocs.add(workingDirectory.toDocument());
 		}
+		
+		wdHandler.insertMany(wdDocs);
 	}
 
 	private void processDiff(List<Diff> diffs) {
