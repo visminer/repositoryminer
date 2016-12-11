@@ -78,7 +78,7 @@ public class HostingProcessor {
 			}
 		}
 
-		repoDocHandler.updateOnlyContributors(repositoryDoc);
+		repoDocHandler.updateOnlyContributors(repositoryId, contributorsDoc);
 	}
 
 	private void connectMilestonesAndIssues(List<Milestone> milestones, List<Issue> issues) {

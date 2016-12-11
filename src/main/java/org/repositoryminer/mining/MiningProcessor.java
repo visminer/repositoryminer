@@ -72,6 +72,7 @@ public class MiningProcessor {
 	private ISCM scm;
 	private RepositoryMiner repositoryMiner;
 	private List<Reference> selectedReferences;
+	private Set<String> visitedCommits;
 
 	private void saveReferences(String repositoryId) {
 		selectedReferences = new ArrayList<Reference>();
@@ -80,7 +81,7 @@ public class MiningProcessor {
 		for (Reference ref : scm.getReferences()) {
 			Entry<String, ReferenceType> entry = new AbstractMap.SimpleEntry<String, ReferenceType>(ref.getName(),
 					ref.getType());
-			
+
 			if (!repositoryMiner.getReferences().contains(entry)) {
 				continue;
 			}
@@ -100,30 +101,34 @@ public class MiningProcessor {
 	private Set<Contributor> saveCommits(String repositoryId) {
 		Set<Contributor> contributors = new HashSet<Contributor>();
 		IssueExtractor messageAnalyzer = new IssueExtractor();
+		visitedCommits = new HashSet<String>();
 		CommitDocumentHandler documentHandler = new CommitDocumentHandler();
 
 		repositoryMiner.getMiningListener().initCommitsMining();
 
-		int skip = 0;
+		for (Reference reference : selectedReferences) {
+			int skip = 0;
 
-		List<Commit> commits = scm.getCommits(skip, repositoryMiner.getCommitCount());
+			List<Commit> commits = scm.getCommits(skip, repositoryMiner.getCommitCount(), reference, visitedCommits);
 
-		while (commits.size() > 0) {
-			List<Document> commitsDoc = new ArrayList<Document>();
+			while (commits.size() > 0) {
+				List<Document> commitsDoc = new ArrayList<Document>();
 
-			for (Commit commit : commits) {
-				commit.setRepository(repositoryId);
-				commit.setIssueReferences(messageAnalyzer.analyzeMessage(commit.getMessage()));
+				for (Commit commit : commits) {
+					commit.setRepository(repositoryId);
+					commit.setIssueReferences(messageAnalyzer.analyzeMessage(commit.getMessage()));
 
-				contributors.add(commit.getCommitter());
-				commitsDoc.add(commit.toDocument());
+					contributors.add(commit.getCommitter());
+					commitsDoc.add(commit.toDocument());
+
+					visitedCommits.add(commit.getId());
+				}
+
+				documentHandler.insertMany(commitsDoc);
+				skip += repositoryMiner.getCommitCount();
+				commits = scm.getCommits(skip, repositoryMiner.getCommitCount(), reference, visitedCommits);
 			}
-
-			documentHandler.insertMany(commitsDoc);
-			skip += repositoryMiner.getCommitCount();
-			commits = scm.getCommits(skip, repositoryMiner.getCommitCount());
 		}
-
 		return contributors;
 	}
 
@@ -138,15 +143,12 @@ public class MiningProcessor {
 	 */
 	public Repository mine(RepositoryMiner repositoryMiner) throws IOException {
 		RepositoryDocumentHandler repoHandler = new RepositoryDocumentHandler();
-		Repository repository;
-		this.repositoryMiner = repositoryMiner;
 
-		List<Document> repos = repoHandler.findRepositoriesByName(repositoryMiner.getName());
-
-		if (repos.size() > 0) {
-			repository = Repository.parseDocument(repos.get(0));
-			return repository;
+		if (repoHandler.checkIfRepositoryExistsById(repositoryMiner.getName())) {
+			return Repository.parseDocument(repoHandler.findRepositoryByName(repositoryMiner.getName()));
 		}
+
+		this.repositoryMiner = repositoryMiner;
 
 		File repositoryFolder = new File(repositoryMiner.getPath());
 		String tempRepo = FileUtils.copyFolderToTmp(repositoryFolder.getAbsolutePath(), repositoryMiner.getName());
@@ -154,27 +156,19 @@ public class MiningProcessor {
 		scm = SCMFactory.getSCM(repositoryMiner.getScm());
 		scm.open(tempRepo);
 
-		repository = new Repository(repositoryMiner);
+		Repository repository = new Repository(repositoryMiner);
 		repository.setPath(FilenameUtils.normalize(repositoryFolder.getAbsolutePath(), true));
 
 		Document repoDoc = repository.toDocument();
 		repoHandler.insert(repoDoc);
 		repository.setId(repoDoc.get("_id").toString());
 
+		saveReferences(repository.getId());
 		Set<Contributor> contributors = saveCommits(repository.getId());
-
-		repoDoc.append("contributors", Contributor.toDocumentList(contributors));
-		repoHandler.updateOnlyContributors(repoDoc);
+		repoHandler.updateOnlyContributors(repository.getId(), Contributor.toDocumentList(contributors));
 		repository.setContributors(new ArrayList<Contributor>(contributors));
 
-		saveReferences(repository.getId());
-
-		WorkingDirectoryProcessor wdProcessor = new WorkingDirectoryProcessor();
-		wdProcessor.setListener(repositoryMiner.getMiningListener());
-		wdProcessor.setReferences(selectedReferences);
-		wdProcessor.setRepositoryId(repository.getId());
-		wdProcessor.processWorkingDirectories();
-
+		saveWorkingDirectories(repository.getId());
 		calculateAndDetect(tempRepo, repository.getId());
 
 		scm.close();
@@ -183,6 +177,14 @@ public class MiningProcessor {
 		return repository;
 	}
 
+	private void saveWorkingDirectories(String repositoryId) {
+		WorkingDirectoryProcessor wdProcessor = new WorkingDirectoryProcessor();
+		wdProcessor.setListener(repositoryMiner.getMiningListener());
+		wdProcessor.setReferences(selectedReferences);
+		wdProcessor.setRepositoryId(repositoryId);
+		wdProcessor.processWorkingDirectories();
+	}
+	
 	/**
 	 * Performs both the calculation (metrics) and detections (smells/debts) on
 	 * the targeted project.
