@@ -212,8 +212,16 @@ public class MiningProcessor {
 		}
 
 		if (repositoryMiner.shouldProcessReferences()) {
+			List<String> validSnapshots = new ArrayList<String>();
+			for (String hash : repositoryMiner.getSnapshots()) {
+				if (visitedCommits.contains(hash)) {
+					validSnapshots.add(hash);
+				}
+			}
+			
 			SnapshotProcessor snapshotProcessor = new SnapshotProcessor();
 			snapshotProcessor.setReferences(selectedReferences);
+			snapshotProcessor.setSnapshots(validSnapshots);
 			snapshotProcessor.setRepositoryData(repositoryId, tempRepo);
 			snapshotProcessor.setRepositoryMiner(repositoryMiner);
 			snapshotProcessor.setSCM(scm);

@@ -25,6 +25,7 @@ public class SnapshotProcessor {
 	private String repositoryId;
 	private String repositoryPath;
 	private List<Reference> references;
+	private List<String> snapshots;
 
 	private SnapshotAnalysisDocumentHandler snapshotPersistence;
 	private ReferenceDocumentHandler referencePersistence;
@@ -48,6 +49,10 @@ public class SnapshotProcessor {
 		this.scm = scm;
 	}
 
+	public void setSnapshots(List<String> snapshots) {
+		this.snapshots = snapshots;
+	}
+	
 	public void setRepositoryData(String repositoryId, String repositoryPath) {
 		this.repositoryId = repositoryId;
 		this.repositoryPath = repositoryPath;
@@ -59,7 +64,7 @@ public class SnapshotProcessor {
 	}
 
 	private void processCommits() {
-		for (String snapshot : repositoryMiner.getSnapshots()) {
+		for (String snapshot : snapshots) {
 			Commit commit = Commit
 					.parseDocument(commitPersistence.findById(snapshot, Projections.include("commit_date")));
 
