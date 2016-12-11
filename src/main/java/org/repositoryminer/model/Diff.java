@@ -48,6 +48,14 @@ public class Diff {
 	public Diff() {
 	}
 
+	public Diff(String path, String oldPath, long hash, DiffType type) {
+		super();
+		this.path = path;
+		this.oldPath = oldPath;
+		this.hash = hash;
+		this.type = type;
+	}
+
 	public Diff(String path, String oldPath, long hash, int linesAdded, int linesRemoved, DiffType type) {
 		super();
 		this.path = path;

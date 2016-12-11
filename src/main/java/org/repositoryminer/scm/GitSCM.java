@@ -68,10 +68,7 @@ public class GitSCM implements ISCM {
 		}
 
 		try {
-			repository = repositoryBuilder.setGitDir(repoFolder).
-					readEnvironment().
-					findGitDir().
-					build();
+			repository = repositoryBuilder.setGitDir(repoFolder).readEnvironment().findGitDir().build();
 		} catch (IOException e) {
 			throw new VisMinerAPIException(ErrorMessage.GIT_REPOSITORY_IOERROR.toString(), e);
 		}
@@ -128,7 +125,7 @@ public class GitSCM implements ISCM {
 	@Override
 	public List<Commit> getCommits(int skip, int maxCount, Reference reference, Collection<String> commitsToSkip) {
 		Iterable<RevCommit> revCommits = null;
-		
+
 		if (reference.getType() == ReferenceType.BRANCH) {
 			revCommits = getCommitsFromBranch(reference.getPath(), skip, maxCount);
 		} else {
@@ -138,7 +135,7 @@ public class GitSCM implements ISCM {
 		if (revCommits == null) {
 			return new ArrayList<Commit>();
 		}
-		
+
 		List<Commit> commits = new ArrayList<Commit>();
 
 		if (commitsToSkip == null || commitsToSkip.size() == 0) {
@@ -175,10 +172,10 @@ public class GitSCM implements ISCM {
 			errorHandler(ErrorMessage.GIT_RETRIEVE_CHANGES_ERROR.toString(), e);
 		}
 
-		return new Commit(revCommit.getName(), revCommit.getFullMessage(), author.getWhen(),
-				committer.getWhen(), null, parents, myAuthor, myCommitter, diffs);
+		return new Commit(revCommit.getName(), revCommit.getFullMessage(), author.getWhen(), committer.getWhen(), null,
+				parents, myAuthor, myCommitter, diffs);
 	}
-	
+
 	@Override
 	public List<String> getReferenceCommits(String name, ReferenceType type) {
 		Iterable<RevCommit> revCommits;
@@ -248,45 +245,40 @@ public class GitSCM implements ISCM {
 			RevCommit parentCommit = oldCommit == null ? null
 					: revWalk.parseCommit(ObjectId.fromString(oldCommit.getName()));
 
-			String path = null; // file path of the current commit
-			String oldPath = null; // file path of the previous commit
-			DiffType type = null;
+			Diff diff = processDiff(entry);
+			LinesInfo linesInfo = getLinesAddedAndDeleted(diff.getPath(), parentCommit, revCommit);
 
-			switch (entry.getChangeType()) {
-			case ADD:
-				path = entry.getNewPath();
-				type = DiffType.ADD;
-				break;
+			diff.setLinesAdded(linesInfo.added);
+			diff.setLinesRemoved(linesInfo.removed);
 
-			case COPY:
-				path = entry.getNewPath();
-				oldPath = entry.getOldPath();
-				type = DiffType.COPY;
-				break;
-
-			case DELETE:
-				path = entry.getOldPath();
-				type = DiffType.DELETE;
-				break;
-
-			case MODIFY:
-				path = entry.getNewPath();
-				type = DiffType.MODIFY;
-				break;
-
-			case RENAME:
-				path = entry.getNewPath();
-				oldPath = entry.getOldPath();
-				type = DiffType.RENAME;
-				break;
-			}
-
-			LinesInfo linesInfo = getLinesAddedAndDeleted(path, parentCommit, revCommit);
-			Diff change = new Diff(path, oldPath, StringUtils.encodeToCRC32(path), linesInfo.added, linesInfo.removed, type);
-			changes.add(change);
+			changes.add(diff);
 		}
 
 		return changes;
+	}
+
+	private Diff processDiff(DiffEntry entry) {
+		switch (entry.getChangeType()) {
+		case ADD:
+			return new Diff(entry.getNewPath(), null, StringUtils.encodeToCRC32(entry.getNewPath()), DiffType.ADD);
+
+		case COPY:
+			return new Diff(entry.getNewPath(), entry.getOldPath(), StringUtils.encodeToCRC32(entry.getNewPath()),
+					DiffType.COPY);
+
+		case DELETE:
+			return new Diff(null, entry.getOldPath(), StringUtils.encodeToCRC32(entry.getOldPath()), DiffType.DELETE);
+
+		case MODIFY:
+			return new Diff(entry.getNewPath(), null, StringUtils.encodeToCRC32(entry.getNewPath()), DiffType.MODIFY);
+
+		case RENAME:
+			return new Diff(entry.getNewPath(), entry.getOldPath(), StringUtils.encodeToCRC32(entry.getNewPath()),
+					DiffType.RENAME);
+
+		default:
+			return null;
+		}
 	}
 
 	private LinesInfo getLinesAddedAndDeleted(String path, RevCommit oldCommit, RevCommit currentCommit)
