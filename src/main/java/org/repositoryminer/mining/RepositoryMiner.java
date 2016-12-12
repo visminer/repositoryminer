@@ -16,6 +16,7 @@ import org.repositoryminer.metric.clazz.IClassMetric;
 import org.repositoryminer.metric.project.IProjectMetric;
 import org.repositoryminer.model.Repository;
 import org.repositoryminer.parser.IParser;
+import org.repositoryminer.persistence.handler.RepositoryDocumentHandler;
 import org.repositoryminer.postprocessing.IPostMiningTask;
 import org.repositoryminer.scm.ReferenceType;
 import org.repositoryminer.scm.SCMType;
@@ -113,12 +114,21 @@ public class RepositoryMiner {
 	 * @return instance of repository after mining and post-mining are performed
 	 * @throws IOException
 	 */
-	public Repository mine() throws IOException {
-		MiningProcessor processor = new MiningProcessor();
+	public Repository miness() throws IOException {
 		PostMiningProcessor postProcessor = new PostMiningProcessor();
 		miningListener.initMining(name);
 
-		return postProcessor.executeTasks(processor.mine(this), this);
+		RepositoryDocumentHandler repoDocHandler = new RepositoryDocumentHandler();
+		if (repoDocHandler.checkIfRepositoryExistsById(name)) {
+			MiningProcessor processor = new MiningProcessor();
+			processor.mine(this);
+		} else {
+			IncrementalMiningProcessor processor = new IncrementalMiningProcessor();
+			processor.mine(this);
+		}
+		
+		Repository repository = Repository.parseDocument(repoDocHandler.findByName(name));
+		return postProcessor.executeTasks(repository, this);
 	}
 
 	/**

@@ -21,7 +21,7 @@ public class RepositoryDocumentHandler extends DocumentHandler {
 		return collection.count(clause) > 0 ? true : false;
 	}
 
-	public Document findRepositoryByName(String name) {
+	public Document findByName(String name) {
 		return findOne(new BasicDBObject("name", name));
 	}
 

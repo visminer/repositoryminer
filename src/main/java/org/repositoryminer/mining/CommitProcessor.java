@@ -43,7 +43,7 @@ public class CommitProcessor {
 	private ReferenceDocumentHandler referenceHandler;
 
 	private List<Reference> references;
-	private Set<String> commitsProcessed;
+	private Set<String> visitedCommits;
 	
 	private Map<String, IParser> parsers;
 
@@ -51,7 +51,7 @@ public class CommitProcessor {
 		commitAnalysisPersistence = new CommitAnalysisDocumentHandler();
 		referenceHandler = new ReferenceDocumentHandler();
 		commitPersistence = new CommitDocumentHandler();
-		commitsProcessed = new HashSet<String>();
+		visitedCommits = new HashSet<String>();
 	}
 
 	public void setRepositoryData(String repositoryId, String repositoryPath) {
@@ -67,6 +67,10 @@ public class CommitProcessor {
 		this.repositoryMiner = repositoryMiner;
 	}
 
+	public void setVisitedCommits(Set<String> visitedCommits) {
+		this.visitedCommits = visitedCommits;
+	}
+
 	public void setSCM(ISCM scm) {
 		this.scm = scm;
 	}
@@ -77,6 +81,10 @@ public class CommitProcessor {
 			for (String ext : p.getExtensions()) {
 				parsers.put(ext, p);
 			}
+		}
+		
+		if (visitedCommits == null) {
+			visitedCommits = new HashSet<String>();
 		}
 		
 		processReferences();
@@ -106,7 +114,7 @@ public class CommitProcessor {
 		List<String> newCommits = new ArrayList<String>();
 		
 		for (String commit : commits) {
-			if (commitsProcessed.contains(commit)) {
+			if (visitedCommits.contains(commit)) {
 				repositoryMiner.getMiningListener().commitsProgressChange(refName, commit, ++progress, qtdCommits);
 			} else {
 				newCommits.add(commit);
@@ -122,7 +130,7 @@ public class CommitProcessor {
 			
 			repositoryMiner.getMiningListener().commitsProgressChange(refName, commit.getId(), ++progress, qtdCommits);
 
-			commitsProcessed.add(commit.getId());
+			visitedCommits.add(commit.getId());
 			scm.checkout(commit.getId());
 
 			for (IParser parser : repositoryMiner.getParsers()) {

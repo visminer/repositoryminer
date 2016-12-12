@@ -23,10 +23,15 @@ public class CommitDocumentHandler extends DocumentHandler {
 	public Document findById(String id, Bson projection) {
 		BasicDBObject whereClause = new BasicDBObject();
 		whereClause.put("_id", id);
-
 		return findOne(whereClause, projection);
 	}
 
+	public List<Document> findByRepository(String repositoryId, Bson projection) {
+		BasicDBObject whereClause = new BasicDBObject();
+		whereClause.put("repository", new ObjectId(repositoryId));
+		return findMany(whereClause, projection);
+	}
+	
 	public List<Document> findByIdColl(String repository, List<String> ids, Bson projection) {
 		List<BasicDBObject> where = new ArrayList<BasicDBObject>(2);
 		where.add(new BasicDBObject("repository", new ObjectId(repository)));

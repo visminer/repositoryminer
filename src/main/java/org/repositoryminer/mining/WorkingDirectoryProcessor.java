@@ -30,17 +30,20 @@ public class WorkingDirectoryProcessor {
 	private ReferenceDocumentHandler referenceHandler;
 	private WorkingDirectoryDocumentHandler wdHandler;
 	
-	private Set<String> commitsProcessed;
+	private Set<String> visitedCommits;
 	private String repositoryId; 
 	private List<Reference> references;
 	private IMiningListener listener;
 	private WorkingDirectory workingDirectory;
 	
 	public WorkingDirectoryProcessor() {
-		commitsProcessed = new HashSet<String>();
 		commitHandler = new CommitDocumentHandler();
 		referenceHandler = new ReferenceDocumentHandler();
 		wdHandler = new WorkingDirectoryDocumentHandler();
+	}
+
+	public void setVisitedCommits(Set<String> visitedCommits) {
+		this.visitedCommits = visitedCommits;
 	}
 
 	public void setRepositoryId(String repositoryId) {
@@ -57,6 +60,10 @@ public class WorkingDirectoryProcessor {
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void processWorkingDirectories() {
+		if (visitedCommits == null) {
+			visitedCommits = new HashSet<String>();
+		}
+		
 		for (Reference ref : references) {
 			workingDirectory = new WorkingDirectory(repositoryId);
 			Document refDoc = referenceHandler.findById(ref.getId(), Projections.include("commits"));
@@ -84,7 +91,7 @@ public class WorkingDirectoryProcessor {
 		String prevCommit = null;
 		
 		for (String commit : commits) {
-			if (commitsProcessed.contains(commit)) {
+			if (visitedCommits.contains(commit)) {
 				prevCommit = commit;
 				listener.workingDirectoryProgressChange(refName, commit, ++progress, qtdCommits);
 			} else {
@@ -106,7 +113,7 @@ public class WorkingDirectoryProcessor {
 			
 			listener.workingDirectoryProgressChange(refName, commitId, ++progress, qtdCommits);
 			
-			commitsProcessed.add(commitId);
+			visitedCommits.add(commitId);
 			workingDirectory.setId(commitId);
 			
 			processDiff(Diff.parseDocuments((List<Document>) doc.get("diffs")));

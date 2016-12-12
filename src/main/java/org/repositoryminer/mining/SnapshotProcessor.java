@@ -52,7 +52,7 @@ public class SnapshotProcessor {
 	public void setSnapshots(List<String> snapshots) {
 		this.snapshots = snapshots;
 	}
-	
+
 	public void setRepositoryData(String repositoryId, String repositoryPath) {
 		this.repositoryId = repositoryId;
 		this.repositoryPath = repositoryPath;
@@ -61,6 +61,23 @@ public class SnapshotProcessor {
 	public void start() throws IOException {
 		processReferences();
 		processCommits();
+	}
+
+	public void startUpdate() throws IOException {
+		List<String> commitsToRemove = new ArrayList<String>();
+		commitsToRemove.addAll(snapshots);
+
+		for (Reference ref : references) {
+			Document doc = referencePersistence.findById(ref.getId(),
+					Projections.fields(Projections.include("commits"), Projections.slice("commits", 1)));
+
+			@SuppressWarnings("unchecked")
+			String commitId = ((List<String>) doc.get("commits")).get(0);
+			commitsToRemove.add(commitId);
+		}
+		
+		snapshotPersistence.deleteByCommits(repositoryId, commitsToRemove);
+		start();
 	}
 
 	private void processCommits() {
@@ -87,6 +104,8 @@ public class SnapshotProcessor {
 
 			@SuppressWarnings("unchecked")
 			String commitId = ((List<String>) doc.get("commits")).get(0);
+
+			snapshots.remove(commitId); // avoids to process some commit again
 
 			Commit commit = Commit
 					.parseDocument(commitPersistence.findById(commitId, Projections.include("commit_date")));
