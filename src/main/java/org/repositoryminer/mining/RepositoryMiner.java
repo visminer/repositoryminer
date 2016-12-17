@@ -114,7 +114,7 @@ public class RepositoryMiner {
 	 * @return instance of repository after mining and post-mining are performed
 	 * @throws IOException
 	 */
-	public Repository miness() throws IOException {
+	public Repository mine() throws IOException {
 		PostMiningProcessor postProcessor = new PostMiningProcessor();
 		miningListener.initMining(name);
 
