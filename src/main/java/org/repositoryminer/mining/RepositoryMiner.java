@@ -120,10 +120,10 @@ public class RepositoryMiner {
 
 		RepositoryDocumentHandler repoDocHandler = new RepositoryDocumentHandler();
 		if (repoDocHandler.checkIfRepositoryExistsById(name)) {
-			MiningProcessor processor = new MiningProcessor();
+			IncrementalMiningProcessor processor = new IncrementalMiningProcessor();
 			processor.mine(this);
 		} else {
-			IncrementalMiningProcessor processor = new IncrementalMiningProcessor();
+			MiningProcessor processor = new MiningProcessor();
 			processor.mine(this);
 		}
 		
