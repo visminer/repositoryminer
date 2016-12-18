@@ -247,12 +247,8 @@ public class GitSCM implements ISCM {
 
 			Diff diff = processDiff(entry);
 			LinesInfo linesInfo;
-			
-			if (diff.getType() == DiffType.DELETE) {
-				linesInfo = getLinesAddedAndDeleted(diff.getOldPath(), parentCommit, revCommit);
-			} else {
-				linesInfo = getLinesAddedAndDeleted(diff.getPath(), parentCommit, revCommit);
-			}
+
+			linesInfo = getLinesAddedAndDeleted(diff.getPath(), parentCommit, revCommit);
 
 			diff.setLinesAdded(linesInfo.added);
 			diff.setLinesRemoved(linesInfo.removed);
@@ -273,7 +269,7 @@ public class GitSCM implements ISCM {
 					DiffType.COPY);
 
 		case DELETE:
-			return new Diff(null, entry.getOldPath(), StringUtils.encodeToCRC32(entry.getOldPath()), DiffType.DELETE);
+			return new Diff(entry.getOldPath(), null, StringUtils.encodeToCRC32(entry.getOldPath()), DiffType.DELETE);
 
 		case MODIFY:
 			return new Diff(entry.getNewPath(), null, StringUtils.encodeToCRC32(entry.getNewPath()), DiffType.MODIFY);

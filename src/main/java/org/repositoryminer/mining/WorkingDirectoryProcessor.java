@@ -1,10 +1,5 @@
 package org.repositoryminer.mining;
 
-import static org.repositoryminer.scm.DiffType.ADD;
-import static org.repositoryminer.scm.DiffType.COPY;
-import static org.repositoryminer.scm.DiffType.DELETE;
-import static org.repositoryminer.scm.DiffType.MODIFY;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -19,6 +14,7 @@ import org.repositoryminer.model.WorkingDirectory;
 import org.repositoryminer.persistence.handler.CommitDocumentHandler;
 import org.repositoryminer.persistence.handler.ReferenceDocumentHandler;
 import org.repositoryminer.persistence.handler.WorkingDirectoryDocumentHandler;
+import org.repositoryminer.scm.DiffType;
 
 import com.mongodb.client.model.Projections;
 
@@ -125,11 +121,11 @@ public class WorkingDirectoryProcessor {
 
 	private void processDiff(List<Diff> diffs) {
 		for (Diff d : diffs) {
-			if (d.getType() == ADD || d.getType() == MODIFY || d.getType() == COPY) {
+			if (d.getType() == DiffType.ADD || d.getType() == DiffType.COPY) {
 				workingDirectory.getFiles().put(d.getPath(), workingDirectory.getId());
-			} else if (d.getType() == DELETE) {
+			} else if (d.getType() == DiffType.DELETE) {
 				workingDirectory.getFiles().remove(d.getPath());
-			} else { // d.getType() == RENAME
+			} else if(d.getType() == DiffType.RENAME) {
 				workingDirectory.getFiles().remove(d.getOldPath());
 				workingDirectory.getFiles().put(d.getPath(), workingDirectory.getId());
 			}
