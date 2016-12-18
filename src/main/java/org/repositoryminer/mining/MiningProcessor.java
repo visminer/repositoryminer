@@ -111,7 +111,7 @@ public class MiningProcessor {
 		repositoryMiner.getMiningListener().initCommitsMining();
 
 		int skip = 0;
-		List<Commit> commits = scm.getCommits(skip, repositoryMiner.getCommitCount(), reference, visitedCommits);
+		List<Commit> commits = scm.getCommits(skip, repositoryMiner.getCommitCount(), reference, visitedCommits, true);
 
 		while (commits.size() > 0) {
 			List<Document> commitsDoc = new ArrayList<Document>();
@@ -128,7 +128,7 @@ public class MiningProcessor {
 
 			documentHandler.insertMany(commitsDoc);
 			skip += repositoryMiner.getCommitCount();
-			commits = scm.getCommits(skip, repositoryMiner.getCommitCount(), reference, visitedCommits);
+			commits = scm.getCommits(skip, repositoryMiner.getCommitCount(), reference, visitedCommits, true);
 		}
 	}
 

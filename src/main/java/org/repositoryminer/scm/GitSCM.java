@@ -123,7 +123,8 @@ public class GitSCM implements ISCM {
 	}
 
 	@Override
-	public List<Commit> getCommits(int skip, int maxCount, Reference reference, Collection<String> commitsToSkip) {
+	public List<Commit> getCommits(int skip, int maxCount, Reference reference, Collection<String> commits,
+			boolean despise) {
 		Iterable<RevCommit> revCommits = null;
 
 		if (reference.getType() == ReferenceType.BRANCH) {
@@ -136,21 +137,22 @@ public class GitSCM implements ISCM {
 			return new ArrayList<Commit>();
 		}
 
-		List<Commit> commits = new ArrayList<Commit>();
+		List<Commit> processedCommits = new ArrayList<Commit>();
 
-		if (commitsToSkip == null || commitsToSkip.size() == 0) {
+		if (commits == null || commits.size() == 0) {
 			for (RevCommit revCommit : revCommits) {
-				commits.add(processCommit(revCommit));
+				processedCommits.add(processCommit(revCommit));
 			}
 		} else {
 			for (RevCommit revCommit : revCommits) {
-				if (!commitsToSkip.contains(revCommit.getName())) {
-					commits.add(processCommit(revCommit));
+				if ((commits.contains(revCommit.getName()) && !despise)
+						|| (!commits.contains(revCommit.getName()) && despise)) {
+					processedCommits.add(processCommit(revCommit));
 				}
 			}
 		}
 
-		return commits;
+		return processedCommits;
 	}
 
 	private Commit processCommit(RevCommit revCommit) {
