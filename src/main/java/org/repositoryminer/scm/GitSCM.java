@@ -246,7 +246,13 @@ public class GitSCM implements ISCM {
 					: revWalk.parseCommit(ObjectId.fromString(oldCommit.getName()));
 
 			Diff diff = processDiff(entry);
-			LinesInfo linesInfo = getLinesAddedAndDeleted(diff.getPath(), parentCommit, revCommit);
+			LinesInfo linesInfo;
+			
+			if (diff.getType() == DiffType.DELETE) {
+				linesInfo = getLinesAddedAndDeleted(diff.getOldPath(), parentCommit, revCommit);
+			} else {
+				linesInfo = getLinesAddedAndDeleted(diff.getPath(), parentCommit, revCommit);
+			}
 
 			diff.setLinesAdded(linesInfo.added);
 			diff.setLinesRemoved(linesInfo.removed);
