@@ -2,7 +2,7 @@ package org.repositoryminer.scm.hostingservice;
 
 import java.util.List;
 
-import org.repositoryminer.mining.HostingServiceMiner;
+import org.repositoryminer.miner.HostingServiceMiner;
 import org.repositoryminer.model.Contributor;
 import org.repositoryminer.model.Issue;
 import org.repositoryminer.model.Milestone;

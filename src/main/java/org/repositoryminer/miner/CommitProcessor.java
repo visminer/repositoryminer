@@ -1,4 +1,4 @@
-package org.repositoryminer.mining;
+package org.repositoryminer.miner;
 
 import java.io.File;
 import java.io.IOException;

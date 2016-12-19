@@ -9,7 +9,7 @@ import org.repositoryminer.listener.IPostMiningListener;
  * {@link org.repositoryminer.listener.IPostMiningListener} to output mining steps
  * to console. This default instance can be replaced by injecting a customized
  * one into
- * {@link org.repositoryminer.mining.RepositoryMiner#setPostMiningListener(IPostMiningListener)}
+ * {@link org.repositoryminer.miner.RepositoryMiner#setPostMiningListener(IPostMiningListener)}
  */
 public class PostMiningListener implements IPostMiningListener {
 

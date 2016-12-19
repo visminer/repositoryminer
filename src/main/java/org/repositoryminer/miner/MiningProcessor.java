@@ -1,4 +1,4 @@
-package org.repositoryminer.mining;
+package org.repositoryminer.miner;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,15 +25,15 @@ import org.repositoryminer.utility.FileUtils;
 
 /**
  * <h1>The actual mining processor behind
- * {@link org.repositoryminer.mining.RepositoryMiner}</h1>
+ * {@link org.repositoryminer.miner.RepositoryMiner}</h1>
  * <p>
  * MiningProcessor is a second level entry for the mining API. Direct calls to
  * instances of this class can be made, but we encourage the use of our main
- * facade, {@link org.repositoryminer.mining.RepositoryMiner}, provided it has
+ * facade, {@link org.repositoryminer.miner.RepositoryMiner}, provided it has
  * all the necessary parameters to get the mining process started.
  * <p>
  * It is very important that the injected instance of
- * {@link org.repositoryminer.mining.RepositoryMiner} has all of the mandatory
+ * {@link org.repositoryminer.miner.RepositoryMiner} has all of the mandatory
  * parameters set to valid values so that the persistence of the mined
  * information will be consistent.
  * <p>
@@ -55,7 +55,7 @@ import org.repositoryminer.utility.FileUtils;
  * </ul>
  * At least one of the lists must be populated so to get the mining process
  * started. The lists are then injected in a instance of
- * {@link org.repositoryminer.mining.CommitProcessor} which is capable of
+ * {@link org.repositoryminer.miner.CommitProcessor} which is capable of
  * performing the actual calculations and detections.
  * <p>
  * Raised exceptions are:
@@ -136,7 +136,7 @@ public class MiningProcessor {
 	 * Starts the mining process
 	 * 
 	 * @param repositoryMiner
-	 *            instance of {@link org.repositoryminer.mining.RepositoryMiner}
+	 *            instance of {@link org.repositoryminer.miner.RepositoryMiner}
 	 *            . It must <b>NEVER<b> be null, since it will provide important
 	 *            parameters for the source-code analysis and persistence
 	 * @throws IOException
@@ -181,7 +181,7 @@ public class MiningProcessor {
 	 * the targeted project.
 	 * 
 	 * @param repositoryMiner
-	 *            instance of {@link org.repositoryminer.mining.RepositoryMiner}
+	 *            instance of {@link org.repositoryminer.miner.RepositoryMiner}
 	 * @param tempPath
 	 *            temporary repository path to access the files content
 	 * @throws IOException

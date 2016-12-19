@@ -2,7 +2,7 @@ package org.repositoryminer.listener;
 
 /**
  * <h1>IHostServiceListener is dedicated to notify mining steps performed by
- * {@link org.repositoryminer.mining.HostingServiceMiner}}</h1>
+ * {@link org.repositoryminer.miner.HostingServiceMiner}}</h1>
  * <p>
  * Since HostingServiceMiner is <b>NOT</b> intended to be executed directly,
  * having the actual purpose of serving as an API for other applications it is
@@ -13,7 +13,7 @@ package org.repositoryminer.listener;
  * to progress changes.
  * <p>
  * Listeners can be injected into
- * {@link org.repositoryminer.mining.HostingServiceMiner#setListener(IHostServiceListener)}
+ * {@link org.repositoryminer.miner.HostingServiceMiner#setListener(IHostServiceListener)}
  * in order to be activated.
  * <p>
  */

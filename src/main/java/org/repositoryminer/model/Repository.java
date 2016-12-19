@@ -31,7 +31,7 @@ public class Repository {
 		return repository;
 	}
 
-	public Repository(org.repositoryminer.mining.RepositoryMiner repo) {
+	public Repository(org.repositoryminer.miner.RepositoryMiner repo) {
 		this(null, repo.getName(), repo.getPath(), repo.getDescription(), repo.getScm());
 	}
 
