@@ -14,7 +14,7 @@ import org.repositoryminer.effort.model.EffortsByReference;
 import org.repositoryminer.effort.persistence.handler.EffortCategoriesDocumentHandler;
 import org.repositoryminer.effort.persistence.handler.EffortsDocumentHandler;
 import org.repositoryminer.listener.IPostMiningListener;
-import org.repositoryminer.miner.RepositoryMiner;
+import org.repositoryminer.mining.RepositoryMiner;
 import org.repositoryminer.model.Repository;
 import org.repositoryminer.postprocessing.IPostMiningTask;
 

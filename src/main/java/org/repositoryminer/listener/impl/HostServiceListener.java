@@ -9,7 +9,7 @@ import org.repositoryminer.listener.IHostServiceListener;
  * {@link org.repositoryminer.listener.IHostServiceListener} to output mining steps
  * to console. This default instance can be replaced by injecting a customized
  * one into
- * {@link org.repositoryminer.miner.HostingServiceMiner#setListener(IHostServiceListener)}
+ * {@link org.repositoryminer.mining.hosting.HostingServiceMiner#setListener(IHostServiceListener)}
  */
 public class HostServiceListener implements IHostServiceListener {
 

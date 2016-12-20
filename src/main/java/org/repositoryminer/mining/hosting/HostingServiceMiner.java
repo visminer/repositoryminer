@@ -1,7 +1,8 @@
-package org.repositoryminer.miner;
+package org.repositoryminer.mining.hosting;
 
 import org.repositoryminer.listener.IHostServiceListener;
 import org.repositoryminer.listener.impl.HostServiceListener;
+import org.repositoryminer.mining.RepositoryMiner;
 import org.repositoryminer.scm.hostingservice.HostingServiceType;
 
 /**

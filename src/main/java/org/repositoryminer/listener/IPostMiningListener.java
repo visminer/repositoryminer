@@ -13,7 +13,7 @@ package org.repositoryminer.listener;
  * to progress changes.
  * <p>
  * Listeners can be injected into
- * {@link org.repositoryminer.miner.RepositoryMiner#setPostMiningListener(IPostMiningListener)}
+ * {@link org.repositoryminer.mining.RepositoryMiner#setPostMiningListener(IPostMiningListener)}
  * in order to be activated.
  * <p>
  */

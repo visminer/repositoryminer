@@ -13,7 +13,7 @@ import org.repositoryminer.effort.model.Effort;
 import org.repositoryminer.effort.model.EffortsByReference;
 import org.repositoryminer.effort.persistence.handler.EffortsDocumentHandler;
 import org.repositoryminer.listener.IPostMiningListener;
-import org.repositoryminer.miner.RepositoryMiner;
+import org.repositoryminer.mining.RepositoryMiner;
 import org.repositoryminer.model.Commit;
 import org.repositoryminer.model.Diff;
 import org.repositoryminer.model.Reference;

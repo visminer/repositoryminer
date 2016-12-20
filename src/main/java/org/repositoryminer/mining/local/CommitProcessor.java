@@ -1,4 +1,4 @@
-package org.repositoryminer.miner;
+package org.repositoryminer.mining.local;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,6 +17,7 @@ import org.repositoryminer.ast.AST;
 import org.repositoryminer.ast.AbstractTypeDeclaration;
 import org.repositoryminer.codesmell.clazz.IClassCodeSmell;
 import org.repositoryminer.metric.clazz.IClassMetric;
+import org.repositoryminer.mining.RepositoryMiner;
 import org.repositoryminer.model.Commit;
 import org.repositoryminer.model.Diff;
 import org.repositoryminer.model.Reference;
@@ -90,7 +91,51 @@ public class CommitProcessor {
 		processReferences();
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public void startIncrementalAnalysis(List<String> commits) throws IOException {
+		parsers = new HashMap<String, IParser>();
+		for (IParser p : repositoryMiner.getParsers()) {
+			for (String ext : p.getExtensions()) {
+				parsers.put(ext, p);
+			}
+		}
+		
+		processIncrementalAnalysis(commits);
+	}
+	
+	private void processIncrementalAnalysis(List<String> commits) throws IOException {
+		int begin = 0;
+		int end = Math.min(commits.size(), COMMIT_RANGE);
+
+		while (end < commits.size()) {
+			processNewCommits(commits.subList(begin, end), begin, commits.size());
+			begin = end;
+			end = Math.min(commits.size(), COMMIT_RANGE + end);
+		}
+
+		processNewCommits(commits.subList(begin, end), begin, commits.size());
+	}
+	
+	private void processNewCommits(List<String> commits, int progress, int qtdCommits) throws IOException {
+		for (Document doc : commitPersistence.findByIdColl(repositoryId, commits, Projections.include("diffs", "commit_date"))) {
+			Commit commit = Commit.parseDocument(doc);
+			
+			repositoryMiner.getMiningListener().commitsProgressChange("", commit.getId(), ++progress, qtdCommits);
+
+			scm.checkout(commit.getId());
+
+			for (IParser parser : repositoryMiner.getParsers()) {
+				parser.processSourceFolders(repositoryPath);
+			}
+
+			for (Diff diff : commit.getDiffs()) {
+				if (diff.getType() != DiffType.DELETE) {
+					processDiff(diff.getPath(), diff.getHash(), commit);
+				}
+			}
+		}
+	}
+	
+	@SuppressWarnings({"unchecked" })
 	private void processReferences() throws IOException {
 		for (Reference ref : references) {
 			Document refDoc = referenceHandler.findById(ref.getId(), Projections.include("commits"));
@@ -100,12 +145,12 @@ public class CommitProcessor {
 			int end = Math.min(commits.size(), COMMIT_RANGE);
 
 			while (end < commits.size()) {
-				processCommits(new ArrayList(commits.subList(begin, end)), ref.getName(), begin, commits.size());
+				processCommits(commits.subList(begin, end), ref.getName(), begin, commits.size());
 				begin = end;
 				end = Math.min(commits.size(), COMMIT_RANGE + end);
 			}
 
-			processCommits(new ArrayList(commits.subList(begin, end)), ref.getName(), begin, commits.size());
+			processCommits(commits.subList(begin, end), ref.getName(), begin, commits.size());
 		}
 	}
 

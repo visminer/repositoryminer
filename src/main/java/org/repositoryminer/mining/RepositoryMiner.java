@@ -1,4 +1,4 @@
-package org.repositoryminer.miner;
+package org.repositoryminer.mining;
 
 import java.io.IOException;
 import java.util.AbstractMap;
@@ -14,6 +14,8 @@ import org.repositoryminer.listener.impl.MiningListener;
 import org.repositoryminer.listener.impl.PostMiningListener;
 import org.repositoryminer.metric.clazz.IClassMetric;
 import org.repositoryminer.metric.project.IProjectMetric;
+import org.repositoryminer.mining.local.IncrementalMiningProcessor;
+import org.repositoryminer.mining.local.MiningProcessor;
 import org.repositoryminer.model.Repository;
 import org.repositoryminer.parser.IParser;
 import org.repositoryminer.persistence.handler.RepositoryDocumentHandler;

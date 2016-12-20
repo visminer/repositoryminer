@@ -16,11 +16,12 @@ public class SnapshotAnalysisDocumentHandler extends DocumentHandler{
 		super.collection = Connection.getInstance().getCollection(COLLECTION_NAME);
 	}
 
-	public void deleteByCommits(String repositoryId, List<String> commitsToRemove) {
+	public boolean hasSnapshot(String repositoryId, String commit) {
 		List<BasicDBObject> where = new ArrayList<BasicDBObject>(2);
 		where.add(new BasicDBObject("repository", new ObjectId(repositoryId)));
-		where.add(new BasicDBObject("commit", new BasicDBObject("$in", commitsToRemove)));
-		deleteMany(new BasicDBObject("$and", where));
+		where.add(new BasicDBObject("commit", commit));
+		
+		return collection.count(new BasicDBObject("$and", where)) > 0 ? true : false;
 	}
 	
 }

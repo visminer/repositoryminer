@@ -1,4 +1,4 @@
-package org.repositoryminer.miner;
+package org.repositoryminer.mining;
 
 import java.util.List;
 

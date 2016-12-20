@@ -1,4 +1,4 @@
-package org.repositoryminer.miner;
+package org.repositoryminer.mining.local;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,6 +11,7 @@ import java.util.Map.Entry;
 
 import org.apache.commons.io.FilenameUtils;
 import org.bson.Document;
+import org.repositoryminer.mining.RepositoryMiner;
 import org.repositoryminer.model.Commit;
 import org.repositoryminer.model.Contributor;
 import org.repositoryminer.model.Reference;
@@ -25,15 +26,15 @@ import org.repositoryminer.utility.FileUtils;
 
 /**
  * <h1>The actual mining processor behind
- * {@link org.repositoryminer.miner.RepositoryMiner}</h1>
+ * {@link org.repositoryminer.mining.RepositoryMiner}</h1>
  * <p>
  * MiningProcessor is a second level entry for the mining API. Direct calls to
  * instances of this class can be made, but we encourage the use of our main
- * facade, {@link org.repositoryminer.miner.RepositoryMiner}, provided it has
+ * facade, {@link org.repositoryminer.mining.RepositoryMiner}, provided it has
  * all the necessary parameters to get the mining process started.
  * <p>
  * It is very important that the injected instance of
- * {@link org.repositoryminer.miner.RepositoryMiner} has all of the mandatory
+ * {@link org.repositoryminer.mining.RepositoryMiner} has all of the mandatory
  * parameters set to valid values so that the persistence of the mined
  * information will be consistent.
  * <p>
@@ -55,8 +56,8 @@ import org.repositoryminer.utility.FileUtils;
  * </ul>
  * At least one of the lists must be populated so to get the mining process
  * started. The lists are then injected in a instance of
- * {@link org.repositoryminer.miner.CommitProcessor} which is capable of
- * performing the actual calculations and detections.
+ * {@link org.repositoryminer.mining.local.CommitProcessor} which is
+ * capable of performing the actual calculations and detections.
  * <p>
  * Raised exceptions are:
  * <p>
@@ -81,7 +82,7 @@ public class MiningProcessor {
 		contributors = new HashSet<Contributor>();
 		visitedCommits = new HashSet<String>();
 		messageAnalyzer = new IssueExtractor();
-		
+
 		ReferenceDocumentHandler refDocumentHandler = new ReferenceDocumentHandler();
 
 		for (Reference ref : scm.getReferences()) {
@@ -100,7 +101,7 @@ public class MiningProcessor {
 
 			ref.setCommits(null);
 			ref.setId(refDoc.getObjectId("_id").toString());
-			
+
 			saveCommits(repositoryId, ref);
 			selectedReferences.add(ref);
 		}
@@ -111,7 +112,7 @@ public class MiningProcessor {
 		repositoryMiner.getMiningListener().initCommitsMining();
 
 		int skip = 0;
-		List<Commit> commits = scm.getCommits(skip, repositoryMiner.getCommitCount(), reference, visitedCommits, true);
+		List<Commit> commits = scm.getCommits(skip, repositoryMiner.getCommitCount(), reference, visitedCommits);
 
 		while (commits.size() > 0) {
 			List<Document> commitsDoc = new ArrayList<Document>();
@@ -128,7 +129,7 @@ public class MiningProcessor {
 
 			documentHandler.insertMany(commitsDoc);
 			skip += repositoryMiner.getCommitCount();
-			commits = scm.getCommits(skip, repositoryMiner.getCommitCount(), reference, visitedCommits, true);
+			commits = scm.getCommits(skip, repositoryMiner.getCommitCount(), reference, visitedCommits);
 		}
 	}
 
@@ -136,7 +137,7 @@ public class MiningProcessor {
 	 * Starts the mining process
 	 * 
 	 * @param repositoryMiner
-	 *            instance of {@link org.repositoryminer.miner.RepositoryMiner}
+	 *            instance of {@link org.repositoryminer.mining.RepositoryMiner}
 	 *            . It must <b>NEVER<b> be null, since it will provide important
 	 *            parameters for the source-code analysis and persistence
 	 * @throws IOException
@@ -181,7 +182,7 @@ public class MiningProcessor {
 	 * the targeted project.
 	 * 
 	 * @param repositoryMiner
-	 *            instance of {@link org.repositoryminer.miner.RepositoryMiner}
+	 *            instance of {@link org.repositoryminer.mining.RepositoryMiner}
 	 * @param tempPath
 	 *            temporary repository path to access the files content
 	 * @throws IOException

@@ -1,7 +1,7 @@
 package org.repositoryminer.postprocessing;
 
 import org.repositoryminer.listener.IPostMiningListener;
-import org.repositoryminer.miner.RepositoryMiner;
+import org.repositoryminer.mining.RepositoryMiner;
 import org.repositoryminer.model.Repository;
 
 /**

@@ -1,4 +1,4 @@
-package org.repositoryminer.miner;
+package org.repositoryminer.mining.hosting;
 
 import java.util.ArrayList;
 import java.util.List;

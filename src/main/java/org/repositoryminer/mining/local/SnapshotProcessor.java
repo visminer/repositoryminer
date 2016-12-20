@@ -1,4 +1,4 @@
-package org.repositoryminer.miner;
+package org.repositoryminer.mining.local;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -8,6 +8,7 @@ import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.repositoryminer.codesmell.project.IProjectCodeSmell;
 import org.repositoryminer.metric.project.IProjectMetric;
+import org.repositoryminer.mining.RepositoryMiner;
 import org.repositoryminer.model.Commit;
 import org.repositoryminer.model.Reference;
 import org.repositoryminer.parser.IParser;
@@ -63,20 +64,28 @@ public class SnapshotProcessor {
 		processCommits();
 	}
 
-	public void startUpdate() throws IOException {
-		List<String> commitsToRemove = new ArrayList<String>();
-		commitsToRemove.addAll(snapshots);
-
-		for (Reference ref : references) {
-			Document doc = referencePersistence.findById(ref.getId(),
+	public void startIncrementalAnalysis() throws IOException {
+		for (int i = 0; i < references.size(); i++){
+			Document doc = referencePersistence.findById(references.get(i).getId(),
 					Projections.fields(Projections.include("commits"), Projections.slice("commits", 1)));
 
 			@SuppressWarnings("unchecked")
 			String commitId = ((List<String>) doc.get("commits")).get(0);
-			commitsToRemove.add(commitId);
+			
+			if (snapshotPersistence.hasSnapshot(repositoryId, commitId)) {
+				snapshots.remove(commitId);
+				references.remove(i);
+				i--;
+			}
 		}
 		
-		snapshotPersistence.deleteByCommits(repositoryId, commitsToRemove);
+		for (int i = 0; i < snapshots.size(); i++) {
+			if (snapshotPersistence.hasSnapshot(repositoryId, snapshots.get(i))) {
+				snapshots.remove(i);
+				i--;
+			}
+		}
+		
 		start();
 	}
 

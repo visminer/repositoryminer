@@ -1,4 +1,4 @@
-package org.repositoryminer.miner;
+package org.repositoryminer.mining.local;
 
 import java.io.IOException;
 import java.util.AbstractMap;
@@ -9,6 +9,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.bson.Document;
+import org.repositoryminer.mining.RepositoryMiner;
 import org.repositoryminer.model.Commit;
 import org.repositoryminer.model.Contributor;
 import org.repositoryminer.model.Reference;
@@ -25,119 +26,120 @@ import com.mongodb.client.model.Projections;
 
 public class IncrementalMiningProcessor {
 
-	private ISCM scm;
-	private IssueExtractor messageAnalyzer;
 	private RepositoryMiner repositoryMiner;
-	private List<Reference> selectedReferences;
-	private Set<String> visitedCommits; // stores all the commits before starts the incremental analysis
-	private Set<String> newerCommits; // stores the new commits found in the incremental analysis
+	private ISCM scm;
+	private Set<String> processedCommits;
 	private Set<Contributor> contributors;
+	private IssueExtractor issueExtractor;
+	private List<Reference> selectedReferences;
+	private List<String> newCommits;
 
 	private void updateReferences(String repositoryId) {
-		selectedReferences = new ArrayList<Reference>();
 		contributors = new HashSet<Contributor>();
-		messageAnalyzer = new IssueExtractor();
-		newerCommits = new HashSet<String>();
-		
+		issueExtractor = new IssueExtractor();
+		selectedReferences = new ArrayList<Reference>();
+
 		ReferenceDocumentHandler refDocumentHandler = new ReferenceDocumentHandler();
-		Set<String> commitsToSkip = new HashSet<String>(visitedCommits);
-		
 		for (Reference ref : scm.getReferences()) {
 			Entry<String, ReferenceType> entry = new AbstractMap.SimpleEntry<String, ReferenceType>(ref.getName(),
-                    ref.getType());
+					ref.getType());
 
-            if (!repositoryMiner.getReferences().contains(entry)) {
-                continue;
-            }
-            
-            ref.setRepository(repositoryId);
-            Document refDoc = refDocumentHandler.findByPath(ref.getPath(), repositoryId, Projections.include("_id"));
-            
-            if (refDoc == null) {
-                ref.setCommits(scm.getReferenceCommits(ref.getPath(), ref.getType()));
-                refDoc = ref.toDocument();
-                refDocumentHandler.insert(refDoc);
-            } else {
-            	refDocumentHandler.updateOnlyCommits(refDoc.getObjectId("_id").toString(), scm.getReferenceCommits(ref.getPath(), ref.getType()));
-            }
-            
-            ref.setId(refDoc.getObjectId("_id").toString());
-            updateCommits(ref, commitsToSkip);
-            
-            ref.setCommits(null);
-            selectedReferences.add(ref);
+			if (!repositoryMiner.getReferences().contains(entry)) {
+				continue;
+			}
+
+			ref.setRepository(repositoryId);
+			Document refDoc = refDocumentHandler.findByPath(ref.getPath(), repositoryId, Projections.include("_id"));
+
+			if (refDoc == null) {
+				ref.setCommits(scm.getReferenceCommits(ref.getPath(), ref.getType()));
+				refDoc = ref.toDocument();
+				refDocumentHandler.insert(refDoc);
+			} else {
+				refDocumentHandler.updateOnlyCommits(refDoc.getObjectId("_id").toString(),
+						scm.getReferenceCommits(ref.getPath(), ref.getType()));
+			}
+
+			ref.setId(refDoc.getObjectId("_id").toString());
+			ref.setCommits(null);
+			selectedReferences.add(ref);
 		}
 	}
-	
+
 	private void updateCommits(Reference reference, Set<String> commitsToSkip) {
 		CommitDocumentHandler documentHandler = new CommitDocumentHandler();
-		repositoryMiner.getMiningListener().initCommitsMining();
-		
+
 		int skip = 0;
-		List<Commit> commits = scm.getCommits(skip, repositoryMiner.getCommitCount(), reference, commitsToSkip, false);
-		
+		List<Commit> commits = scm.getCommits(skip, repositoryMiner.getCommitCount(), reference, commitsToSkip);
+
 		while (commits.size() > 0) {
 			List<Document> commitsDoc = new ArrayList<Document>();
 
 			for (Commit commit : commits) {
 				commit.setRepository(reference.getRepository());
-				commit.setIssueReferences(messageAnalyzer.analyzeMessage(commit.getMessage()));
+				commit.setIssueReferences(issueExtractor.analyzeMessage(commit.getMessage()));
 
 				contributors.add(commit.getCommitter());
 				commitsDoc.add(commit.toDocument());
 
 				commitsToSkip.add(commit.getId());
-				newerCommits.add(commit.getId());
+				newCommits.add(commit.getId());
 			}
 
 			documentHandler.insertMany(commitsDoc);
 			skip += repositoryMiner.getCommitCount();
-			commits = scm.getCommits(skip, repositoryMiner.getCommitCount(), reference, commitsToSkip, false);
+			commits = scm.getCommits(skip, repositoryMiner.getCommitCount(), reference, commitsToSkip);
 		}
 	}
-	
+
 	public void mine(RepositoryMiner repositoryMiner) throws IOException {
 		this.repositoryMiner = repositoryMiner;
-		
+
 		RepositoryDocumentHandler repoHandler = new RepositoryDocumentHandler();
 		Repository repository = Repository.parseDocument(repoHandler.findByName(repositoryMiner.getName()));
-		
+
 		String tempRepo = FileUtils.copyFolderToTmp(repository.getPath(), repository.getName());
-		
+
 		scm = SCMFactory.getSCM(repositoryMiner.getScm());
-        scm.open(tempRepo);
-        
-        CommitDocumentHandler commitDocHandler = new CommitDocumentHandler();
-        visitedCommits = new HashSet<String>();
-        List<Document> commitsDoc = commitDocHandler.findByRepository(repository.getId(), Projections.include("_id"));
-        for (Document d : commitsDoc) {
-        	visitedCommits.add(d.getString("_id"));
-        }
-        
-        updateReferences(repository.getId());
-        
-        for (Contributor c : repository.getContributors()) {
-        	contributors.add(c);
-        }
-        repoHandler.updateOnlyContributors(repository.getId(), Contributor.toDocumentList(contributors));
-        
-        saveWorkingDirectories(repository.getId());
-        calculateAndDetect(tempRepo, repository.getId());
-        
-        scm.close();
-        FileUtils.deleteFolder(tempRepo);
+		scm.open(tempRepo);
+
+		loadAllCommits(repository.getId());
+
+		updateReferences(repository.getId());
+		
+		newCommits = new ArrayList<String>();
+		Set<String> commitsToSkip = new HashSet<String>(processedCommits);
+		for (Reference ref : selectedReferences) {
+			updateCommits(ref, commitsToSkip);
+		}
+
+		updateWorkingDirectories(repository.getId());
+		calculateAndDetect(tempRepo, repository.getId());
+		
+		scm.close();
+		FileUtils.deleteFolder(tempRepo);
 	}
-	
-	private void saveWorkingDirectories(String repositoryId) {
+
+	private void updateWorkingDirectories(String repositoryId) {
 		WorkingDirectoryProcessor wdProcessor = new WorkingDirectoryProcessor();
 		wdProcessor.setListener(repositoryMiner.getMiningListener());
 		wdProcessor.setReferences(selectedReferences);
-		wdProcessor.setVisitedCommits(visitedCommits);
+		wdProcessor.setVisitedCommits(processedCommits);
 		wdProcessor.setRepositoryId(repositoryId);
 		wdProcessor.processWorkingDirectories();
 	}
-	
-	// Performs both the calculation (metrics) and detections (smells/debts) on the targeted project.
+
+	private void loadAllCommits(String repositoryId) {
+		CommitDocumentHandler commitDocHandler = new CommitDocumentHandler();
+		processedCommits = new HashSet<String>();
+
+		List<Document> commitsDoc = commitDocHandler.findByRepository(repositoryId, Projections.include("_id"));
+
+		for (Document d : commitsDoc) {
+			processedCommits.add(d.getString("_id"));
+		}
+	}
+
 	private void calculateAndDetect(String tempRepo, String repositoryId) throws IOException {
 		if (!repositoryMiner.shouldProcessCommits() && !repositoryMiner.shouldProcessReferences())
 			return;
@@ -147,18 +149,16 @@ public class IncrementalMiningProcessor {
 
 		if (repositoryMiner.shouldProcessCommits()) {
 			CommitProcessor commitProcessor = new CommitProcessor();
-			commitProcessor.setReferences(selectedReferences);
 			commitProcessor.setSCM(scm);
 			commitProcessor.setRepositoryMiner(repositoryMiner);
-			commitProcessor.setVisitedCommits(visitedCommits);
 			commitProcessor.setRepositoryData(repositoryId, tempRepo);
-			commitProcessor.start();
+			commitProcessor.startIncrementalAnalysis(newCommits);
 		}
 
 		if (repositoryMiner.shouldProcessReferences()) {
 			List<String> validSnapshots = new ArrayList<String>();
 			for (String hash : repositoryMiner.getSnapshots()) {
-				if (visitedCommits.contains(hash) || newerCommits.contains(hash)) {
+				if (processedCommits.contains(hash) || newCommits.contains(hash)) {
 					validSnapshots.add(hash);
 				}
 			}
@@ -169,8 +169,8 @@ public class IncrementalMiningProcessor {
 			snapshotProcessor.setRepositoryData(repositoryId, tempRepo);
 			snapshotProcessor.setRepositoryMiner(repositoryMiner);
 			snapshotProcessor.setSCM(scm);
-			snapshotProcessor.startUpdate();
+			snapshotProcessor.startIncrementalAnalysis();
 		}
 	}
-	
+
 }

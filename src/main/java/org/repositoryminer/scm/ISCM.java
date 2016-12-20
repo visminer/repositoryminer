@@ -41,16 +41,12 @@ public interface ISCM {
 	 *            defines how many commits should be fetch
 	 * @param reference
 	 *            the reference
-	 * @param commits
-	 *            collection of commits names
-	 * @param despise
-	 *            defines True if the list of commits in the parameters should
-	 *            be skipped or False if only the commits in the list should be
-	 *            returned.
+	 * @param commitsToSkip
+	 *            collection of commits to be skipped. The
+	 *            commits inside this collection will not be returned
 	 * @return A list with a set of commits in a reference
 	 */
-	public List<Commit> getCommits(int skip, int maxCount, Reference reference, Collection<String> commits,
-			boolean despise);
+	public List<Commit> getCommits(int skip, int maxCount, Reference reference, Collection<String> commitsToSkip);
 
 	/**
 	 * @param fullName
