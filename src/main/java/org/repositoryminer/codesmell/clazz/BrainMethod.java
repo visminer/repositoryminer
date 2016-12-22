@@ -37,7 +37,7 @@ import org.repositoryminer.metric.clazz.NOAV;
  * The default thresholds used are:
  * <ul>
  * <li>mlocThreshold = 65</li>
- * <li>ccMlocThreshold = 0.24</li>
+ * <li>ccMlocThreshold = 10</li>
  * <li>maxNestingThreshold = 5</li>
  * <li>noavThreshold = 5</li>
  * </ul>
@@ -51,7 +51,7 @@ public class BrainMethod implements IClassCodeSmell {
 	private MAXNESTING maxNestingMetric;
 
 	private int mlocThreshold = 65;
-	private float ccThreshold = 0.24f;
+	private int ccThreshold = 10;
 	private int maxNestingThreshold = 5;
 	private int noavThreshold = 5;
 
@@ -62,7 +62,7 @@ public class BrainMethod implements IClassCodeSmell {
 		maxNestingMetric = new MAXNESTING();
 	}
 
-	public BrainMethod(int mlocThreshold, float ccMlocThreshold, int maxNestingThreshold, int noavThreshold) {
+	public BrainMethod(int mlocThreshold, int ccMlocThreshold, int maxNestingThreshold, int noavThreshold) {
 		this();
 		this.mlocThreshold = mlocThreshold;
 		this.ccThreshold = ccMlocThreshold;
