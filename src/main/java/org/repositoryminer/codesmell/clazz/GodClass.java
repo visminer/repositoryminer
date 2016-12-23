@@ -6,6 +6,7 @@ import org.repositoryminer.ast.AbstractTypeDeclaration;
 import org.repositoryminer.ast.AbstractTypeDeclaration.Archetype;
 import org.repositoryminer.ast.TypeDeclaration;
 import org.repositoryminer.codesmell.CodeSmellId;
+import org.repositoryminer.metric.MetricId;
 import org.repositoryminer.metric.clazz.ATFD;
 import org.repositoryminer.metric.clazz.TCC;
 import org.repositoryminer.metric.clazz.WMC;
@@ -65,23 +66,40 @@ public class GodClass implements IClassCodeSmell {
 
 	@Override
 	public Document detect(AbstractTypeDeclaration type, AST ast) {
-		if (type.getArchetype() == Archetype.CLASS_OR_INTERFACE) {
-			TypeDeclaration cls = (TypeDeclaration) type;
-			return new Document("name", CodeSmellId.GOD_CLASS.toString()).append("value", detect(type, cls));
+		if (type.getArchetype() != Archetype.CLASS_OR_INTERFACE) {
+			return null;
 		}
-		return null;
-	}
-
-	public boolean detect(AbstractTypeDeclaration type, TypeDeclaration cls) {
-		atfdMetric = new ATFD();
-		wmcMetric = new WMC();
-		tccMetric = new TCC();
-
+		
+		TypeDeclaration cls = (TypeDeclaration) type;
+		
 		int atfd = atfdMetric.calculate(type, cls.getMethods(), false);
 		float tcc = tccMetric.calculate(type, cls.getMethods());
 		int wmc = wmcMetric.calculate(cls.getMethods());
+		
+		Document response = new Document("name", CodeSmellId.GOD_CLASS.toString());
+		response.append("is_smell", atfd > atfdThreshold && wmc >= wmcThreshold && tcc < tccThreshold);
+		response.append("metrics", metricsToDocument(atfd, wmc, tcc));
+		response.append("thresholds", thresholdsToDocument());
+		
+		return response;
+	}
 
-		return atfd > atfdThreshold && wmc >= wmcThreshold && tcc < tccThreshold;
+	private Document metricsToDocument(int atfd, int wmc, float tcc) {
+		Document doc = new Document();
+		doc.append(MetricId.ATFD.toString(), atfd);
+		doc.append(MetricId.WMC.toString(), wmc);
+		doc.append(MetricId.TCC.toString(), tcc);
+
+		return doc;
+	}
+
+	private Document thresholdsToDocument() {
+		Document doc = new Document();
+		doc.append(MetricId.ATFD.toString(), atfdThreshold);
+		doc.append(MetricId.WMC.toString(), wmcThreshold);
+		doc.append(MetricId.TCC.toString(), tccThreshold);
+
+		return doc;
 	}
 
 }

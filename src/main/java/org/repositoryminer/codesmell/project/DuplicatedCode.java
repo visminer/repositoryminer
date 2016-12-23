@@ -81,6 +81,7 @@ public class DuplicatedCode implements IProjectCodeSmell {
 
 			cpd.go();
 			Iterator<Match> ms = cpd.getMatches();
+			
 			while (ms.hasNext()) {
 				Match m = ms.next();
 				Document auxDoc = new Document();
@@ -140,7 +141,6 @@ public class DuplicatedCode implements IProjectCodeSmell {
 			DecimalFormat df = new DecimalFormat("#.####");
 			df.setRoundingMode(RoundingMode.CEILING);
 			return Double.valueOf(df.format(percentage).replaceAll(",", "."));
-
 		} catch (IOException e) {
 			return 0.0;
 		}
