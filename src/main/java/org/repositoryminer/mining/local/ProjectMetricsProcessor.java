@@ -14,12 +14,12 @@ import org.repositoryminer.model.Reference;
 import org.repositoryminer.parser.IParser;
 import org.repositoryminer.persistence.handler.CommitDocumentHandler;
 import org.repositoryminer.persistence.handler.ReferenceDocumentHandler;
-import org.repositoryminer.persistence.handler.SnapshotAnalysisDocumentHandler;
+import org.repositoryminer.persistence.handler.ProjectMetricsDocumentHandler;
 import org.repositoryminer.scm.ISCM;
 
 import com.mongodb.client.model.Projections;
 
-public class SnapshotProcessor {
+public class ProjectMetricsProcessor {
 
 	private ISCM scm;
 	private RepositoryMiner repositoryMiner;
@@ -28,12 +28,12 @@ public class SnapshotProcessor {
 	private List<Reference> references;
 	private List<String> snapshots;
 
-	private SnapshotAnalysisDocumentHandler snapshotPersistence;
+	private ProjectMetricsDocumentHandler projectMetricsHandler;
 	private ReferenceDocumentHandler referencePersistence;
 	private CommitDocumentHandler commitPersistence;
 
-	public SnapshotProcessor() {
-		snapshotPersistence = new SnapshotAnalysisDocumentHandler();
+	public ProjectMetricsProcessor() {
+		projectMetricsHandler = new ProjectMetricsDocumentHandler();
 		referencePersistence = new ReferenceDocumentHandler();
 		commitPersistence = new CommitDocumentHandler();
 	}
@@ -72,7 +72,7 @@ public class SnapshotProcessor {
 			@SuppressWarnings("unchecked")
 			String commitId = ((List<String>) doc.get("commits")).get(0);
 			
-			if (snapshotPersistence.hasSnapshot(repositoryId, commitId)) {
+			if (projectMetricsHandler.hasRecord(repositoryId, commitId)) {
 				snapshots.remove(commitId);
 				references.remove(i);
 				i--;
@@ -80,7 +80,7 @@ public class SnapshotProcessor {
 		}
 		
 		for (int i = 0; i < snapshots.size(); i++) {
-			if (snapshotPersistence.hasSnapshot(repositoryId, snapshots.get(i))) {
+			if (projectMetricsHandler.hasRecord(repositoryId, snapshots.get(i))) {
 				snapshots.remove(i);
 				i--;
 			}
@@ -152,7 +152,7 @@ public class SnapshotProcessor {
 		if (repositoryMiner.hasProjectMetrics())
 			processProjectMetrics(doc);
 
-		snapshotPersistence.insert(doc);
+		projectMetricsHandler.insert(doc);
 	}
 
 	private void processProjectCodeSmells(Document tagDoc) {
@@ -164,7 +164,7 @@ public class SnapshotProcessor {
 		}
 
 		if (codeSmellsDocs.size() > 0)
-			tagDoc.append("code_smells", codeSmellsDocs);
+			tagDoc.append("codesmells", codeSmellsDocs);
 	}
 
 	private void processProjectMetrics(Document tagDoc) {

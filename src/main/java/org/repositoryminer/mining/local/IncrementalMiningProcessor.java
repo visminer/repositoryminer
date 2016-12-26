@@ -148,7 +148,7 @@ public class IncrementalMiningProcessor {
 			return;
 
 		if (repositoryMiner.shouldProcessCommits()) {
-			CommitProcessor commitProcessor = new CommitProcessor();
+			FilesProcessor commitProcessor = new FilesProcessor();
 			commitProcessor.setSCM(scm);
 			commitProcessor.setRepositoryMiner(repositoryMiner);
 			commitProcessor.setRepositoryData(repositoryId, tempRepo);
@@ -163,7 +163,7 @@ public class IncrementalMiningProcessor {
 				}
 			}
 
-			SnapshotProcessor snapshotProcessor = new SnapshotProcessor();
+			ProjectMetricsProcessor snapshotProcessor = new ProjectMetricsProcessor();
 			snapshotProcessor.setReferences(selectedReferences);
 			snapshotProcessor.setSnapshots(validSnapshots);
 			snapshotProcessor.setRepositoryData(repositoryId, tempRepo);

@@ -56,7 +56,7 @@ import org.repositoryminer.utility.FileUtils;
  * </ul>
  * At least one of the lists must be populated so to get the mining process
  * started. The lists are then injected in a instance of
- * {@link org.repositoryminer.mining.local.CommitProcessor} which is
+ * {@link org.repositoryminer.mining.local.FilesProcessor} which is
  * capable of performing the actual calculations and detections.
  * <p>
  * Raised exceptions are:
@@ -195,7 +195,7 @@ public class MiningProcessor {
 			return;
 
 		if (repositoryMiner.shouldProcessCommits()) {
-			CommitProcessor commitProcessor = new CommitProcessor();
+			FilesProcessor commitProcessor = new FilesProcessor();
 			commitProcessor.setReferences(selectedReferences);
 			commitProcessor.setSCM(scm);
 			commitProcessor.setRepositoryMiner(repositoryMiner);
@@ -211,7 +211,7 @@ public class MiningProcessor {
 				}
 			}
 
-			SnapshotProcessor snapshotProcessor = new SnapshotProcessor();
+			ProjectMetricsProcessor snapshotProcessor = new ProjectMetricsProcessor();
 			snapshotProcessor.setReferences(selectedReferences);
 			snapshotProcessor.setSnapshots(validSnapshots);
 			snapshotProcessor.setRepositoryData(repositoryId, tempRepo);

@@ -87,7 +87,7 @@ public class DuplicatedCode implements IProjectCodeSmell {
 				Document auxDoc = new Document();
 				auxDoc.append("line_count", m.getLineCount());
 				auxDoc.append("token_count", m.getTokenCount());
-				auxDoc.append("source_code_slice", m.getSourceCodeSlice());
+				auxDoc.append("source_slice", m.getSourceCodeSlice());
 				auxDoc.append("language", parser.getLanguage().toString());
 
 				List<Document> filesDoc = new ArrayList<Document>();
@@ -99,7 +99,7 @@ public class DuplicatedCode implements IProjectCodeSmell {
 					Document fileDoc = new Document();
 					fileDoc.append("begin_line", mark.getBeginLine());
 					fileDoc.append("end_line", mark.getEndLine());
-					fileDoc.append("file_name", filePath);
+					fileDoc.append("filename", filePath);
 					fileDoc.append("percentage", getDuplicatedPercentage(mark.getFilename(), m.getLineCount()));
 					filesDoc.add(fileDoc);
 				}

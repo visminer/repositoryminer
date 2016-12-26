@@ -8,15 +8,15 @@ import org.repositoryminer.persistence.Connection;
 
 import com.mongodb.BasicDBObject;
 
-public class SnapshotAnalysisDocumentHandler extends DocumentHandler{
+public class ProjectMetricsDocumentHandler extends DocumentHandler{
 
-	private static final String COLLECTION_NAME = "rm_snapshot_analysis";
+	private static final String COLLECTION_NAME = "rm_project_metrics";
 	
-	public SnapshotAnalysisDocumentHandler() {
+	public ProjectMetricsDocumentHandler() {
 		super.collection = Connection.getInstance().getCollection(COLLECTION_NAME);
 	}
 
-	public boolean hasSnapshot(String repositoryId, String commit) {
+	public boolean hasRecord(String repositoryId, String commit) {
 		List<BasicDBObject> where = new ArrayList<BasicDBObject>(2);
 		where.add(new BasicDBObject("repository", new ObjectId(repositoryId)));
 		where.add(new BasicDBObject("commit", commit));

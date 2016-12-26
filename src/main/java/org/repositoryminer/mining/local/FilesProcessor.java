@@ -22,7 +22,7 @@ import org.repositoryminer.model.Commit;
 import org.repositoryminer.model.Diff;
 import org.repositoryminer.model.Reference;
 import org.repositoryminer.parser.IParser;
-import org.repositoryminer.persistence.handler.CommitAnalysisDocumentHandler;
+import org.repositoryminer.persistence.handler.DirectMetricsDocumentHandler;
 import org.repositoryminer.persistence.handler.CommitDocumentHandler;
 import org.repositoryminer.persistence.handler.ReferenceDocumentHandler;
 import org.repositoryminer.scm.DiffType;
@@ -30,7 +30,7 @@ import org.repositoryminer.scm.ISCM;
 
 import com.mongodb.client.model.Projections;
 
-public class CommitProcessor {
+public class FilesProcessor {
 
 	private static final int COMMIT_RANGE = 3000;
 
@@ -39,7 +39,7 @@ public class CommitProcessor {
 	private String repositoryId;
 	private String repositoryPath;
 	
-	private CommitAnalysisDocumentHandler commitAnalysisPersistence;
+	private DirectMetricsDocumentHandler directMetricHandler;
 	private CommitDocumentHandler commitPersistence;
 	private ReferenceDocumentHandler referenceHandler;
 
@@ -48,8 +48,8 @@ public class CommitProcessor {
 	
 	private Map<String, IParser> parsers;
 
-	public CommitProcessor() {
-		commitAnalysisPersistence = new CommitAnalysisDocumentHandler();
+	public FilesProcessor() {
+		directMetricHandler = new DirectMetricsDocumentHandler();
 		referenceHandler = new ReferenceDocumentHandler();
 		commitPersistence = new CommitDocumentHandler();
 		visitedCommits = new HashSet<String>();
@@ -225,7 +225,7 @@ public class CommitProcessor {
 		doc.append("package", ast.getDocument().getPackageDeclaration());
 		doc.append("filename", file);
 		doc.append("repository", new ObjectId(repositoryId));
-		doc.append("file_hash", fileHash);
+		doc.append("filehash", fileHash);
 
 		List<Document> thresholdsDoc = new ArrayList<Document>();
 		for (IClassCodeSmell codeSmell : repositoryMiner.getClassCodeSmells()) {
@@ -252,7 +252,7 @@ public class CommitProcessor {
 		}
 
 		doc.append("abstract_types", abstractTypeDocs);
-		commitAnalysisPersistence.insert(doc);
+		directMetricHandler.insert(doc);
 	}
 
 	private void processClassMetrics(AST ast, AbstractTypeDeclaration type, Document typeDoc) {
