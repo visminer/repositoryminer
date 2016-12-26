@@ -227,6 +227,12 @@ public class CommitProcessor {
 		doc.append("repository", new ObjectId(repositoryId));
 		doc.append("file_hash", fileHash);
 
+		List<Document> thresholdsDoc = new ArrayList<Document>();
+		for (IClassCodeSmell codeSmell : repositoryMiner.getClassCodeSmells()) {
+			thresholdsDoc.add(codeSmell.getThresholds());
+		}
+		doc.append("codesmells_threshholds", thresholdsDoc);
+		
 		List<AbstractTypeDeclaration> types = ast.getDocument().getTypes();
 		List<Document> abstractTypeDocs = new ArrayList<Document>();
 		
