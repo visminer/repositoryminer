@@ -51,7 +51,7 @@ public class DuplicatedCode implements IProjectCodeSmell {
 
 	@Override
 	public Document detect(List<IParser> parsers, String repositoryPath, String charset) {
-		return new Document("name", CodeSmellId.DUPLICATED_CODE.toString()).append("occurrences", calculate(parsers, repositoryPath, charset));
+		return new Document("codesmell", CodeSmellId.DUPLICATED_CODE.toString()).append("occurrences", calculate(parsers, repositoryPath, charset));
 	}
 
 	public List<Document> calculate(List<IParser> parsers, String repositoryPath, String charset) {

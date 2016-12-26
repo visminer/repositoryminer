@@ -55,7 +55,7 @@ public class ComplexMethod implements IClassCodeSmell {
 			}
 
 			if (methods.size() > 0) {
-				return new Document("name", CodeSmellId.COMPLEX_METHOD.toString()).append("methods", methods);
+				return new Document("codesmell", CodeSmellId.COMPLEX_METHOD.toString()).append("methods", methods);
 			}
 		}
 		return null;

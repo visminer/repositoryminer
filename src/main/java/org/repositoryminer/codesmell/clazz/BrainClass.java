@@ -62,7 +62,7 @@ public class BrainClass implements IClassCodeSmell {
 		if (type.getArchetype() == Archetype.CLASS_OR_INTERFACE) {
 			TypeDeclaration cls = (TypeDeclaration) type;
 			if (detect(ast, type, cls)) {
-				return new Document("name", new String(CodeSmellId.BRAIN_CLASS.toString()));
+				return new Document("codesmell", new String(CodeSmellId.BRAIN_CLASS.toString()));
 			}
 		}
 		return null;

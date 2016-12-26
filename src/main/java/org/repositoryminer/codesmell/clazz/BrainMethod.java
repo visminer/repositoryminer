@@ -88,7 +88,7 @@ public class BrainMethod implements IClassCodeSmell {
 			}
 
 			if (methods.size() > 0) {
-				return new Document("name", CodeSmellId.BRAIN_METHOD.toString()).append("methods", methods);
+				return new Document("codesmell", CodeSmellId.BRAIN_METHOD.toString()).append("methods", methods);
 			}
 		}
 		return null;

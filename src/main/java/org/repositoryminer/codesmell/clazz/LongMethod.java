@@ -46,7 +46,7 @@ public class LongMethod implements IClassCodeSmell {
 			}
 
 			if (methods.size() > 0) {
-				return new Document("name", CodeSmellId.LONG_METHOD.toString()).append("methods", methods);
+				return new Document("codesmell", CodeSmellId.LONG_METHOD.toString()).append("methods", methods);
 			}
 		}
 		return null;
