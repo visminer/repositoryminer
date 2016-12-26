@@ -59,12 +59,15 @@ public class BrainClass implements IClassCodeSmell {
 
 	@Override
 	public Document detect(AbstractTypeDeclaration type, AST ast) {
-		if (type.getArchetype() != Archetype.CLASS_OR_INTERFACE) {
-			return null;
+		if (type.getArchetype() == Archetype.CLASS_OR_INTERFACE) {
+			TypeDeclaration cls = (TypeDeclaration) type;
+			boolean brainClass = detect(ast, type, cls);
+			return new Document("name", new String(CodeSmellId.BRAIN_CLASS.toString())).append("value", brainClass);
 		}
+		return null;
+	}
 
-		TypeDeclaration cls = (TypeDeclaration) type;
-
+	public boolean detect(AST ast, AbstractTypeDeclaration type, TypeDeclaration cls) {
 		int wmc = wmcMetric.calculate(cls.getMethods());
 		float tcc = tccMetric.calculate(type, cls.getMethods());
 
@@ -73,46 +76,32 @@ public class BrainClass implements IClassCodeSmell {
 
 		for (MethodDeclaration method : cls.getMethods()) {
 			totalMloc += mlocMetric.calculate(method, ast);
-			if (brainMethod.detect(type, method, ast)) {
+			if (brainMethod.detect(type, method, ast))
 				nbm++;
-			}
 		}
 
 		// Class contains more than one Brain Method and is very large
 		boolean exp1 = nbm > nbmThreshold && totalMloc >= locThreshold;
 
-		// Class contains only one BrainMethod but is extremely large and complex
+		// Class contains only one BrainMethod but is extremely large and
+		// complex
 		boolean exp2 = nbm == nbmThreshold && totalMloc >= (2 * locThreshold) && wmc >= (2 * wmcThreshold);
 
 		// Class is very complex and non-cohesive
 		boolean exp3 = wmc >= wmcThreshold && tcc < tccThreshold;
 
-		Document response = new Document("name", new String(CodeSmellId.BRAIN_CLASS.toString()));
-		response.append("is_smell", (exp1 || exp2) && exp3);
-		response.append("metrics", metricsToDocument(wmc, tcc, totalMloc, nbm));
-		response.append("thresholds", thresholdsToDocument());
-		
-		return response;
+		return (exp1 || exp2) && exp3;
 	}
 
-	private Document metricsToDocument(int wmc, float tcc, int totalMloc, int nbm) {
-		Document doc = new Document();
-		doc.append(MetricId.WMC.toString(), wmc);
-		doc.append(MetricId.TCC.toString(), tcc);
-		doc.append(MetricId.LOC.toString(), totalMloc);
-		doc.append(CodeSmellId.BRAIN_METHOD.toString(), nbm);
-		
-		return doc;
-	}
-
-	private Document thresholdsToDocument() {
+	@Override
+	public Document getThresholds() {
 		Document doc = new Document();
 		doc.append(MetricId.WMC.toString(), wmcThreshold);
 		doc.append(MetricId.TCC.toString(), tccThreshold);
 		doc.append(MetricId.LOC.toString(), locThreshold);
 		doc.append(CodeSmellId.BRAIN_METHOD.toString(), nbmThreshold);
-		
+
 		return doc;
 	}
-	
+
 }

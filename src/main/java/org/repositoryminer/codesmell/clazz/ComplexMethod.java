@@ -7,11 +7,11 @@ import org.bson.Document;
 import org.repositoryminer.ast.AST;
 import org.repositoryminer.ast.AbstractTypeDeclaration;
 import org.repositoryminer.ast.AbstractTypeDeclaration.Archetype;
+import org.repositoryminer.ast.MethodDeclaration;
+import org.repositoryminer.ast.TypeDeclaration;
 import org.repositoryminer.codesmell.CodeSmellId;
 import org.repositoryminer.metric.MetricId;
 import org.repositoryminer.metric.clazz.CYCLO;
-import org.repositoryminer.ast.MethodDeclaration;
-import org.repositoryminer.ast.TypeDeclaration;
 
 /**
  * <h1>Complex Method</h1>
@@ -51,20 +51,22 @@ public class ComplexMethod implements IClassCodeSmell {
 			methodsDoc = new ArrayList<Document>();
 
 			for (MethodDeclaration method : cls.getMethods()) {
-				int ccValue = ccMetric.calculate(method);
-				
-				Document methodDoc = new Document("method", method.getName());
-				methodDoc.append("metrics", new Document(MetricId.CYCLO.toString(), ccValue));
-				methodDoc.append("is_smell", ccValue > ccThreshold);
-				
-				methodsDoc.add(methodDoc);
+				boolean complexMethod = detect(method);
+				methodsDoc.add(new Document("method", method.getName()).append("value", complexMethod));
 			}
 
-			Document response = new Document("name", CodeSmellId.COMPLEX_METHOD.toString());
-			response.append("thresholds", new Document(MetricId.CYCLO.toString(), ccThreshold));
-			response.append("methods", methodsDoc);
+			return new Document("name", CodeSmellId.COMPLEX_METHOD.toString()).append("methods", methodsDoc);
 		}
 		return null;
+	}
+
+	public boolean detect(MethodDeclaration method) {
+		return ccMetric.calculate(method) > ccThreshold;
+	}
+
+	@Override
+	public Document getThresholds() {
+		return new Document(MetricId.CYCLO.toString(), ccThreshold);
 	}
 
 }

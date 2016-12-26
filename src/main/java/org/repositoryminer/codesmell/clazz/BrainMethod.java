@@ -12,8 +12,8 @@ import org.repositoryminer.ast.TypeDeclaration;
 import org.repositoryminer.codesmell.CodeSmellId;
 import org.repositoryminer.metric.MetricId;
 import org.repositoryminer.metric.clazz.CYCLO;
-import org.repositoryminer.metric.clazz.MLOC;
 import org.repositoryminer.metric.clazz.MAXNESTING;
+import org.repositoryminer.metric.clazz.MLOC;
 import org.repositoryminer.metric.clazz.NOAV;
 
 /**
@@ -38,7 +38,7 @@ import org.repositoryminer.metric.clazz.NOAV;
  * The default thresholds used are:
  * <ul>
  * <li>mlocThreshold = 65</li>
- * <li>ccMlocThreshold = 10</li>
+ * <li>ccMlocThreshold = 0.24</li>
  * <li>maxNestingThreshold = 5</li>
  * <li>noavThreshold = 5</li>
  * </ul>
@@ -52,7 +52,7 @@ public class BrainMethod implements IClassCodeSmell {
 	private MAXNESTING maxNestingMetric;
 
 	private int mlocThreshold = 65;
-	private int ccThreshold = 10;
+	private float ccThreshold = 0.24f;
 	private int maxNestingThreshold = 5;
 	private int noavThreshold = 5;
 
@@ -63,7 +63,7 @@ public class BrainMethod implements IClassCodeSmell {
 		maxNestingMetric = new MAXNESTING();
 	}
 
-	public BrainMethod(int mlocThreshold, int ccMlocThreshold, int maxNestingThreshold, int noavThreshold) {
+	public BrainMethod(int mlocThreshold, float ccMlocThreshold, int maxNestingThreshold, int noavThreshold) {
 		this();
 		this.mlocThreshold = mlocThreshold;
 		this.ccThreshold = ccMlocThreshold;
@@ -78,52 +78,19 @@ public class BrainMethod implements IClassCodeSmell {
 
 	@Override
 	public Document detect(AbstractTypeDeclaration type, AST ast) {
-		if (type.getArchetype() != Archetype.CLASS_OR_INTERFACE) {
-			return null;
+		if (type.getArchetype() == Archetype.CLASS_OR_INTERFACE) {
+			TypeDeclaration cls = (TypeDeclaration) type;
+
+			methodsDoc = new ArrayList<Document>();
+
+			for (MethodDeclaration method : cls.getMethods()) {
+				boolean brainMethod = detect(type, method, ast);
+				methodsDoc.add(new Document("method", method.getName()).append("value", brainMethod));
+			}
+
+			return new Document("name", CodeSmellId.BRAIN_METHOD.toString()).append("methods", methodsDoc);
 		}
-
-		TypeDeclaration cls = (TypeDeclaration) type;
-
-		methodsDoc = new ArrayList<Document>();
-
-		for (MethodDeclaration method : cls.getMethods()) {
-			int cc = ccMetric.calculate(method);
-			int mloc = mlocMetric.calculate(method, ast);
-			int noav = noavMetric.calculate(type, method);
-			int maxNesting = maxNestingMetric.calculate(method);
-
-			Document methodDoc = new Document("method", method.getName());
-			methodDoc.append("is_smell", detect(cc, mloc, noav, maxNesting));
-			methodDoc.append("metrics", metricsToDocument(mloc, cc, noav, maxNesting));
-
-			methodsDoc.add(methodDoc);
-		}
-
-		Document response = new Document("name", CodeSmellId.BRAIN_METHOD.toString());
-		response.append("thresholds", thresholdsToDocument());
-		response.append("methods", methodsDoc);
-
-		return response;
-	}
-
-	private Document metricsToDocument(int mloc, int cc, int noav, int maxNesting) {
-		Document doc = new Document();
-		doc.append(MetricId.MLOC.toString(), mloc);
-		doc.append(MetricId.CYCLO.toString(), cc);
-		doc.append(MetricId.NOAV.toString(), noav);
-		doc.append(MetricId.MAXNESTING.toString(), maxNesting);
-
-		return doc;
-	}
-
-	private Document thresholdsToDocument() {
-		Document doc = new Document();
-		doc.append(MetricId.MLOC.toString(), mlocThreshold);
-		doc.append(MetricId.CYCLO.toString(), ccThreshold);
-		doc.append(MetricId.NOAV.toString(), noavThreshold);
-		doc.append(MetricId.MAXNESTING.toString(), maxNestingThreshold);
-
-		return doc;
+		return null;
 	}
 
 	public boolean detect(AbstractTypeDeclaration type, MethodDeclaration method, AST ast) {
@@ -132,12 +99,19 @@ public class BrainMethod implements IClassCodeSmell {
 		int noav = noavMetric.calculate(type, method);
 		int maxNesting = maxNestingMetric.calculate(method);
 
-		return detect(cc, mloc, noav, maxNesting);
-	}
-
-	private boolean detect(int cc, int mloc, int noav, int maxNesting) {
 		return mloc > (mlocThreshold / 2) && cc >= ccThreshold && maxNesting >= maxNestingThreshold
 				&& noav > noavThreshold;
+	}
+
+	@Override
+	public Document getThresholds() {
+		Document doc = new Document();
+		doc.append(MetricId.MLOC.toString(), mlocThreshold);
+		doc.append(MetricId.CYCLO.toString(), ccThreshold);
+		doc.append(MetricId.NOAV.toString(), noavThreshold);
+		doc.append(MetricId.MAXNESTING.toString(), maxNestingThreshold);
+
+		return doc;
 	}
 
 }

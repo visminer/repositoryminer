@@ -41,22 +41,21 @@ public class LongMethod implements IClassCodeSmell {
 			methodsDoc = new ArrayList<Document>();
 
 			for(MethodDeclaration method : cls.getMethods()){
-				int mlocValue = mlocMetric.calculate(method, ast);
-				
-				Document methodDoc = new Document("method", method.getName());
-				methodDoc.append("metrics", new Document(MetricId.MLOC.toString(), mlocValue));
-				methodDoc.append("is_smell", mlocValue > mlocThreshold);
-				
-				methodsDoc.add(methodDoc);
+				methodsDoc.add(new Document("method", method.getName()).append("value", detect(method, ast)));
 			}
 
-			Document response = new Document("name", CodeSmellId.LONG_METHOD.toString());
-			response.append("thresholds", new Document(MetricId.MLOC.toString(), mlocThreshold));
-			response.append("methods", methodsDoc);
-			
-			return response;
+			return new Document("name", CodeSmellId.LONG_METHOD.toString()).append("methods", methodsDoc);
 		}
 		return null;
 	}
 	
+	public boolean detect(MethodDeclaration method, AST ast){
+		return mlocMetric.calculate(method, ast) > mlocThreshold;
+	}
+
+	@Override
+	public Document getThresholds() {
+		return new Document(MetricId.MLOC.toString(), mlocThreshold);
+	}
+
 }

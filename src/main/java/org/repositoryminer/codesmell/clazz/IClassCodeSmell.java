@@ -28,4 +28,9 @@ public interface IClassCodeSmell {
 	 */
 	public CodeSmellId getId();
 	
+	/**
+	 * @return The thresholds used to detect the codesmell
+	 */
+	public Document getThresholds();
+	
 }
