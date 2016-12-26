@@ -30,5 +30,10 @@ public interface IProjectCodeSmell {
 	 * @return The code smell ID
 	 */
 	public CodeSmellId getId();
-
+	
+	/**
+	 * @return The thresholds used to detect the codesmell
+	 */
+	public Document getThresholds();
+	
 }

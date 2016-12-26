@@ -140,6 +140,12 @@ public class SnapshotProcessor {
 		doc.append("commit_date", commit.getCommitDate());
 		doc.append("repository", new ObjectId(repositoryId));
 
+		List<Document> thresholdsDoc = new ArrayList<Document>();
+		for (IProjectCodeSmell codeSmell : repositoryMiner.getProjectCodeSmells()) {
+			thresholdsDoc.add(codeSmell.getThresholds());
+		}
+		doc.append("codesmells_threshholds", thresholdsDoc);
+		
 		if (repositoryMiner.hasProjectsCodeSmells())
 			processProjectCodeSmells(doc);
 

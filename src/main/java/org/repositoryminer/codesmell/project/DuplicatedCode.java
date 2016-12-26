@@ -112,6 +112,12 @@ public class DuplicatedCode implements IProjectCodeSmell {
 		return docs;
 	}
 
+	@Override
+	public Document getThresholds() {
+		return new Document("codesmell", CodeSmellId.DUPLICATED_CODE.toString()).append("thresholds",
+				new Document("tokens", tokensThreshold));
+	}
+	
 	private static void addSourcesFilesToCPD(List<File> files, CPD cpd) {
 		try {
 			for (File file : files) {
