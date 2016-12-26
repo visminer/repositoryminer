@@ -24,7 +24,7 @@ public class LOC implements IClassMetric {
 	@Override
 	public Document calculate(AbstractTypeDeclaration type, AST ast) {
 		int sloc = calculate(ast.getSourceCode());
-		return new Document("name", MetricId.LOC.toString()).append("value", new Integer(sloc));
+		return new Document("metric", MetricId.LOC.toString()).append("value", sloc);
 	}
 
 	public int calculate(String source) {

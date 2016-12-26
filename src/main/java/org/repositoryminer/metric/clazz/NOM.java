@@ -22,7 +22,7 @@ public class NOM extends MethodBasedMetricTemplate {
 
 	@Override
 	public Document calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast) {
-		return new Document("name", MetricId.NOM.toString()).append("value", methods.size());
+		return new Document("metric", MetricId.NOM.toString()).append("value", methods.size());
 	}
 
 }

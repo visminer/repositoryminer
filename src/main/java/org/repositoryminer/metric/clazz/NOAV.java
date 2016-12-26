@@ -38,11 +38,10 @@ public class NOAV extends MethodBasedMetricTemplate {
 		List<MethodDeclaration> filteredMethods = filterMethods(methods);
 		
 		for (MethodDeclaration method : filteredMethods) {
-			int noav = calculate(type, method);
-			methodsDoc.add(new Document("method", method.getName()).append("value", new Integer(noav)));
+			methodsDoc.add(new Document("method", method.getName()).append("value", calculate(type, method)));
 		}
 
-		return new Document("name", MetricId.NOAV.toString()).append("methods", methodsDoc);
+		return new Document("metric", MetricId.NOAV.toString()).append("methods", methodsDoc);
 	}
 
 	public int calculate(AbstractTypeDeclaration currType, MethodDeclaration method) {

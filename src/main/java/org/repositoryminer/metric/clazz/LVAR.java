@@ -33,17 +33,18 @@ public class LVAR extends MethodBasedMetricTemplate {
 		for(MethodDeclaration method : methods){
 			int lvar = calculate(method);
 			accumulated += lvar;
-			methodsDoc.add(new Document("method", method.getName()).append("value", new Integer(lvar)));
+			methodsDoc.add(new Document("method", method.getName()).append("value", lvar));
 		}
 		
-		return new Document("name", MetricId.LVAR.toString()).append("accumulated", new Integer(accumulated)).append("methods", methodsDoc);
+		return new Document("metric", MetricId.LVAR.toString()).append("accumulated", accumulated).append("methods", methodsDoc);
 	}
 	
 	public int calculate(MethodDeclaration method){
 		List<String> lvar = new ArrayList<String>();
 		for(Statement statement : method.getStatements()){
-			if(statement.getNodeType() == NodeType.VARIABLE_DECLARATION && !lvar.contains(statement.getExpression()))
+			if(statement.getNodeType() == NodeType.VARIABLE_DECLARATION && !lvar.contains(statement.getExpression())) {
 				lvar.add(statement.getExpression());
+			}
 		}
 		return lvar.size();
 	}

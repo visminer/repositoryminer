@@ -57,7 +57,7 @@ public class CYCLO extends MethodBasedMetricTemplate {
 	public Document calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast) {
 		methodsDoc = new ArrayList<Document>();
 		calculate(methods);
-		return new Document("name", MetricId.CYCLO.toString()).append("methods", methodsDoc);
+		return new Document("metric", MetricId.CYCLO.toString()).append("methods", methodsDoc);
 	}
 
 	/**
@@ -71,8 +71,7 @@ public class CYCLO extends MethodBasedMetricTemplate {
 	 */
 	public void calculate(List<MethodDeclaration> methods) {
 		for (MethodDeclaration method : methods) {
-			int cc = calculate(method);
-			methodsDoc.add(new Document("method", method.getName()).append("value", new Integer(cc)));
+			methodsDoc.add(new Document("method", method.getName()).append("value", calculate(method)));
 		}
 	}
 

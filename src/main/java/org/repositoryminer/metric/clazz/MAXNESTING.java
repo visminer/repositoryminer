@@ -31,7 +31,7 @@ public class MAXNESTING extends MethodBasedMetricTemplate {
 		for (MethodDeclaration method : methods) {
 			methodsDoc.add(new Document("method", method.getName()).append("value", calculate(method)));
 		}
-		return new Document("name", MetricId.MAXNESTING.toString()).append("methods", methodsDoc);
+		return new Document("metric", MetricId.MAXNESTING.toString()).append("methods", methodsDoc);
 	}
 
 	public int calculate(MethodDeclaration method) {

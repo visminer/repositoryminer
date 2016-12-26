@@ -34,7 +34,7 @@ public class NOP implements IProjectMetric {
 			packageDocs.add(doc);
 		}
 		
-		return new Document("name", MetricId.NOP.toString()).append("value", packageDocs);
+		return new Document("metric", MetricId.NOP.toString()).append("value", packageDocs);
 	}
 
 	private void analyzeFile(IParser parser, File file, String charset) {

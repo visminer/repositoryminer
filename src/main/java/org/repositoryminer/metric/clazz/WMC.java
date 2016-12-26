@@ -29,8 +29,7 @@ public class WMC extends MethodBasedMetricTemplate {
 	
 	@Override
 	public Document calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast) {
-		int wmc = calculate(methods);
-		return new Document("name", MetricId.WMC.toString()).append("value", new Integer(wmc));
+		return new Document("metric", MetricId.WMC.toString()).append("value", calculate(methods));
 	}
 
 	public int calculate(List<MethodDeclaration> methods) {

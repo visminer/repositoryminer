@@ -28,7 +28,7 @@ public class NOA implements IClassMetric {
 	public Document calculate(AbstractTypeDeclaration type, AST ast) {
 		if (Archetype.CLASS_OR_INTERFACE == type.getArchetype()) {
 			TypeDeclaration cls = (TypeDeclaration) type;
-			new Document("name", MetricId.NOA.toString()).append("value", new Integer(calculate(cls.getFields())));
+			new Document("metric", MetricId.NOA.toString()).append("value", calculate(cls.getFields()));
 		}
 		return null;
 	}

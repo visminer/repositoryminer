@@ -42,7 +42,7 @@ public class NOC implements IProjectMetric {
 			classDocs.add(doc);
 		}
 
-		return new Document("name", MetricId.NOC.toString()).append("value", classDocs);
+		return new Document("metric", MetricId.NOC.toString()).append("value", classDocs);
 	}
 
 	private void analyzeFile(IParser parser, File file, String charset) {
@@ -54,8 +54,9 @@ public class NOC implements IProjectMetric {
 		}
 
 		AST ast = parser.generate(file.getAbsolutePath(), text, charset);
-		if (ast == null)
+		if (ast == null) {
 			return;
+		}
 
 		for (AbstractTypeDeclaration type : ast.getDocument().getTypes()) {
 			classes.put(type.getName(), type.getArchetype().toString());

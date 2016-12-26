@@ -31,10 +31,10 @@ public class PAR extends MethodBasedMetricTemplate {
 		for(MethodDeclaration method : methods){
 			int par = calculate(method);
 			accumulated += par;
-			methodsDoc.add(new Document("method", method.getName()).append("value", new Integer(par)));
+			methodsDoc.add(new Document("method", method.getName()).append("value", par));
 		}
 	
-		return new Document("name", MetricId.PAR.toString()).append("accumulated", new Integer(accumulated)).append("methods", methodsDoc);
+		return new Document("metric", MetricId.PAR.toString()).append("accumulated", accumulated).append("methods", methodsDoc);
 	}
 	
 	public int calculate(MethodDeclaration method){

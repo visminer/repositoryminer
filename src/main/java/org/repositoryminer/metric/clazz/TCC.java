@@ -30,8 +30,7 @@ public class TCC extends MethodBasedMetricTemplate {
 
 	@Override
 	public Document calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast) {
-		float tcc = calculate(type, methods);
-		return new Document("name", MetricId.TCC.toString()).append("value", new Float(tcc));
+		return new Document("metric", MetricId.TCC.toString()).append("value", calculate(type, methods));
 	}
 
 	public float calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods) {
@@ -53,6 +52,7 @@ public class TCC extends MethodBasedMetricTemplate {
 		if (npc > 0) {
 			tcc = (float) ndc / npc;
 		}
+
 		return tcc;
 	}
 
@@ -67,10 +67,10 @@ public class TCC extends MethodBasedMetricTemplate {
 
 	public List<String> processAccessedFields(AbstractTypeDeclaration currType, MethodDeclaration method) {
 		Set<String> fields = new HashSet<String>();
-		
+
 		for (Statement stmt : method.getStatements()) {
 			String exp, type, target;
-			
+
 			if (stmt.getNodeType() == NodeType.FIELD_ACCESS || stmt.getNodeType() == NodeType.METHOD_INVOCATION) {
 				exp = stmt.getExpression();
 				type = exp.substring(0, exp.lastIndexOf("."));
@@ -102,7 +102,7 @@ public class TCC extends MethodBasedMetricTemplate {
 	private Collection<String> processGetOrSetOrIs(String methodInv) {
 		String field;
 		List<String> fields = new ArrayList<String>(2);
-		
+
 		if ((methodInv.startsWith("get") || methodInv.startsWith("set")) && methodInv.length() > 3) {
 			field = methodInv.substring(3);
 		} else if (methodInv.startsWith("is") && methodInv.length() > 2) {
@@ -110,11 +110,11 @@ public class TCC extends MethodBasedMetricTemplate {
 		} else {
 			return fields;
 		}
-		
+
 		char c[] = field.toCharArray();
 		c[0] = Character.toLowerCase(c[0]);
 		String field2 = new String(c);
-		
+
 		for (FieldDeclaration fd : currentFields) {
 			if (fd.getName().equals(field)) {
 				fields.add(field);
@@ -124,7 +124,7 @@ public class TCC extends MethodBasedMetricTemplate {
 				break;
 			}
 		}
-		
+
 		return fields;
 	}
 
