@@ -39,7 +39,7 @@ public class LongMethod implements IClassCodeSmell {
 			TypeDeclaration cls = (TypeDeclaration) type;
 			List<String> methods = new ArrayList<String>();
 
-			for(MethodDeclaration method : cls.getMethods()){
+			for (MethodDeclaration method : cls.getMethods()) {
 				if (detect(method, ast)) {
 					methods.add(method.getName());
 				}
@@ -52,13 +52,14 @@ public class LongMethod implements IClassCodeSmell {
 		return null;
 	}
 
-	public boolean detect(MethodDeclaration method, AST ast){
+	public boolean detect(MethodDeclaration method, AST ast) {
 		return mlocMetric.calculate(method, ast) > mlocThreshold;
 	}
 
 	@Override
 	public Document getThresholds() {
-		return new Document(MetricId.MLOC.toString(), mlocThreshold);
+		return new Document("codesmell", CodeSmellId.LONG_METHOD.toString()).append("thresholds",
+				new Document(MetricId.MLOC.toString(), mlocThreshold));
 	}
 
 }

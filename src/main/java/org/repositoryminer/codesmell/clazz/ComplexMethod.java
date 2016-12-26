@@ -19,8 +19,8 @@ import org.repositoryminer.metric.clazz.CYCLO;
  * This code smell is used to detect methods which are too complex. Complex
  * methods causes negative impact in software understandability and maintenance.
  * <p>
- * A method is considered too complex when it has McCabe’s cyclomatic number too high.
- * The default threshold for cyclomatic complexity is 10.
+ * A method is considered too complex when it has McCabe’s cyclomatic number too
+ * high. The default threshold for cyclomatic complexity is 10.
  */
 public class ComplexMethod implements IClassCodeSmell {
 
@@ -67,7 +67,8 @@ public class ComplexMethod implements IClassCodeSmell {
 
 	@Override
 	public Document getThresholds() {
-		return new Document(MetricId.CYCLO.toString(), ccThreshold);
+		return new Document("codesmell", CodeSmellId.COMPLEX_METHOD.toString()).append("thresholds",
+				new Document(MetricId.CYCLO.toString(), ccThreshold));
 	}
 
 }

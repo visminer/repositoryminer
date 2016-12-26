@@ -102,7 +102,7 @@ public class BrainClass implements IClassCodeSmell {
 		doc.append(MetricId.LOC.toString(), locThreshold);
 		doc.append(CodeSmellId.BRAIN_METHOD.toString(), nbmThreshold);
 
-		return doc;
+		return new Document("codesmell", CodeSmellId.BRAIN_CLASS.toString()).append("thresholds", doc);
 	}
 
 }

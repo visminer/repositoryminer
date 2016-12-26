@@ -112,7 +112,7 @@ public class BrainMethod implements IClassCodeSmell {
 		doc.append(MetricId.NOAV.toString(), noavThreshold);
 		doc.append(MetricId.MAXNESTING.toString(), maxNestingThreshold);
 
-		return doc;
+		return new Document("codesmell", CodeSmellId.BRAIN_METHOD.toString()).append("thresholds", doc);
 	}
 
 }

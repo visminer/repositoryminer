@@ -94,7 +94,7 @@ public class GodClass implements IClassCodeSmell {
 		doc.append(MetricId.WMC.toString(), wmcThreshold);
 		doc.append(MetricId.TCC.toString(), tccThreshold);
 
-		return doc;
+		return new Document("codesmell", CodeSmellId.GOD_CLASS.toString()).append("thresholds", doc);
 	}
 
 }
