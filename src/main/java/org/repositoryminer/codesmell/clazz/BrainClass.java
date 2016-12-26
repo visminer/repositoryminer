@@ -61,8 +61,9 @@ public class BrainClass implements IClassCodeSmell {
 	public Document detect(AbstractTypeDeclaration type, AST ast) {
 		if (type.getArchetype() == Archetype.CLASS_OR_INTERFACE) {
 			TypeDeclaration cls = (TypeDeclaration) type;
-			boolean brainClass = detect(ast, type, cls);
-			return new Document("name", new String(CodeSmellId.BRAIN_CLASS.toString())).append("value", brainClass);
+			if (detect(ast, type, cls)) {
+				return new Document("name", new String(CodeSmellId.BRAIN_CLASS.toString()));
+			}
 		}
 		return null;
 	}
@@ -76,15 +77,15 @@ public class BrainClass implements IClassCodeSmell {
 
 		for (MethodDeclaration method : cls.getMethods()) {
 			totalMloc += mlocMetric.calculate(method, ast);
-			if (brainMethod.detect(type, method, ast))
+			if (brainMethod.detect(type, method, ast)) {
 				nbm++;
+			}
 		}
 
 		// Class contains more than one Brain Method and is very large
 		boolean exp1 = nbm > nbmThreshold && totalMloc >= locThreshold;
 
-		// Class contains only one BrainMethod but is extremely large and
-		// complex
+		// Class contains only one BrainMethod but is extremely large and complex
 		boolean exp2 = nbm == nbmThreshold && totalMloc >= (2 * locThreshold) && wmc >= (2 * wmcThreshold);
 
 		// Class is very complex and non-cohesive

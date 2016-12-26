@@ -15,15 +15,14 @@ import org.repositoryminer.metric.clazz.MLOC;
 
 public class LongMethod implements IClassCodeSmell {
 
-	private List<Document> methodsDoc;
 	private MLOC mlocMetric;
-	
+
 	private int mlocThreshold = 40;
-	
+
 	public LongMethod() {
 		mlocMetric = new MLOC();
 	}
-	
+
 	public LongMethod(int mlocThreshold) {
 		this();
 		this.mlocThreshold = mlocThreshold;
@@ -33,22 +32,26 @@ public class LongMethod implements IClassCodeSmell {
 	public CodeSmellId getId() {
 		return CodeSmellId.LONG_METHOD;
 	}
-	
+
 	@Override
 	public Document detect(AbstractTypeDeclaration type, AST ast) {
 		if (type.getArchetype() == Archetype.CLASS_OR_INTERFACE) {
 			TypeDeclaration cls = (TypeDeclaration) type;
-			methodsDoc = new ArrayList<Document>();
+			List<String> methods = new ArrayList<String>();
 
 			for(MethodDeclaration method : cls.getMethods()){
-				methodsDoc.add(new Document("method", method.getName()).append("value", detect(method, ast)));
+				if (detect(method, ast)) {
+					methods.add(method.getName());
+				}
 			}
 
-			return new Document("name", CodeSmellId.LONG_METHOD.toString()).append("methods", methodsDoc);
+			if (methods.size() > 0) {
+				return new Document("name", CodeSmellId.LONG_METHOD.toString()).append("methods", methods);
+			}
 		}
 		return null;
 	}
-	
+
 	public boolean detect(MethodDeclaration method, AST ast){
 		return mlocMetric.calculate(method, ast) > mlocThreshold;
 	}

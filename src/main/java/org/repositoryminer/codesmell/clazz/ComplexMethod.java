@@ -24,9 +24,8 @@ import org.repositoryminer.metric.clazz.CYCLO;
  */
 public class ComplexMethod implements IClassCodeSmell {
 
-	private List<Document> methodsDoc;
 	private CYCLO ccMetric;
-	
+
 	private int ccThreshold = 10;
 
 	public ComplexMethod() {
@@ -42,20 +41,22 @@ public class ComplexMethod implements IClassCodeSmell {
 	public CodeSmellId getId() {
 		return CodeSmellId.COMPLEX_METHOD;
 	}
-	
+
 	@Override
 	public Document detect(AbstractTypeDeclaration type, AST ast) {
 		if (type.getArchetype() == Archetype.CLASS_OR_INTERFACE) {
 			TypeDeclaration cls = (TypeDeclaration) type;
-
-			methodsDoc = new ArrayList<Document>();
+			List<String> methods = new ArrayList<String>();
 
 			for (MethodDeclaration method : cls.getMethods()) {
-				boolean complexMethod = detect(method);
-				methodsDoc.add(new Document("method", method.getName()).append("value", complexMethod));
+				if (detect(method)) {
+					methods.add(method.getName());
+				}
 			}
 
-			return new Document("name", CodeSmellId.COMPLEX_METHOD.toString()).append("methods", methodsDoc);
+			if (methods.size() > 0) {
+				return new Document("name", CodeSmellId.COMPLEX_METHOD.toString()).append("methods", methods);
+			}
 		}
 		return null;
 	}

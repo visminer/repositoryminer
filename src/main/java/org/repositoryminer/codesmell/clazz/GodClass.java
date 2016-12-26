@@ -68,7 +68,9 @@ public class GodClass implements IClassCodeSmell {
 	public Document detect(AbstractTypeDeclaration type, AST ast) {
 		if (type.getArchetype() == Archetype.CLASS_OR_INTERFACE) {
 			TypeDeclaration cls = (TypeDeclaration) type;
-			return new Document("name", CodeSmellId.GOD_CLASS.toString()).append("value", detect(type, cls));
+			if (detect(type, cls)) {
+				return new Document("name", CodeSmellId.GOD_CLASS.toString());
+			}
 		}
 		return null;
 	}

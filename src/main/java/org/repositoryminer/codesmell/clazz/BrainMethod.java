@@ -45,14 +45,13 @@ import org.repositoryminer.metric.clazz.NOAV;
  */
 public class BrainMethod implements IClassCodeSmell {
 
-	private List<Document> methodsDoc;
 	private MLOC mlocMetric;
 	private CYCLO ccMetric;
 	private NOAV noavMetric;
 	private MAXNESTING maxNestingMetric;
 
 	private int mlocThreshold = 65;
-	private float ccThreshold = 0.24f;
+	private float ccThreshold = 10;
 	private int maxNestingThreshold = 5;
 	private int noavThreshold = 5;
 
@@ -80,15 +79,17 @@ public class BrainMethod implements IClassCodeSmell {
 	public Document detect(AbstractTypeDeclaration type, AST ast) {
 		if (type.getArchetype() == Archetype.CLASS_OR_INTERFACE) {
 			TypeDeclaration cls = (TypeDeclaration) type;
-
-			methodsDoc = new ArrayList<Document>();
+			List<String> methods = new ArrayList<String>();
 
 			for (MethodDeclaration method : cls.getMethods()) {
-				boolean brainMethod = detect(type, method, ast);
-				methodsDoc.add(new Document("method", method.getName()).append("value", brainMethod));
+				if (detect(type, method, ast)) {
+					methods.add(method.getName());
+				}
 			}
 
-			return new Document("name", CodeSmellId.BRAIN_METHOD.toString()).append("methods", methodsDoc);
+			if (methods.size() > 0) {
+				return new Document("name", CodeSmellId.BRAIN_METHOD.toString()).append("methods", methods);
+			}
 		}
 		return null;
 	}
