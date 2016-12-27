@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import org.repositoryminer.codesmell.clazz.IClassCodeSmell;
-import org.repositoryminer.codesmell.project.IProjectCodeSmell;
 import org.repositoryminer.listener.IMiningListener;
 import org.repositoryminer.listener.IPostMiningListener;
 import org.repositoryminer.listener.impl.MiningListener;
@@ -64,7 +63,6 @@ public class RepositoryMiner {
 	private List<IClassMetric> classMetrics = new ArrayList<IClassMetric>();
 	private List<IProjectMetric> projectMetrics = new ArrayList<IProjectMetric>();
 	private List<IClassCodeSmell> classCodeSmells = new ArrayList<IClassCodeSmell>();
-	private List<IProjectCodeSmell> projectCodeSmells = new ArrayList<IProjectCodeSmell>();
 	private List<IPostMiningTask> postMiningTasks = new ArrayList<IPostMiningTask>();
 	private List<Entry<String, ReferenceType>> references = new ArrayList<Entry<String, ReferenceType>>();
 	private List<String> snapshots = new ArrayList<String>();
@@ -179,21 +177,6 @@ public class RepositoryMiner {
 	}
 
 	/**
-	 * Adds a project code smell without duplicates
-	 * 
-	 * @param projectCodeSmell
-	 * @return true if the code smell was added and false otherwise
-	 */
-	public boolean addProjectCodeSmell(IProjectCodeSmell projectCodeSmell) {
-		for (IProjectCodeSmell c : this.projectCodeSmells) {
-			if (c.getId().equals(projectCodeSmell.getId()))
-				return false;
-		}
-		this.projectCodeSmells.add(projectCodeSmell);
-		return true;
-	}
-
-	/**
 	 * Adds a parser without duplicates
 	 * 
 	 * @param parser
@@ -264,10 +247,6 @@ public class RepositoryMiner {
 		return !classCodeSmells.isEmpty();
 	}
 
-	public boolean hasProjectsCodeSmells() {
-		return !projectCodeSmells.isEmpty();
-	}
-
 	public boolean hasPostMiningTasks() {
 		return !postMiningTasks.isEmpty();
 	}
@@ -276,16 +255,16 @@ public class RepositoryMiner {
 	 * @return True if calculation (metrics) and detections (smells/debts)
 	 *         should be performed in commits and False otherwise
 	 */
-	public boolean shouldProcessCommits() {
+	public boolean shouldProcessFiles() {
 		return hasClassCodeSmells() || hasClassMetrics();
 	}
 
 	/**
 	 * @return True if calculation (metrics) and detections (smells/debts)
-	 *         should be performed in references and False otherwise
+	 *         should be performed in the whole project and False otherwise
 	 */
-	public boolean shouldProcessReferences() {
-		return hasProjectsCodeSmells() || hasProjectMetrics();
+	public boolean shouldProcessProject() {
+		return hasProjectMetrics();
 	}
 
 	public String getPath() {
@@ -355,10 +334,6 @@ public class RepositoryMiner {
 
 	public List<IClassCodeSmell> getClassCodeSmells() {
 		return classCodeSmells;
-	}
-
-	public List<IProjectCodeSmell> getProjectCodeSmells() {
-		return projectCodeSmells;
 	}
 
 	public List<IPostMiningTask> getPostMiningTasks() {

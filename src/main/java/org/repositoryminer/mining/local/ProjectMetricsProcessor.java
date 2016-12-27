@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.bson.Document;
 import org.bson.types.ObjectId;
-import org.repositoryminer.codesmell.project.IProjectCodeSmell;
 import org.repositoryminer.metric.project.IProjectMetric;
 import org.repositoryminer.mining.RepositoryMiner;
 import org.repositoryminer.model.Commit;
@@ -140,31 +139,11 @@ public class ProjectMetricsProcessor {
 		doc.append("commit_date", commit.getCommitDate());
 		doc.append("repository", new ObjectId(repositoryId));
 
-		List<Document> thresholdsDoc = new ArrayList<Document>();
-		for (IProjectCodeSmell codeSmell : repositoryMiner.getProjectCodeSmells()) {
-			thresholdsDoc.add(codeSmell.getThresholds());
-		}
-		doc.append("codesmells_threshholds", thresholdsDoc);
-		
-		if (repositoryMiner.hasProjectsCodeSmells())
-			processProjectCodeSmells(doc);
-
-		if (repositoryMiner.hasProjectMetrics())
+		if (repositoryMiner.hasProjectMetrics()) {
 			processProjectMetrics(doc);
+		}
 
 		projectMetricsHandler.insert(doc);
-	}
-
-	private void processProjectCodeSmells(Document tagDoc) {
-		List<Document> codeSmellsDocs = new ArrayList<Document>();
-		for (IProjectCodeSmell codeSmell : repositoryMiner.getProjectCodeSmells()) {
-			Document doc = codeSmell.detect(repositoryMiner.getParsers(), repositoryPath, repositoryMiner.getCharset());
-			if (doc != null)
-				codeSmellsDocs.add(doc);
-		}
-
-		if (codeSmellsDocs.size() > 0)
-			tagDoc.append("codesmells", codeSmellsDocs);
 	}
 
 	private void processProjectMetrics(Document tagDoc) {
@@ -175,8 +154,9 @@ public class ProjectMetricsProcessor {
 				metricDocs.add(doc);
 		}
 
-		if (metricDocs.size() > 0)
+		if (metricDocs.size() > 0) {
 			tagDoc.append("metrics", metricDocs);
+		}
 	}
 
 }

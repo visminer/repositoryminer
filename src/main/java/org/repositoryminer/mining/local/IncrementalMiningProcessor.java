@@ -141,21 +141,21 @@ public class IncrementalMiningProcessor {
 	}
 
 	private void calculateAndDetect(String tempRepo, String repositoryId) throws IOException {
-		if (!repositoryMiner.shouldProcessCommits() && !repositoryMiner.shouldProcessReferences())
+		if (!repositoryMiner.shouldProcessFiles() && !repositoryMiner.shouldProcessProject())
 			return;
 
 		if (selectedReferences.size() == 0)
 			return;
 
-		if (repositoryMiner.shouldProcessCommits()) {
-			FilesProcessor commitProcessor = new FilesProcessor();
-			commitProcessor.setSCM(scm);
-			commitProcessor.setRepositoryMiner(repositoryMiner);
-			commitProcessor.setRepositoryData(repositoryId, tempRepo);
-			commitProcessor.startIncrementalAnalysis(newCommits);
+		if (repositoryMiner.shouldProcessFiles()) {
+			FilesProcessor filesProcessor = new FilesProcessor();
+			filesProcessor.setSCM(scm);
+			filesProcessor.setRepositoryMiner(repositoryMiner);
+			filesProcessor.setRepositoryData(repositoryId, tempRepo);
+			filesProcessor.startIncrementalAnalysis(newCommits);
 		}
 
-		if (repositoryMiner.shouldProcessReferences()) {
+		if (repositoryMiner.shouldProcessProject()) {
 			List<String> validSnapshots = new ArrayList<String>();
 			for (String hash : repositoryMiner.getSnapshots()) {
 				if (processedCommits.contains(hash) || newCommits.contains(hash)) {
@@ -163,13 +163,13 @@ public class IncrementalMiningProcessor {
 				}
 			}
 
-			ProjectMetricsProcessor snapshotProcessor = new ProjectMetricsProcessor();
-			snapshotProcessor.setReferences(selectedReferences);
-			snapshotProcessor.setSnapshots(validSnapshots);
-			snapshotProcessor.setRepositoryData(repositoryId, tempRepo);
-			snapshotProcessor.setRepositoryMiner(repositoryMiner);
-			snapshotProcessor.setSCM(scm);
-			snapshotProcessor.startIncrementalAnalysis();
+			ProjectMetricsProcessor projectProcessor = new ProjectMetricsProcessor();
+			projectProcessor.setReferences(selectedReferences);
+			projectProcessor.setSnapshots(validSnapshots);
+			projectProcessor.setRepositoryData(repositoryId, tempRepo);
+			projectProcessor.setRepositoryMiner(repositoryMiner);
+			projectProcessor.setSCM(scm);
+			projectProcessor.startIncrementalAnalysis();
 		}
 	}
 

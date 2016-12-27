@@ -188,22 +188,22 @@ public class MiningProcessor {
 	 * @throws IOException
 	 */
 	private void calculateAndDetect(String tempRepo, String repositoryId) throws IOException {
-		if (!repositoryMiner.shouldProcessCommits() && !repositoryMiner.shouldProcessReferences())
+		if (!repositoryMiner.shouldProcessFiles() && !repositoryMiner.shouldProcessProject())
 			return;
 
 		if (selectedReferences.size() == 0)
 			return;
 
-		if (repositoryMiner.shouldProcessCommits()) {
-			FilesProcessor commitProcessor = new FilesProcessor();
-			commitProcessor.setReferences(selectedReferences);
-			commitProcessor.setSCM(scm);
-			commitProcessor.setRepositoryMiner(repositoryMiner);
-			commitProcessor.setRepositoryData(repositoryId, tempRepo);
-			commitProcessor.start();
+		if (repositoryMiner.shouldProcessFiles()) {
+			FilesProcessor filesProcessor = new FilesProcessor();
+			filesProcessor.setReferences(selectedReferences);
+			filesProcessor.setSCM(scm);
+			filesProcessor.setRepositoryMiner(repositoryMiner);
+			filesProcessor.setRepositoryData(repositoryId, tempRepo);
+			filesProcessor.start();
 		}
 
-		if (repositoryMiner.shouldProcessReferences()) {
+		if (repositoryMiner.shouldProcessProject()) {
 			List<String> validSnapshots = new ArrayList<String>();
 			for (String hash : repositoryMiner.getSnapshots()) {
 				if (visitedCommits.contains(hash)) {
@@ -211,13 +211,13 @@ public class MiningProcessor {
 				}
 			}
 
-			ProjectMetricsProcessor snapshotProcessor = new ProjectMetricsProcessor();
-			snapshotProcessor.setReferences(selectedReferences);
-			snapshotProcessor.setSnapshots(validSnapshots);
-			snapshotProcessor.setRepositoryData(repositoryId, tempRepo);
-			snapshotProcessor.setRepositoryMiner(repositoryMiner);
-			snapshotProcessor.setSCM(scm);
-			snapshotProcessor.start();
+			ProjectMetricsProcessor projectProcessor = new ProjectMetricsProcessor();
+			projectProcessor.setReferences(selectedReferences);
+			projectProcessor.setSnapshots(validSnapshots);
+			projectProcessor.setRepositoryData(repositoryId, tempRepo);
+			projectProcessor.setRepositoryMiner(repositoryMiner);
+			projectProcessor.setSCM(scm);
+			projectProcessor.start();
 		}
 	}
 
