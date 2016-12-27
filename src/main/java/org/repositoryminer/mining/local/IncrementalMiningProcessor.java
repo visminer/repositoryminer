@@ -148,11 +148,11 @@ public class IncrementalMiningProcessor {
 			return;
 
 		if (repositoryMiner.shouldProcessFiles()) {
-			FilesProcessor filesProcessor = new FilesProcessor();
-			filesProcessor.setSCM(scm);
-			filesProcessor.setRepositoryMiner(repositoryMiner);
-			filesProcessor.setRepositoryData(repositoryId, tempRepo);
-			filesProcessor.startIncrementalAnalysis(newCommits);
+			DirectMetricsProcessor directMetricsProcessor = new DirectMetricsProcessor();
+			directMetricsProcessor.setSCM(scm);
+			directMetricsProcessor.setRepositoryMiner(repositoryMiner);
+			directMetricsProcessor.setRepositoryData(repositoryId, tempRepo);
+			directMetricsProcessor.startIncrementalAnalysis(newCommits);
 		}
 
 		if (repositoryMiner.shouldProcessProject()) {

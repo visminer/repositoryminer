@@ -30,7 +30,7 @@ import org.repositoryminer.scm.ISCM;
 
 import com.mongodb.client.model.Projections;
 
-public class FilesProcessor {
+public class DirectMetricsProcessor {
 
 	private static final int COMMIT_RANGE = 3000;
 
@@ -48,7 +48,7 @@ public class FilesProcessor {
 	
 	private Map<String, IParser> parsers;
 
-	public FilesProcessor() {
+	public DirectMetricsProcessor() {
 		directMetricHandler = new DirectMetricsDocumentHandler();
 		referenceHandler = new ReferenceDocumentHandler();
 		commitPersistence = new CommitDocumentHandler();

@@ -56,7 +56,7 @@ import org.repositoryminer.utility.FileUtils;
  * </ul>
  * At least one of the lists must be populated so to get the mining process
  * started. The lists are then injected in a instance of
- * {@link org.repositoryminer.mining.local.FilesProcessor} which is
+ * {@link org.repositoryminer.mining.local.DirectMetricsProcessor} which is
  * capable of performing the actual calculations and detections.
  * <p>
  * Raised exceptions are:
@@ -195,12 +195,12 @@ public class MiningProcessor {
 			return;
 
 		if (repositoryMiner.shouldProcessFiles()) {
-			FilesProcessor filesProcessor = new FilesProcessor();
-			filesProcessor.setReferences(selectedReferences);
-			filesProcessor.setSCM(scm);
-			filesProcessor.setRepositoryMiner(repositoryMiner);
-			filesProcessor.setRepositoryData(repositoryId, tempRepo);
-			filesProcessor.start();
+			DirectMetricsProcessor directMetricsProcessor = new DirectMetricsProcessor();
+			directMetricsProcessor.setReferences(selectedReferences);
+			directMetricsProcessor.setSCM(scm);
+			directMetricsProcessor.setRepositoryMiner(repositoryMiner);
+			directMetricsProcessor.setRepositoryData(repositoryId, tempRepo);
+			directMetricsProcessor.start();
 		}
 
 		if (repositoryMiner.shouldProcessProject()) {
