@@ -58,7 +58,7 @@ public class CPDMiner {
 		this.repository = Repository.parseDocument(repoHandler.findById(repositoryId, Projections.include("scm")));
 	}
 	
-	public void detect(String hash) throws IOException {
+	public void detectCopyPaste(String hash) throws IOException {
 		Document commitDoc = commitPersist.findById(hash, Projections.include("commit_date"));
 		Commit commit = Commit.parseDocument(commitDoc);
 
@@ -74,7 +74,7 @@ public class CPDMiner {
 		cpdPersist.insert(doc);
 	}
 
-	public void detect(String name, ReferenceType type) throws IOException {
+	public void detectCopyPaste(String name, ReferenceType type) throws IOException {
 		Document refDoc = refPersist.findByNameAndType(name, type, repository.getId(), Projections.slice("commits", 1));
 		Reference reference = Reference.parseDocument(refDoc);
 

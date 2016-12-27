@@ -65,7 +65,7 @@ public class FindBugsMiner {
 	private Priority priority = Priority.NORMAL;
 	private Effort effort = Effort.DEFAULT;
 
-	public void findInCommit(String hash) throws IllegalStateException, IOException, InterruptedException {
+	public void findBugs(String hash) throws IllegalStateException, IOException, InterruptedException {
 		Document commitDoc = commitPersist.findById(hash, Projections.include("commit_date"));
 		Commit commit = Commit.parseDocument(commitDoc);
 
@@ -82,7 +82,7 @@ public class FindBugsMiner {
 		findBugsPersist.insert(doc);
 	}
 
-	public void findInReference(String name, ReferenceType type) throws IllegalStateException, IOException, InterruptedException {
+	public void findBugs(String name, ReferenceType type) throws IllegalStateException, IOException, InterruptedException {
 		Document refDoc = refPersist.findByNameAndType(name, type, repository.getId(), Projections.slice("commits", 1));
 		Reference reference = Reference.parseDocument(refDoc);
 
