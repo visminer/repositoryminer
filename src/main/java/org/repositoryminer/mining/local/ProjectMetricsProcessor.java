@@ -1,19 +1,17 @@
 package org.repositoryminer.mining.local;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.bson.Document;
 import org.bson.types.ObjectId;
-import org.repositoryminer.metric.project.IProjectMetric;
 import org.repositoryminer.mining.RepositoryMiner;
 import org.repositoryminer.model.Commit;
 import org.repositoryminer.model.Reference;
 import org.repositoryminer.parser.IParser;
 import org.repositoryminer.persistence.handler.CommitDocumentHandler;
-import org.repositoryminer.persistence.handler.ReferenceDocumentHandler;
 import org.repositoryminer.persistence.handler.ProjectMetricsDocumentHandler;
+import org.repositoryminer.persistence.handler.ReferenceDocumentHandler;
 import org.repositoryminer.scm.ISCM;
 
 import com.mongodb.client.model.Projections;
@@ -139,24 +137,7 @@ public class ProjectMetricsProcessor {
 		doc.append("commit_date", commit.getCommitDate());
 		doc.append("repository", new ObjectId(repositoryId));
 
-		if (repositoryMiner.hasProjectMetrics()) {
-			processProjectMetrics(doc);
-		}
-
 		projectMetricsHandler.insert(doc);
-	}
-
-	private void processProjectMetrics(Document tagDoc) {
-		List<Document> metricDocs = new ArrayList<Document>();
-		for (IProjectMetric metric : repositoryMiner.getProjectMetrics()) {
-			Document doc = metric.calculate(repositoryMiner.getParsers(), repositoryPath, repositoryMiner.getCharset());
-			if (doc != null)
-				metricDocs.add(doc);
-		}
-
-		if (metricDocs.size() > 0) {
-			tagDoc.append("metrics", metricDocs);
-		}
 	}
 
 }

@@ -188,11 +188,9 @@ public class MiningProcessor {
 	 * @throws IOException
 	 */
 	private void calculateAndDetect(String tempRepo, String repositoryId) throws IOException {
-		if (!repositoryMiner.shouldProcessFiles() && !repositoryMiner.shouldProcessProject())
+		if (!repositoryMiner.shouldProcessFiles() || selectedReferences.size() == 0) {
 			return;
-
-		if (selectedReferences.size() == 0)
-			return;
+		}
 
 		if (repositoryMiner.shouldProcessFiles()) {
 			DirectMetricsProcessor directMetricsProcessor = new DirectMetricsProcessor();
@@ -201,23 +199,6 @@ public class MiningProcessor {
 			directMetricsProcessor.setRepositoryMiner(repositoryMiner);
 			directMetricsProcessor.setRepositoryData(repositoryId, tempRepo);
 			directMetricsProcessor.start();
-		}
-
-		if (repositoryMiner.shouldProcessProject()) {
-			List<String> validSnapshots = new ArrayList<String>();
-			for (String hash : repositoryMiner.getSnapshots()) {
-				if (visitedCommits.contains(hash)) {
-					validSnapshots.add(hash);
-				}
-			}
-
-			ProjectMetricsProcessor projectProcessor = new ProjectMetricsProcessor();
-			projectProcessor.setReferences(selectedReferences);
-			projectProcessor.setSnapshots(validSnapshots);
-			projectProcessor.setRepositoryData(repositoryId, tempRepo);
-			projectProcessor.setRepositoryMiner(repositoryMiner);
-			projectProcessor.setSCM(scm);
-			projectProcessor.start();
 		}
 	}
 
