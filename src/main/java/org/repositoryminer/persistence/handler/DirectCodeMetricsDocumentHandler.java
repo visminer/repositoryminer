@@ -9,11 +9,11 @@ import org.repositoryminer.persistence.Connection;
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.model.Projections;
 
-public class DirectMetricsDocumentHandler extends DocumentHandler {
+public class DirectCodeMetricsDocumentHandler extends DocumentHandler {
 
-	private static final String COLLECTION_NAME = "rm_direct_metrics";
+	private static final String COLLECTION_NAME = "rm_direct_code_metrics";
 
-	public DirectMetricsDocumentHandler() {
+	public DirectCodeMetricsDocumentHandler() {
 		super.collection = Connection.getInstance().getCollection(COLLECTION_NAME);
 	}
 

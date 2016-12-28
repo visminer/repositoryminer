@@ -22,7 +22,7 @@ import org.repositoryminer.model.Commit;
 import org.repositoryminer.model.Diff;
 import org.repositoryminer.model.Reference;
 import org.repositoryminer.parser.IParser;
-import org.repositoryminer.persistence.handler.DirectMetricsDocumentHandler;
+import org.repositoryminer.persistence.handler.DirectCodeMetricsDocumentHandler;
 import org.repositoryminer.persistence.handler.CommitDocumentHandler;
 import org.repositoryminer.persistence.handler.ReferenceDocumentHandler;
 import org.repositoryminer.scm.DiffType;
@@ -39,7 +39,7 @@ public class DirectMetricsProcessor {
 	private String repositoryId;
 	private String repositoryPath;
 	
-	private DirectMetricsDocumentHandler directMetricHandler;
+	private DirectCodeMetricsDocumentHandler directMetricHandler;
 	private CommitDocumentHandler commitPersistence;
 	private ReferenceDocumentHandler referenceHandler;
 
@@ -49,7 +49,7 @@ public class DirectMetricsProcessor {
 	private Map<String, IParser> parsers;
 
 	public DirectMetricsProcessor() {
-		directMetricHandler = new DirectMetricsDocumentHandler();
+		directMetricHandler = new DirectCodeMetricsDocumentHandler();
 		referenceHandler = new ReferenceDocumentHandler();
 		commitPersistence = new CommitDocumentHandler();
 		visitedCommits = new HashSet<String>();

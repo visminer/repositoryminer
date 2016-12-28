@@ -18,7 +18,7 @@ import org.repositoryminer.model.Commit;
 import org.repositoryminer.model.Diff;
 import org.repositoryminer.model.Reference;
 import org.repositoryminer.model.Repository;
-import org.repositoryminer.persistence.handler.DirectMetricsDocumentHandler;
+import org.repositoryminer.persistence.handler.DirectCodeMetricsDocumentHandler;
 import org.repositoryminer.persistence.handler.CommitDocumentHandler;
 import org.repositoryminer.persistence.handler.ReferenceDocumentHandler;
 import org.repositoryminer.postprocessing.IPostMiningTask;
@@ -201,7 +201,7 @@ public class EffortsMiningTask implements IPostMiningTask {
 	private List<String> getCodeSmells(long fileHash, String commitHash) {
 		List<String> smells = new ArrayList<String>();
 
-		DirectMetricsDocumentHandler handler = new DirectMetricsDocumentHandler();
+		DirectCodeMetricsDocumentHandler handler = new DirectCodeMetricsDocumentHandler();
 		Document doc = handler.getCodeSmellsMeasures(fileHash, commitHash);
 		if (doc != null && !doc.isEmpty()) {
 			List<Document> typeDocs = (List<Document>) doc.get("abstract_types");
