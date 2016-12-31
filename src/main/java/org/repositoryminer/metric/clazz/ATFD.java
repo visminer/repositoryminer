@@ -7,7 +7,7 @@ import java.util.Set;
 
 import org.bson.Document;
 import org.repositoryminer.ast.AST;
-import org.repositoryminer.ast.AbstractTypeDeclaration;
+import org.repositoryminer.ast.AbstractClassDeclaration;
 import org.repositoryminer.ast.MethodDeclaration;
 import org.repositoryminer.ast.Statement;
 import org.repositoryminer.ast.Statement.NodeType;
@@ -29,13 +29,13 @@ public class ATFD extends MethodBasedMetricTemplate {
 	}
 
 	@Override
-	public Document calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast) {
+	public Document calculate(AbstractClassDeclaration type, List<MethodDeclaration> methods, AST ast) {
 		methodsDoc = new ArrayList<Document>();
 		return new Document("metric", MetricId.ATFD.toString()).append("accumulated", calculate(type, methods, true))
 				.append("methods", methodsDoc);
 	}
 
-	public int calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, boolean calculateByMethod) {
+	public int calculate(AbstractClassDeclaration type, List<MethodDeclaration> methods, boolean calculateByMethod) {
 		int atfdClass = 0;
 
 		for (MethodDeclaration mDeclaration : methods) {
@@ -50,7 +50,7 @@ public class ATFD extends MethodBasedMetricTemplate {
 		return atfdClass;
 	}
 
-	private int countForeignAccessedFields(AbstractTypeDeclaration currType, MethodDeclaration method) {
+	private int countForeignAccessedFields(AbstractClassDeclaration currType, MethodDeclaration method) {
 		Set<String> accessedFields = new HashSet<String>();
 
 		for (Statement stmt : method.getStatements()) {

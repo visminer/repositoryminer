@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.bson.Document;
 import org.repositoryminer.ast.AST;
-import org.repositoryminer.ast.AbstractTypeDeclaration;
+import org.repositoryminer.ast.AbstractClassDeclaration;
 import org.repositoryminer.ast.MethodDeclaration;
 import org.repositoryminer.ast.Statement;
 import org.repositoryminer.metric.MetricId;
@@ -26,7 +26,7 @@ public class MAXNESTING extends MethodBasedMetricTemplate {
 	}
 	
 	@Override
-	public Document calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast) {
+	public Document calculate(AbstractClassDeclaration type, List<MethodDeclaration> methods, AST ast) {
 		methodsDoc = new ArrayList<Document>();
 		for (MethodDeclaration method : methods) {
 			methodsDoc.add(new Document("method", method.getName()).append("value", calculate(method)));

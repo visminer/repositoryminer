@@ -14,7 +14,7 @@ import java.util.Set;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.repositoryminer.ast.AST;
-import org.repositoryminer.ast.AbstractTypeDeclaration;
+import org.repositoryminer.ast.AbstractClassDeclaration;
 import org.repositoryminer.codesmell.clazz.IClassCodeSmell;
 import org.repositoryminer.metric.clazz.IClassMetric;
 import org.repositoryminer.mining.RepositoryMiner;
@@ -233,10 +233,10 @@ public class DirectMetricsProcessor {
 		}
 		doc.append("codesmells_threshholds", thresholdsDoc);
 		
-		List<AbstractTypeDeclaration> types = ast.getDocument().getTypes();
+		List<AbstractClassDeclaration> types = ast.getDocument().getTypes();
 		List<Document> abstractTypeDocs = new ArrayList<Document>();
 		
-		for (AbstractTypeDeclaration type : types) {
+		for (AbstractClassDeclaration type : types) {
 			Document typeDoc = new Document();
 			typeDoc.append("name", type.getName()).append("declaration", type.getArchetype().toString());
 
@@ -255,7 +255,7 @@ public class DirectMetricsProcessor {
 		directMetricHandler.insert(doc);
 	}
 
-	private void processClassMetrics(AST ast, AbstractTypeDeclaration type, Document typeDoc) {
+	private void processClassMetrics(AST ast, AbstractClassDeclaration type, Document typeDoc) {
 		List<Document> metricsDoc = new ArrayList<Document>();
 		for (IClassMetric metric : repositoryMiner.getClassMetrics()) {
 			Document mDoc = metric.calculate(type, ast);
@@ -269,7 +269,7 @@ public class DirectMetricsProcessor {
 		}
 	}
 
-	private void processClassCodeSmells(AST ast, AbstractTypeDeclaration type, Document typeDoc) {
+	private void processClassCodeSmells(AST ast, AbstractClassDeclaration type, Document typeDoc) {
 		List<Document> codeSmellsDoc = new ArrayList<Document>();
 		for (IClassCodeSmell codeSmell : repositoryMiner.getClassCodeSmells()) {
 			Document cDoc = codeSmell.detect(type, ast);

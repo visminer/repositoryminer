@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.bson.Document;
 import org.repositoryminer.ast.AST;
-import org.repositoryminer.ast.AbstractTypeDeclaration;
+import org.repositoryminer.ast.AbstractClassDeclaration;
 import org.repositoryminer.ast.MethodDeclaration;
 import org.repositoryminer.ast.Statement;
 import org.repositoryminer.ast.Statement.NodeType;
@@ -50,11 +50,11 @@ public class CYCLO extends MethodBasedMetricTemplate {
 	}
 
 	/**
-	 * @see MethodBasedMetricTemplate#calculate(AbstractTypeDeclaration, List,
+	 * @see MethodBasedMetricTemplate#calculate(AbstractClassDeclaration, List,
 	 *      AST, Document)
 	 */
 	@Override
-	public Document calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast) {
+	public Document calculate(AbstractClassDeclaration type, List<MethodDeclaration> methods, AST ast) {
 		methodsDoc = new ArrayList<Document>();
 		calculate(methods);
 		return new Document("metric", MetricId.CYCLO.toString()).append("methods", methodsDoc);

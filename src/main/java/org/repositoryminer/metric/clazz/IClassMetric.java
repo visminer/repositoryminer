@@ -2,7 +2,7 @@ package org.repositoryminer.metric.clazz;
 
 import org.bson.Document;
 import org.repositoryminer.ast.AST;
-import org.repositoryminer.ast.AbstractTypeDeclaration;
+import org.repositoryminer.ast.AbstractClassDeclaration;
 import org.repositoryminer.metric.MetricId;
 
 /**
@@ -21,7 +21,7 @@ import org.repositoryminer.metric.MetricId;
  * persist the data extracted from a given AST (
  * {@link org.repositoryminer.ast.AST}). After the metric's value is obtained it
  * can be pushed to the instance of org.bson.Document injected into
- * {@link #calculate(AbstractTypeDeclaration, AST, Document)}.
+ * {@link #calculate(AbstractClassDeclaration, AST, Document)}.
  */
 public interface IClassMetric {
 
@@ -30,13 +30,13 @@ public interface IClassMetric {
 	 * 
 	 * @param type
 	 *            the abstract representation of a type (
-	 *            {@link org.repositoryminer.ast.AbstractTypeDeclaration}).
+	 *            {@link org.repositoryminer.ast.AbstractClassDeclaration}).
 	 * @param ast
 	 *            an instance of an abstract syntactic tree (
 	 *            {@link org.repositoryminer.ast.AST})
 	 * @return the document with the data to persist in database
 	 */
-	public Document calculate(AbstractTypeDeclaration type, AST ast);
+	public Document calculate(AbstractClassDeclaration type, AST ast);
 
 	/**
 	 * @return The metric ID

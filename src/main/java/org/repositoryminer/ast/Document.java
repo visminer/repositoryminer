@@ -5,7 +5,7 @@ import java.util.List;
 public class Document {
 
 	private String name;
-	private List<AbstractTypeDeclaration> types;
+	private List<AbstractClassDeclaration> types;
 	private List<MethodDeclaration> methods;
 	private List<ImportDeclaration> imports;
 	private String packageDeclaration;
@@ -18,11 +18,11 @@ public class Document {
 		this.name = name;
 	}
 
-	public List<AbstractTypeDeclaration> getTypes() {
+	public List<AbstractClassDeclaration> getTypes() {
 		return types;
 	}
 
-	public void setTypes(List<AbstractTypeDeclaration> types) {
+	public void setTypes(List<AbstractClassDeclaration> types) {
 		this.types = types;
 	}
 

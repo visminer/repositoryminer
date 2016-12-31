@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.bson.Document;
 import org.repositoryminer.ast.AST;
-import org.repositoryminer.ast.AbstractTypeDeclaration;
+import org.repositoryminer.ast.AbstractClassDeclaration;
 import org.repositoryminer.ast.MethodDeclaration;
 import org.repositoryminer.metric.MetricId;
 
@@ -33,7 +33,7 @@ public class NOAV extends MethodBasedMetricTemplate {
 	}
 
 	@Override
-	public Document calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast) {
+	public Document calculate(AbstractClassDeclaration type, List<MethodDeclaration> methods, AST ast) {
 		methodsDoc = new ArrayList<Document>();
 		List<MethodDeclaration> filteredMethods = filterMethods(methods);
 		
@@ -44,7 +44,7 @@ public class NOAV extends MethodBasedMetricTemplate {
 		return new Document("metric", MetricId.NOAV.toString()).append("methods", methodsDoc);
 	}
 
-	public int calculate(AbstractTypeDeclaration currType, MethodDeclaration method) {
+	public int calculate(AbstractClassDeclaration currType, MethodDeclaration method) {
 		int accessFields = tccMetric.processAccessedFields(currType, method).size();
 		int nVar = lvarMetric.calculate(method);
 		int nParams = method.getParameters() != null ? method.getParameters().size() : 0;

@@ -2,13 +2,13 @@ package org.repositoryminer.ast;
 
 import java.util.List;
 
-public class TypeDeclaration extends AbstractTypeDeclaration{
+public class ClassDeclaration extends AbstractClassDeclaration{
 
 	private boolean isInterface;
 	private List<MethodDeclaration> methods;
 	private List<FieldDeclaration> fields;
 	
-	public TypeDeclaration() {
+	public ClassDeclaration() {
 		setArchetype(Archetype.CLASS_OR_INTERFACE);
 	}
 	

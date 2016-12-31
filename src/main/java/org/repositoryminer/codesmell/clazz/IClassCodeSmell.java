@@ -2,7 +2,7 @@ package org.repositoryminer.codesmell.clazz;
 
 import org.bson.Document;
 import org.repositoryminer.ast.AST;
-import org.repositoryminer.ast.AbstractTypeDeclaration;
+import org.repositoryminer.ast.AbstractClassDeclaration;
 import org.repositoryminer.codesmell.CodeSmellId;
 
 /**
@@ -15,13 +15,13 @@ public interface IClassCodeSmell {
 	 * 
 	 * @param type
 	 *            the abstract representation of a type (
-	 *            {@link org.repositoryminer.ast.AbstractTypeDeclaration}).
+	 *            {@link org.repositoryminer.ast.AbstractClassDeclaration}).
 	 * @param ast
 	 *            an instance of an abstract syntactic tree (
 	 *            {@link org.repositoryminer.ast.AST})
 	 * @return the document with the data to persist in database
 	 */
-	public Document detect(AbstractTypeDeclaration type, AST ast);
+	public Document detect(AbstractClassDeclaration type, AST ast);
 	
 	/**
 	 * @return The code smell ID

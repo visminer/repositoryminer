@@ -1,6 +1,6 @@
 package org.repositoryminer.ast;
 
-public class AbstractTypeDeclaration {
+public class AbstractClassDeclaration {
 
 	public enum Archetype {
 		CLASS_OR_INTERFACE, ENUM, ANNOTATION;

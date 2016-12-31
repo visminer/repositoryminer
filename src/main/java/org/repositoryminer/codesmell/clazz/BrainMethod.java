@@ -5,10 +5,10 @@ import java.util.List;
 
 import org.bson.Document;
 import org.repositoryminer.ast.AST;
-import org.repositoryminer.ast.AbstractTypeDeclaration;
-import org.repositoryminer.ast.AbstractTypeDeclaration.Archetype;
+import org.repositoryminer.ast.AbstractClassDeclaration;
+import org.repositoryminer.ast.AbstractClassDeclaration.Archetype;
 import org.repositoryminer.ast.MethodDeclaration;
-import org.repositoryminer.ast.TypeDeclaration;
+import org.repositoryminer.ast.ClassDeclaration;
 import org.repositoryminer.codesmell.CodeSmellId;
 import org.repositoryminer.metric.MetricId;
 import org.repositoryminer.metric.clazz.CYCLO;
@@ -76,9 +76,9 @@ public class BrainMethod implements IClassCodeSmell {
 	}
 
 	@Override
-	public Document detect(AbstractTypeDeclaration type, AST ast) {
+	public Document detect(AbstractClassDeclaration type, AST ast) {
 		if (type.getArchetype() == Archetype.CLASS_OR_INTERFACE) {
-			TypeDeclaration cls = (TypeDeclaration) type;
+			ClassDeclaration cls = (ClassDeclaration) type;
 			List<String> methods = new ArrayList<String>();
 
 			for (MethodDeclaration method : cls.getMethods()) {
@@ -94,7 +94,7 @@ public class BrainMethod implements IClassCodeSmell {
 		return null;
 	}
 
-	public boolean detect(AbstractTypeDeclaration type, MethodDeclaration method, AST ast) {
+	public boolean detect(AbstractClassDeclaration type, MethodDeclaration method, AST ast) {
 		int cc = ccMetric.calculate(method);
 		int mloc = mlocMetric.calculate(method, ast);
 		int noav = noavMetric.calculate(type, method);

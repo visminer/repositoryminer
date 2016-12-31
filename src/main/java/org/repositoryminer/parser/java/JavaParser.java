@@ -19,7 +19,7 @@ import org.repositoryminer.ast.ImportDeclaration;
 import org.repositoryminer.ast.Language;
 import org.repositoryminer.ast.MethodDeclaration;
 import org.repositoryminer.ast.ParameterDeclaration;
-import org.repositoryminer.ast.TypeDeclaration;
+import org.repositoryminer.ast.ClassDeclaration;
 import org.repositoryminer.parser.IParser;
 
 /**
@@ -144,7 +144,7 @@ public class JavaParser implements IParser {
 		}
 		document.setImports(importsDecls);
 
-		List<org.repositoryminer.ast.AbstractTypeDeclaration> typesDecls = new ArrayList<org.repositoryminer.ast.AbstractTypeDeclaration>();
+		List<org.repositoryminer.ast.AbstractClassDeclaration> typesDecls = new ArrayList<org.repositoryminer.ast.AbstractClassDeclaration>();
 		for (int i = 0; i < root.types().size(); i++) {
 			Object obj = root.types().get(i);
 			if (obj instanceof org.eclipse.jdt.core.dom.TypeDeclaration) {
@@ -161,9 +161,9 @@ public class JavaParser implements IParser {
 		return ast;
 	}
 
-	private static org.repositoryminer.ast.AbstractTypeDeclaration processType(String packageName, 
+	private static org.repositoryminer.ast.AbstractClassDeclaration processType(String packageName, 
 			org.eclipse.jdt.core.dom.TypeDeclaration type) {
-		TypeDeclaration clsDecl = new TypeDeclaration();
+		ClassDeclaration clsDecl = new ClassDeclaration();
 		clsDecl.setInterface(type.isInterface());
 
 		clsDecl.setName(packageName + "." + type.getName().getIdentifier());

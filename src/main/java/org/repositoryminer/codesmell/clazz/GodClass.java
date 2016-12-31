@@ -2,9 +2,9 @@ package org.repositoryminer.codesmell.clazz;
 
 import org.bson.Document;
 import org.repositoryminer.ast.AST;
-import org.repositoryminer.ast.AbstractTypeDeclaration;
-import org.repositoryminer.ast.AbstractTypeDeclaration.Archetype;
-import org.repositoryminer.ast.TypeDeclaration;
+import org.repositoryminer.ast.AbstractClassDeclaration;
+import org.repositoryminer.ast.AbstractClassDeclaration.Archetype;
+import org.repositoryminer.ast.ClassDeclaration;
 import org.repositoryminer.codesmell.CodeSmellId;
 import org.repositoryminer.metric.MetricId;
 import org.repositoryminer.metric.clazz.ATFD;
@@ -65,9 +65,9 @@ public class GodClass implements IClassCodeSmell {
 	}
 
 	@Override
-	public Document detect(AbstractTypeDeclaration type, AST ast) {
+	public Document detect(AbstractClassDeclaration type, AST ast) {
 		if (type.getArchetype() == Archetype.CLASS_OR_INTERFACE) {
-			TypeDeclaration cls = (TypeDeclaration) type;
+			ClassDeclaration cls = (ClassDeclaration) type;
 			if (detect(type, cls)) {
 				return new Document("codesmell", CodeSmellId.GOD_CLASS.toString());
 			}
@@ -75,7 +75,7 @@ public class GodClass implements IClassCodeSmell {
 		return null;
 	}
 
-	public boolean detect(AbstractTypeDeclaration type, TypeDeclaration cls) {
+	public boolean detect(AbstractClassDeclaration type, ClassDeclaration cls) {
 		atfdMetric = new ATFD();
 		wmcMetric = new WMC();
 		tccMetric = new TCC();

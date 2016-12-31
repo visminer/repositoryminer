@@ -5,11 +5,11 @@ import java.util.List;
 
 import org.bson.Document;
 import org.repositoryminer.ast.AST;
-import org.repositoryminer.ast.TypeDeclaration;
+import org.repositoryminer.ast.ClassDeclaration;
 import org.repositoryminer.ast.FieldDeclaration;
 import org.repositoryminer.ast.MethodDeclaration;
-import org.repositoryminer.ast.AbstractTypeDeclaration;
-import org.repositoryminer.ast.AbstractTypeDeclaration.Archetype;
+import org.repositoryminer.ast.AbstractClassDeclaration;
+import org.repositoryminer.ast.AbstractClassDeclaration.Archetype;
 
 /**
  * <h1>A method-oriented version of metric</h1>
@@ -28,26 +28,26 @@ import org.repositoryminer.ast.AbstractTypeDeclaration.Archetype;
  * code.
  * <p>
  * The actual calculation of the metric is delegated to sub-types that must
- * implement {@link #calculate(AbstractTypeDeclaration, List, AST, Document)}.
+ * implement {@link #calculate(AbstractClassDeclaration, List, AST, Document)}.
  * <p>
  * It is up to the implementations of this interface to properly decide how to
  * persist the data extracted from a given AST (
  * {@link org.repositoryminer.ast.AST}). After metrics' values are obtained they
  * can be pushed to the instance of org.bson.Document injected into
- * {@link #calculate(AbstractTypeDeclaration, AST, Document)}.
+ * {@link #calculate(AbstractClassDeclaration, AST, Document)}.
  */
 public abstract class MethodBasedMetricTemplate implements IClassMetric {
 
 	protected List<FieldDeclaration> currentFields = new ArrayList<FieldDeclaration>();
 
 	/**
-	 * @see IClassMetric#calculate(AbstractTypeDeclaration, AST, Document)
+	 * @see IClassMetric#calculate(AbstractClassDeclaration, AST, Document)
 	 */
 	@Override
-	public Document calculate(AbstractTypeDeclaration type, AST ast) {
-		TypeDeclaration cls = null;
+	public Document calculate(AbstractClassDeclaration type, AST ast) {
+		ClassDeclaration cls = null;
 		if (type.getArchetype() == Archetype.CLASS_OR_INTERFACE) {
-			cls = (TypeDeclaration) type;
+			cls = (ClassDeclaration) type;
 
 			if (cls.getMethods() != null) {
 				if (cls.getFields() != null) 
@@ -77,6 +77,6 @@ public abstract class MethodBasedMetricTemplate implements IClassMetric {
 	 *            the AST obtained from the type
 	 * @return the document with the data to persist in database
 	 */
-	public abstract Document calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast);
+	public abstract Document calculate(AbstractClassDeclaration type, List<MethodDeclaration> methods, AST ast);
 
 }

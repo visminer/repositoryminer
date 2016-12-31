@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.bson.Document;
 import org.repositoryminer.ast.AST;
-import org.repositoryminer.ast.AbstractTypeDeclaration;
+import org.repositoryminer.ast.AbstractClassDeclaration;
 import org.repositoryminer.ast.MethodDeclaration;
 import org.repositoryminer.ast.Statement;
 import org.repositoryminer.ast.Statement.NodeType;
@@ -26,7 +26,7 @@ public class LVAR extends MethodBasedMetricTemplate {
 	}
 	
 	@Override
-	public Document calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast) {
+	public Document calculate(AbstractClassDeclaration type, List<MethodDeclaration> methods, AST ast) {
 		methodsDoc = new ArrayList<Document>();
 		int accumulated = 0;
 		

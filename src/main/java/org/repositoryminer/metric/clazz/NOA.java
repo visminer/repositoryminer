@@ -4,10 +4,10 @@ import java.util.List;
 
 import org.bson.Document;
 import org.repositoryminer.ast.AST;
-import org.repositoryminer.ast.AbstractTypeDeclaration;
-import org.repositoryminer.ast.AbstractTypeDeclaration.Archetype;
+import org.repositoryminer.ast.AbstractClassDeclaration;
+import org.repositoryminer.ast.AbstractClassDeclaration.Archetype;
 import org.repositoryminer.ast.FieldDeclaration;
-import org.repositoryminer.ast.TypeDeclaration;
+import org.repositoryminer.ast.ClassDeclaration;
 import org.repositoryminer.metric.MetricId;
 
 /**
@@ -25,9 +25,9 @@ public class NOA implements IClassMetric {
 	}
 	
 	@Override
-	public Document calculate(AbstractTypeDeclaration type, AST ast) {
+	public Document calculate(AbstractClassDeclaration type, AST ast) {
 		if (Archetype.CLASS_OR_INTERFACE == type.getArchetype()) {
-			TypeDeclaration cls = (TypeDeclaration) type;
+			ClassDeclaration cls = (ClassDeclaration) type;
 			new Document("metric", MetricId.NOA.toString()).append("value", calculate(cls.getFields()));
 		}
 		return null;

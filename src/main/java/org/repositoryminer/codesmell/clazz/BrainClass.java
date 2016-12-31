@@ -2,10 +2,10 @@ package org.repositoryminer.codesmell.clazz;
 
 import org.bson.Document;
 import org.repositoryminer.ast.AST;
-import org.repositoryminer.ast.AbstractTypeDeclaration;
-import org.repositoryminer.ast.AbstractTypeDeclaration.Archetype;
+import org.repositoryminer.ast.AbstractClassDeclaration;
+import org.repositoryminer.ast.AbstractClassDeclaration.Archetype;
 import org.repositoryminer.ast.MethodDeclaration;
-import org.repositoryminer.ast.TypeDeclaration;
+import org.repositoryminer.ast.ClassDeclaration;
 import org.repositoryminer.codesmell.CodeSmellId;
 import org.repositoryminer.metric.MetricId;
 import org.repositoryminer.metric.clazz.MLOC;
@@ -58,9 +58,9 @@ public class BrainClass implements IClassCodeSmell {
 	}
 
 	@Override
-	public Document detect(AbstractTypeDeclaration type, AST ast) {
+	public Document detect(AbstractClassDeclaration type, AST ast) {
 		if (type.getArchetype() == Archetype.CLASS_OR_INTERFACE) {
-			TypeDeclaration cls = (TypeDeclaration) type;
+			ClassDeclaration cls = (ClassDeclaration) type;
 			if (detect(ast, type, cls)) {
 				return new Document("codesmell", new String(CodeSmellId.BRAIN_CLASS.toString()));
 			}
@@ -68,7 +68,7 @@ public class BrainClass implements IClassCodeSmell {
 		return null;
 	}
 
-	public boolean detect(AST ast, AbstractTypeDeclaration type, TypeDeclaration cls) {
+	public boolean detect(AST ast, AbstractClassDeclaration type, ClassDeclaration cls) {
 		int wmc = wmcMetric.calculate(cls.getMethods());
 		float tcc = tccMetric.calculate(type, cls.getMethods());
 

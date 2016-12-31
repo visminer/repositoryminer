@@ -8,7 +8,7 @@ import java.util.Set;
 
 import org.bson.Document;
 import org.repositoryminer.ast.AST;
-import org.repositoryminer.ast.AbstractTypeDeclaration;
+import org.repositoryminer.ast.AbstractClassDeclaration;
 import org.repositoryminer.ast.FieldDeclaration;
 import org.repositoryminer.ast.MethodDeclaration;
 import org.repositoryminer.ast.Statement;
@@ -29,11 +29,11 @@ public class TCC extends MethodBasedMetricTemplate {
 	}
 
 	@Override
-	public Document calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods, AST ast) {
+	public Document calculate(AbstractClassDeclaration type, List<MethodDeclaration> methods, AST ast) {
 		return new Document("metric", MetricId.TCC.toString()).append("value", calculate(type, methods));
 	}
 
-	public float calculate(AbstractTypeDeclaration type, List<MethodDeclaration> methods) {
+	public float calculate(AbstractClassDeclaration type, List<MethodDeclaration> methods) {
 		List<MethodDeclaration> methodList = filterMethods(methods);
 		int n = methodList.size();
 		int npc = (n * (n - 1)) / 2; // Number of possible connected methods
@@ -65,7 +65,7 @@ public class TCC extends MethodBasedMetricTemplate {
 		return methodList;
 	}
 
-	public List<String> processAccessedFields(AbstractTypeDeclaration currType, MethodDeclaration method) {
+	public List<String> processAccessedFields(AbstractClassDeclaration currType, MethodDeclaration method) {
 		Set<String> fields = new HashSet<String>();
 
 		for (Statement stmt : method.getStatements()) {

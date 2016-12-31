@@ -5,7 +5,7 @@ import java.util.regex.Pattern;
 
 import org.bson.Document;
 import org.repositoryminer.ast.AST;
-import org.repositoryminer.ast.AbstractTypeDeclaration;
+import org.repositoryminer.ast.AbstractClassDeclaration;
 import org.repositoryminer.metric.MetricId;
 
 public class LOC implements IClassMetric {
@@ -22,7 +22,7 @@ public class LOC implements IClassMetric {
 	}
 	
 	@Override
-	public Document calculate(AbstractTypeDeclaration type, AST ast) {
+	public Document calculate(AbstractClassDeclaration type, AST ast) {
 		int sloc = calculate(ast.getSourceCode());
 		return new Document("metric", MetricId.LOC.toString()).append("value", sloc);
 	}
