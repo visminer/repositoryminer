@@ -7,17 +7,12 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import org.repositoryminer.codesmell.clazz.IClassCodeSmell;
-import org.repositoryminer.listener.IMiningListener;
-import org.repositoryminer.listener.IPostMiningListener;
-import org.repositoryminer.listener.impl.MiningListener;
-import org.repositoryminer.listener.impl.PostMiningListener;
 import org.repositoryminer.metric.clazz.IClassMetric;
 import org.repositoryminer.mining.local.IncrementalMiningProcessor;
 import org.repositoryminer.mining.local.MiningProcessor;
 import org.repositoryminer.model.Repository;
 import org.repositoryminer.parser.IParser;
 import org.repositoryminer.persistence.handler.RepositoryDocumentHandler;
-import org.repositoryminer.postprocessing.IPostMiningTask;
 import org.repositoryminer.scm.ReferenceType;
 import org.repositoryminer.scm.SCMType;
 
@@ -59,14 +54,12 @@ public class RepositoryMiner {
 	private int commitCount = 3000;
 
 	private List<IParser> parsers = new ArrayList<IParser>();
+
 	private List<IClassMetric> classMetrics = new ArrayList<IClassMetric>();
 	private List<IClassCodeSmell> classCodeSmells = new ArrayList<IClassCodeSmell>();
-	private List<IPostMiningTask> postMiningTasks = new ArrayList<IPostMiningTask>();
+
 	private List<Entry<String, ReferenceType>> references = new ArrayList<Entry<String, ReferenceType>>();
 	private List<String> snapshots = new ArrayList<String>();
-
-	private IMiningListener miningListener =  MiningListener.getDefault();
-	private IPostMiningListener postMiningListener = PostMiningListener.getDefault();
 
 	/**
 	 * Use this void constructor if parameters are going to be set later
@@ -113,9 +106,6 @@ public class RepositoryMiner {
 	 * @throws IOException
 	 */
 	public Repository mine() throws IOException {
-		PostMiningProcessor postProcessor = new PostMiningProcessor();
-		miningListener.initMining(name);
-
 		RepositoryDocumentHandler repoDocHandler = new RepositoryDocumentHandler();
 		if (repoDocHandler.checkIfRepositoryExistsById(name)) {
 			IncrementalMiningProcessor processor = new IncrementalMiningProcessor();
@@ -124,9 +114,9 @@ public class RepositoryMiner {
 			MiningProcessor processor = new MiningProcessor();
 			processor.mine(this);
 		}
-		
+
 		Repository repository = Repository.parseDocument(repoDocHandler.findByName(name));
-		return postProcessor.executeTasks(repository, this);
+		return new Repository();
 	}
 
 	/**
@@ -175,21 +165,6 @@ public class RepositoryMiner {
 	}
 
 	/**
-	 * Adds a post mining task without duplicates
-	 * 
-	 * @param postMiningTask
-	 * @return true if the task was added and false otherwise
-	 */
-	public boolean addPostMiningTask(IPostMiningTask postMiningTask) {
-		for (IPostMiningTask p : this.postMiningTasks) {
-			if (p.getTaskName().equals(postMiningTask.getTaskName()))
-				return false;
-		}
-		this.postMiningTasks.add(postMiningTask);
-		return true;
-	}
-
-	/**
 	 * Adds a reference without duplicates
 	 * 
 	 * @param reference
@@ -213,21 +188,17 @@ public class RepositoryMiner {
 	public boolean addSnapshot(String snapshot) {
 		if (snapshots.contains(snapshot))
 			return false;
-		
+
 		snapshots.add(snapshot);
 		return true;
 	}
-	
+
 	public boolean hasClassMetrics() {
 		return !classMetrics.isEmpty();
 	}
 
 	public boolean hasClassCodeSmells() {
 		return !classCodeSmells.isEmpty();
-	}
-
-	public boolean hasPostMiningTasks() {
-		return !postMiningTasks.isEmpty();
 	}
 
 	/**
@@ -301,36 +272,6 @@ public class RepositoryMiner {
 
 	public List<IClassCodeSmell> getClassCodeSmells() {
 		return classCodeSmells;
-	}
-
-	public List<IPostMiningTask> getPostMiningTasks() {
-		return postMiningTasks;
-	}
-
-	public RepositoryMiner setMiningListener(IMiningListener listener) {
-		if (listener == null) {
-			throw new NullPointerException("Listener cannot be null");
-		}
-		
-		this.miningListener = listener;
-		return this;
-	}
-
-	public IMiningListener getMiningListener() {
-		return miningListener;
-	}
-
-	public RepositoryMiner setPostMiningListener(IPostMiningListener listener) {
-		if (listener == null) {
-			throw new NullPointerException("Listener cannot be null");
-		}
-		
-		this.postMiningListener = listener;
-		return this;
-	}
-
-	public IPostMiningListener getPostMiningListener() {
-		return postMiningListener;
 	}
 
 	public List<Entry<String, ReferenceType>> getReferences() {

@@ -6,7 +6,6 @@ import java.util.List;
 import org.bson.Document;
 import org.repositoryminer.exceptions.ErrorMessage;
 import org.repositoryminer.exceptions.VisMinerAPIException;
-import org.repositoryminer.listener.IHostServiceListener;
 import org.repositoryminer.model.Contributor;
 import org.repositoryminer.model.Issue;
 import org.repositoryminer.model.Milestone;
@@ -20,7 +19,6 @@ import org.repositoryminer.scm.hostingservice.IHostingService;
 public class HostingProcessor {
 	
 	private IHostingService service;
-	private IHostServiceListener listener;
 	private String repositoryId;
 	
 	public void connectToService(HostingServiceMiner hostingServiceMiner, String login, String password) {
@@ -52,7 +50,6 @@ public class HostingProcessor {
 	}
 
 	private void init(HostingServiceMiner hostingServiceMiner) {
-		listener = hostingServiceMiner.getListener();
 		repositoryId = hostingServiceMiner.getRepositoryId();
 	}
 	
@@ -65,8 +62,6 @@ public class HostingProcessor {
 
 		int contributorIndex = 0;
 		for (Document contributorDoc : contributorsDoc) {
-			listener.contributorsProgressChange(++contributorIndex, contributorsDoc.size());
-
 			String name = contributorDoc.getString("name");
 			for (Contributor contributorDb : contributors) {
 				if (name.equals(contributorDb.getName())) {
@@ -84,8 +79,6 @@ public class HostingProcessor {
 	private void connectMilestonesAndIssues(List<Milestone> milestones, List<Issue> issues) {
 		// connect issues to milestones
 		if (milestones.size() > 0) {
-			listener.initMilestonesIssuesConnection();
-
 			for (Milestone m : milestones) {
 				m.setIssues(new ArrayList<Integer>());
 				for (Issue i : issues) {
@@ -106,8 +99,6 @@ public class HostingProcessor {
 		if (issues.size() > 0) {
 			int issuesIndex = 0;
 			for (Issue issue : issues) {
-				listener.issuesProgressChange(++issuesIndex, issues.size());
-
 				issue.setRepository(repositoryId);
 				issuesDocs.add(issue.toDocument());
 			}
@@ -124,8 +115,6 @@ public class HostingProcessor {
 		if (milestones.size() > 0) {
 			int milestonesIndex = 0;
 			for (Milestone mile : milestones) {
-				listener.milestonesProgressChange(++milestonesIndex, milestones.size());
-
 				mile.setRepository(repositoryId);
 				milesDocs.add(mile.toDocument());
 			}

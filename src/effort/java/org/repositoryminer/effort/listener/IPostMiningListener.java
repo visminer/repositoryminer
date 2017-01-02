@@ -1,4 +1,4 @@
-package org.repositoryminer.listener;
+package org.repositoryminer.effort.listener;
 
 /**
  * <h1>IPostMiningListener is a post mining tasks progress monitoring interface

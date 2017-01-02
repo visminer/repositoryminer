@@ -1,7 +1,5 @@
 package org.repositoryminer.mining.hosting;
 
-import org.repositoryminer.listener.IHostServiceListener;
-import org.repositoryminer.listener.impl.HostServiceListener;
 import org.repositoryminer.mining.RepositoryMiner;
 import org.repositoryminer.scm.hostingservice.HostingServiceType;
 
@@ -30,8 +28,6 @@ public class HostingServiceMiner {
 	private int issueMaxHops = 1000;
 	private int milestoneMaxHops = 50;
 	
-	private IHostServiceListener listener = HostServiceListener.getDefault();
-
 	/**
 	 * Use this void constructor if parameters are going to be set later.
 	 */
@@ -145,19 +141,6 @@ public class HostingServiceMiner {
 
 	public void setMilestoneMaxHops(int milestoneMaxHops) {
 		this.milestoneMaxHops = milestoneMaxHops;
-	}
-
-	public HostingServiceMiner setListener(IHostServiceListener listener) {
-		if (listener == null) {
-			throw new NullPointerException("Listener cannot be null");
-		}
-		
-		this.listener = listener;
-		return this;
-	}
-
-	public IHostServiceListener getListener() {
-		return listener;
 	}
 
 }

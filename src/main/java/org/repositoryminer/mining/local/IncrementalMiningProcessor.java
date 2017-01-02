@@ -122,7 +122,6 @@ public class IncrementalMiningProcessor {
 
 	private void updateWorkingDirectories(String repositoryId) {
 		WorkingDirectoryProcessor wdProcessor = new WorkingDirectoryProcessor();
-		wdProcessor.setListener(repositoryMiner.getMiningListener());
 		wdProcessor.setReferences(selectedReferences);
 		wdProcessor.setVisitedCommits(processedCommits);
 		wdProcessor.setRepositoryId(repositoryId);

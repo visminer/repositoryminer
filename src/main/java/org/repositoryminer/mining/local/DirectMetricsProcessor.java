@@ -119,8 +119,6 @@ public class DirectMetricsProcessor {
 		for (Document doc : commitPersistence.findByIdColl(repositoryId, commits, Projections.include("diffs", "commit_date"))) {
 			Commit commit = Commit.parseDocument(doc);
 			
-			repositoryMiner.getMiningListener().commitsProgressChange("", commit.getId(), ++progress, qtdCommits);
-
 			scm.checkout(commit.getId());
 
 			for (IParser parser : repositoryMiner.getParsers()) {
@@ -159,9 +157,7 @@ public class DirectMetricsProcessor {
 		List<String> newCommits = new ArrayList<String>();
 		
 		for (String commit : commits) {
-			if (visitedCommits.contains(commit)) {
-				repositoryMiner.getMiningListener().commitsProgressChange(refName, commit, ++progress, qtdCommits);
-			} else {
+			if (!visitedCommits.contains(commit)) {
 				newCommits.add(commit);
 			}
 		}
@@ -173,8 +169,6 @@ public class DirectMetricsProcessor {
 		for (Document doc : commitPersistence.findByIdColl(repositoryId, newCommits, Projections.include("diffs", "commit_date"))) {
 			Commit commit = Commit.parseDocument(doc);
 			
-			repositoryMiner.getMiningListener().commitsProgressChange(refName, commit.getId(), ++progress, qtdCommits);
-
 			visitedCommits.add(commit.getId());
 			scm.checkout(commit.getId());
 
@@ -238,7 +232,7 @@ public class DirectMetricsProcessor {
 		
 		for (AbstractClassDeclaration type : types) {
 			Document typeDoc = new Document();
-			typeDoc.append("name", type.getName()).append("declaration", type.getArchetype().toString());
+			typeDoc.append("name", type.getName()).append("type", type.getArchetype().toString());
 
 			if (repositoryMiner.hasClassMetrics()) {
 				processClassMetrics(ast, type, typeDoc);
@@ -251,7 +245,7 @@ public class DirectMetricsProcessor {
 			abstractTypeDocs.add(typeDoc);
 		}
 
-		doc.append("abstract_types", abstractTypeDocs);
+		doc.append("classes", abstractTypeDocs);
 		directMetricHandler.insert(doc);
 	}
 

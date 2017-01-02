@@ -35,6 +35,9 @@ public class Repository {
 		this(null, repo.getName(), repo.getPath(), repo.getDescription(), repo.getScm());
 	}
 
+	public Repository() {
+	}
+	
 	public Repository(String id, String name, String path, String description, SCMType scm) {
 		this.id = id;
 		this.name = name;

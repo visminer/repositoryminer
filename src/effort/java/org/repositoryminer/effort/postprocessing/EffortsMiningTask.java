@@ -9,19 +9,18 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import org.bson.Document;
+import org.repositoryminer.effort.listener.IPostMiningListener;
 import org.repositoryminer.effort.model.Effort;
 import org.repositoryminer.effort.model.EffortsByReference;
-import org.repositoryminer.effort.persistence.handler.EffortsDocumentHandler;
-import org.repositoryminer.listener.IPostMiningListener;
+import org.repositoryminer.effort.persistence.EffortsDocumentHandler;
 import org.repositoryminer.mining.RepositoryMiner;
 import org.repositoryminer.model.Commit;
 import org.repositoryminer.model.Diff;
 import org.repositoryminer.model.Reference;
 import org.repositoryminer.model.Repository;
-import org.repositoryminer.persistence.handler.DirectCodeMetricsDocumentHandler;
 import org.repositoryminer.persistence.handler.CommitDocumentHandler;
+import org.repositoryminer.persistence.handler.DirectCodeMetricsDocumentHandler;
 import org.repositoryminer.persistence.handler.ReferenceDocumentHandler;
-import org.repositoryminer.postprocessing.IPostMiningTask;
 import org.repositoryminer.scm.ReferenceType;
 
 /**

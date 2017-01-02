@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.bson.Document;
-import org.repositoryminer.listener.IMiningListener;
 import org.repositoryminer.model.Diff;
 import org.repositoryminer.model.Reference;
 import org.repositoryminer.model.WorkingDirectory;
@@ -29,7 +28,6 @@ public class WorkingDirectoryProcessor {
 	private Set<String> visitedCommits;
 	private String repositoryId; 
 	private List<Reference> references;
-	private IMiningListener listener;
 	private WorkingDirectory workingDirectory;
 	
 	public WorkingDirectoryProcessor() {
@@ -48,10 +46,6 @@ public class WorkingDirectoryProcessor {
 
 	public void setReferences(List<Reference> references) {
 		this.references = references;
-	}
-
-	public void setListener(IMiningListener listener) {
-		this.listener = listener;
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -89,7 +83,6 @@ public class WorkingDirectoryProcessor {
 		for (String commit : commits) {
 			if (visitedCommits.contains(commit)) {
 				prevCommit = commit;
-				listener.workingDirectoryProgressChange(refName, commit, ++progress, qtdCommits);
 			} else {
 				newCommits.add(commit);
 			}
@@ -106,8 +99,6 @@ public class WorkingDirectoryProcessor {
 		List<Document> wdDocs = new ArrayList<Document>();
 		for (Document doc : commitHandler.findByIdColl(repositoryId, newCommits, Projections.include("diffs"))) {
 			String commitId = doc.get("_id").toString();
-			
-			listener.workingDirectoryProgressChange(refName, commitId, ++progress, qtdCommits);
 			
 			visitedCommits.add(commitId);
 			workingDirectory.setId(commitId);

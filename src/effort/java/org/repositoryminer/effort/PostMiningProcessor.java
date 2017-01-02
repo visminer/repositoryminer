@@ -1,10 +1,12 @@
-package org.repositoryminer.mining;
+package org.repositoryminer.effort;
 
 import java.util.List;
 
-import org.repositoryminer.listener.IPostMiningListener;
+import org.repositoryminer.effort.listener.IPostMiningListener;
+import org.repositoryminer.effort.listener.PostMiningListener;
+import org.repositoryminer.effort.postprocessing.IPostMiningTask;
+import org.repositoryminer.mining.RepositoryMiner;
 import org.repositoryminer.model.Repository;
-import org.repositoryminer.postprocessing.IPostMiningTask;
 
 /**
  * <h1>Processor of post mining tasks</h1>
@@ -26,7 +28,28 @@ import org.repositoryminer.postprocessing.IPostMiningTask;
  */
 public class PostMiningProcessor {
 
-	public PostMiningProcessor() {
+	private List<IPostMiningTask> tasks;
+	private IPostMiningListener listener = PostMiningListener.getDefault();
+
+	public PostMiningProcessor(List<IPostMiningTask> tasks) {
+		super();
+		this.tasks = tasks;
+	}
+	
+	public List<IPostMiningTask> getTasks() {
+		return tasks;
+	}
+
+	public void setTasks(List<IPostMiningTask> tasks) {
+		this.tasks = tasks;
+	}
+
+	public IPostMiningListener getListener() {
+		return listener;
+	}
+
+	public void setListener(IPostMiningListener listener) {
+		this.listener = listener;
 	}
 
 	/**
@@ -39,13 +62,9 @@ public class PostMiningProcessor {
 	 * @return instance of repository after post processing
 	 */
 	public Repository executeTasks(Repository repository, RepositoryMiner repositoryMiner) {
-		if (repositoryMiner.hasPostMiningTasks()) {
-			List<IPostMiningTask> tasks = repositoryMiner.getPostMiningTasks();
-			IPostMiningListener listener = repositoryMiner.getPostMiningListener();
-			for (IPostMiningTask task : tasks) {
-				listener.initPostMiningTaskProgress(task.getTaskName());
-				task.execute(repositoryMiner, repository, listener);
-			}
+		for (IPostMiningTask task : tasks) {
+			listener.initPostMiningTaskProgress(task.getTaskName());
+			task.execute(repositoryMiner, repository, listener);
 		}
 
 		return repository;

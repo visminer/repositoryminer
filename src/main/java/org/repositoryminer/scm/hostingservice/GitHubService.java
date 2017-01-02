@@ -57,8 +57,6 @@ public class GitHubService implements IHostingService {
 
 	@Override
 	public List<Issue> getAllIssues() {
-		hostingMiner.getListener().initIssuesProcessing();
-
 		int number = 1;
 		List<Issue> issues = new ArrayList<Issue>();
 
@@ -101,8 +99,6 @@ public class GitHubService implements IHostingService {
 
 	@Override
 	public List<Milestone> getAllMilestones() {
-		hostingMiner.getListener().initMilestonesProcessing();
-
 		int number = 1;
 		List<Milestone> milesDB = new ArrayList<Milestone>();
 
@@ -130,8 +126,6 @@ public class GitHubService implements IHostingService {
 
 	@Override
 	public List<Contributor> getAllContributors() {
-		hostingMiner.getListener().initMilestonesProcessing();
-
 		List<Contributor> contributors = new ArrayList<Contributor>();
 		try {
 			for (org.eclipse.egit.github.core.Contributor contributor : repoServ.getContributors(repositoryId, true)) {

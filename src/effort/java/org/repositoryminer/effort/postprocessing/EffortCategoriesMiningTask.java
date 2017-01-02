@@ -7,16 +7,15 @@ import java.util.List;
 import java.util.Map;
 
 import org.bson.Document;
+import org.repositoryminer.effort.listener.IPostMiningListener;
 import org.repositoryminer.effort.model.Effort;
 import org.repositoryminer.effort.model.EffortCategoriesByReference;
 import org.repositoryminer.effort.model.EffortCategory;
 import org.repositoryminer.effort.model.EffortsByReference;
-import org.repositoryminer.effort.persistence.handler.EffortCategoriesDocumentHandler;
-import org.repositoryminer.effort.persistence.handler.EffortsDocumentHandler;
-import org.repositoryminer.listener.IPostMiningListener;
+import org.repositoryminer.effort.persistence.EffortCategoriesDocumentHandler;
+import org.repositoryminer.effort.persistence.EffortsDocumentHandler;
 import org.repositoryminer.mining.RepositoryMiner;
 import org.repositoryminer.model.Repository;
-import org.repositoryminer.postprocessing.IPostMiningTask;
 
 /**
  * <h1>A task to agglomerate effort within categories</h1>

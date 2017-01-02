@@ -109,7 +109,6 @@ public class MiningProcessor {
 
 	private void saveCommits(String repositoryId, Reference reference) {
 		CommitDocumentHandler documentHandler = new CommitDocumentHandler();
-		repositoryMiner.getMiningListener().initCommitsMining();
 
 		int skip = 0;
 		List<Commit> commits = scm.getCommits(skip, repositoryMiner.getCommitCount(), reference, visitedCommits);
@@ -171,7 +170,6 @@ public class MiningProcessor {
 
 	private void saveWorkingDirectories(String repositoryId) {
 		WorkingDirectoryProcessor wdProcessor = new WorkingDirectoryProcessor();
-		wdProcessor.setListener(repositoryMiner.getMiningListener());
 		wdProcessor.setReferences(selectedReferences);
 		wdProcessor.setRepositoryId(repositoryId);
 		wdProcessor.processWorkingDirectories();

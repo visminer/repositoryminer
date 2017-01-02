@@ -1,6 +1,4 @@
-package org.repositoryminer.listener.impl;
-
-import org.repositoryminer.listener.IPostMiningListener;
+package org.repositoryminer.effort.listener;
 
 /**
  * <h1>Default implementation of IPostMiningListener</h1>
