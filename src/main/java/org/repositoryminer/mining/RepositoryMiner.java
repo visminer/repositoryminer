@@ -1,16 +1,15 @@
 package org.repositoryminer.mining;
 
 import java.io.IOException;
-import java.util.AbstractMap;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 
-import org.repositoryminer.codesmell.clazz.IClassCodeSmell;
-import org.repositoryminer.metric.clazz.IClassMetric;
+import org.repositoryminer.codemetric.direct.IDirectCodeMetric;
+import org.repositoryminer.codemetric.indirect.IIndirectCodeMetric;
+import org.repositoryminer.codesmell.direct.IDirectCodeSmell;
+import org.repositoryminer.codesmell.indirect.IIndirectCodeSmell;
 import org.repositoryminer.mining.local.IncrementalMiningProcessor;
 import org.repositoryminer.mining.local.MiningProcessor;
-import org.repositoryminer.model.Repository;
 import org.repositoryminer.parser.IParser;
 import org.repositoryminer.persistence.handler.RepositoryDocumentHandler;
 import org.repositoryminer.scm.ReferenceType;
@@ -49,46 +48,31 @@ public class RepositoryMiner {
 	private String path;
 	private String name;
 	private String description;
-	private SCMType scm;
+	private SCMType scm = SCMType.GIT;
 	private String charset = "UTF-8";
-	private int commitCount = 3000;
 
-	private List<IParser> parsers = new ArrayList<IParser>();
+	private List<IParser> parsers;
 
-	private List<IClassMetric> classMetrics = new ArrayList<IClassMetric>();
-	private List<IClassCodeSmell> classCodeSmells = new ArrayList<IClassCodeSmell>();
+	private List<IDirectCodeMetric> directCodeMetrics;
+	private List<IIndirectCodeMetric> indirectCodeMetrics;
+	
+	private List<IDirectCodeSmell> directCodeSmells;
+	private List<IIndirectCodeSmell> indirectCodeSmell;
 
-	private List<Entry<String, ReferenceType>> references = new ArrayList<Entry<String, ReferenceType>>();
-	private List<String> snapshots = new ArrayList<String>();
-
-	/**
-	 * Use this void constructor if parameters are going to be set later
-	 * <p>
-	 * Otherwise, the non-void constructor (
-	 * {@link #RepositoryMiner(String, String, String, SCMType)}) can be used if
-	 * mandatory parameters are known
-	 */
-	public RepositoryMiner() {
-	}
+	private List<Entry<String, ReferenceType>> references;
+	private List<String> snapshots;
 
 	/**
-	 * Use this non-void constructor if mandatory parameters are known
-	 * <p>
-	 * Otherwise, the void constructor ({@link #RepositoryMiner()} can be used
-	 * if mandatory parameters are not known
-	 * 
 	 * @param path
-	 *            path to versioned project to be mined
+	 *            the project path
 	 * @param name
-	 *            user-friendly name of the project
+	 *            the project name
 	 * @param description
-	 *            extra descriptive information about the project
+	 *            the project description
 	 * @param scm
-	 *            the SCM type ({@link org.repositoryminer.scm.SCMType}) of the
-	 *            mined project
+	 *            the project SCM ({@link org.repositoryminer.scm.SCMType})
 	 */
 	public RepositoryMiner(String path, String name, String description, SCMType scm) {
-		super();
 		this.path = path;
 		this.name = name;
 		this.description = description;
@@ -96,16 +80,23 @@ public class RepositoryMiner {
 	}
 
 	/**
+	 * @param name
+	 *            the project name
+	 */
+	public RepositoryMiner(String name) {
+		this.name = name;
+	}
+	
+	/**
 	 * It activates the mining of a project
 	 * <p>
 	 * One must make sure that all needed parameters are set prior to calling
 	 * this method
 	 * <p>
 	 * 
-	 * @return instance of repository after mining and post-mining are performed
 	 * @throws IOException
 	 */
-	public Repository mine() throws IOException {
+	public void mine() throws IOException {
 		RepositoryDocumentHandler repoDocHandler = new RepositoryDocumentHandler();
 		if (repoDocHandler.checkIfRepositoryExistsById(name)) {
 			IncrementalMiningProcessor processor = new IncrementalMiningProcessor();
@@ -114,172 +105,124 @@ public class RepositoryMiner {
 			MiningProcessor processor = new MiningProcessor();
 			processor.mine(this);
 		}
-
-		Repository repository = Repository.parseDocument(repoDocHandler.findByName(name));
-		return new Repository();
 	}
 
-	/**
-	 * Adds a class metric without duplicates
-	 * 
-	 * @param classMetric
-	 * @return true if the metric was added and false otherwise
-	 */
-	public boolean addClassMetric(IClassMetric classMetric) {
-		for (IClassMetric c : this.classMetrics) {
-			if (c.getId().equals(classMetric.getId()))
-				return false;
-		}
-		this.classMetrics.add(classMetric);
-		return true;
+	public boolean hasParsers() {
+		return parsers != null && parsers.size() > 0;
 	}
-
-	/**
-	 * Adds a class code smell without duplicates
-	 * 
-	 * @param classCodeSmell
-	 * @return true if the code smell was added and false otherwise
-	 */
-	public boolean addClassCodeSmell(IClassCodeSmell classCodeSmell) {
-		for (IClassCodeSmell c : this.classCodeSmells) {
-			if (c.getId().equals(classCodeSmell.getId()))
-				return false;
-		}
-		this.classCodeSmells.add(classCodeSmell);
-		return true;
+	
+	public boolean hasDirectCodeMetrics() {
+		return directCodeMetrics != null && directCodeMetrics.size() > 0;
 	}
-
-	/**
-	 * Adds a parser without duplicates
-	 * 
-	 * @param parser
-	 * @return true if the parser was added and false otherwise
-	 */
-	public boolean addParser(IParser parser) {
-		for (IParser p : this.parsers) {
-			if (p.getLanguage() == parser.getLanguage())
-				return false;
-		}
-		this.parsers.add(parser);
-		return true;
+	
+	public boolean hasDirectCodeSmells() {
+		return directCodeSmells != null && directCodeSmells.size() > 0;
 	}
-
-	/**
-	 * Adds a reference without duplicates
-	 * 
-	 * @param reference
-	 * @return true if the reference was added and false otherwise
-	 */
-	public boolean addReference(String name, ReferenceType type) {
-		Entry<String, ReferenceType> entry = new AbstractMap.SimpleEntry<String, ReferenceType>(name, type);
-		if (this.references.contains(entry))
-			return false;
-
-		references.add(entry);
-		return true;
+	
+	public boolean hasIndirectCodeMetrics() {
+		return indirectCodeMetrics != null && indirectCodeMetrics.size() > 0;
 	}
-
-	/**
-	 * Adds a snapshot without duplicates
-	 * 
-	 * @param snapshot
-	 * @return
-	 */
-	public boolean addSnapshot(String snapshot) {
-		if (snapshots.contains(snapshot))
-			return false;
-
-		snapshots.add(snapshot);
-		return true;
+	
+	public boolean hasIndirectCodeSmells() {
+		return indirectCodeSmell != null && indirectCodeSmell.size() > 0;
 	}
-
-	public boolean hasClassMetrics() {
-		return !classMetrics.isEmpty();
-	}
-
-	public boolean hasClassCodeSmells() {
-		return !classCodeSmells.isEmpty();
-	}
-
-	/**
-	 * @return True if calculation (metrics) and detections (smells/debts)
-	 *         should be performed in commits and False otherwise
-	 */
-	public boolean shouldProcessFiles() {
-		return hasClassCodeSmells() || hasClassMetrics();
-	}
-
+	
+	// getters and setters
+	
 	public String getPath() {
 		return path;
 	}
 
-	public RepositoryMiner setPath(String path) {
+	public void setPath(String path) {
 		this.path = path;
-		return this;
 	}
 
 	public String getName() {
 		return name;
 	}
 
-	public RepositoryMiner setName(String name) {
+	public void setName(String name) {
 		this.name = name;
-		return this;
 	}
 
 	public String getDescription() {
 		return description;
 	}
 
-	public RepositoryMiner setDescription(String description) {
+	public void setDescription(String description) {
 		this.description = description;
-		return this;
 	}
 
 	public SCMType getScm() {
 		return scm;
 	}
 
-	public RepositoryMiner setScm(SCMType scm) {
+	public void setScm(SCMType scm) {
 		this.scm = scm;
-		return this;
 	}
 
 	public String getCharset() {
 		return charset;
 	}
 
-	public RepositoryMiner setCharset(String charset) {
+	public void setCharset(String charset) {
 		this.charset = charset;
-		return this;
-	}
-
-	public int getCommitCount() {
-		return commitCount;
-	}
-
-	public void setCommitCount(int commitCount) {
-		this.commitCount = commitCount;
 	}
 
 	public List<IParser> getParsers() {
 		return parsers;
 	}
 
-	public List<IClassMetric> getClassMetrics() {
-		return classMetrics;
+	public void setParsers(List<IParser> parsers) {
+		this.parsers = parsers;
 	}
 
-	public List<IClassCodeSmell> getClassCodeSmells() {
-		return classCodeSmells;
+	public List<IDirectCodeMetric> getDirectCodeMetrics() {
+		return directCodeMetrics;
+	}
+
+	public void setDirectCodeMetrics(List<IDirectCodeMetric> directCodeMetrics) {
+		this.directCodeMetrics = directCodeMetrics;
+	}
+
+	public List<IIndirectCodeMetric> getIndirectCodeMetrics() {
+		return indirectCodeMetrics;
+	}
+
+	public void setIndirectCodeMetrics(List<IIndirectCodeMetric> indirectCodeMetrics) {
+		this.indirectCodeMetrics = indirectCodeMetrics;
+	}
+
+	public List<IDirectCodeSmell> getDirectCodeSmells() {
+		return directCodeSmells;
+	}
+
+	public void setDirectCodeSmells(List<IDirectCodeSmell> directCodeSmells) {
+		this.directCodeSmells = directCodeSmells;
+	}
+
+	public List<IIndirectCodeSmell> getIndirectCodeSmell() {
+		return indirectCodeSmell;
+	}
+
+	public void setIndirectCodeSmell(List<IIndirectCodeSmell> indirectCodeSmell) {
+		this.indirectCodeSmell = indirectCodeSmell;
 	}
 
 	public List<Entry<String, ReferenceType>> getReferences() {
 		return references;
 	}
 
+	public void setReferences(List<Entry<String, ReferenceType>> references) {
+		this.references = references;
+	}
+
 	public List<String> getSnapshots() {
 		return snapshots;
+	}
+
+	public void setSnapshots(List<String> snapshots) {
+		this.snapshots = snapshots;
 	}
 
 }

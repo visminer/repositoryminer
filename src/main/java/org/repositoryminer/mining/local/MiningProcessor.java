@@ -43,10 +43,10 @@ import org.repositoryminer.utility.FileUtils;
  * <ul>
  * <li>Metric -> list of metrics to be calculated. It is assumed that the
  * elements of this list are instances of
- * {@link org.repositoryminer.metric.clazz.IClassMetric}
+ * {@link org.repositoryminer.codemetric.direct.IDirectCodeMetric}
  * <li>Commits Codesmells -> list of commits-oriented smells to be detected.
  * Each element of this list has to be a sub-type of
- * {@link org.repositoryminer.codesmell.clazz.IClassCodeSmell}
+ * {@link org.repositoryminer.codesmell.direct.IDirectCodeSmell}
  * <li>Tags Codesmells -> list of tag-related smells to be detected. Each
  * element of this list must be a sub-type of
  * {@link org.repositoryminer.codesmell.project.IProjectCodeSmell}
@@ -56,7 +56,7 @@ import org.repositoryminer.utility.FileUtils;
  * </ul>
  * At least one of the lists must be populated so to get the mining process
  * started. The lists are then injected in a instance of
- * {@link org.repositoryminer.mining.local.DirectMetricsProcessor} which is
+ * {@link org.repositoryminer.mining.local.CodeAnalysisProcessor} which is
  * capable of performing the actual calculations and detections.
  * <p>
  * Raised exceptions are:
@@ -70,6 +70,8 @@ import org.repositoryminer.utility.FileUtils;
  */
 public class MiningProcessor {
 
+	private static final int COMMITS_RANGE = 3000;
+	
 	private ISCM scm;
 	private IssueExtractor messageAnalyzer;
 	private RepositoryMiner repositoryMiner;
@@ -111,7 +113,7 @@ public class MiningProcessor {
 		CommitDocumentHandler documentHandler = new CommitDocumentHandler();
 
 		int skip = 0;
-		List<Commit> commits = scm.getCommits(skip, repositoryMiner.getCommitCount(), reference, visitedCommits);
+		List<Commit> commits = scm.getCommits(skip, COMMITS_RANGE, reference, visitedCommits);
 
 		while (commits.size() > 0) {
 			List<Document> commitsDoc = new ArrayList<Document>();
@@ -127,8 +129,8 @@ public class MiningProcessor {
 			}
 
 			documentHandler.insertMany(commitsDoc);
-			skip += repositoryMiner.getCommitCount();
-			commits = scm.getCommits(skip, repositoryMiner.getCommitCount(), reference, visitedCommits);
+			skip += COMMITS_RANGE;
+			commits = scm.getCommits(skip, COMMITS_RANGE, reference, visitedCommits);
 		}
 	}
 
@@ -186,17 +188,17 @@ public class MiningProcessor {
 	 * @throws IOException
 	 */
 	private void calculateAndDetect(String tempRepo, String repositoryId) throws IOException {
-		if (!repositoryMiner.shouldProcessFiles() || selectedReferences.size() == 0) {
+		if (!repositoryMiner.hasParsers() || selectedReferences.size() == 0) {
 			return;
 		}
 
-		if (repositoryMiner.shouldProcessFiles()) {
-			DirectMetricsProcessor directMetricsProcessor = new DirectMetricsProcessor();
-			directMetricsProcessor.setReferences(selectedReferences);
-			directMetricsProcessor.setSCM(scm);
-			directMetricsProcessor.setRepositoryMiner(repositoryMiner);
-			directMetricsProcessor.setRepositoryData(repositoryId, tempRepo);
-			directMetricsProcessor.start();
+		if (repositoryMiner.hasDirectCodeMetrics() || repositoryMiner.hasDirectCodeSmells()) {
+			CodeAnalysisProcessor codeAnalysisProcessor = new CodeAnalysisProcessor();
+			codeAnalysisProcessor.setReferences(selectedReferences);
+			codeAnalysisProcessor.setSCM(scm);
+			codeAnalysisProcessor.setRepositoryMiner(repositoryMiner);
+			codeAnalysisProcessor.setRepositoryData(repositoryId, tempRepo);
+			codeAnalysisProcessor.start();
 		}
 	}
 

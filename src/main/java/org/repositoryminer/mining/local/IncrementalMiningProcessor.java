@@ -26,6 +26,8 @@ import com.mongodb.client.model.Projections;
 
 public class IncrementalMiningProcessor {
 
+	private static final int COMMITS_RANGE = 3000;
+	
 	private RepositoryMiner repositoryMiner;
 	private ISCM scm;
 	private Set<String> processedCommits;
@@ -70,7 +72,7 @@ public class IncrementalMiningProcessor {
 		CommitDocumentHandler documentHandler = new CommitDocumentHandler();
 
 		int skip = 0;
-		List<Commit> commits = scm.getCommits(skip, repositoryMiner.getCommitCount(), reference, commitsToSkip);
+		List<Commit> commits = scm.getCommits(skip, COMMITS_RANGE, reference, commitsToSkip);
 
 		while (commits.size() > 0) {
 			List<Document> commitsDoc = new ArrayList<Document>();
@@ -87,8 +89,8 @@ public class IncrementalMiningProcessor {
 			}
 
 			documentHandler.insertMany(commitsDoc);
-			skip += repositoryMiner.getCommitCount();
-			commits = scm.getCommits(skip, repositoryMiner.getCommitCount(), reference, commitsToSkip);
+			skip += COMMITS_RANGE;
+			commits = scm.getCommits(skip, COMMITS_RANGE, reference, commitsToSkip);
 		}
 	}
 
@@ -140,16 +142,16 @@ public class IncrementalMiningProcessor {
 	}
 
 	private void calculateAndDetect(String tempRepo, String repositoryId) throws IOException {
-		if (!repositoryMiner.shouldProcessFiles() || selectedReferences.size() == 0) {
+		if (!repositoryMiner.hasParsers() || selectedReferences.size() == 0) {
 			return;
 		}
 
-		if (repositoryMiner.shouldProcessFiles()) {
-			DirectMetricsProcessor directMetricsProcessor = new DirectMetricsProcessor();
-			directMetricsProcessor.setSCM(scm);
-			directMetricsProcessor.setRepositoryMiner(repositoryMiner);
-			directMetricsProcessor.setRepositoryData(repositoryId, tempRepo);
-			directMetricsProcessor.startIncrementalAnalysis(newCommits);
+		if (repositoryMiner.hasDirectCodeMetrics() || repositoryMiner.hasDirectCodeSmells()) {
+			CodeAnalysisProcessor codeAnalysisProcessor = new CodeAnalysisProcessor();
+			codeAnalysisProcessor.setSCM(scm);
+			codeAnalysisProcessor.setRepositoryMiner(repositoryMiner);
+			codeAnalysisProcessor.setRepositoryData(repositoryId, tempRepo);
+			codeAnalysisProcessor.startIncrementalAnalysis(newCommits);
 		}
 
 	}

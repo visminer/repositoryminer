@@ -9,7 +9,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.io.FilenameUtils;
-import org.repositoryminer.metric.clazz.LOC;
+import org.repositoryminer.codemetric.direct.LOC;
 import org.repositoryminer.pmd.cpd.model.FileInfo;
 import org.repositoryminer.pmd.cpd.model.Occurrence;
 

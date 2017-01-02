@@ -60,7 +60,7 @@ public class HostingProcessor {
 
 		List<Contributor> contributors = service.getAllContributors();
 
-		int contributorIndex = 0;
+		//int contributorIndex = 0;
 		for (Document contributorDoc : contributorsDoc) {
 			String name = contributorDoc.getString("name");
 			for (Contributor contributorDb : contributors) {
@@ -97,7 +97,7 @@ public class HostingProcessor {
 		issueDocHandler.deleteByRepository(repositoryId);
 
 		if (issues.size() > 0) {
-			int issuesIndex = 0;
+			//int issuesIndex = 0;
 			for (Issue issue : issues) {
 				issue.setRepository(repositoryId);
 				issuesDocs.add(issue.toDocument());
@@ -113,7 +113,7 @@ public class HostingProcessor {
 		mileDocHandler.deleteByRepository(repositoryId);
 
 		if (milestones.size() > 0) {
-			int milestonesIndex = 0;
+			//int milestonesIndex = 0;
 			for (Milestone mile : milestones) {
 				mile.setRepository(repositoryId);
 				milesDocs.add(mile.toDocument());
