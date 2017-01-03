@@ -147,11 +147,11 @@ public class IncrementalMiningProcessor {
 		}
 
 		if (repositoryMiner.hasDirectCodeMetrics() || repositoryMiner.hasDirectCodeSmells()) {
-			CodeAnalysisProcessor codeAnalysisProcessor = new CodeAnalysisProcessor();
-			codeAnalysisProcessor.setSCM(scm);
-			codeAnalysisProcessor.setRepositoryMiner(repositoryMiner);
-			codeAnalysisProcessor.setRepositoryData(repositoryId, tempRepo);
-			codeAnalysisProcessor.startIncrementalAnalysis(newCommits);
+			DirectCodeAnalysisProcessor directCodeAnalysisProcessor = new DirectCodeAnalysisProcessor();
+			directCodeAnalysisProcessor.setSCM(scm);
+			directCodeAnalysisProcessor.setRepositoryMiner(repositoryMiner);
+			directCodeAnalysisProcessor.setRepositoryData(repositoryId, tempRepo);
+			directCodeAnalysisProcessor.startIncrementalAnalysis(newCommits);
 		}
 
 	}

@@ -1,6 +1,7 @@
 package org.repositoryminer.mining;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 
@@ -108,23 +109,23 @@ public class RepositoryMiner {
 	}
 
 	public boolean hasParsers() {
-		return parsers != null && parsers.size() > 0;
+		return getParsers().size() > 0;
 	}
 	
 	public boolean hasDirectCodeMetrics() {
-		return directCodeMetrics != null && directCodeMetrics.size() > 0;
+		return getDirectCodeMetrics().size() > 0;
 	}
 	
 	public boolean hasDirectCodeSmells() {
-		return directCodeSmells != null && directCodeSmells.size() > 0;
+		return getDirectCodeSmells().size() > 0;
 	}
 	
 	public boolean hasIndirectCodeMetrics() {
-		return indirectCodeMetrics != null && indirectCodeMetrics.size() > 0;
+		return getIndirectCodeMetrics().size() > 0;
 	}
 	
 	public boolean hasIndirectCodeSmells() {
-		return indirectCodeSmell != null && indirectCodeSmell.size() > 0;
+		return getIndirectCodeSmell().size() > 0;
 	}
 	
 	// getters and setters
@@ -170,6 +171,10 @@ public class RepositoryMiner {
 	}
 
 	public List<IParser> getParsers() {
+		if (parsers == null) {
+			parsers = new ArrayList<IParser>();
+		}
+		
 		return parsers;
 	}
 
@@ -178,6 +183,10 @@ public class RepositoryMiner {
 	}
 
 	public List<IDirectCodeMetric> getDirectCodeMetrics() {
+		if (directCodeMetrics == null) {
+			directCodeMetrics = new ArrayList<IDirectCodeMetric>();
+		}
+		
 		return directCodeMetrics;
 	}
 
@@ -186,6 +195,10 @@ public class RepositoryMiner {
 	}
 
 	public List<IIndirectCodeMetric> getIndirectCodeMetrics() {
+		if (indirectCodeMetrics == null) {
+			indirectCodeMetrics = new ArrayList<IIndirectCodeMetric>();
+		}
+		
 		return indirectCodeMetrics;
 	}
 
@@ -194,6 +207,10 @@ public class RepositoryMiner {
 	}
 
 	public List<IDirectCodeSmell> getDirectCodeSmells() {
+		if (directCodeSmells == null) {
+			directCodeSmells = new ArrayList<IDirectCodeSmell>();
+		}
+		
 		return directCodeSmells;
 	}
 
@@ -202,6 +219,10 @@ public class RepositoryMiner {
 	}
 
 	public List<IIndirectCodeSmell> getIndirectCodeSmell() {
+		if (indirectCodeSmell == null) {
+			indirectCodeSmell = new ArrayList<IIndirectCodeSmell>();
+		}
+		
 		return indirectCodeSmell;
 	}
 
@@ -210,6 +231,10 @@ public class RepositoryMiner {
 	}
 
 	public List<Entry<String, ReferenceType>> getReferences() {
+		if (references == null) {
+			references = new ArrayList<Entry<String, ReferenceType>>();
+		}
+		
 		return references;
 	}
 
@@ -218,6 +243,10 @@ public class RepositoryMiner {
 	}
 
 	public List<String> getSnapshots() {
+		if (snapshots == null) {
+			snapshots = new ArrayList<String>();
+		}
+		
 		return snapshots;
 	}
 

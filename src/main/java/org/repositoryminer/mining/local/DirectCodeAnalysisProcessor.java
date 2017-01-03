@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.io.FilenameUtils;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.repositoryminer.ast.AST;
@@ -30,7 +31,7 @@ import org.repositoryminer.scm.ISCM;
 
 import com.mongodb.client.model.Projections;
 
-public class CodeAnalysisProcessor {
+public class DirectCodeAnalysisProcessor {
 
 	private static final int COMMIT_RANGE = 3000;
 
@@ -38,18 +39,18 @@ public class CodeAnalysisProcessor {
 	private RepositoryMiner repositoryMiner;
 	private String repositoryId;
 	private String repositoryPath;
-	
-	private DirectCodeAnalysisDocumentHandler directMetricHandler;
+
+	private DirectCodeAnalysisDocumentHandler directAnalysisHandler;
 	private CommitDocumentHandler commitPersistence;
 	private ReferenceDocumentHandler referenceHandler;
 
 	private List<Reference> references;
 	private Set<String> visitedCommits;
-	
+
 	private Map<String, IParser> parsers;
 
-	public CodeAnalysisProcessor() {
-		directMetricHandler = new DirectCodeAnalysisDocumentHandler();
+	public DirectCodeAnalysisProcessor() {
+		directAnalysisHandler = new DirectCodeAnalysisDocumentHandler();
 		referenceHandler = new ReferenceDocumentHandler();
 		commitPersistence = new CommitDocumentHandler();
 		visitedCommits = new HashSet<String>();
@@ -83,11 +84,11 @@ public class CodeAnalysisProcessor {
 				parsers.put(ext, p);
 			}
 		}
-		
+
 		if (visitedCommits == null) {
 			visitedCommits = new HashSet<String>();
 		}
-		
+
 		processReferences();
 	}
 
@@ -98,10 +99,10 @@ public class CodeAnalysisProcessor {
 				parsers.put(ext, p);
 			}
 		}
-		
+
 		processIncrementalAnalysis(commits);
 	}
-	
+
 	private void processIncrementalAnalysis(List<String> commits) throws IOException {
 		int begin = 0;
 		int end = Math.min(commits.size(), COMMIT_RANGE);
@@ -114,11 +115,12 @@ public class CodeAnalysisProcessor {
 
 		processNewCommits(commits.subList(begin, end), begin, commits.size());
 	}
-	
+
 	private void processNewCommits(List<String> commits, int progress, int qtdCommits) throws IOException {
-		for (Document doc : commitPersistence.findByIdColl(repositoryId, commits, Projections.include("diffs", "commit_date"))) {
+		for (Document doc : commitPersistence.findByIdColl(repositoryId, commits,
+				Projections.include("diffs", "commit_date"))) {
 			Commit commit = Commit.parseDocument(doc);
-			
+
 			scm.checkout(commit.getId());
 
 			for (IParser parser : repositoryMiner.getParsers()) {
@@ -132,8 +134,8 @@ public class CodeAnalysisProcessor {
 			}
 		}
 	}
-	
-	@SuppressWarnings({"unchecked" })
+
+	@SuppressWarnings({ "unchecked" })
 	private void processReferences() throws IOException {
 		for (Reference ref : references) {
 			Document refDoc = referenceHandler.findById(ref.getId(), Projections.include("commits"));
@@ -155,20 +157,21 @@ public class CodeAnalysisProcessor {
 	private void processCommits(List<String> commits, String refName, int progress, int qtdCommits) throws IOException {
 		// not selects already processed commits
 		List<String> newCommits = new ArrayList<String>();
-		
+
 		for (String commit : commits) {
 			if (!visitedCommits.contains(commit)) {
 				newCommits.add(commit);
 			}
 		}
-		
+
 		if (newCommits.size() == 0) {
 			return;
 		}
-		
-		for (Document doc : commitPersistence.findByIdColl(repositoryId, newCommits, Projections.include("diffs", "commit_date"))) {
+
+		for (Document doc : commitPersistence.findByIdColl(repositoryId, newCommits,
+				Projections.include("diffs", "commit_date"))) {
 			Commit commit = Commit.parseDocument(doc);
-			
+
 			visitedCommits.add(commit.getId());
 			scm.checkout(commit.getId());
 
@@ -185,11 +188,9 @@ public class CodeAnalysisProcessor {
 	}
 
 	private void processDiff(String filePath, long fileHash, Commit commit) throws IOException {
-		int index = filePath.lastIndexOf(".") + 1;
-		String ext = filePath.substring(index);
-
+		String ext = FilenameUtils.getExtension(filePath);
 		IParser currParser = parsers.get(ext);
-		
+
 		if (currParser == null) {
 			return;
 		}
@@ -201,7 +202,7 @@ public class CodeAnalysisProcessor {
 			return;
 		}
 
-		byte[] data = Files.readAllBytes(Paths.get(f.getCanonicalPath()));
+		byte[] data = Files.readAllBytes(Paths.get(f.getAbsolutePath()));
 
 		if (data == null) {
 			return;
@@ -226,55 +227,46 @@ public class CodeAnalysisProcessor {
 			thresholdsDoc.add(codeSmell.getThresholds());
 		}
 		doc.append("codesmells_threshholds", thresholdsDoc);
-		
+
 		List<AbstractClassDeclaration> types = ast.getDocument().getTypes();
-		List<Document> abstractTypeDocs = new ArrayList<Document>();
-		
+		List<Document> classesDocs = new ArrayList<Document>();
+
 		for (AbstractClassDeclaration type : types) {
 			Document typeDoc = new Document();
 			typeDoc.append("name", type.getName()).append("type", type.getArchetype().toString());
 
-			if (repositoryMiner.hasDirectCodeMetrics()) {
-				processClassMetrics(ast, type, typeDoc);
-			}
-			
-			if (repositoryMiner.hasDirectCodeSmells()) {
-				processClassCodeSmells(ast, type, typeDoc);
-			}
+			processDirectCodeMetrics(ast, type, typeDoc);
+			processDirectCodeSmells(ast, type, typeDoc);
 
-			abstractTypeDocs.add(typeDoc);
+			classesDocs.add(typeDoc);
 		}
 
-		doc.append("classes", abstractTypeDocs);
-		directMetricHandler.insert(doc);
+		doc.append("classes", classesDocs);
+		directAnalysisHandler.insert(doc);
 	}
 
-	private void processClassMetrics(AST ast, AbstractClassDeclaration type, Document typeDoc) {
+	private void processDirectCodeMetrics(AST ast, AbstractClassDeclaration cls, Document clsDoc) {
 		List<Document> metricsDoc = new ArrayList<Document>();
 		for (IDirectCodeMetric metric : repositoryMiner.getDirectCodeMetrics()) {
-			Document mDoc = metric.calculate(type, ast);
+			Document mDoc = metric.calculate(cls, ast);
 			if (mDoc != null) {
 				metricsDoc.add(mDoc);
 			}
 		}
-		
-		if (metricsDoc.size() > 0) {
-			typeDoc.append("metrics", metricsDoc);
-		}
+
+		clsDoc.append("metrics", metricsDoc);
 	}
 
-	private void processClassCodeSmells(AST ast, AbstractClassDeclaration type, Document typeDoc) {
+	private void processDirectCodeSmells(AST ast, AbstractClassDeclaration cls, Document clsDoc) {
 		List<Document> codeSmellsDoc = new ArrayList<Document>();
 		for (IDirectCodeSmell codeSmell : repositoryMiner.getDirectCodeSmells()) {
-			Document cDoc = codeSmell.detect(type, ast);
+			Document cDoc = codeSmell.detect(cls, ast);
 			if (cDoc != null) {
 				codeSmellsDoc.add(cDoc);
 			}
 		}
-		
-		if (codeSmellsDoc.size() > 0) {
-			typeDoc.append("codesmells", codeSmellsDoc);
-		}
+
+		clsDoc.append("codesmells", codeSmellsDoc);
 	}
 
 }

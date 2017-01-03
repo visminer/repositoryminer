@@ -56,7 +56,7 @@ import org.repositoryminer.utility.FileUtils;
  * </ul>
  * At least one of the lists must be populated so to get the mining process
  * started. The lists are then injected in a instance of
- * {@link org.repositoryminer.mining.local.CodeAnalysisProcessor} which is
+ * {@link org.repositoryminer.mining.local.DirectCodeAnalysisProcessor} which is
  * capable of performing the actual calculations and detections.
  * <p>
  * Raised exceptions are:
@@ -193,12 +193,12 @@ public class MiningProcessor {
 		}
 
 		if (repositoryMiner.hasDirectCodeMetrics() || repositoryMiner.hasDirectCodeSmells()) {
-			CodeAnalysisProcessor codeAnalysisProcessor = new CodeAnalysisProcessor();
-			codeAnalysisProcessor.setReferences(selectedReferences);
-			codeAnalysisProcessor.setSCM(scm);
-			codeAnalysisProcessor.setRepositoryMiner(repositoryMiner);
-			codeAnalysisProcessor.setRepositoryData(repositoryId, tempRepo);
-			codeAnalysisProcessor.start();
+			DirectCodeAnalysisProcessor directCodeAnalysisProcessor = new DirectCodeAnalysisProcessor();
+			directCodeAnalysisProcessor.setReferences(selectedReferences);
+			directCodeAnalysisProcessor.setSCM(scm);
+			directCodeAnalysisProcessor.setRepositoryMiner(repositoryMiner);
+			directCodeAnalysisProcessor.setRepositoryData(repositoryId, tempRepo);
+			directCodeAnalysisProcessor.start();
 		}
 	}
 
