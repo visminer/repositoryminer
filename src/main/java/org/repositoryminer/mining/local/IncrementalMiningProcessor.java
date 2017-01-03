@@ -27,7 +27,7 @@ import com.mongodb.client.model.Projections;
 public class IncrementalMiningProcessor {
 
 	private static final int COMMITS_RANGE = 3000;
-	
+
 	private RepositoryMiner repositoryMiner;
 	private ISCM scm;
 	private Set<String> processedCommits;
@@ -108,7 +108,7 @@ public class IncrementalMiningProcessor {
 		loadAllCommits(repository.getId());
 
 		updateReferences(repository.getId());
-		
+
 		newCommits = new ArrayList<String>();
 		Set<String> commitsToSkip = new HashSet<String>(processedCommits);
 		for (Reference ref : selectedReferences) {
@@ -117,7 +117,7 @@ public class IncrementalMiningProcessor {
 
 		updateWorkingDirectories(repository.getId());
 		calculateAndDetect(tempRepo, repository.getId());
-		
+
 		scm.close();
 		FileUtils.deleteFolder(tempRepo);
 	}
@@ -147,11 +147,28 @@ public class IncrementalMiningProcessor {
 		}
 
 		if (repositoryMiner.hasDirectCodeMetrics() || repositoryMiner.hasDirectCodeSmells()) {
-			DirectCodeAnalysisProcessor directCodeAnalysisProcessor = new DirectCodeAnalysisProcessor();
-			directCodeAnalysisProcessor.setSCM(scm);
-			directCodeAnalysisProcessor.setRepositoryMiner(repositoryMiner);
-			directCodeAnalysisProcessor.setRepositoryData(repositoryId, tempRepo);
-			directCodeAnalysisProcessor.startIncrementalAnalysis(newCommits);
+			DirectCodeAnalysisProcessor processor = new DirectCodeAnalysisProcessor();
+			processor.setSCM(scm);
+			processor.setRepositoryMiner(repositoryMiner);
+			processor.setRepositoryData(repositoryId, tempRepo);
+			processor.startIncrementalAnalysis(newCommits);
+		}
+
+		if (repositoryMiner.hasIndirectCodeMetrics() || repositoryMiner.hasIndirectCodeSmells()) {
+			List<String> validSnapshots = new ArrayList<String>();
+			for (String hash : repositoryMiner.getSnapshots()) {
+				if (processedCommits.contains(hash) || newCommits.contains(hash)) {
+					validSnapshots.add(hash);
+				}
+			}
+
+			IndirectCodeAnalysisProcessor processor = new IndirectCodeAnalysisProcessor();
+			processor.setReferences(selectedReferences);
+			processor.setSnapshots(validSnapshots);
+			processor.setRepositoryData(repositoryId, tempRepo);
+			processor.setRepositoryMiner(repositoryMiner);
+			processor.setSCM(scm);
+			processor.startIncrementalAnalysis();
 		}
 
 	}

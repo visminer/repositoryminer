@@ -71,7 +71,7 @@ import org.repositoryminer.utility.FileUtils;
 public class MiningProcessor {
 
 	private static final int COMMITS_RANGE = 3000;
-	
+
 	private ISCM scm;
 	private IssueExtractor messageAnalyzer;
 	private RepositoryMiner repositoryMiner;
@@ -193,12 +193,29 @@ public class MiningProcessor {
 		}
 
 		if (repositoryMiner.hasDirectCodeMetrics() || repositoryMiner.hasDirectCodeSmells()) {
-			DirectCodeAnalysisProcessor directCodeAnalysisProcessor = new DirectCodeAnalysisProcessor();
-			directCodeAnalysisProcessor.setReferences(selectedReferences);
-			directCodeAnalysisProcessor.setSCM(scm);
-			directCodeAnalysisProcessor.setRepositoryMiner(repositoryMiner);
-			directCodeAnalysisProcessor.setRepositoryData(repositoryId, tempRepo);
-			directCodeAnalysisProcessor.start();
+			DirectCodeAnalysisProcessor processor = new DirectCodeAnalysisProcessor();
+			processor.setReferences(selectedReferences);
+			processor.setSCM(scm);
+			processor.setRepositoryMiner(repositoryMiner);
+			processor.setRepositoryData(repositoryId, tempRepo);
+			processor.start();
+		}
+
+		if (repositoryMiner.hasIndirectCodeMetrics() || repositoryMiner.hasIndirectCodeSmells()) {
+			List<String> validSnapshots = new ArrayList<String>();
+			for (String hash : repositoryMiner.getSnapshots()) {
+				if (visitedCommits.contains(hash)) {
+					validSnapshots.add(hash);
+				}
+			}
+
+			IndirectCodeAnalysisProcessor processor = new IndirectCodeAnalysisProcessor();
+			processor.setReferences(selectedReferences);
+			processor.setSnapshots(validSnapshots);
+			processor.setRepositoryData(repositoryId, tempRepo);
+			processor.setRepositoryMiner(repositoryMiner);
+			processor.setSCM(scm);
+			processor.start();
 		}
 	}
 
