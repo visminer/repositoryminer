@@ -105,6 +105,7 @@ public class IndirectCodeAnalysisProcessor {
 				snapshots.remove(commitId);
 				references.remove(i);
 				i--;
+				updateReferenceInIndirectAnalysis(commitId, references.get(i));
 			}
 		}
 
@@ -116,6 +117,11 @@ public class IndirectCodeAnalysisProcessor {
 		}
 
 		start();
+	}
+
+	private void updateReferenceInIndirectAnalysis(String commitId, Reference reference) {
+		Document doc = indirectAnalysisHandler.find(repositoryId, commitId, Projections.include("_id"));
+		indirectAnalysisHandler.updateOnlyReference(doc.getObjectId("_id"), reference.getName(), reference.getType());
 	}
 
 	private void processCommits() throws IOException {
@@ -231,18 +237,18 @@ public class IndirectCodeAnalysisProcessor {
 			thresholdsDoc.add(codeSmell.getThresholds());
 		}
 		doc.append("codesmells_threshholds", thresholdsDoc);
-		
+
 		List<Document> classesDocs = new ArrayList<Document>();
 		for (Entry<String, String> entry : fileEntry.classes.entrySet()) {
 			Document clsDoc = new Document();
 			clsDoc.append("name", entry.getKey()).append("type", entry.getValue());
-			
+
 			addIndirectCodeMetrics(entry.getKey(), codeMetricsResults, clsDoc);
 			addIndirectCodeSmells(entry.getKey(), codeSmellsResults, clsDoc);
-			
+
 			classesDocs.add(clsDoc);
 		}
-		
+
 		doc.append("classes", classesDocs);
 		indirectAnalysisHandler.insert(doc);
 	}
@@ -255,10 +261,10 @@ public class IndirectCodeAnalysisProcessor {
 				metricsDoc.add(mDoc);
 			}
 		}
-		
+
 		clsDoc.append("metrics", metricsDoc);
 	}
-	
+
 	private void addIndirectCodeSmells(String cls, List<Map<String, Document>> codeSmellsResults, Document clsDoc) {
 		List<Document> smellsDoc = new ArrayList<Document>();
 		for (Map<String, Document> map : codeSmellsResults) {
@@ -267,8 +273,8 @@ public class IndirectCodeAnalysisProcessor {
 				smellsDoc.add(sDoc);
 			}
 		}
-		
+
 		clsDoc.append("codesmells", smellsDoc);
 	}
-	
+
 }

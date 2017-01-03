@@ -63,6 +63,7 @@ public class CPDMiner {
 		Commit commit = Commit.parseDocument(commitDoc);
 
 		configureCPD();
+		checkout(hash);
 		List<Occurrence> occurrences = cpdExecutor.execute();
 
 		Document doc = new Document();
@@ -78,12 +79,13 @@ public class CPDMiner {
 		Document refDoc = refPersist.findByNameAndType(name, type, repository.getId(), Projections.slice("commits", 1));
 		Reference reference = Reference.parseDocument(refDoc);
 
-		configureCPD();
-		List<Occurrence> occurrences = cpdExecutor.execute();
-		
 		String commitId = reference.getCommits().get(0);
 		Commit commit = Commit.parseDocument(commitPersist.findById(commitId, Projections.include("commit_date")));
-
+		
+		configureCPD();
+		checkout(commitId);
+		List<Occurrence> occurrences = cpdExecutor.execute();
+		
 		Document doc = new Document();
 		doc.append("reference_name", reference.getName());
 		doc.append("reference_type", reference.getType().toString());
@@ -112,21 +114,11 @@ public class CPDMiner {
 		FileUtils.deleteFolder(tmpRepository);
 	}
 	
-	public void checkout(String ref) {
+	private void checkout(String ref) {
 		scm.checkout(ref);
 	}
 	
-	public void checkout(String reference, ReferenceType type) {
-		List<Reference> references = scm.getReferences();
-		for (Reference r : references) {
-			if (r.getName().equals(reference) && r.getType().equals(type)) {
-				scm.checkout(r.getPath());
-				break;
-			}
-		}
-	}
-	
-	public void configureCPD() {
+	private void configureCPD() {
 		cpdExecutor.setCharset(charset);
 		cpdExecutor.setLanguages(languages);
 		cpdExecutor.setMinTokens(minTokens);

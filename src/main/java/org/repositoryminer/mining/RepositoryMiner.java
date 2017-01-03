@@ -1,6 +1,7 @@
 package org.repositoryminer.mining;
 
 import java.io.IOException;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
@@ -56,12 +57,86 @@ public class RepositoryMiner {
 
 	private List<IDirectCodeMetric> directCodeMetrics;
 	private List<IIndirectCodeMetric> indirectCodeMetrics;
-	
+
 	private List<IDirectCodeSmell> directCodeSmells;
 	private List<IIndirectCodeSmell> indirectCodeSmell;
 
 	private List<Entry<String, ReferenceType>> references;
 	private List<String> snapshots;
+
+	public boolean addParser(IParser parser) {
+		for (IParser p : getParsers()) {
+			if (p.getLanguage() == parser.getLanguage()) {
+				return false;
+			}
+		}
+
+		parsers.add(parser);
+		return true;
+	}
+
+	public boolean addDirectCodeMetric(IDirectCodeMetric codeMetric) {
+		for (IDirectCodeMetric metric : getDirectCodeMetrics()) {
+			if (metric.getId() == codeMetric.getId()) {
+				return false;
+			}
+		}
+
+		directCodeMetrics.add(codeMetric);
+		return true;
+	}
+
+	public boolean addIndirectCodeMetric(IIndirectCodeMetric codeMetric) {
+		for (IIndirectCodeMetric metric : getIndirectCodeMetrics()) {
+			if (metric.getId() == codeMetric.getId()) {
+				return false;
+			}
+		}
+
+		indirectCodeMetrics.add(codeMetric);
+		return true;
+	}	
+
+	public boolean addDirectCodeSmell(IDirectCodeSmell codeSmell) {
+		for (IDirectCodeSmell smell : getDirectCodeSmells()) {
+			if (smell.getId() == codeSmell.getId()) {
+				return false;
+			}
+		}
+
+		directCodeSmells.add(codeSmell);
+		return true;
+	}
+
+	public boolean addIndirectCodeSmell(IIndirectCodeSmell codeSmell) {
+		for (IIndirectCodeSmell smell : getIndirectCodeSmell()) {
+			if (smell.getId() == codeSmell.getId()) {
+				return false;
+			}
+		}
+
+		indirectCodeSmell.add(codeSmell);
+		return true;
+	}
+
+	public boolean addReference(String name, ReferenceType type) {
+		Entry<String, ReferenceType> entry = new AbstractMap.SimpleEntry<String, ReferenceType>(name, type);
+		if (getReferences().contains(entry)) {
+			return false;
+		}
+
+		references.add(entry);
+		return true;
+	}
+
+	public boolean addSnapshot(String snapshot) {
+		if (getSnapshots().contains(snapshot)) {
+			return false;
+		}
+
+		snapshots.add(snapshot);
+		return true;
+	}
 
 	/**
 	 * @param path
@@ -87,7 +162,7 @@ public class RepositoryMiner {
 	public RepositoryMiner(String name) {
 		this.name = name;
 	}
-	
+
 	/**
 	 * It activates the mining of a project
 	 * <p>
@@ -111,25 +186,25 @@ public class RepositoryMiner {
 	public boolean hasParsers() {
 		return getParsers().size() > 0;
 	}
-	
+
 	public boolean hasDirectCodeMetrics() {
 		return getDirectCodeMetrics().size() > 0;
 	}
-	
+
 	public boolean hasDirectCodeSmells() {
 		return getDirectCodeSmells().size() > 0;
 	}
-	
+
 	public boolean hasIndirectCodeMetrics() {
 		return getIndirectCodeMetrics().size() > 0;
 	}
-	
+
 	public boolean hasIndirectCodeSmells() {
 		return getIndirectCodeSmell().size() > 0;
 	}
-	
+
 	// getters and setters
-	
+
 	public String getPath() {
 		return path;
 	}
@@ -174,7 +249,7 @@ public class RepositoryMiner {
 		if (parsers == null) {
 			parsers = new ArrayList<IParser>();
 		}
-		
+
 		return parsers;
 	}
 
@@ -186,7 +261,7 @@ public class RepositoryMiner {
 		if (directCodeMetrics == null) {
 			directCodeMetrics = new ArrayList<IDirectCodeMetric>();
 		}
-		
+
 		return directCodeMetrics;
 	}
 
@@ -198,7 +273,7 @@ public class RepositoryMiner {
 		if (indirectCodeMetrics == null) {
 			indirectCodeMetrics = new ArrayList<IIndirectCodeMetric>();
 		}
-		
+
 		return indirectCodeMetrics;
 	}
 
@@ -210,7 +285,7 @@ public class RepositoryMiner {
 		if (directCodeSmells == null) {
 			directCodeSmells = new ArrayList<IDirectCodeSmell>();
 		}
-		
+
 		return directCodeSmells;
 	}
 
@@ -222,7 +297,7 @@ public class RepositoryMiner {
 		if (indirectCodeSmell == null) {
 			indirectCodeSmell = new ArrayList<IIndirectCodeSmell>();
 		}
-		
+
 		return indirectCodeSmell;
 	}
 
@@ -234,7 +309,7 @@ public class RepositoryMiner {
 		if (references == null) {
 			references = new ArrayList<Entry<String, ReferenceType>>();
 		}
-		
+
 		return references;
 	}
 
@@ -246,7 +321,7 @@ public class RepositoryMiner {
 		if (snapshots == null) {
 			snapshots = new ArrayList<String>();
 		}
-		
+
 		return snapshots;
 	}
 

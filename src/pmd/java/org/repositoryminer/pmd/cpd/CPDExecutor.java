@@ -80,7 +80,7 @@ public class CPDExecutor{
 				Occurrence occurrence = new Occurrence();
 				occurrence.setLineCount(m.getLineCount());
 				occurrence.setTokenCount(m.getTokenCount());
-				occurrence.setSourceCodeSlice(m.getSourceCodeSlice());
+				occurrence.setSourceCodeSlice(m.getSourceCodeSlice().trim());
 				occurrence.setLanguage(lang);
 
 				List<FileInfo> filesInfo = new ArrayList<FileInfo>();
