@@ -1,6 +1,7 @@
 package org.repositoryminer.pmd.cpd;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -96,19 +97,24 @@ public class CPDMiner {
 		configureCPD();
 		List<Occurrence> occurrences = cpdExecutor.execute();
 
-		Document doc = new Document();
+		List<Document> documents = new ArrayList<Document>(occurrences.size());
+		for (Occurrence occurence : occurrences) {
+			Document doc = new Document();
 
-		if (reference != null) {
-			doc.append("reference_name", reference.getName());
-			doc.append("reference_type", reference.getType().toString());
+			if (reference != null) {
+				doc.append("reference_name", reference.getName());
+				doc.append("reference_type", reference.getType().toString());
+			}
+
+			doc.append("commit", commit.getId());
+			doc.append("commit_date", commit.getCommitDate());
+			doc.append("repository", new ObjectId(repository.getId()));
+			doc.putAll(occurence.toDocument());
+			
+			documents.add(doc);
 		}
 
-		doc.append("commit", commit.getId());
-		doc.append("commit_date", commit.getCommitDate());
-		doc.append("repository", new ObjectId(repository.getId()));
-		doc.append("occurrences", Occurrence.toDocumentList(occurrences));
-
-		cpdPersist.insert(doc);
+		cpdPersist.insertMany(documents);
 	}
 
 	private void checkout(String ref) {

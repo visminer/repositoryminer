@@ -110,7 +110,7 @@ public class CPDExecutor{
 		case JAVA:
 			return new JavaLanguage();
 		default:
-			return null;
+			return new JavaLanguage();
 		}
 	}
 

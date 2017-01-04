@@ -63,6 +63,22 @@ public class ExCommentMiner {
 				.parseDocument(repoHandler.findById(repositoryId, Projections.include("scm", "path")));
 	}
 
+	public void setCommentsCSV(String commentsCSV) {
+		this.commentsCSV = commentsCSV;
+	}
+
+	public void setPatternsCSV(String patternsCSV) {
+		this.patternsCSV = patternsCSV;
+	}
+
+	public void setHeuristicsCSV(String heuristicsCSV) {
+		this.heuristicsCSV = heuristicsCSV;
+	}
+
+	public void setDelimiter(char delimiter) {
+		this.delimiter = delimiter;
+	}
+	
 	public void mineToCommit(String hash) throws IOException {
 		persistAnalysis(hash, null);
 	}
@@ -164,22 +180,6 @@ public class ExCommentMiner {
 
 			comment.getHeuristics().add(heuristic);
 		}
-	}
-
-	public void setCommentsCSV(String commentsCSV) {
-		this.commentsCSV = commentsCSV;
-	}
-
-	public void setPatternsCSV(String patternsCSV) {
-		this.patternsCSV = patternsCSV;
-	}
-
-	public void setHeuristicsCSV(String heuristicsCSV) {
-		this.heuristicsCSV = heuristicsCSV;
-	}
-
-	public void setDelimiter(char delimiter) {
-		this.delimiter = delimiter;
 	}
 
 }

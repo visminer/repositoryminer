@@ -68,11 +68,11 @@ public class DocumentHandler {
 	public List<Document> fromCursorToList(MongoCursor<Document> cursor) {
 		List<Document> list = new ArrayList<Document>();
 
-		while (cursor.hasNext())
+		while (cursor.hasNext()) {
 			list.add(cursor.next());
+		}
 
 		cursor.close();
-		
 		return list;
 	}
 
