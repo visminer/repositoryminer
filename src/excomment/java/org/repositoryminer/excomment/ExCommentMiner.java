@@ -2,9 +2,11 @@ package org.repositoryminer.excomment;
 
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -43,7 +45,11 @@ public class ExCommentMiner {
 	private ReferenceDocumentHandler refPersist;
 	private ExCommentDocumentHandler exCommPersist;
 
+	// the comment id is used as key
 	private Map<Integer, Comment> commentsMap;
+
+	// keeps the relationship between files and comments
+	private Map<String, List<Integer>> filesMap;
 
 	private ExCommentMiner() {
 		commitPersist = new CommitDocumentHandler();
@@ -78,7 +84,7 @@ public class ExCommentMiner {
 	public void setDelimiter(char delimiter) {
 		this.delimiter = delimiter;
 	}
-	
+
 	public void mineToCommit(String hash) throws IOException {
 		persistAnalysis(hash, null);
 	}
@@ -96,19 +102,30 @@ public class ExCommentMiner {
 
 		readCSVs();
 
-		Document doc = new Document();
-		
-		if (reference != null) {
-			doc.append("reference_name", reference.getName());
-			doc.append("reference_type", reference.getType().toString());
-		}
-		
-		doc.append("commit", commit.getId());
-		doc.append("commit_date", commit.getCommitDate());
-		doc.append("repository", new ObjectId(repository.getId()));
-		doc.append("comments", Comment.toDocumentList(commentsMap.values()));
+		List<Document> documents = new ArrayList<Document>(filesMap.size());
+		for (Entry<String, List<Integer>> entry : filesMap.entrySet()) {
+			Document doc = new Document();
 
-		exCommPersist.insert(doc);
+			if (reference != null) {
+				doc.append("reference_name", reference.getName());
+				doc.append("reference_type", reference.getType().toString());
+			}
+
+			doc.append("commit", commit.getId());
+			doc.append("commit_date", commit.getCommitDate());
+			doc.append("repository", new ObjectId(repository.getId()));
+			doc.append("filename", entry.getKey());
+			
+			List<Comment> commentsAux = new ArrayList<Comment>(entry.getValue().size());
+			for (Integer i : entry.getValue()) {
+				commentsAux.add(commentsMap.get(i));
+			}
+			doc.append("comments", Comment.toDocumentList(commentsAux));
+			
+			documents.add(doc);
+		}
+
+		exCommPersist.insertMany(documents);
 	}
 
 	private List<CSVRecord> readCSV(String[] header, String filename) throws IOException {
@@ -128,6 +145,7 @@ public class ExCommentMiner {
 
 	private void readCSVs() throws IOException {
 		commentsMap = new HashMap<Integer, Comment>();
+		filesMap = new HashMap<String, List<Integer>>();
 
 		readComments();
 		readHeuristics();
@@ -139,14 +157,18 @@ public class ExCommentMiner {
 
 		for (CSVRecord record : records) {
 			Comment comment = new Comment(Integer.parseInt(record.get(0)), Float.parseFloat(record.get(1)),
-					Float.parseFloat(record.get(2)), Float.parseFloat(record.get(3)), record.get(4), null,
+					Float.parseFloat(record.get(2)), Float.parseFloat(record.get(3)), record.get(4),
 					record.get(6), record.get(7));
 
-			String path = FilenameUtils.normalize(record.get(5), true);
-			path = path.substring(repository.getPath().length()+1);
-			comment.setPath(path);
+			String filename = FilenameUtils.normalize(record.get(5), true);
+			filename = filename.substring(repository.getPath().length()+1);
+
+			if (!filesMap.containsKey(filename)) {
+				filesMap.put(filename, new ArrayList<Integer>());
+			}
 
 			commentsMap.put(comment.getId(), comment);
+			filesMap.get(filename).add(comment.getId());
 		}
 	}
 
