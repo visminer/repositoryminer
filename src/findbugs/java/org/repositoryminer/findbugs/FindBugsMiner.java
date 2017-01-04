@@ -1,9 +1,11 @@
 package org.repositoryminer.findbugs;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.bson.Document;
 import org.bson.types.ObjectId;
@@ -131,21 +133,27 @@ public class FindBugsMiner {
 		Commit commit = Commit.parseDocument(commitPersist.findById(commitId, Projections.include("commit_date")));
 
 		configureFindBugs();
-		List<ReportedBug> reportedBugs = findBugsExecutor.execute();
+		Map<String, List<ReportedBug>> reportedBugs = findBugsExecutor.execute();
 
-		Document doc = new Document();
+		List<Document> documents = new ArrayList<Document>(reportedBugs.size());
+		for (Entry<String, List<ReportedBug>> bug : reportedBugs.entrySet()) {
+			Document doc = new Document();
 
-		if (reference != null) {
-			doc.append("reference_name", reference.getName());
-			doc.append("reference_type", reference.getType().toString());
+			if (reference != null) {
+				doc.append("reference_name", reference.getName());
+				doc.append("reference_type", reference.getType().toString());
+			}
+
+			doc.append("commit", commit.getId());
+			doc.append("commit_date", commit.getCommitDate());
+			doc.append("repository", new ObjectId(repository.getId()));
+			doc.append("filename", bug.getKey());
+			doc.append("bugs", ReportedBug.toDocumentList(bug.getValue()));
+			
+			documents.add(doc);
 		}
-
-		doc.append("commit", commit.getId());
-		doc.append("commit_date", commit.getCommitDate());
-		doc.append("repository", new ObjectId(repository.getId()));
-		doc.append("bugs", ReportedBug.toDocumentList(reportedBugs));
-
-		findBugsPersist.insert(doc);
+		
+		findBugsPersist.insertMany(documents);
 	}
 
 	private void configureFindBugs() {

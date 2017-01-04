@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -29,7 +31,7 @@ public class FindBugsExecutor {
 		this.rootDir = rootDir;
 	}
 
-	public List<ReportedBug> execute() throws IOException, InterruptedException, IllegalStateException {
+	public Map<String, List<ReportedBug>> execute() throws IOException, InterruptedException, IllegalStateException {
 		FindBugs2 findBugs = new FindBugs2();
 		Project project = getProject();
 
@@ -52,13 +54,24 @@ public class FindBugsExecutor {
 
 		findBugs.execute();
 
-		List<ReportedBug> reportedBugs = new ArrayList<ReportedBug>();
+		Map<String, List<ReportedBug>> reportedBugs = new HashMap<String, List<ReportedBug>>();
 		for (BugInstance b : reporter.getBugCollection()) {
-			ReportedBug rb = new ReportedBug(b.getPrimaryClass().getSourceLines().getSourcePath(), b.getBugRank(),
-					b.getPriority(), b.getType(), b.getAbbrev(), b.getBugPattern().getCategory(),
-					b.getPrimaryClass().getClassName(), b.getPrimarySourceLineAnnotation().getStartLine(),
+			String filename = b.getPrimarySourceLineAnnotation().getSourceFile();
+			
+			if (!reportedBugs.containsKey(filename)) {
+				reportedBugs.put(filename, new ArrayList<ReportedBug>());
+			}
+			
+			ReportedBug rb = new ReportedBug(b.getBugRank(), b.getPriorityString(), b.getType(), b.getAbbrev(),
+					b.getBugPattern().getCategory(), b.getPrimaryClass().getClassName(),
+					b.getPrimarySourceLineAnnotation().getStartLine(), b.getPrimarySourceLineAnnotation().getEndLine(),
 					b.getAbridgedMessage(), b.getMessage());
-			reportedBugs.add(rb);
+
+			if (b.getPrimaryMethod() != null) {
+				rb.setMethod(b.getPrimaryMethod().getMethodSignature());
+			}
+
+			reportedBugs.get(filename).add(rb);
 		}
 
 		findBugs.dispose();
