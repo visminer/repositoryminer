@@ -28,14 +28,23 @@ public class CPDMiner {
 	private ISCM scm;
 	private String tmpRepository;
 	private CPDExecutor cpdExecutor;
-	
+
 	private CPDDocumentHandler cpdPersist;
 	private CommitDocumentHandler commitPersist;
 	private ReferenceDocumentHandler refPersist;
-	
+
 	private int minTokens = 100;
 	private String charset = "UTF-8";
 	private List<Language> languages = Arrays.asList(Language.JAVA);
+
+	public CPDMiner(Repository repository) {
+		this.repository = repository;
+	}
+
+	public CPDMiner(String repositoryId) {
+		RepositoryDocumentHandler repoHandler = new RepositoryDocumentHandler();
+		this.repository = Repository.parseDocument(repoHandler.findById(repositoryId, Projections.include("scm")));
+	}
 
 	public void setMinTokens(int minTokens) {
 		this.minTokens = minTokens;
@@ -49,30 +58,8 @@ public class CPDMiner {
 		this.languages = languages;
 	}
 
-	public void setRepository(Repository repository) {
-		this.repository = repository;
-	}
-	
-	public void setRepository(String repositoryId) {
-		RepositoryDocumentHandler repoHandler = new RepositoryDocumentHandler();
-		this.repository = Repository.parseDocument(repoHandler.findById(repositoryId, Projections.include("scm")));
-	}
-	
 	public void detectCopyPaste(String hash) throws IOException {
-		Document commitDoc = commitPersist.findById(hash, Projections.include("commit_date"));
-		Commit commit = Commit.parseDocument(commitDoc);
-
-		configureCPD();
-		checkout(hash);
-		List<Occurrence> occurrences = cpdExecutor.execute();
-
-		Document doc = new Document();
-		doc.append("commit", commit.getId());
-		doc.append("commit_date", commit.getCommitDate());
-		doc.append("repository", new ObjectId(repository.getId()));
-		doc.append("occurrences", Occurrence.toDocumentList(occurrences));
-
-		cpdPersist.insert(doc);
+		persistAnalysis(hash, null);
 	}
 
 	public void detectCopyPaste(String name, ReferenceType type) throws IOException {
@@ -80,23 +67,9 @@ public class CPDMiner {
 		Reference reference = Reference.parseDocument(refDoc);
 
 		String commitId = reference.getCommits().get(0);
-		Commit commit = Commit.parseDocument(commitPersist.findById(commitId, Projections.include("commit_date")));
-		
-		configureCPD();
-		checkout(commitId);
-		List<Occurrence> occurrences = cpdExecutor.execute();
-		
-		Document doc = new Document();
-		doc.append("reference_name", reference.getName());
-		doc.append("reference_type", reference.getType().toString());
-		doc.append("commit", commit.getId());
-		doc.append("commit_date", commit.getCommitDate());
-		doc.append("repository", new ObjectId(repository.getId()));
-		doc.append("occurrences", Occurrence.toDocumentList(occurrences));
-
-		cpdPersist.insert(doc);
+		persistAnalysis(commitId, reference);
 	}
-	
+
 	public void configure() throws IOException {
 		tmpRepository = FileUtils.copyFolderToTmp(repository.getPath(), repository.getId());
 		cpdExecutor = new CPDExecutor(tmpRepository);
@@ -108,20 +81,44 @@ public class CPDMiner {
 		scm = SCMFactory.getSCM(repository.getScm());
 		scm.open(tmpRepository);
 	}
-	
+
 	public void dispose() throws IOException {
 		scm.close();
 		FileUtils.deleteFolder(tmpRepository);
 	}
-	
+
+	private void persistAnalysis(String commitId, Reference reference) throws IOException {
+		Document commitDoc = commitPersist.findById(commitId, Projections.include("commit_date"));
+		Commit commit = Commit.parseDocument(commitDoc);
+
+		checkout(commitId);
+
+		configureCPD();
+		List<Occurrence> occurrences = cpdExecutor.execute();
+
+		Document doc = new Document();
+
+		if (reference != null) {
+			doc.append("reference_name", reference.getName());
+			doc.append("reference_type", reference.getType().toString());
+		}
+
+		doc.append("commit", commit.getId());
+		doc.append("commit_date", commit.getCommitDate());
+		doc.append("repository", new ObjectId(repository.getId()));
+		doc.append("occurrences", Occurrence.toDocumentList(occurrences));
+
+		cpdPersist.insert(doc);
+	}
+
 	private void checkout(String ref) {
 		scm.checkout(ref);
 	}
-	
+
 	private void configureCPD() {
 		cpdExecutor.setCharset(charset);
 		cpdExecutor.setLanguages(languages);
 		cpdExecutor.setMinTokens(minTokens);
 	}
-	
+
 }

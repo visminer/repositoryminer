@@ -31,10 +31,10 @@ public class ExCommentMiner {
 	private static final String[] COMMENTS_HEADER = { "idcomment", "total_pattern", "total_heuristic", "total_score",
 			"comment", "path", "class", "method" };
 	private static final String[] PATTERNS_HEADER = { "idcomment", "pattern", "pattern_score", "pattern_class", "theme",
-			"tdtype" };
+	"tdtype" };
 	private static final String[] HEURISTICS_HEADER = { "idcomment", "heuristic_description", "heuristic_status",
-			"heuristic_score" };
-	
+	"heuristic_score" };
+
 	private String commentsCSV, patternsCSV, heuristicsCSV;
 	private char delimiter = ';';
 	private Repository repository;
@@ -42,50 +42,59 @@ public class ExCommentMiner {
 	private CommitDocumentHandler commitPersist;
 	private ReferenceDocumentHandler refPersist;
 	private ExCommentDocumentHandler exCommPersist;
-	
+
 	private Map<Integer, Comment> commentsMap;
-	
-	public ExCommentMiner() {
+
+	private ExCommentMiner() {
 		commitPersist = new CommitDocumentHandler();
 		refPersist = new ReferenceDocumentHandler();
 		exCommPersist = new ExCommentDocumentHandler();
 	}
-	
-	public void mineToCommit(String hash) throws IOException {
-		Document commitDoc = commitPersist.findById(hash, Projections.include("commit_date"));
-		Commit commit = Commit.parseDocument(commitDoc);
 
-		readCSVs();
-		
-		Document doc = new Document();
-		doc.append("commit", commit.getId());
-		doc.append("commit_date", commit.getCommitDate());
-		doc.append("repository", new ObjectId(repository.getId()));
-		doc.append("comments", Comment.toDocumentList(commentsMap.values()));
-		
-		exCommPersist.insert(doc);
+	public ExCommentMiner(Repository repository) {
+		this();
+		this.repository = repository;
+	}
+
+	public ExCommentMiner(String repositoryId) {
+		this();
+		RepositoryDocumentHandler repoHandler = new RepositoryDocumentHandler();
+		this.repository = Repository
+				.parseDocument(repoHandler.findById(repositoryId, Projections.include("scm", "path")));
+	}
+
+	public void mineToCommit(String hash) throws IOException {
+		persistAnalysis(hash, null);
 	}
 
 	public void mineToReference(String name, ReferenceType type) throws IOException {
 		Document refDoc = refPersist.findByNameAndType(name, type, repository.getId(), Projections.slice("commits", 1));
 		Reference reference = Reference.parseDocument(refDoc);
-		
+
 		String commitId = reference.getCommits().get(0);
+		persistAnalysis(commitId, reference);
+	}
+
+	private void persistAnalysis(String commitId, Reference reference) throws IOException {
 		Commit commit = Commit.parseDocument(commitPersist.findById(commitId, Projections.include("commit_date")));
 
 		readCSVs();
-		
+
 		Document doc = new Document();
-		doc.append("reference_name", reference.getName());
-		doc.append("reference_type", reference.getType().toString());
+		
+		if (reference != null) {
+			doc.append("reference_name", reference.getName());
+			doc.append("reference_type", reference.getType().toString());
+		}
+		
 		doc.append("commit", commit.getId());
 		doc.append("commit_date", commit.getCommitDate());
 		doc.append("repository", new ObjectId(repository.getId()));
 		doc.append("comments", Comment.toDocumentList(commentsMap.values()));
-		
+
 		exCommPersist.insert(doc);
 	}
-	
+
 	private List<CSVRecord> readCSV(String[] header, String filename) throws IOException {
 		FileReader fileReader = new FileReader(filename);
 
@@ -108,7 +117,7 @@ public class ExCommentMiner {
 		readHeuristics();
 		readPatterns();
 	}
-	
+
 	private void readComments() throws IOException {
 		List<CSVRecord> records = readCSV(COMMENTS_HEADER, commentsCSV);
 
@@ -116,11 +125,11 @@ public class ExCommentMiner {
 			Comment comment = new Comment(Integer.parseInt(record.get(0)), Float.parseFloat(record.get(1)),
 					Float.parseFloat(record.get(2)), Float.parseFloat(record.get(3)), record.get(4), null,
 					record.get(6), record.get(7));
-			
+
 			String path = FilenameUtils.normalize(record.get(5), true);
 			path = path.substring(repository.getPath().length()+1);
 			comment.setPath(path);
-			
+
 			commentsMap.put(comment.getId(), comment);
 		}
 	}
@@ -171,16 +180,6 @@ public class ExCommentMiner {
 
 	public void setDelimiter(char delimiter) {
 		this.delimiter = delimiter;
-	}
-
-	public void setRepository(Repository repository) {
-		this.repository = repository;
-	}
-
-	public void setRepository(String repositoryId) {
-		RepositoryDocumentHandler repoHandler = new RepositoryDocumentHandler();
-		this.repository = Repository
-				.parseDocument(repoHandler.findById(repositoryId, Projections.include("scm", "path")));
 	}
 
 }
