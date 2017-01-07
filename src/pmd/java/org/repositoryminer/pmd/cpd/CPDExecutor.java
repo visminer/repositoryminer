@@ -7,11 +7,13 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.io.FilenameUtils;
 import org.repositoryminer.codemetric.direct.LOC;
 import org.repositoryminer.pmd.cpd.model.FileInfo;
 import org.repositoryminer.pmd.cpd.model.Occurrence;
+import org.repositoryminer.utility.StringUtils;
 
 import net.sourceforge.pmd.cpd.CPD;
 import net.sourceforge.pmd.cpd.CPDConfiguration;
@@ -35,7 +37,7 @@ public class CPDExecutor{
 	private int minTokens;
 	private String charset;
 	private String repositoryFolder;
-	private List<org.repositoryminer.ast.Language> languages;
+	private Set<org.repositoryminer.ast.Language> languages;
 	
 	private LOC locMetric = new LOC();
 
@@ -51,7 +53,7 @@ public class CPDExecutor{
 		this.charset = charset;
 	}
 
-	public void setLanguages(List<org.repositoryminer.ast.Language> languages) {
+	public void setLanguages(Set<org.repositoryminer.ast.Language> languages) {
 		this.languages = languages;
 	}
 
@@ -93,6 +95,7 @@ public class CPDExecutor{
 					fileInfo.setBeginLine(mark.getBeginLine());
 					fileInfo.setEndLine(mark.getEndLine());
 					fileInfo.setFilename(filePath);
+					fileInfo.setFilehash(StringUtils.encodeToCRC32(filePath));
 					fileInfo.setDuplicationPercentage(getDuplicatedPercentage(mark.getFilename(), m.getLineCount()));
 					filesInfo.add(fileInfo);
 				}

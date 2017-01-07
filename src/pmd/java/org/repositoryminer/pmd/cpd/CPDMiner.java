@@ -2,8 +2,9 @@ package org.repositoryminer.pmd.cpd;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.bson.Document;
 import org.bson.types.ObjectId;
@@ -36,31 +37,50 @@ public class CPDMiner {
 
 	private int minTokens = 100;
 	private String charset = "UTF-8";
-	private List<Language> languages = Arrays.asList(Language.JAVA);
+	private Set<Language> languages;
 
+	private CPDMiner() {
+		languages = new HashSet<Language>(1);
+		languages.add(Language.JAVA);
+	}
+	
 	public CPDMiner(Repository repository) {
+		this();
 		this.repository = repository;
 	}
 
 	public CPDMiner(String repositoryId) {
+		this();
 		RepositoryDocumentHandler repoHandler = new RepositoryDocumentHandler();
-		this.repository = Repository.parseDocument(repoHandler.findById(repositoryId, Projections.include("scm")));
+		this.repository = Repository.parseDocument(repoHandler.findById(repositoryId, Projections.include("scm", "path")));
+	}
+
+	public int getMinTokens() {
+		return minTokens;
 	}
 
 	public void setMinTokens(int minTokens) {
 		this.minTokens = minTokens;
 	}
 
+	public String getCharset() {
+		return charset;
+	}
+
 	public void setCharset(String charset) {
 		this.charset = charset;
 	}
 
-	public void setLanguages(List<Language> languages) {
+	public Set<Language> getLanguages() {
+		return languages;
+	}
+
+	public void setLanguages(Set<Language> languages) {
 		this.languages = languages;
 	}
 
 	public void detectCopyPaste(String hash) throws IOException {
-		persistAnalysis(hash, null);
+		persistAnalysis(hash);
 	}
 
 	public void detectCopyPaste(String name, ReferenceType type) throws IOException {
@@ -68,7 +88,7 @@ public class CPDMiner {
 		Reference reference = Reference.parseDocument(refDoc);
 
 		String commitId = reference.getCommits().get(0);
-		persistAnalysis(commitId, reference);
+		persistAnalysis(commitId);
 	}
 
 	public void configure() throws IOException {
@@ -88,7 +108,7 @@ public class CPDMiner {
 		FileUtils.deleteFolder(tmpRepository);
 	}
 
-	private void persistAnalysis(String commitId, Reference reference) throws IOException {
+	private void persistAnalysis(String commitId) throws IOException {
 		Document commitDoc = commitPersist.findById(commitId, Projections.include("commit_date"));
 		Commit commit = Commit.parseDocument(commitDoc);
 
@@ -100,15 +120,10 @@ public class CPDMiner {
 		List<Document> documents = new ArrayList<Document>(occurrences.size());
 		for (Occurrence occurence : occurrences) {
 			Document doc = new Document();
-
-			if (reference != null) {
-				doc.append("reference_name", reference.getName());
-				doc.append("reference_type", reference.getType().toString());
-			}
-
 			doc.append("commit", commit.getId());
 			doc.append("commit_date", commit.getCommitDate());
 			doc.append("repository", new ObjectId(repository.getId()));
+			doc.append("tokens_threshold", minTokens);
 			doc.putAll(occurence.toDocument());
 			
 			documents.add(doc);
