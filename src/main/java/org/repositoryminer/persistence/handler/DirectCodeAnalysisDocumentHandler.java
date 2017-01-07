@@ -1,12 +1,11 @@
 package org.repositoryminer.persistence.handler;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.repositoryminer.persistence.Connection;
 
 import com.mongodb.BasicDBObject;
+import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Projections;
 
 public class DirectCodeAnalysisDocumentHandler extends DocumentHandler {
@@ -18,18 +17,17 @@ public class DirectCodeAnalysisDocumentHandler extends DocumentHandler {
 	}
 
 	public Document getMetrics(long fileHash, String commitHash) {
-		return getMeasuresHelper(fileHash, commitHash, "classes.metrics");
+		return getByFileAndCommit(fileHash, commitHash, Projections.include("classes.metrics"));
 	}
 
 	public Document getCodeSmells(long fileHash, String commitHash) {
-		return getMeasuresHelper(fileHash, commitHash, "classes.codesmells");
+		return getByFileAndCommit(fileHash, commitHash, Projections.include("classes.codesmells"));
 	}
 
-	private Document getMeasuresHelper(long fileHash, String commit, String field) {
-		List<BasicDBObject> conditions = new ArrayList<BasicDBObject>();
-		conditions.add(new BasicDBObject("filehash", fileHash));
-		conditions.add(new BasicDBObject("commit", commit));
-		return findOne(new BasicDBObject("$and", conditions), Projections.include(field));
+	public Document getByFileAndCommit(long fileHash, String commit, Bson projection) {
+		Bson clause1 = new BasicDBObject("filehash", fileHash);
+		Bson clause2 = new BasicDBObject("commit", commit);
+		return findOne(Filters.and(clause1, clause2), projection);
 	}
-
+	
 }

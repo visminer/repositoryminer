@@ -8,31 +8,36 @@ import org.bson.Document;
 public class ReportedBug {
 
 	private int rank;
-	private String priority;
+	private String rankCategory;
+	private int priority;
+	private String priorityCategory;
 	private String type;
 	private String abbreviation;
-	private String patternCategory;
+	private String description;
+	private String category;
 	private String clazz;
+	private String field;
 	private String method;
-	private int startline;
-	private int endLine;
+	private String localVariable;
 	private String shortMessage;
 	private String longMessage;
 
 	public ReportedBug() {
 	}
 
-	public ReportedBug(int rank, String priority, String type, String abbreviation, String patternCategory, String clazz,
-			int startline, int endLine, String shortMessage, String longMessage) {
+	public ReportedBug(int rank, String rankCategory, int priority, String priorityCategory, String type,
+			String abbreviation, String description, String category, String clazz, String shortMessage,
+			String longMessage) {
 		super();
 		this.rank = rank;
+		this.rankCategory = rankCategory;
 		this.priority = priority;
+		this.priorityCategory = priorityCategory;
 		this.type = type;
 		this.abbreviation = abbreviation;
-		this.patternCategory = patternCategory;
+		this.description = description;
+		this.category = category;
 		this.clazz = clazz;
-		this.startline = startline;
-		this.endLine = endLine;
 		this.shortMessage = shortMessage;
 		this.longMessage = longMessage;
 	}
@@ -41,16 +46,18 @@ public class ReportedBug {
 		List<Document> list = new ArrayList<Document>();
 		for (ReportedBug rb : reportedBugs) {
 			Document doc = new Document();
-			doc.append("rank", rb.getRank()).append("priority", rb.getPriority()).append("type", rb.getType())
-					.append("abbreviation", rb.getAbbreviation()).append("pattern_category", rb.getPatternCategory())
-					.append("class", rb.getClazz()).append("method", rb.getMethod())
-					.append("startline", rb.getStartline()).append("endline", rb.getEndLine())
-					.append("short_message", rb.getShortMessage()).append("long_message", rb.getLongMessage());
+			doc.append("rank", rb.getRank()).append("rank_category", rb.getRankCategory())
+					.append("priority", rb.getPriority()).append("priority_category", rb.getPriorityCategory())
+					.append("type", rb.getType()).append("abbreviation", rb.getAbbreviation())
+					.append("description", rb.getDescription()).append("category", rb.getCategory())
+					.append("class", rb.getClazz()).append("field", rb.getField()).append("method", rb.getMethod())
+					.append("local_variable", rb.getLocalVariable()).append("short_message", rb.getShortMessage())
+					.append("long_message", rb.getLongMessage());
 			list.add(doc);
 		}
 		return list;
 	}
-	
+
 	public int getRank() {
 		return rank;
 	}
@@ -59,12 +66,28 @@ public class ReportedBug {
 		this.rank = rank;
 	}
 
-	public String getPriority() {
+	public String getRankCategory() {
+		return rankCategory;
+	}
+
+	public void setRankCategory(String rankCategory) {
+		this.rankCategory = rankCategory;
+	}
+
+	public int getPriority() {
 		return priority;
 	}
 
-	public void setPriority(String priority) {
+	public void setPriority(int priority) {
 		this.priority = priority;
+	}
+
+	public String getPriorityCategory() {
+		return priorityCategory;
+	}
+
+	public void setPriorityCategory(String priorityCategory) {
+		this.priorityCategory = priorityCategory;
 	}
 
 	public String getType() {
@@ -83,12 +106,20 @@ public class ReportedBug {
 		this.abbreviation = abbreviation;
 	}
 
-	public String getPatternCategory() {
-		return patternCategory;
+	public String getDescription() {
+		return description;
 	}
 
-	public void setPatternCategory(String patternCategory) {
-		this.patternCategory = patternCategory;
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public String getCategory() {
+		return category;
+	}
+
+	public void setCategory(String category) {
+		this.category = category;
 	}
 
 	public String getClazz() {
@@ -99,6 +130,14 @@ public class ReportedBug {
 		this.clazz = clazz;
 	}
 
+	public String getField() {
+		return field;
+	}
+
+	public void setField(String field) {
+		this.field = field;
+	}
+
 	public String getMethod() {
 		return method;
 	}
@@ -107,20 +146,12 @@ public class ReportedBug {
 		this.method = method;
 	}
 
-	public int getStartline() {
-		return startline;
+	public String getLocalVariable() {
+		return localVariable;
 	}
 
-	public void setStartline(int startline) {
-		this.startline = startline;
-	}
-
-	public int getEndLine() {
-		return endLine;
-	}
-
-	public void setEndLine(int endLine) {
-		this.endLine = endLine;
+	public void setLocalVariable(String localVariable) {
+		this.localVariable = localVariable;
 	}
 
 	public String getShortMessage() {

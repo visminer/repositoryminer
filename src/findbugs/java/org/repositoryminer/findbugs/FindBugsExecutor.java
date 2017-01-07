@@ -56,21 +56,30 @@ public class FindBugsExecutor {
 
 		Map<String, List<ReportedBug>> reportedBugs = new HashMap<String, List<ReportedBug>>();
 		for (BugInstance b : reporter.getBugCollection()) {
-			String filename = b.getPrimarySourceLineAnnotation().getSourceFile();
-			
+			String filename = b.getPrimarySourceLineAnnotation().getSourcePath();
+
 			if (!reportedBugs.containsKey(filename)) {
 				reportedBugs.put(filename, new ArrayList<ReportedBug>());
 			}
-			
-			ReportedBug rb = new ReportedBug(b.getBugRank(), b.getPriorityString(), b.getType(), b.getAbbrev(),
+
+			ReportedBug rb = new ReportedBug(b.getBugRank(), b.getBugRankCategory().toString(), b.getPriority(),
+					b.getPriorityString(), b.getType(), b.getAbbrev(), b.getBugPattern().getDetailPlainText(),
 					b.getBugPattern().getCategory(), b.getPrimaryClass().getClassName(),
-					b.getPrimarySourceLineAnnotation().getStartLine(), b.getPrimarySourceLineAnnotation().getEndLine(),
 					b.getAbridgedMessage(), b.getMessage());
 
 			if (b.getPrimaryMethod() != null) {
-				rb.setMethod(b.getPrimaryMethod().getMethodSignature());
+				String methodName = b.getPrimaryMethod().getFullMethod(b.getPrimaryClass());
+				rb.setMethod(methodName.substring(methodName.lastIndexOf(".")+1));
 			}
 
+			if (b.getPrimaryField() != null) {
+				rb.setField(b.getPrimaryField().getFieldName());
+			}
+			
+			if (b.getPrimaryLocalVariableAnnotation() != null) {
+				rb.setLocalVariable(b.getPrimaryLocalVariableAnnotation().getName());
+			}
+			
 			reportedBugs.get(filename).add(rb);
 		}
 

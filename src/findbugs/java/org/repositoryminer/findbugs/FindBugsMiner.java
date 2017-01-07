@@ -73,11 +73,11 @@ public class FindBugsMiner {
 
 	public FindBugsMiner(String repositoryId) {
 		RepositoryDocumentHandler repoHandler = new RepositoryDocumentHandler();
-		this.repository = Repository.parseDocument(repoHandler.findById(repositoryId, Projections.include("scm")));
+		this.repository = Repository.parseDocument(repoHandler.findById(repositoryId, Projections.include("scm", "path")));
 	}
 
 	public void findBugs(String hash) throws IllegalStateException, IOException, InterruptedException {
-		persistAnalysis(hash, null);
+		persistAnalysis(hash);
 	}
 
 	public void findBugs(String name, ReferenceType type)
@@ -86,7 +86,7 @@ public class FindBugsMiner {
 		Reference reference = Reference.parseDocument(refDoc);
 
 		String commitId = reference.getCommits().get(0);
-		persistAnalysis(commitId, reference);
+		persistAnalysis(commitId);
 	}
 
 	public void configure() throws IOException {
@@ -128,7 +128,7 @@ public class FindBugsMiner {
 		this.priority = priority;
 	}
 
-	private void persistAnalysis(String commitId, Reference reference)
+	private void persistAnalysis(String commitId)
 			throws IllegalStateException, IOException, InterruptedException {
 		Commit commit = Commit.parseDocument(commitPersist.findById(commitId, Projections.include("commit_date")));
 
@@ -138,12 +138,6 @@ public class FindBugsMiner {
 		List<Document> documents = new ArrayList<Document>(reportedBugs.size());
 		for (Entry<String, List<ReportedBug>> bug : reportedBugs.entrySet()) {
 			Document doc = new Document();
-
-			if (reference != null) {
-				doc.append("reference_name", reference.getName());
-				doc.append("reference_type", reference.getType().toString());
-			}
-
 			doc.append("commit", commit.getId());
 			doc.append("commit_date", commit.getCommitDate());
 			doc.append("repository", new ObjectId(repository.getId()));

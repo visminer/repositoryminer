@@ -10,12 +10,13 @@ public class FileInfo {
 	private int beginLine;
 	private int endLine;
 	private String filename;
+	private long filehash;
 	private float duplicationPercentage;
 
 	public Document toDocument() {
 		Document doc = new Document();
 		doc.append("begin_line", beginLine).append("end_line", endLine).append("filename", filename)
-				.append("duplicationPercentage", duplicationPercentage);
+				.append("filehash", filehash).append("duplicationPercentage", duplicationPercentage);
 
 		return doc;
 	}
@@ -24,15 +25,15 @@ public class FileInfo {
 		if (filesInfo == null) {
 			return new ArrayList<Document>();
 		}
-		
+
 		List<Document> docs = new ArrayList<Document>();
 		for (FileInfo fi : filesInfo) {
 			docs.add(fi.toDocument());
 		}
-		
+
 		return docs;
 	}
-	
+
 	public int getBeginLine() {
 		return beginLine;
 	}
@@ -55,6 +56,14 @@ public class FileInfo {
 
 	public void setFilename(String filename) {
 		this.filename = filename;
+	}
+
+	public long getFilehash() {
+		return filehash;
+	}
+
+	public void setFilehash(long filehash) {
+		this.filehash = filehash;
 	}
 
 	public float getDuplicationPercentage() {
