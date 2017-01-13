@@ -1,10 +1,12 @@
 package org.repositoryminer.effort.listener;
 
+import org.repositoryminer.postprocessing.IPostMiningListener;
+
 /**
  * <h1>Default implementation of IPostMiningListener</h1>
  * <p>
  * It provides a default instance of
- * {@link org.repositoryminer.listener.IPostMiningListener} to output mining steps
+ * {@link org.repositoryminer.postprocessing.IPostMiningListener} to output mining steps
  * to console. This default instance can be replaced by injecting a customized
  * one into
  * {@link org.repositoryminer.mining.RepositoryMiner#setPostMiningListener(IPostMiningListener)}

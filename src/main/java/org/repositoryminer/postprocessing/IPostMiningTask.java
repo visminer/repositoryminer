@@ -1,6 +1,5 @@
-package org.repositoryminer.effort.postprocessing;
+package org.repositoryminer.postprocessing;
 
-import org.repositoryminer.effort.listener.IPostMiningListener;
 import org.repositoryminer.mining.RepositoryMiner;
 import org.repositoryminer.model.Repository;
 

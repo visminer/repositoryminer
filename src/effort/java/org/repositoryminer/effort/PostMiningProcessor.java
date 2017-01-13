@@ -2,11 +2,11 @@ package org.repositoryminer.effort;
 
 import java.util.List;
 
-import org.repositoryminer.effort.listener.IPostMiningListener;
 import org.repositoryminer.effort.listener.PostMiningListener;
-import org.repositoryminer.effort.postprocessing.IPostMiningTask;
 import org.repositoryminer.mining.RepositoryMiner;
 import org.repositoryminer.model.Repository;
+import org.repositoryminer.postprocessing.IPostMiningListener;
+import org.repositoryminer.postprocessing.IPostMiningTask;
 
 /**
  * <h1>Processor of post mining tasks</h1>
