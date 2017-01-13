@@ -20,7 +20,6 @@ public class CodeDebt implements ITechnicalCodeDebt {
 	private CPDDocumentHandler cpdHandler;
 	private FindBugsDocumentHandler bugHandler;
 	private Map<String, Long> indicators;
-	private String[] classNames;
 
 	public CodeDebt() {
 		directAnalysisHandler = new DirectCodeAnalysisDocumentHandler();
@@ -40,7 +39,7 @@ public class CodeDebt implements ITechnicalCodeDebt {
 		long filehash = StringUtils.encodeToCRC32(filename);
 		detecCodeSmells(filehash, filestate);
 		detectDuplicatedCode(filehash, snapshot);
-		detectBugs(snapshot);
+		detectBugs(filehash, snapshot);
 		
 		if (indicators.size() == 0) {
 			return null;
@@ -60,11 +59,8 @@ public class CodeDebt implements ITechnicalCodeDebt {
 		}
 
 		List<Document> classes = (List<Document>) doc.get("classes");
-		classNames = new String[classes.size()];
 
 		for (int i = 0; i < classes.size(); i++) {
-			classNames[i] = classes.get(i).getString("name");
-
 			for (Document codesmell : (List<Document>) classes.get(i).get("codesmells")) {
 				TechnicalDebtIndicator indicator = TechnicalDebtIndicator.valueOf(codesmell.getString("codesmell"));
 
@@ -101,8 +97,8 @@ public class CodeDebt implements ITechnicalCodeDebt {
 	}
 
 	@SuppressWarnings("unchecked")
-	public void detectBugs(String snapshot) {
-		Document doc = bugHandler.findByClasses(classNames, snapshot, include("bugs.category"));
+	public void detectBugs(long fileshash, String snapshot) {
+		Document doc = bugHandler.findByFile(fileshash, snapshot, include("bugs.category"));
 
 		if (doc == null) {
 			return;
