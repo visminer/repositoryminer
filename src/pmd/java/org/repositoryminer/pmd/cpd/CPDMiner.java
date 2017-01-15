@@ -80,7 +80,7 @@ public class CPDMiner {
 	}
 
 	public void detectCopyPaste(String hash) throws IOException {
-		persistAnalysis(hash);
+		persistAnalysis(hash, null);
 	}
 
 	public void detectCopyPaste(String name, ReferenceType type) throws IOException {
@@ -88,7 +88,7 @@ public class CPDMiner {
 		Reference reference = Reference.parseDocument(refDoc);
 
 		String commitId = reference.getCommits().get(0);
-		persistAnalysis(commitId);
+		persistAnalysis(commitId, reference);
 	}
 
 	public void configure() throws IOException {
@@ -108,7 +108,7 @@ public class CPDMiner {
 		FileUtils.deleteFolder(tmpRepository);
 	}
 
-	private void persistAnalysis(String commitId) throws IOException {
+	private void persistAnalysis(String commitId, Reference ref) throws IOException {
 		Document commitDoc = commitPersist.findById(commitId, Projections.include("commit_date"));
 		Commit commit = Commit.parseDocument(commitDoc);
 
@@ -120,6 +120,12 @@ public class CPDMiner {
 		List<Document> documents = new ArrayList<Document>(occurrences.size());
 		for (Occurrence occurence : occurrences) {
 			Document doc = new Document();
+
+			if (ref != null) {
+				doc.append("reference_name", ref.getName());
+				doc.append("reference_type", ref.getType().toString());
+			}
+			
 			doc.append("commit", commit.getId());
 			doc.append("commit_date", commit.getCommitDate());
 			doc.append("repository", new ObjectId(repository.getId()));

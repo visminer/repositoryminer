@@ -86,7 +86,7 @@ public class ExCommentMiner {
 	}
 
 	public void mineToCommit(String hash) throws IOException {
-		persistAnalysis(hash);
+		persistAnalysis(hash, null);
 	}
 
 	public void mineToReference(String name, ReferenceType type) throws IOException {
@@ -94,10 +94,10 @@ public class ExCommentMiner {
 		Reference reference = Reference.parseDocument(refDoc);
 
 		String commitId = reference.getCommits().get(0);
-		persistAnalysis(commitId);
+		persistAnalysis(commitId, reference);
 	}
 
-	private void persistAnalysis(String commitId) throws IOException {
+	private void persistAnalysis(String commitId, Reference ref) throws IOException {
 		Commit commit = Commit.parseDocument(commitPersist.findById(commitId, Projections.include("commit_date")));
 
 		readCSVs();
@@ -105,6 +105,12 @@ public class ExCommentMiner {
 		List<Document> documents = new ArrayList<Document>(filesMap.size());
 		for (Entry<String, List<Integer>> entry : filesMap.entrySet()) {
 			Document doc = new Document();
+
+			if (ref != null) {
+				doc.append("reference_name", ref.getName());
+				doc.append("reference_type", ref.getType().toString());
+			}
+			
 			doc.append("commit", commit.getId());
 			doc.append("commit_date", commit.getCommitDate());
 			doc.append("repository", new ObjectId(repository.getId()));
