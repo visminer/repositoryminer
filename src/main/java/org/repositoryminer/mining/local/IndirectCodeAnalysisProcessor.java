@@ -25,7 +25,6 @@ import org.repositoryminer.model.Reference;
 import org.repositoryminer.parser.IParser;
 import org.repositoryminer.persistence.handler.CommitDocumentHandler;
 import org.repositoryminer.persistence.handler.IndirectCodeAnalysisDocumentHandler;
-import org.repositoryminer.persistence.handler.ReferenceDocumentHandler;
 import org.repositoryminer.scm.ISCM;
 import org.repositoryminer.utility.StringUtils;
 
@@ -58,12 +57,10 @@ public class IndirectCodeAnalysisProcessor {
 	List<FileEntry> processedFiles;
 
 	private IndirectCodeAnalysisDocumentHandler indirectAnalysisHandler;
-	private ReferenceDocumentHandler referenceHandler;
 	private CommitDocumentHandler commitHandler;
 
 	public IndirectCodeAnalysisProcessor() {
 		indirectAnalysisHandler = new IndirectCodeAnalysisDocumentHandler();
-		referenceHandler = new ReferenceDocumentHandler();
 		commitHandler = new CommitDocumentHandler();
 	}
 
@@ -95,12 +92,7 @@ public class IndirectCodeAnalysisProcessor {
 
 	public void startIncrementalAnalysis() throws IOException {
 		for (int i = 0; i < references.size(); i++) {
-			Document doc = referenceHandler.findById(references.get(i).getId(),
-					Projections.fields(Projections.include("commits"), Projections.slice("commits", 1)));
-
-			@SuppressWarnings("unchecked")
-			String commitId = ((List<String>) doc.get("commits")).get(0);
-
+			String commitId = references.get(i).getCommits().get(0);
 			if (indirectAnalysisHandler.hasRecord(repositoryId, commitId)) {
 				snapshots.remove(commitId);
 				references.remove(i);
@@ -133,13 +125,8 @@ public class IndirectCodeAnalysisProcessor {
 	}
 
 	private void processReferences() throws IOException {
-		// int idx = 0;
 		for (Reference ref : references) {
-			Document doc = referenceHandler.findById(ref.getId(),
-					Projections.fields(Projections.include("commits"), Projections.slice("commits", 1)));
-
-			@SuppressWarnings("unchecked")
-			String commitId = ((List<String>) doc.get("commits")).get(0);
+			String commitId = ref.getCommits().get(0);
 
 			snapshots.remove(commitId); // avoids to process some commit again
 
