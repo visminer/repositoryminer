@@ -1,4 +1,4 @@
-package org.repositoryminer.postprocessing;
+package org.repositoryminer.listener.postmining;
 
 /**
  * <h1>IPostMiningListener is a post mining tasks progress monitoring interface
@@ -20,17 +20,12 @@ package org.repositoryminer.postprocessing;
 public interface IPostMiningListener {
 
 	/**
-	 * Notifies the initiation of post mining tasks processing
-	 */
-	public void initPostMining();
-
-	/**
-	 * Notifies that the progress of a post mining task has started
+	 * Notifies that the post mining task has started
 	 * 
 	 * @param postMiningTaskName
 	 *            the name of the task being started
 	 */
-	public void initPostMiningTaskProgress(String postMiningTaskName);
+	public void notifyTaskStart(String postMiningTaskName);
 
 	/**
 	 * Notifies the progress of post mining tasks processing
@@ -42,6 +37,14 @@ public interface IPostMiningListener {
 	 * @param numberOfTaskSteps
 	 *            total number of task's steps to be processed
 	 */
-	public void postMiningTaskProgressChange(String taskStepName, int taskStepIndex, int numberOfTaskSteps);
+	public void notifyTaskProgress(String taskStepName, int taskStepIndex, int numberOfTaskSteps);
+
+	/**
+	 * Notifies that the post mining task has ended
+	 * 
+	 * @param postMiningTaskName
+	 *            the name of the task being ended
+	 */
+	public void notifyTaskEnd(String postMiningTaskName);
 
 }

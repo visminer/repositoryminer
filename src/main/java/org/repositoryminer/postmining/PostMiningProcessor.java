@@ -1,12 +1,11 @@
-package org.repositoryminer.effort;
+package org.repositoryminer.postmining;
 
 import java.util.List;
 
-import org.repositoryminer.effort.listener.PostMiningListener;
+import org.repositoryminer.listener.postmining.IPostMiningListener;
+import org.repositoryminer.listener.postmining.NullPostMiningListener;
 import org.repositoryminer.mining.RepositoryMiner;
 import org.repositoryminer.model.Repository;
-import org.repositoryminer.postprocessing.IPostMiningListener;
-import org.repositoryminer.postprocessing.IPostMiningTask;
 
 /**
  * <h1>Processor of post mining tasks</h1>
@@ -23,16 +22,15 @@ import org.repositoryminer.postprocessing.IPostMiningTask;
  * Reference to {@link RepositoryMiner} is necessary to provide access to the
  * parameters injected by caller routines that are important to the post-mining.
  * That is the case, for instance, with the injected list of tasks (
- * {@link org.repositoryminer.postprocessing.IPostMiningTask}) that must be
+ * {@link org.repositoryminer.postmining.IPostMiningTask}) that must be
  * executed.
  */
 public class PostMiningProcessor {
 
 	private List<IPostMiningTask> tasks;
-	private IPostMiningListener listener = PostMiningListener.getDefault();
+	private IPostMiningListener listener = new NullPostMiningListener();
 
 	public PostMiningProcessor(List<IPostMiningTask> tasks) {
-		super();
 		this.tasks = tasks;
 	}
 	
@@ -63,8 +61,9 @@ public class PostMiningProcessor {
 	 */
 	public Repository executeTasks(Repository repository, RepositoryMiner repositoryMiner) {
 		for (IPostMiningTask task : tasks) {
-			listener.initPostMiningTaskProgress(task.getTaskName());
+			listener.notifyTaskStart(task.getTaskName());
 			task.execute(repositoryMiner, repository, listener);
+			listener.notifyTaskEnd(task.getTaskName());
 		}
 
 		return repository;

@@ -101,7 +101,7 @@ public class MiningProcessor {
 			Document refDoc = ref.toDocument();
 			refDocumentHandler.insert(refDoc);
 
-			ref.setCommits(null);
+			ref.setCommits(ref.getCommits().subList(0, 1)); // copy only the last commit in the reference
 			ref.setId(refDoc.getObjectId("_id").toString());
 
 			saveCommits(repositoryId, ref);
