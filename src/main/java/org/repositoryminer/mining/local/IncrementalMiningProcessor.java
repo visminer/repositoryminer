@@ -149,7 +149,7 @@ public class IncrementalMiningProcessor {
 		wdProcessor.setReferences(selectedReferences);
 		wdProcessor.setVisitedCommits(processedCommits);
 		wdProcessor.setRepositoryId(repositoryId);
-		wdProcessor.setListener(listener);
+		wdProcessor.setMiningListener(listener);
 		wdProcessor.processWorkingDirectories();
 	}
 

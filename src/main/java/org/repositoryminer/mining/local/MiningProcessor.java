@@ -198,7 +198,7 @@ public class MiningProcessor {
 		WorkingDirectoryProcessor wdProcessor = new WorkingDirectoryProcessor();
 		wdProcessor.setReferences(selectedReferences);
 		wdProcessor.setRepositoryId(repositoryId);
-		wdProcessor.setListener(listener);
+		wdProcessor.setMiningListener(listener);
 		wdProcessor.processWorkingDirectories();
 	}
 

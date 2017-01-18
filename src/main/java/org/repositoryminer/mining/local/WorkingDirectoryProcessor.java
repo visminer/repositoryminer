@@ -29,7 +29,7 @@ public class WorkingDirectoryProcessor {
 	private String repositoryId; 
 	private List<Reference> references;
 	private WorkingDirectory workingDirectory;
-	private IMiningListener listener;
+	private IMiningListener miningListener;
 	
 	public WorkingDirectoryProcessor() {
 		commitHandler = new CommitDocumentHandler();
@@ -49,8 +49,8 @@ public class WorkingDirectoryProcessor {
 		this.references = references;
 	}
 
-	public void setListener(IMiningListener listener) {
-		this.listener = listener;
+	public void setMiningListener(IMiningListener miningListener) {
+		this.miningListener = miningListener;
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -65,7 +65,7 @@ public class WorkingDirectoryProcessor {
 
 			List<String> commits = (List<String>) refDoc.get("commits");
 
-			listener.notifyWorkingDirectoriesMiningStart(ref.getName(), ref.getType(), commits.size());
+			miningListener.notifyWorkingDirectoriesMiningStart(ref.getName(), ref.getType(), commits.size());
 			
 			int end = commits.size();
 			int begin = Math.max(end - COMMIT_RANGE, 0);
@@ -78,7 +78,7 @@ public class WorkingDirectoryProcessor {
 			}
 
 			acceptedCommits += processCommits(new ArrayList(commits.subList(begin, end)), ref);
-			listener.notifyWorkingDirectoriesMiningEnd(ref.getName(), ref.getType(), acceptedCommits);
+			miningListener.notifyWorkingDirectoriesMiningEnd(ref.getName(), ref.getType(), acceptedCommits);
 		}
 	}
 
@@ -107,7 +107,7 @@ public class WorkingDirectoryProcessor {
 		List<Document> wdDocs = new ArrayList<Document>();
 		for (Document doc : commitHandler.findByIdColl(repositoryId, newCommits, Projections.include("diffs"))) {
 			String commitId = doc.get("_id").toString();
-			listener.notifyWorkingDirectoriesMiningProgress(ref.getName(), ref.getType(), commitId);
+			miningListener.notifyWorkingDirectoriesMiningProgress(ref.getName(), ref.getType(), commitId);
 			
 			visitedCommits.add(commitId);
 			workingDirectory.setId(commitId);
