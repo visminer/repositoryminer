@@ -74,11 +74,15 @@ public class CodeDebt implements ITechnicalCodeDebt {
 				TechnicalDebtIndicator indicator = TechnicalDebtIndicator
 						.getTechnicalDebtIndicator(codesmell.getString("codesmell"));
 
+				if (indicator == null) {
+					continue;
+				}
+				
 				if (indicator.equals(TechnicalDebtIndicator.COMPLEX_METHOD)
 						|| indicator.equals(TechnicalDebtIndicator.BRAIN_METHOD)) {
 					List<Document> methods = (List<Document>) codesmell.get("methods");
 					addValueToIndicator(indicator, methods.size());
-				} else if (indicator.equals(TechnicalDebtIndicator.GOD_CLASS)) {
+				} else {
 					addValueToIndicator(indicator, 1);
 				}
 
