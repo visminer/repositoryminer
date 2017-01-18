@@ -193,7 +193,7 @@ public class RepositoryMiner {
 	 * 
 	 * @throws IOException
 	 */
-	public void mine() throws IOException {
+	public Repository mine() throws IOException {
 		RepositoryDocumentHandler repoDocHandler = new RepositoryDocumentHandler();
 		if (repoDocHandler.checkIfRepositoryExistsById(name)) {
 			IncrementalMiningProcessor processor = new IncrementalMiningProcessor();
@@ -203,14 +203,14 @@ public class RepositoryMiner {
 			processor.mine(this);
 		}
 
-		if (!hasPostMiningTasks()) {
-			return;
+		if (hasPostMiningTasks()) {
+			PostMiningProcessor postProcessor = new PostMiningProcessor();
+			postProcessor.setListener(postMiningListener);
+			postProcessor.setTasks(getPostMiningTasks());
+			postProcessor.executeTasks(Repository.parseDocument(repoDocHandler.findByName(name)), this);
 		}
 
-		PostMiningProcessor postProcessor = new PostMiningProcessor();
-		postProcessor.setListener(postMiningListener);
-		postProcessor.setTasks(getPostMiningTasks());
-		postProcessor.executeTasks(Repository.parseDocument(repoDocHandler.findByName(name)), this);
+		return Repository.parseDocument(repoDocHandler.findByName(name));
 	}
 
 	public boolean hasParsers() {
