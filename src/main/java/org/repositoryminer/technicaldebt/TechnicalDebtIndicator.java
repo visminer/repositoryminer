@@ -9,5 +9,15 @@ public enum TechnicalDebtIndicator {
 	SLOW_ALGORITHM,
 	MULTITHREAD_CORRECTNESS,
 	AUTOMATIC_STATIC_ANALYSIS_ISSUES;
+
+	public static TechnicalDebtIndicator getTechnicalDebtIndicator(String indicatorName) {
+		for (TechnicalDebtIndicator indicator : TechnicalDebtIndicator.values()) {
+			if (indicator.toString().equals(indicatorName)) {
+				return indicator;
+			}
+		}
+		
+		return null;
+	}
 	
 }

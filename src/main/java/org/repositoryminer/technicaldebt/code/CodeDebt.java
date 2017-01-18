@@ -19,7 +19,7 @@ public class CodeDebt implements ITechnicalCodeDebt {
 	private DirectCodeAnalysisDocumentHandler directAnalysisHandler;
 	private CPDDocumentHandler cpdHandler;
 	private FindBugsDocumentHandler bugHandler;
-	private Map<String, Long> indicators;
+	private Map<String, Integer> indicators;
 
 	public CodeDebt() {
 		directAnalysisHandler = new DirectCodeAnalysisDocumentHandler();
@@ -34,20 +34,29 @@ public class CodeDebt implements ITechnicalCodeDebt {
 
 	@Override
 	public Document detect(String filename, String filestate, String snapshot) {
-		indicators = new HashMap<String, Long>();
-		
+		indicators = new HashMap<String, Integer>();
+
 		long filehash = StringUtils.encodeToCRC32(filename);
 		detecCodeSmells(filehash, filestate);
 		detectDuplicatedCode(filehash, snapshot);
 		detectBugs(filehash, snapshot);
-		
+
 		if (indicators.size() == 0) {
 			return null;
 		}
-		
+
 		Document indicatorsDoc = new Document();
 		indicatorsDoc.putAll(indicators);
 		return new Document("debt", TechnicalDebtId.CODE_DEBT.toString()).append("indicators", indicatorsDoc);
+	}
+
+	private void addValueToIndicator(TechnicalDebtIndicator indicator, int value) {
+		if (!indicators.containsKey(indicator.toString())) {
+			indicators.put(indicator.toString(), value);
+		} else {
+			int newValue = indicators.get(indicator.toString()) + value;
+			indicators.replace(indicator.toString(), newValue);
+		}
 	}
 
 	@SuppressWarnings("unchecked")
@@ -62,22 +71,15 @@ public class CodeDebt implements ITechnicalCodeDebt {
 
 		for (int i = 0; i < classes.size(); i++) {
 			for (Document codesmell : (List<Document>) classes.get(i).get("codesmells")) {
-				TechnicalDebtIndicator indicator = TechnicalDebtIndicator.valueOf(codesmell.getString("codesmell"));
+				TechnicalDebtIndicator indicator = TechnicalDebtIndicator
+						.getTechnicalDebtIndicator(codesmell.getString("codesmell"));
 
-				if (indicator == null) {
-					continue;
-				}
-
-				if (!indicators.containsKey(indicator.toString())) {
-					indicators.put(indicator.toString(), 0l);
-				}
-
-				if (indicator == TechnicalDebtIndicator.COMPLEX_METHOD
-						|| indicator == TechnicalDebtIndicator.BRAIN_METHOD) {
+				if (indicator.equals(TechnicalDebtIndicator.COMPLEX_METHOD)
+						|| indicator.equals(TechnicalDebtIndicator.BRAIN_METHOD)) {
 					List<Document> methods = (List<Document>) codesmell.get("methods");
-					indicators.put(indicator.toString(), indicators.get(indicator.toString()) + methods.size());
-				} else {
-					indicators.put(indicator.toString(), indicators.get(indicator.toString()) + 1);
+					addValueToIndicator(indicator, methods.size());
+				} else if (indicator.equals(TechnicalDebtIndicator.GOD_CLASS)) {
+					addValueToIndicator(indicator, 1);
 				}
 
 			}
@@ -86,14 +88,7 @@ public class CodeDebt implements ITechnicalCodeDebt {
 
 	public void detectDuplicatedCode(long fileshash, String snapshot) {
 		long occurrences = cpdHandler.countOccurrences(fileshash, snapshot);
-
-		if (occurrences == 0) {
-			return;
-		}
-
-		if (occurrences > 0) {
-			indicators.put(TechnicalDebtIndicator.DUPLICATED_CODE.toString(), occurrences);
-		}
+		addValueToIndicator(TechnicalDebtIndicator.DUPLICATED_CODE, new Long(occurrences).intValue());
 	}
 
 	@SuppressWarnings("unchecked")
@@ -103,16 +98,15 @@ public class CodeDebt implements ITechnicalCodeDebt {
 		if (doc == null) {
 			return;
 		}
-		
+
 		List<Document> bugs = (List<Document>) doc.get("bugs");
+		addValueToIndicator(TechnicalDebtIndicator.AUTOMATIC_STATIC_ANALYSIS_ISSUES, bugs.size());
 		
 		for (Document bug : bugs) {
 			String category = bug.getString("category");
 			TechnicalDebtIndicator indicator = null;
 
-			if (category.equals("BAD_PRACTICE") || category.equals("STYLE") || category.equals("CORRECTNESS")) {
-				indicator = TechnicalDebtIndicator.AUTOMATIC_STATIC_ANALYSIS_ISSUES;
-			} else if (category.equals("MT_CORRECTNESS")) {
+			if (category.equals("MT_CORRECTNESS")) {
 				indicator = TechnicalDebtIndicator.MULTITHREAD_CORRECTNESS;
 			} else if (category.equals("PERFORMANCE")) {
 				indicator = TechnicalDebtIndicator.SLOW_ALGORITHM;
@@ -121,12 +115,8 @@ public class CodeDebt implements ITechnicalCodeDebt {
 			if (indicator == null) {
 				continue;
 			}
-
-			if (!indicators.containsKey(indicator.toString())) {
-				indicators.put(indicator.toString(), 0l);
-			}
-
-			indicators.put(indicator.toString(), indicators.get(indicator.toString()) + 1);
+			
+			addValueToIndicator(indicator, 1);
 		}
 	}
 
