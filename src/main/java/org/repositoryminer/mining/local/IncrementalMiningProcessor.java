@@ -9,6 +9,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.bson.Document;
+import org.repositoryminer.listener.mining.IMiningListener;
 import org.repositoryminer.mining.RepositoryMiner;
 import org.repositoryminer.model.Commit;
 import org.repositoryminer.model.Contributor;
@@ -29,6 +30,8 @@ public class IncrementalMiningProcessor {
 	private static final int COMMITS_RANGE = 3000;
 
 	private RepositoryMiner repositoryMiner;
+	private IMiningListener listener;
+
 	private ISCM scm;
 	private Set<String> processedCommits;
 	private Set<Contributor> contributors;
@@ -42,13 +45,20 @@ public class IncrementalMiningProcessor {
 		selectedReferences = new ArrayList<Reference>();
 
 		ReferenceDocumentHandler refDocumentHandler = new ReferenceDocumentHandler();
-		for (Reference ref : scm.getReferences()) {
+		List<Reference> references = scm.getReferences();
+
+		listener.notifyReferencesMiningStart(references.size());
+		Set<String> commitsToSkip = new HashSet<String>(processedCommits);
+
+		for (Reference ref : references) {
 			Entry<String, ReferenceType> entry = new AbstractMap.SimpleEntry<String, ReferenceType>(ref.getName(),
 					ref.getType());
 
 			if (!repositoryMiner.getReferences().contains(entry)) {
 				continue;
 			}
+
+			listener.notifyReferencesMiningProgress(ref.getName(), ref.getType());
 
 			ref.setRepository(repositoryId);
 			Document refDoc = refDocumentHandler.findByPath(ref.getPath(), repositoryId, Projections.include("_id"));
@@ -62,22 +72,31 @@ public class IncrementalMiningProcessor {
 						scm.getReferenceCommits(ref.getPath(), ref.getType()));
 			}
 
+			listener.notifyCommitsMiningStart(ref.getName(), ref.getType(), ref.getCommits().size());
+			listener.notifyCommitsMiningEnd(ref.getName(), ref.getType(), updateCommits(ref, commitsToSkip));
+			
+			ref.setCommits(ref.getCommits().subList(0, 1)); // copy only the last commit in the reference
 			ref.setId(refDoc.getObjectId("_id").toString());
-			ref.setCommits(null);
 			selectedReferences.add(ref);
 		}
+
+		listener.notifyReferencesMiningEnd(selectedReferences.size());
 	}
 
-	private void updateCommits(Reference reference, Set<String> commitsToSkip) {
+	private int updateCommits(Reference reference, Set<String> commitsToSkip) {
 		CommitDocumentHandler documentHandler = new CommitDocumentHandler();
 
 		int skip = 0;
+		int acceptedCommits = 0;
 		List<Commit> commits = scm.getCommits(skip, COMMITS_RANGE, reference, commitsToSkip);
 
 		while (commits.size() > 0) {
 			List<Document> commitsDoc = new ArrayList<Document>();
+			acceptedCommits += commits.size();
 
 			for (Commit commit : commits) {
+				listener.notifyCommitsMiningProgress(reference.getName(), reference.getType(), commit.getId());
+
 				commit.setRepository(reference.getRepository());
 				commit.setIssueReferences(issueExtractor.analyzeMessage(commit.getMessage()));
 
@@ -92,10 +111,16 @@ public class IncrementalMiningProcessor {
 			skip += COMMITS_RANGE;
 			commits = scm.getCommits(skip, COMMITS_RANGE, reference, commitsToSkip);
 		}
+
+		return acceptedCommits;
 	}
 
 	public void mine(RepositoryMiner repositoryMiner) throws IOException {
 		this.repositoryMiner = repositoryMiner;
+		listener = repositoryMiner.getMiningListener();
+		newCommits = new ArrayList<String>();
+		
+		listener.notifyMiningStart(repositoryMiner.getName());
 
 		RepositoryDocumentHandler repoHandler = new RepositoryDocumentHandler();
 		Repository repository = Repository.parseDocument(repoHandler.findByName(repositoryMiner.getName()));
@@ -108,18 +133,15 @@ public class IncrementalMiningProcessor {
 		loadAllCommits(repository.getId());
 
 		updateReferences(repository.getId());
-
-		newCommits = new ArrayList<String>();
-		Set<String> commitsToSkip = new HashSet<String>(processedCommits);
-		for (Reference ref : selectedReferences) {
-			updateCommits(ref, commitsToSkip);
-		}
-
+		
 		updateWorkingDirectories(repository.getId());
+		
 		calculateAndDetect(tempRepo, repository.getId());
 
 		scm.close();
 		FileUtils.deleteFolder(tempRepo);
+
+		listener.notifyMiningEnd(repositoryMiner.getName());
 	}
 
 	private void updateWorkingDirectories(String repositoryId) {
@@ -127,6 +149,7 @@ public class IncrementalMiningProcessor {
 		wdProcessor.setReferences(selectedReferences);
 		wdProcessor.setVisitedCommits(processedCommits);
 		wdProcessor.setRepositoryId(repositoryId);
+		wdProcessor.setListener(listener);
 		wdProcessor.processWorkingDirectories();
 	}
 
