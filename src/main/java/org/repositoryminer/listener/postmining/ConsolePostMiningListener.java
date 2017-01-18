@@ -13,17 +13,17 @@ public class ConsolePostMiningListener implements IPostMiningListener {
 
 	@Override
 	public void notifyTaskStart(String postMiningTaskName) {
-		System.out.println("Starting task " + postMiningTaskName);
+		System.out.printf("Starting task %s", postMiningTaskName);
 	}
 
 	@Override
 	public void notifyTaskProgress(String taskStepName, int taskStepIndex, int numberOfTaskSteps) {
-		System.out.println("Processing " + taskStepIndex + " of " + numberOfTaskSteps + " steps in " + taskStepName);
+		System.out.printf("Processing %d of %d steps in %s", taskStepIndex, numberOfTaskSteps, taskStepName);
 	}
 
 	@Override
 	public void notifyTaskEnd(String postMiningTaskName) {
-		System.out.println("Finishing task " + postMiningTaskName);
+		System.out.printf("Finishing task %s", postMiningTaskName);
 	}
 
 }

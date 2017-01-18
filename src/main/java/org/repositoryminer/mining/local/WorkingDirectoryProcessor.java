@@ -1,12 +1,12 @@
 package org.repositoryminer.mining.local;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.bson.Document;
+import org.repositoryminer.listener.mining.IMiningListener;
 import org.repositoryminer.model.Diff;
 import org.repositoryminer.model.Reference;
 import org.repositoryminer.model.WorkingDirectory;
@@ -29,6 +29,7 @@ public class WorkingDirectoryProcessor {
 	private String repositoryId; 
 	private List<Reference> references;
 	private WorkingDirectory workingDirectory;
+	private IMiningListener listener;
 	
 	public WorkingDirectoryProcessor() {
 		commitHandler = new CommitDocumentHandler();
@@ -48,6 +49,10 @@ public class WorkingDirectoryProcessor {
 		this.references = references;
 	}
 
+	public void setListener(IMiningListener listener) {
+		this.listener = listener;
+	}
+
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void processWorkingDirectories() {
 		if (visitedCommits == null) {
@@ -59,37 +64,40 @@ public class WorkingDirectoryProcessor {
 			Document refDoc = referenceHandler.findById(ref.getId(), Projections.include("commits"));
 
 			List<String> commits = (List<String>) refDoc.get("commits");
-			Collections.reverse(commits);
 
-			int begin = 0;
-			int end = Math.min(commits.size(), COMMIT_RANGE);
-
-			while (end < commits.size()) {
-				processCommits(new ArrayList(commits.subList(begin, end)), ref.getName(), begin, commits.size());
-				begin = end;
-				end = Math.min(commits.size(), COMMIT_RANGE + end);
+			listener.notifyWorkingDirectoriesMiningStart(ref.getName(), ref.getType(), commits.size());
+			
+			int end = commits.size();
+			int begin = Math.max(end - COMMIT_RANGE, 0);
+			int acceptedCommits = 0;
+			
+			while (begin > 0) {
+				acceptedCommits += processCommits(new ArrayList(commits.subList(begin, end)), ref);
+				end = begin;
+				begin = Math.max(end - COMMIT_RANGE, 0);
 			}
 
-			processCommits(new ArrayList(commits.subList(begin, end)), ref.getName(), begin, commits.size());
+			acceptedCommits += processCommits(new ArrayList(commits.subList(begin, end)), ref);
+			listener.notifyWorkingDirectoriesMiningEnd(ref.getName(), ref.getType(), acceptedCommits);
 		}
 	}
 
 	@SuppressWarnings("unchecked")
-	private void processCommits(List<String> commits, String refName, int progress, int qtdCommits) {
+	private int processCommits(List<String> commits, Reference ref) {
 		// not selects already processed commits
 		List<String> newCommits = new ArrayList<String>();
 		String prevCommit = null;
 		
-		for (String commit : commits) {
-			if (visitedCommits.contains(commit)) {
-				prevCommit = commit;
+		for (int i = commits.size() - 1; i >= 0; i--) {
+			if (visitedCommits.contains(commits.get(i))) {
+				prevCommit = commits.get(i);
 			} else {
-				newCommits.add(commit);
+				newCommits.add(commits.get(i));
 			}
 		}
 		
 		if (newCommits.size() == 0) {
-			return;
+			return 0;
 		}
 		
 		if (prevCommit != null) {
@@ -99,6 +107,7 @@ public class WorkingDirectoryProcessor {
 		List<Document> wdDocs = new ArrayList<Document>();
 		for (Document doc : commitHandler.findByIdColl(repositoryId, newCommits, Projections.include("diffs"))) {
 			String commitId = doc.get("_id").toString();
+			listener.notifyWorkingDirectoriesMiningProgress(ref.getName(), ref.getType(), commitId);
 			
 			visitedCommits.add(commitId);
 			workingDirectory.setId(commitId);
@@ -108,6 +117,7 @@ public class WorkingDirectoryProcessor {
 		}
 		
 		wdHandler.insertMany(wdDocs);
+		return wdDocs.size();
 	}
 
 	private void processDiff(List<Diff> diffs) {

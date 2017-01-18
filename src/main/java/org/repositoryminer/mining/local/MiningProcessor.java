@@ -11,6 +11,7 @@ import java.util.Map.Entry;
 
 import org.apache.commons.io.FilenameUtils;
 import org.bson.Document;
+import org.repositoryminer.listener.mining.IMiningListener;
 import org.repositoryminer.mining.RepositoryMiner;
 import org.repositoryminer.model.Commit;
 import org.repositoryminer.model.Contributor;
@@ -74,20 +75,26 @@ public class MiningProcessor {
 
 	private ISCM scm;
 	private IssueExtractor messageAnalyzer;
+	
 	private RepositoryMiner repositoryMiner;
+	private IMiningListener listener;
+	
 	private List<Reference> selectedReferences;
-	private Set<String> visitedCommits;
+	private Set<String> selectedCommits;
 	private Set<Contributor> contributors;
 
 	private void saveReferences(String repositoryId) {
 		selectedReferences = new ArrayList<Reference>();
 		contributors = new HashSet<Contributor>();
-		visitedCommits = new HashSet<String>();
+		selectedCommits = new HashSet<String>();
 		messageAnalyzer = new IssueExtractor();
 
 		ReferenceDocumentHandler refDocumentHandler = new ReferenceDocumentHandler();
-
-		for (Reference ref : scm.getReferences()) {
+		List<Reference> references = scm.getReferences();
+		
+		listener.notifyReferencesMiningStart(references.size());
+		
+		for (Reference ref : references) {
 			Entry<String, ReferenceType> entry = new AbstractMap.SimpleEntry<String, ReferenceType>(ref.getName(),
 					ref.getType());
 
@@ -95,43 +102,55 @@ public class MiningProcessor {
 				continue;
 			}
 
+			listener.notifyReferencesMiningProgress(ref.getName(), ref.getType());
+			
 			ref.setRepository(repositoryId);
 			ref.setCommits(scm.getReferenceCommits(ref.getPath(), ref.getType()));
 
 			Document refDoc = ref.toDocument();
 			refDocumentHandler.insert(refDoc);
 
+			listener.notifyCommitsMiningStart(ref.getName(), ref.getType(), ref.getCommits().size());
+			listener.notifyCommitsMiningEnd(ref.getName(), ref.getType(), saveCommits(repositoryId, ref));
+			
 			ref.setCommits(ref.getCommits().subList(0, 1)); // copy only the last commit in the reference
 			ref.setId(refDoc.getObjectId("_id").toString());
-
-			saveCommits(repositoryId, ref);
 			selectedReferences.add(ref);
 		}
+		
+		listener.notifyReferencesMiningEnd(selectedReferences.size());
 	}
 
-	private void saveCommits(String repositoryId, Reference reference) {
+	private int saveCommits(String repositoryId, Reference reference) {
 		CommitDocumentHandler documentHandler = new CommitDocumentHandler();
 
 		int skip = 0;
-		List<Commit> commits = scm.getCommits(skip, COMMITS_RANGE, reference, visitedCommits);
+		int acceptedCommits = 0;
+		
+		List<Commit> commits = scm.getCommits(skip, COMMITS_RANGE, reference, selectedCommits);
 
 		while (commits.size() > 0) {
 			List<Document> commitsDoc = new ArrayList<Document>();
-
+			acceptedCommits += commits.size();
+			
 			for (Commit commit : commits) {
+				listener.notifyCommitsMiningProgress(reference.getName(), reference.getType(), commit.getId());
+				
 				commit.setRepository(repositoryId);
 				commit.setIssueReferences(messageAnalyzer.analyzeMessage(commit.getMessage()));
 
 				contributors.add(commit.getCommitter());
 				commitsDoc.add(commit.toDocument());
 
-				visitedCommits.add(commit.getId());
+				selectedCommits.add(commit.getId());
 			}
 
 			documentHandler.insertMany(commitsDoc);
 			skip += COMMITS_RANGE;
-			commits = scm.getCommits(skip, COMMITS_RANGE, reference, visitedCommits);
+			commits = scm.getCommits(skip, COMMITS_RANGE, reference, selectedCommits);
 		}
+		
+		return acceptedCommits;
 	}
 
 	/**
@@ -145,7 +164,10 @@ public class MiningProcessor {
 	 */
 	public void mine(RepositoryMiner repositoryMiner) throws IOException {
 		this.repositoryMiner = repositoryMiner;
+		this.listener = repositoryMiner.getMiningListener();
 
+		listener.notifyMiningStart(repositoryMiner.getName());
+		
 		File repositoryFolder = new File(repositoryMiner.getPath());
 		String tempRepo = FileUtils.copyFolderToTmp(repositoryFolder.getAbsolutePath(), repositoryMiner.getName());
 
@@ -168,6 +190,8 @@ public class MiningProcessor {
 
 		scm.close();
 		FileUtils.deleteFolder(tempRepo);
+		
+		listener.notifyMiningEnd(repositoryMiner.getName());
 	}
 
 	private void saveWorkingDirectories(String repositoryId) {
@@ -175,6 +199,7 @@ public class MiningProcessor {
 		wdProcessor.setReferences(selectedReferences);
 		wdProcessor.setRepositoryId(repositoryId);
 		wdProcessor.processWorkingDirectories();
+		wdProcessor.setListener(listener);
 	}
 
 	/**
@@ -194,7 +219,7 @@ public class MiningProcessor {
 
 		if (repositoryMiner.hasDirectCodeMetrics() || repositoryMiner.hasDirectCodeSmells()) {
 			DirectCodeAnalysisProcessor processor = new DirectCodeAnalysisProcessor();
-			processor.setReferences(selectedReferences);
+			processor.setSelectedCommits(new ArrayList<String>(selectedCommits));
 			processor.setSCM(scm);
 			processor.setRepositoryMiner(repositoryMiner);
 			processor.setRepositoryData(repositoryId, tempRepo);
@@ -204,7 +229,7 @@ public class MiningProcessor {
 		if (repositoryMiner.hasIndirectCodeMetrics() || repositoryMiner.hasIndirectCodeSmells()) {
 			List<String> validSnapshots = new ArrayList<String>();
 			for (String hash : repositoryMiner.getSnapshots()) {
-				if (visitedCommits.contains(hash)) {
+				if (selectedCommits.contains(hash)) {
 					validSnapshots.add(hash);
 				}
 			}

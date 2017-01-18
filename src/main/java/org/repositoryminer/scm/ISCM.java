@@ -49,11 +49,11 @@ public interface ISCM {
 	public List<Commit> getCommits(int skip, int maxCount, Reference reference, Collection<String> commitsToSkip);
 
 	/**
-	 * @param fullName
+	 * @param name
 	 * @param type
 	 * @return A list of commits names in the reference.
 	 */
-	public List<String> getReferenceCommits(String fullName, ReferenceType type);
+	public List<String> getReferenceCommits(String name, ReferenceType type);
 
 	/**
 	 * @param treeName

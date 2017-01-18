@@ -10,10 +10,17 @@ import org.repositoryminer.codemetric.direct.IDirectCodeMetric;
 import org.repositoryminer.codemetric.indirect.IIndirectCodeMetric;
 import org.repositoryminer.codesmell.direct.IDirectCodeSmell;
 import org.repositoryminer.codesmell.indirect.IIndirectCodeSmell;
+import org.repositoryminer.listener.mining.IMiningListener;
+import org.repositoryminer.listener.mining.NullMiningListener;
+import org.repositoryminer.listener.postmining.IPostMiningListener;
+import org.repositoryminer.listener.postmining.NullPostMiningListener;
 import org.repositoryminer.mining.local.IncrementalMiningProcessor;
 import org.repositoryminer.mining.local.MiningProcessor;
+import org.repositoryminer.model.Repository;
 import org.repositoryminer.parser.IParser;
 import org.repositoryminer.persistence.handler.RepositoryDocumentHandler;
+import org.repositoryminer.postmining.IPostMiningTask;
+import org.repositoryminer.postmining.PostMiningProcessor;
 import org.repositoryminer.scm.ReferenceType;
 import org.repositoryminer.scm.SCMType;
 
@@ -64,6 +71,10 @@ public class RepositoryMiner {
 	private List<Entry<String, ReferenceType>> references;
 	private List<String> snapshots;
 
+	private IMiningListener miningListener = new NullMiningListener();
+	private IPostMiningListener postMiningListener = new NullPostMiningListener();
+	private List<IPostMiningTask> postMiningTasks;
+
 	public boolean addParser(IParser parser) {
 		for (IParser p : getParsers()) {
 			if (p.getLanguage() == parser.getLanguage()) {
@@ -95,7 +106,7 @@ public class RepositoryMiner {
 
 		indirectCodeMetrics.add(codeMetric);
 		return true;
-	}	
+	}
 
 	public boolean addDirectCodeSmell(IDirectCodeSmell codeSmell) {
 		for (IDirectCodeSmell smell : getDirectCodeSmells()) {
@@ -135,6 +146,16 @@ public class RepositoryMiner {
 		}
 
 		snapshots.add(snapshot);
+		return true;
+	}
+
+	public boolean addPostTaskMining(IPostMiningTask task) {
+		for (IPostMiningTask task2 : getPostMiningTasks()) {
+			if (task2.getTaskName().equals(task.getTaskName())) {
+				return false;
+			}
+		}
+		postMiningTasks.add(task);
 		return true;
 	}
 
@@ -181,6 +202,15 @@ public class RepositoryMiner {
 			MiningProcessor processor = new MiningProcessor();
 			processor.mine(this);
 		}
+
+		if (!hasPostMiningTasks()) {
+			return;
+		}
+
+		PostMiningProcessor postProcessor = new PostMiningProcessor();
+		postProcessor.setListener(postMiningListener);
+		postProcessor.setTasks(getPostMiningTasks());
+		postProcessor.executeTasks(Repository.parseDocument(repoDocHandler.findByName(name)), this);
 	}
 
 	public boolean hasParsers() {
@@ -201,6 +231,10 @@ public class RepositoryMiner {
 
 	public boolean hasIndirectCodeSmells() {
 		return getIndirectCodeSmell().size() > 0;
+	}
+
+	public boolean hasPostMiningTasks() {
+		return getPostMiningTasks().size() > 0;
 	}
 
 	// getters and setters
@@ -327,6 +361,39 @@ public class RepositoryMiner {
 
 	public void setSnapshots(List<String> snapshots) {
 		this.snapshots = snapshots;
+	}
+
+	public IMiningListener getMiningListener() {
+		if (miningListener == null) {
+			miningListener = new NullMiningListener();
+		}
+		return miningListener;
+	}
+
+	public void setMiningListener(IMiningListener miningListener) {
+		this.miningListener = miningListener;
+	}
+
+	public IPostMiningListener getPostMiningListener() {
+		if (postMiningListener == null) {
+			postMiningListener = new NullPostMiningListener();
+		}
+		return postMiningListener;
+	}
+
+	public void setPostMiningListener(IPostMiningListener postMiningListener) {
+		this.postMiningListener = postMiningListener;
+	}
+
+	public List<IPostMiningTask> getPostMiningTasks() {
+		if (postMiningTasks == null) {
+			postMiningTasks = new ArrayList<IPostMiningTask>();
+		}
+		return postMiningTasks;
+	}
+
+	public void setPostMiningTasks(List<IPostMiningTask> postMiningTasks) {
+		this.postMiningTasks = postMiningTasks;
 	}
 
 }

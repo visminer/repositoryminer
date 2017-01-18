@@ -6,10 +6,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.commons.io.FilenameUtils;
 import org.bson.Document;
@@ -18,14 +16,13 @@ import org.repositoryminer.ast.AST;
 import org.repositoryminer.ast.AbstractClassDeclaration;
 import org.repositoryminer.codemetric.direct.IDirectCodeMetric;
 import org.repositoryminer.codesmell.direct.IDirectCodeSmell;
+import org.repositoryminer.listener.mining.IMiningListener;
 import org.repositoryminer.mining.RepositoryMiner;
 import org.repositoryminer.model.Commit;
 import org.repositoryminer.model.Diff;
-import org.repositoryminer.model.Reference;
 import org.repositoryminer.parser.IParser;
-import org.repositoryminer.persistence.handler.DirectCodeAnalysisDocumentHandler;
 import org.repositoryminer.persistence.handler.CommitDocumentHandler;
-import org.repositoryminer.persistence.handler.ReferenceDocumentHandler;
+import org.repositoryminer.persistence.handler.DirectCodeAnalysisDocumentHandler;
 import org.repositoryminer.scm.DiffType;
 import org.repositoryminer.scm.ISCM;
 
@@ -39,21 +36,19 @@ public class DirectCodeAnalysisProcessor {
 	private RepositoryMiner repositoryMiner;
 	private String repositoryId;
 	private String repositoryPath;
-
+	
+	private List<String> selectedCommits;
+	
+	private IMiningListener listener;
+	
 	private DirectCodeAnalysisDocumentHandler directAnalysisHandler;
 	private CommitDocumentHandler commitPersistence;
-	private ReferenceDocumentHandler referenceHandler;
-
-	private List<Reference> references;
-	private Set<String> visitedCommits;
-
+	
 	private Map<String, IParser> parsers;
 
 	public DirectCodeAnalysisProcessor() {
 		directAnalysisHandler = new DirectCodeAnalysisDocumentHandler();
-		referenceHandler = new ReferenceDocumentHandler();
 		commitPersistence = new CommitDocumentHandler();
-		visitedCommits = new HashSet<String>();
 	}
 
 	public void setRepositoryData(String repositoryId, String repositoryPath) {
@@ -61,16 +56,13 @@ public class DirectCodeAnalysisProcessor {
 		this.repositoryPath = repositoryPath;
 	}
 
-	public void setReferences(List<Reference> references) {
-		this.references = references;
-	}
-
 	public void setRepositoryMiner(RepositoryMiner repositoryMiner) {
 		this.repositoryMiner = repositoryMiner;
+		listener = repositoryMiner.getMiningListener();
 	}
 
-	public void setVisitedCommits(Set<String> visitedCommits) {
-		this.visitedCommits = visitedCommits;
+	public void setSelectedCommits(List<String> selectedCommits) {
+		this.selectedCommits = selectedCommits;
 	}
 
 	public void setSCM(ISCM scm) {
@@ -85,94 +77,28 @@ public class DirectCodeAnalysisProcessor {
 			}
 		}
 
-		if (visitedCommits == null) {
-			visitedCommits = new HashSet<String>();
-		}
-
-		processReferences();
-	}
-
-	public void startIncrementalAnalysis(List<String> commits) throws IOException {
-		parsers = new HashMap<String, IParser>();
-		for (IParser p : repositoryMiner.getParsers()) {
-			for (String ext : p.getExtensions()) {
-				parsers.put(ext, p);
-			}
-		}
-
-		processIncrementalAnalysis(commits);
-	}
-
-	private void processIncrementalAnalysis(List<String> commits) throws IOException {
 		int begin = 0;
-		int end = Math.min(commits.size(), COMMIT_RANGE);
+		int end = Math.min(selectedCommits.size(), COMMIT_RANGE);
 
-		while (end < commits.size()) {
-			processNewCommits(commits.subList(begin, end), begin, commits.size());
+		listener.notifyDirectCodeAnalysisStart(selectedCommits.size());
+		
+		while (end < selectedCommits.size()) {
+			processCommits(selectedCommits.subList(begin, end), begin, selectedCommits.size());
 			begin = end;
-			end = Math.min(commits.size(), COMMIT_RANGE + end);
+			end = Math.min(selectedCommits.size(), COMMIT_RANGE + end);
 		}
 
-		processNewCommits(commits.subList(begin, end), begin, commits.size());
+		processCommits(selectedCommits.subList(begin, end), begin, selectedCommits.size());
+		listener.notifyDirectCodeAnalysisEnd(selectedCommits.size());
 	}
 
-	private void processNewCommits(List<String> commits, int progress, int qtdCommits) throws IOException {
+	private void processCommits(List<String> commits, int progress, int totalCommits) throws IOException {
 		for (Document doc : commitPersistence.findByIdColl(repositoryId, commits,
 				Projections.include("diffs", "commit_date"))) {
 			Commit commit = Commit.parseDocument(doc);
-
-			scm.checkout(commit.getId());
-
-			for (IParser parser : repositoryMiner.getParsers()) {
-				parser.processSourceFolders(repositoryPath);
-			}
-
-			for (Diff diff : commit.getDiffs()) {
-				if (diff.getType() != DiffType.DELETE) {
-					processDiff(diff.getPath(), diff.getHash(), commit);
-				}
-			}
-		}
-	}
-
-	@SuppressWarnings({ "unchecked" })
-	private void processReferences() throws IOException {
-		for (Reference ref : references) {
-			Document refDoc = referenceHandler.findById(ref.getId(), Projections.include("commits"));
-
-			List<String> commits = (List<String>) refDoc.get("commits");
-			int begin = 0;
-			int end = Math.min(commits.size(), COMMIT_RANGE);
-
-			while (end < commits.size()) {
-				processCommits(commits.subList(begin, end), ref.getName(), begin, commits.size());
-				begin = end;
-				end = Math.min(commits.size(), COMMIT_RANGE + end);
-			}
-
-			processCommits(commits.subList(begin, end), ref.getName(), begin, commits.size());
-		}
-	}
-
-	private void processCommits(List<String> commits, String refName, int progress, int qtdCommits) throws IOException {
-		// not selects already processed commits
-		List<String> newCommits = new ArrayList<String>();
-
-		for (String commit : commits) {
-			if (!visitedCommits.contains(commit)) {
-				newCommits.add(commit);
-			}
-		}
-
-		if (newCommits.size() == 0) {
-			return;
-		}
-
-		for (Document doc : commitPersistence.findByIdColl(repositoryId, newCommits,
-				Projections.include("diffs", "commit_date"))) {
-			Commit commit = Commit.parseDocument(doc);
-
-			visitedCommits.add(commit.getId());
+			
+			listener.notifyDirectCodeAnalysisProgress(commit.getId(), progress++, totalCommits);
+			
 			scm.checkout(commit.getId());
 
 			for (IParser parser : repositoryMiner.getParsers()) {

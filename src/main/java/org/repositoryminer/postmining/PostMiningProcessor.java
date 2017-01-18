@@ -3,7 +3,6 @@ package org.repositoryminer.postmining;
 import java.util.List;
 
 import org.repositoryminer.listener.postmining.IPostMiningListener;
-import org.repositoryminer.listener.postmining.NullPostMiningListener;
 import org.repositoryminer.mining.RepositoryMiner;
 import org.repositoryminer.model.Repository;
 
@@ -28,22 +27,13 @@ import org.repositoryminer.model.Repository;
 public class PostMiningProcessor {
 
 	private List<IPostMiningTask> tasks;
-	private IPostMiningListener listener = new NullPostMiningListener();
+	private IPostMiningListener listener;
 
-	public PostMiningProcessor(List<IPostMiningTask> tasks) {
-		this.tasks = tasks;
-	}
-	
-	public List<IPostMiningTask> getTasks() {
-		return tasks;
+	public PostMiningProcessor() {
 	}
 
 	public void setTasks(List<IPostMiningTask> tasks) {
 		this.tasks = tasks;
-	}
-
-	public IPostMiningListener getListener() {
-		return listener;
 	}
 
 	public void setListener(IPostMiningListener listener) {

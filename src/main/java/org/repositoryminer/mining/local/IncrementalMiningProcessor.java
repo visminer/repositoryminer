@@ -151,7 +151,8 @@ public class IncrementalMiningProcessor {
 			processor.setSCM(scm);
 			processor.setRepositoryMiner(repositoryMiner);
 			processor.setRepositoryData(repositoryId, tempRepo);
-			processor.startIncrementalAnalysis(newCommits);
+			processor.setSelectedCommits(newCommits);
+			processor.start();
 		}
 
 		if (repositoryMiner.hasIndirectCodeMetrics() || repositoryMiner.hasIndirectCodeSmells()) {

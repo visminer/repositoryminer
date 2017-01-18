@@ -19,6 +19,7 @@ import org.repositoryminer.ast.AST;
 import org.repositoryminer.ast.AbstractClassDeclaration;
 import org.repositoryminer.codemetric.indirect.IIndirectCodeMetric;
 import org.repositoryminer.codesmell.indirect.IIndirectCodeSmell;
+import org.repositoryminer.listener.mining.IMiningListener;
 import org.repositoryminer.mining.RepositoryMiner;
 import org.repositoryminer.model.Commit;
 import org.repositoryminer.model.Reference;
@@ -51,6 +52,9 @@ public class IndirectCodeAnalysisProcessor {
 	private RepositoryMiner repositoryMiner;
 	private String repositoryId;
 	private String repositoryPath;
+
+	private IMiningListener listener;
+
 	private List<Reference> references;
 	private List<String> snapshots;
 
@@ -70,6 +74,7 @@ public class IndirectCodeAnalysisProcessor {
 
 	public void setRepositoryMiner(RepositoryMiner repositoryMiner) {
 		this.repositoryMiner = repositoryMiner;
+		listener = repositoryMiner.getMiningListener();
 	}
 
 	public void setSCM(ISCM scm) {
@@ -86,8 +91,18 @@ public class IndirectCodeAnalysisProcessor {
 	}
 
 	public void start() throws IOException {
+		for (Reference ref : references) {
+			snapshots.remove(ref.getCommits().get(0)); // avoids to process some
+			// commit again
+		}
+
+		int total = references.size() + snapshots.size();
+		listener.notifyIndirectCodeAnalysisStart(total);
+
 		processReferences();
 		processCommits();
+
+		listener.notifyIndirectCodeAnalysisEnd(total);
 	}
 
 	public void startIncrementalAnalysis() throws IOException {
@@ -116,24 +131,32 @@ public class IndirectCodeAnalysisProcessor {
 		indirectAnalysisHandler.updateOnlyReference(doc.getObjectId("_id"), reference.getName(), reference.getType());
 	}
 
-	private void processCommits() throws IOException {
-		for (String snapshot : snapshots) {
-			Commit commit = Commit.parseDocument(commitHandler.findById(snapshot, Projections.include("commit_date")));
-			scm.checkout(snapshot);
-			processFiles(commit, null);
-		}
-	}
-
 	private void processReferences() throws IOException {
+		int index = 1;
+		int total = references.size() + snapshots.size();
+		
 		for (Reference ref : references) {
 			String commitId = ref.getCommits().get(0);
-
-			snapshots.remove(commitId); // avoids to process some commit again
+			
+			listener.notifyIndirectCodeAnalysisProgress(ref.getName(), index, total);
 
 			Commit commit = Commit.parseDocument(commitHandler.findById(commitId, Projections.include("commit_date")));
 			scm.checkout(commitId);
 
 			processFiles(commit, ref);
+		}
+	}
+	
+	private void processCommits() throws IOException {
+		int index = references.size() + 1;
+		int total = references.size() + snapshots.size();
+		
+		for (String snapshot : snapshots) {
+			listener.notifyIndirectCodeAnalysisProgress(snapshot, index, total);
+			
+			Commit commit = Commit.parseDocument(commitHandler.findById(snapshot, Projections.include("commit_date")));
+			scm.checkout(snapshot);
+			processFiles(commit, null);
 		}
 	}
 
