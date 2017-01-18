@@ -25,6 +25,7 @@ import org.repositoryminer.persistence.handler.CommitDocumentHandler;
 import org.repositoryminer.persistence.handler.ReferenceDocumentHandler;
 import org.repositoryminer.persistence.handler.RepositoryDocumentHandler;
 import org.repositoryminer.scm.ReferenceType;
+import org.repositoryminer.utility.StringUtils;
 
 import com.mongodb.client.model.Projections;
 
@@ -115,6 +116,7 @@ public class ExCommentMiner {
 			doc.append("commit_date", commit.getCommitDate());
 			doc.append("repository", new ObjectId(repository.getId()));
 			doc.append("filename", entry.getKey());
+			doc.append("filehash", StringUtils.encodeToCRC32(entry.getKey()));
 			
 			List<Comment> commentsAux = new ArrayList<Comment>(entry.getValue().size());
 			for (Integer i : entry.getValue()) {
