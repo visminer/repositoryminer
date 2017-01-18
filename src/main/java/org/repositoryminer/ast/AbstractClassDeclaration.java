@@ -8,6 +8,7 @@ public class AbstractClassDeclaration {
 	
 	private Archetype archetype;
 	private String name;
+	private ExtendsDeclaration extendsDeclaration;
 
 	public Archetype getArchetype() {
 		return archetype;
@@ -23,6 +24,14 @@ public class AbstractClassDeclaration {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public ExtendsDeclaration getExtendsDeclaration() {
+		return extendsDeclaration;
+	}
+
+	public void setExtendsDeclaration(ExtendsDeclaration extendsDeclaration) {
+		this.extendsDeclaration = extendsDeclaration;
 	}
 
 }
