@@ -5,11 +5,11 @@ import java.util.List;
 
 import org.bson.Document;
 import org.repositoryminer.ast.AST;
+import org.repositoryminer.ast.AbstractClassDeclaration;
+import org.repositoryminer.ast.ClassArchetype;
 import org.repositoryminer.ast.ClassDeclaration;
 import org.repositoryminer.ast.FieldDeclaration;
 import org.repositoryminer.ast.MethodDeclaration;
-import org.repositoryminer.ast.AbstractClassDeclaration;
-import org.repositoryminer.ast.AbstractClassDeclaration.Archetype;
 
 /**
  * <h1>A method-oriented version of metric</h1>
@@ -46,7 +46,7 @@ public abstract class MethodBasedMetricTemplate implements IDirectCodeMetric {
 	@Override
 	public Document calculate(AbstractClassDeclaration type, AST ast) {
 		ClassDeclaration cls = null;
-		if (type.getArchetype() == Archetype.CLASS_OR_INTERFACE) {
+		if (type.getArchetype() == ClassArchetype.CLASS_OR_INTERFACE) {
 			cls = (ClassDeclaration) type;
 
 			if (cls.getMethods() != null) {

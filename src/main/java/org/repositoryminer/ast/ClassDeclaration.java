@@ -7,9 +7,10 @@ public class ClassDeclaration extends AbstractClassDeclaration{
 	private boolean isInterface;
 	private List<MethodDeclaration> methods;
 	private List<FieldDeclaration> fields;
+	private SuperClassDeclaration superClass;
 	
 	public ClassDeclaration() {
-		setArchetype(Archetype.CLASS_OR_INTERFACE);
+		setArchetype(ClassArchetype.CLASS_OR_INTERFACE);
 	}
 	
 	public boolean isInterface() {
@@ -34,6 +35,14 @@ public class ClassDeclaration extends AbstractClassDeclaration{
 
 	public void setFields(List<FieldDeclaration> fields) {
 		this.fields = fields;
+	}
+
+	public SuperClassDeclaration getSuperClass() {
+		return superClass;
+	}
+
+	public void setSuperClass(SuperClassDeclaration superClass) {
+		this.superClass = superClass;
 	}
 	
 }

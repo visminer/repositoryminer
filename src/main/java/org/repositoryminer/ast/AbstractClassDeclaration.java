@@ -2,20 +2,15 @@ package org.repositoryminer.ast;
 
 public class AbstractClassDeclaration {
 
-	public enum Archetype {
-		CLASS_OR_INTERFACE, ENUM, ANNOTATION;
-	}
-	
-	private Archetype archetype;
+	private ClassArchetype archetype;
 	private String name;
-	private ExtendsDeclaration extendsDeclaration;
 
-	public Archetype getArchetype() {
+	public ClassArchetype getArchetype() {
 		return archetype;
 	}
 
-	public void setArchetype(Archetype archetype) {
-		this.archetype = archetype;
+	public void setArchetype(ClassArchetype classArchetype) {
+		this.archetype = classArchetype;
 	}
 
 	public String getName() {
@@ -24,14 +19,6 @@ public class AbstractClassDeclaration {
 
 	public void setName(String name) {
 		this.name = name;
-	}
-
-	public ExtendsDeclaration getExtendsDeclaration() {
-		return extendsDeclaration;
-	}
-
-	public void setExtendsDeclaration(ExtendsDeclaration extendsDeclaration) {
-		this.extendsDeclaration = extendsDeclaration;
 	}
 
 }

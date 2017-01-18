@@ -6,11 +6,11 @@ import java.util.List;
 import org.bson.Document;
 import org.repositoryminer.ast.AST;
 import org.repositoryminer.ast.AbstractClassDeclaration;
-import org.repositoryminer.ast.AbstractClassDeclaration.Archetype;
+import org.repositoryminer.ast.ClassArchetype;
+import org.repositoryminer.ast.ClassDeclaration;
+import org.repositoryminer.ast.MethodDeclaration;
 import org.repositoryminer.codemetric.CodeMetricId;
 import org.repositoryminer.codemetric.direct.MLOC;
-import org.repositoryminer.ast.MethodDeclaration;
-import org.repositoryminer.ast.ClassDeclaration;
 import org.repositoryminer.codesmell.CodeSmellId;
 
 public class LongMethod implements IDirectCodeSmell {
@@ -35,7 +35,7 @@ public class LongMethod implements IDirectCodeSmell {
 
 	@Override
 	public Document detect(AbstractClassDeclaration type, AST ast) {
-		if (type.getArchetype() == Archetype.CLASS_OR_INTERFACE) {
+		if (type.getArchetype() == ClassArchetype.CLASS_OR_INTERFACE) {
 			ClassDeclaration cls = (ClassDeclaration) type;
 			List<Document> methods = new ArrayList<Document>();
 

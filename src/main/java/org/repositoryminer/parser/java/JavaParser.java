@@ -8,17 +8,20 @@ import java.util.List;
 
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.Modifier.ModifierKeyword;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.repositoryminer.ast.AST;
+import org.repositoryminer.ast.ClassArchetype;
 import org.repositoryminer.ast.Document;
 import org.repositoryminer.ast.FieldDeclaration;
 import org.repositoryminer.ast.ImportDeclaration;
 import org.repositoryminer.ast.Language;
 import org.repositoryminer.ast.MethodDeclaration;
 import org.repositoryminer.ast.ParameterDeclaration;
+import org.repositoryminer.ast.SuperClassDeclaration;
 import org.repositoryminer.ast.ClassDeclaration;
 import org.repositoryminer.parser.IParser;
 
@@ -163,9 +166,22 @@ public class JavaParser implements IParser {
 
 	private static org.repositoryminer.ast.AbstractClassDeclaration processType(String packageName, 
 			org.eclipse.jdt.core.dom.TypeDeclaration type) {
+		
 		ClassDeclaration clsDecl = new ClassDeclaration();
+		
+		if (type.getSuperclassType() != null) {
+			ITypeBinding bind = type.getSuperclassType().resolveBinding();
+			
+			SuperClassDeclaration superClass = new SuperClassDeclaration();
+			superClass.setInterface(bind.isInterface());
+			superClass.setName(bind.getQualifiedName());
+			superClass.setPackageDeclaration(bind.getPackage().getName());
+			superClass.setArchetype(ClassArchetype.CLASS_OR_INTERFACE);
+		
+			clsDecl.setSuperClass(superClass);
+		}
+		
 		clsDecl.setInterface(type.isInterface());
-
 		clsDecl.setName(packageName + "." + type.getName().getIdentifier());
 
 		List<FieldDeclaration> fields = new ArrayList<FieldDeclaration>();

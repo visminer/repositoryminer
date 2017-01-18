@@ -5,10 +5,10 @@ import java.util.List;
 import org.bson.Document;
 import org.repositoryminer.ast.AST;
 import org.repositoryminer.ast.AbstractClassDeclaration;
-import org.repositoryminer.ast.AbstractClassDeclaration.Archetype;
-import org.repositoryminer.codemetric.CodeMetricId;
-import org.repositoryminer.ast.FieldDeclaration;
+import org.repositoryminer.ast.ClassArchetype;
 import org.repositoryminer.ast.ClassDeclaration;
+import org.repositoryminer.ast.FieldDeclaration;
+import org.repositoryminer.codemetric.CodeMetricId;
 
 /**
  * <h1>Number of attributes</h1>
@@ -26,7 +26,7 @@ public class NOA implements IDirectCodeMetric {
 	
 	@Override
 	public Document calculate(AbstractClassDeclaration type, AST ast) {
-		if (Archetype.CLASS_OR_INTERFACE == type.getArchetype()) {
+		if (ClassArchetype.CLASS_OR_INTERFACE == type.getArchetype()) {
 			ClassDeclaration cls = (ClassDeclaration) type;
 			new Document("metric", CodeMetricId.NOA.toString()).append("value", calculate(cls.getFields()));
 		}
