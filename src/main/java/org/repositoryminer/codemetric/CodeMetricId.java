@@ -16,6 +16,7 @@ public enum CodeMetricId {
 	TCC,
 	WMC,
 	NOP,
-	NOC;
+	NOC,
+	AMW;
 	
 }
