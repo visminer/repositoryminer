@@ -17,6 +17,7 @@ public enum CodeMetricId {
 	WMC,
 	NOP,
 	NOC,
-	AMW;
+	AMW,
+	DIT;
 	
 }

@@ -30,6 +30,10 @@ public class AMW implements IDirectCodeMetric {
 	}
 
 	public float calculate(int wmc, int nom) {
+		if (nom == 0) {
+			return 0l;
+		}
+		
 		return wmc * 1l / nom;
 	}
 	
