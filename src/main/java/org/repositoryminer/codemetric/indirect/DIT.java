@@ -22,16 +22,11 @@ public class DIT implements IIndirectCodeMetric {
 	// The classes relationship are structured as a DAG to further calculate DIT
 	// using breadth-first search. A empty string is used as root node.
 	// A child just has one father, so a simplified version of bfs is used.
-	private Map<String, List<String>> dag;
+	private Map<String, List<String>> dag = new HashMap<String, List<String>>();
 
 	// Stores the DIT of each class.
-	private Map<String, Integer> dit;
-
-	public DIT() {
-		dag = new HashMap<String, List<String>>();
-		dit = new HashMap<String, Integer>();
-	}
-
+	private Map<String, Integer> dit = new HashMap<String, Integer>();
+	
 	@Override
 	public void calculate(AbstractClassDeclaration type, AST ast) {
 		if (!type.getArchetype().equals(ClassArchetype.CLASS_OR_INTERFACE)) {
@@ -67,8 +62,8 @@ public class DIT implements IIndirectCodeMetric {
 		}
 		
 		// Do not forget to clean your mess after finish the job, another checkout can use this class.
-		dag = new HashMap<String, List<String>>();
-		dit = new HashMap<String, Integer>();
+		dag.clear();
+		dit.clear();
 		
 		return result;
 	}

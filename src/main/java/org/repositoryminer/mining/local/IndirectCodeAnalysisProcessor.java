@@ -60,13 +60,8 @@ public class IndirectCodeAnalysisProcessor {
 
 	List<FileEntry> processedFiles;
 
-	private IndirectCodeAnalysisDocumentHandler indirectAnalysisHandler;
-	private CommitDocumentHandler commitHandler;
-
-	public IndirectCodeAnalysisProcessor() {
-		indirectAnalysisHandler = new IndirectCodeAnalysisDocumentHandler();
-		commitHandler = new CommitDocumentHandler();
-	}
+	private IndirectCodeAnalysisDocumentHandler indirectAnalysisHandler = new IndirectCodeAnalysisDocumentHandler();
+	private CommitDocumentHandler commitHandler = new CommitDocumentHandler();
 
 	public void setReferences(List<Reference> references) {
 		this.references = references;

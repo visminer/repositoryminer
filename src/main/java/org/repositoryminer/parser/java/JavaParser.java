@@ -203,7 +203,6 @@ public class JavaParser implements IParser {
 		MethodDeclaration m = new MethodDeclaration();
 		m.setConstructor(methodDecl.isConstructor());
 		m.setVarargs(methodDecl.isVarargs());
-		m.setName(methodDecl.getName().getFullyQualifiedName());
 		StringBuilder builder = null;
 
 		builder = new StringBuilder();
@@ -218,10 +217,11 @@ public class JavaParser implements IParser {
 			builder.append(param.getType() + " " + param.getName() + ",");
 		}
 
-		if (builder.substring(builder.length() - 1).equals(","))
+		if (builder.substring(builder.length() - 1).equals(",")) {
 			builder.replace(builder.length() - 1, builder.length(), ")");
-		else
+		} else {
 			builder.append(")");
+		}
 
 		m.setName(builder.toString());
 		m.setParameters(params);
