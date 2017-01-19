@@ -256,7 +256,9 @@ public class JavaParser implements IParser {
 	@SuppressWarnings("unchecked")
 	private static FieldDeclaration processField(org.eclipse.jdt.core.dom.FieldDeclaration field) {
 		FieldDeclaration fieldDecl = new FieldDeclaration();
-		fieldDecl.setType(field.getType().toString());
+		
+		ITypeBinding bind = field.getType().resolveBinding();
+		fieldDecl.setType(bind.getQualifiedName());
 
 		for (VariableDeclarationFragment vdf : (List<VariableDeclarationFragment>) field.fragments())
 			fieldDecl.setName(vdf.getName().getIdentifier());
