@@ -11,17 +11,17 @@ import java.util.TreeMap;
 import org.bson.Document;
 import org.repositoryminer.effort.model.Effort;
 import org.repositoryminer.effort.model.EffortsByReference;
-import org.repositoryminer.effort.persistence.handler.EffortsDocumentHandler;
-import org.repositoryminer.listener.IPostMiningListener;
+import org.repositoryminer.effort.persistence.EffortsDocumentHandler;
+import org.repositoryminer.listener.postmining.IPostMiningListener;
 import org.repositoryminer.mining.RepositoryMiner;
 import org.repositoryminer.model.Commit;
 import org.repositoryminer.model.Diff;
 import org.repositoryminer.model.Reference;
 import org.repositoryminer.model.Repository;
-import org.repositoryminer.persistence.handler.CommitAnalysisDocumentHandler;
 import org.repositoryminer.persistence.handler.CommitDocumentHandler;
+import org.repositoryminer.persistence.handler.DirectCodeAnalysisDocumentHandler;
 import org.repositoryminer.persistence.handler.ReferenceDocumentHandler;
-import org.repositoryminer.postprocessing.IPostMiningTask;
+import org.repositoryminer.postmining.IPostMiningTask;
 import org.repositoryminer.scm.ReferenceType;
 
 /**
@@ -72,7 +72,7 @@ public class EffortsMiningTask implements IPostMiningTask {
 			int idx = 0;
 			// for each reference of the repository...
 			for (Entry<String, ReferenceType> ref : refs) {
-				listener.postMiningTaskProgressChange("efforts", ++idx, refs.size());
+				listener.notifyTaskProgress("efforts", ++idx, refs.size());
 				// we must retrieve the reference from the database prior to processing it
 				Document refDoc = handler.findByNameAndType(ref.getKey(), ref.getValue(), repository.getId(), null);
 				Reference reference = Reference.parseDocument(refDoc);
@@ -201,8 +201,8 @@ public class EffortsMiningTask implements IPostMiningTask {
 	private List<String> getCodeSmells(long fileHash, String commitHash) {
 		List<String> smells = new ArrayList<String>();
 
-		CommitAnalysisDocumentHandler handler = new CommitAnalysisDocumentHandler();
-		Document doc = handler.getCodeSmellsMeasures(fileHash, commitHash);
+		DirectCodeAnalysisDocumentHandler handler = new DirectCodeAnalysisDocumentHandler();
+		Document doc = handler.getCodeSmells(fileHash, commitHash);
 		if (doc != null && !doc.isEmpty()) {
 			List<Document> typeDocs = (List<Document>) doc.get("abstract_types");
 			if (typeDocs != null && !typeDocs.isEmpty()) {

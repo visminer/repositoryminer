@@ -14,7 +14,7 @@ import org.eclipse.egit.github.core.service.CollaboratorService;
 import org.eclipse.egit.github.core.service.IssueService;
 import org.eclipse.egit.github.core.service.MilestoneService;
 import org.eclipse.egit.github.core.service.RepositoryService;
-import org.repositoryminer.mining.HostingServiceMiner;
+import org.repositoryminer.mining.hosting.HostingServiceMiner;
 import org.repositoryminer.model.Comment;
 import org.repositoryminer.model.Contributor;
 import org.repositoryminer.model.Event;
@@ -57,8 +57,6 @@ public class GitHubService implements IHostingService {
 
 	@Override
 	public List<Issue> getAllIssues() {
-		hostingMiner.getListener().initIssuesProcessing();
-
 		int number = 1;
 		List<Issue> issues = new ArrayList<Issue>();
 
@@ -101,8 +99,6 @@ public class GitHubService implements IHostingService {
 
 	@Override
 	public List<Milestone> getAllMilestones() {
-		hostingMiner.getListener().initMilestonesProcessing();
-
 		int number = 1;
 		List<Milestone> milesDB = new ArrayList<Milestone>();
 
@@ -130,8 +126,6 @@ public class GitHubService implements IHostingService {
 
 	@Override
 	public List<Contributor> getAllContributors() {
-		hostingMiner.getListener().initMilestonesProcessing();
-
 		List<Contributor> contributors = new ArrayList<Contributor>();
 		try {
 			for (org.eclipse.egit.github.core.Contributor contributor : repoServ.getContributors(repositoryId, true)) {

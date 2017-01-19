@@ -46,8 +46,9 @@ public class WorkingDirectory {
 		wd.setId(doc.getString("_id"));
 
 		Map<String, String> files = new HashMap<String, String>();
-		for (Document d : (List<Document>) doc.get("files"))
+		for (Document d : (List<Document>) doc.get("files")) {
 			files.put(d.getString("file"), d.getString("checkout"));
+		}
 
 		wd.setFiles(files);
 		return wd;

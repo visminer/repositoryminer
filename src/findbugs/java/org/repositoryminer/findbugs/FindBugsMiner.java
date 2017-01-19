@@ -1,9 +1,11 @@
 package org.repositoryminer.findbugs;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.bson.Document;
 import org.bson.types.ObjectId;
@@ -17,10 +19,12 @@ import org.repositoryminer.model.Repository;
 import org.repositoryminer.persistence.handler.CommitDocumentHandler;
 import org.repositoryminer.persistence.handler.ReferenceDocumentHandler;
 import org.repositoryminer.persistence.handler.RepositoryDocumentHandler;
+import org.repositoryminer.persistence.handler.WorkingDirectoryDocumentHandler;
 import org.repositoryminer.scm.ISCM;
 import org.repositoryminer.scm.ReferenceType;
 import org.repositoryminer.scm.SCMFactory;
 import org.repositoryminer.utility.FileUtils;
+import org.repositoryminer.utility.StringUtils;
 
 import com.mongodb.client.model.Projections;
 
@@ -61,47 +65,32 @@ public class FindBugsMiner {
 	private FindBugsDocumentHandler findBugsPersist;
 	private CommitDocumentHandler commitPersist;
 	private ReferenceDocumentHandler refPersist;
+	private WorkingDirectoryDocumentHandler wdPersist;
 
 	private Priority priority = Priority.NORMAL;
 	private Effort effort = Effort.DEFAULT;
 
-	public void findInCommit(String hash) throws IllegalStateException, IOException, InterruptedException {
-		Document commitDoc = commitPersist.findById(hash, Projections.include("commit_date"));
-		Commit commit = Commit.parseDocument(commitDoc);
-
-		configureFindBugs();
-
-		List<ReportedBug> reportedBugs = findBugsExecutor.execute();
-
-		Document doc = new Document();
-		doc.append("commit", commit.getId());
-		doc.append("commit_date", commit.getCommitDate());
-		doc.append("repository", new ObjectId(repository.getId()));
-		doc.append("bugs", ReportedBug.toDocumentList(reportedBugs));
-
-		findBugsPersist.insert(doc);
+	public FindBugsMiner(Repository repository) {
+		this.repository = repository;
 	}
 
-	public void findInReference(String name, ReferenceType type) throws IllegalStateException, IOException, InterruptedException {
+	public FindBugsMiner(String repositoryId) {
+		RepositoryDocumentHandler repoHandler = new RepositoryDocumentHandler();
+		this.repository = Repository
+				.parseDocument(repoHandler.findById(repositoryId, Projections.include("scm", "path")));
+	}
+
+	public void findBugs(String hash) throws IllegalStateException, IOException, InterruptedException {
+		persistAnalysis(hash, null);
+	}
+
+	public void findBugs(String name, ReferenceType type)
+			throws IllegalStateException, IOException, InterruptedException {
 		Document refDoc = refPersist.findByNameAndType(name, type, repository.getId(), Projections.slice("commits", 1));
 		Reference reference = Reference.parseDocument(refDoc);
 
-		configureFindBugs();
-
-		List<ReportedBug> reportedBugs = findBugsExecutor.execute();
-		
 		String commitId = reference.getCommits().get(0);
-		Commit commit = Commit.parseDocument(commitPersist.findById(commitId, Projections.include("commit_date")));
-
-		Document doc = new Document();
-		doc.append("reference_name", reference.getName());
-		doc.append("reference_type", reference.getType().toString());
-		doc.append("commit", commit.getId());
-		doc.append("commit_date", commit.getCommitDate());
-		doc.append("repository", new ObjectId(repository.getId()));
-		doc.append("bugs", ReportedBug.toDocumentList(reportedBugs));
-
-		findBugsPersist.insert(doc);
+		persistAnalysis(commitId, reference);
 	}
 
 	public void configure() throws IOException {
@@ -111,6 +100,7 @@ public class FindBugsMiner {
 		findBugsPersist = new FindBugsDocumentHandler();
 		commitPersist = new CommitDocumentHandler();
 		refPersist = new ReferenceDocumentHandler();
+		wdPersist = new WorkingDirectoryDocumentHandler();
 
 		scm = SCMFactory.getSCM(repository.getScm());
 		scm.open(tmpRepository);
@@ -119,7 +109,7 @@ public class FindBugsMiner {
 	public void checkout(String ref) {
 		scm.checkout(ref);
 	}
-	
+
 	public void checkout(String reference, ReferenceType type) {
 		List<Reference> references = scm.getReferences();
 		for (Reference r : references) {
@@ -129,7 +119,7 @@ public class FindBugsMiner {
 			}
 		}
 	}
-	
+
 	public void dispose() throws IOException {
 		scm.close();
 		FileUtils.deleteFolder(tmpRepository);
@@ -143,13 +133,57 @@ public class FindBugsMiner {
 		this.priority = priority;
 	}
 
-	public void setRepository(Repository repository) {
-		this.repository = repository;
+	private void persistAnalysis(String commitId, Reference ref) throws IllegalStateException, IOException, InterruptedException {
+		Commit commit = Commit.parseDocument(commitPersist.findById(commitId, Projections.include("commit_date")));
+
+		configureFindBugs();
+		Map<String, List<ReportedBug>> reportedBugs = findBugsExecutor.execute();
+
+		List<String> files = createFilesList(commitId);
+
+		List<Document> documents = new ArrayList<Document>(reportedBugs.size());
+		for (Entry<String, List<ReportedBug>> bug : reportedBugs.entrySet()) {
+			Document doc = new Document();
+
+			if (ref != null) {
+				doc.append("reference_name", ref.getName());
+				doc.append("reference_type", ref.getType().toString());
+			}
+			
+			doc.append("commit", commit.getId());
+			doc.append("commit_date", commit.getCommitDate());
+			doc.append("repository", new ObjectId(repository.getId()));
+			
+			String filename = null;
+			for (String file : files) {
+				if (file.endsWith(bug.getKey())) {
+					filename = file;
+					break;
+				}
+			}
+			
+			doc.append("filename", filename);
+			doc.append("filehash", StringUtils.encodeToCRC32(filename));
+			doc.append("bugs", ReportedBug.toDocumentList(bug.getValue()));
+
+			documents.add(doc);
+		}
+
+		findBugsPersist.insertMany(documents);
 	}
-	
-	public void setRepository(String repositoryId) {
-		RepositoryDocumentHandler repoHandler = new RepositoryDocumentHandler();
-		this.repository = Repository.parseDocument(repoHandler.findById(repositoryId, Projections.include("scm")));
+
+	@SuppressWarnings("unchecked")
+	// create a list with the files names in a checkout
+	private List<String> createFilesList(String commitId) {
+		List<Document> filesDoc = (List<Document>) wdPersist.findById(commitId, Projections.include("files.file"))
+				.get("files");
+		List<String> files = new ArrayList<String>(filesDoc.size());
+
+		for (Document file : filesDoc) {
+			files.add(file.getString("file"));
+		}
+		
+		return files;
 	}
 	
 	private void configureFindBugs() {
@@ -157,5 +191,5 @@ public class FindBugsMiner {
 		findBugsExecutor.setEffort(effortsMap.getOrDefault(effort, DEFAULT_EFFORT));
 		findBugsExecutor.setUserPrefsEffort(userPrefsEffortMap.getOrDefault(effort, DEFAULT_USER_PREFS_EFFORT));
 	}
-	
+
 }

@@ -39,4 +39,10 @@ public class ReferenceDocumentHandler extends DocumentHandler {
 		return findOne(whereClause, projection);
 	}
 	
+	public void updateOnlyCommits(String id, List<String> commits) {
+		Document clause = new Document("_id", new ObjectId(id));
+		Document newDoc = new Document("$set", new Document("commits", commits));
+		collection.updateOne(clause, newDoc);
+	}
+	
 }

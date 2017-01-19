@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -29,7 +31,7 @@ public class FindBugsExecutor {
 		this.rootDir = rootDir;
 	}
 
-	public List<ReportedBug> execute() throws IOException, InterruptedException, IllegalStateException {
+	public Map<String, List<ReportedBug>> execute() throws IOException, InterruptedException, IllegalStateException {
 		FindBugs2 findBugs = new FindBugs2();
 		Project project = getProject();
 
@@ -52,13 +54,33 @@ public class FindBugsExecutor {
 
 		findBugs.execute();
 
-		List<ReportedBug> reportedBugs = new ArrayList<ReportedBug>();
+		Map<String, List<ReportedBug>> reportedBugs = new HashMap<String, List<ReportedBug>>();
 		for (BugInstance b : reporter.getBugCollection()) {
-			ReportedBug rb = new ReportedBug(b.getPrimaryClass().getSourceLines().getSourcePath(), b.getBugRank(),
-					b.getPriority(), b.getType(), b.getAbbrev(), b.getBugPattern().getCategory(),
-					b.getPrimaryClass().getClassName(), b.getPrimarySourceLineAnnotation().getStartLine(),
+			String filename = b.getPrimarySourceLineAnnotation().getSourcePath();
+
+			if (!reportedBugs.containsKey(filename)) {
+				reportedBugs.put(filename, new ArrayList<ReportedBug>());
+			}
+
+			ReportedBug rb = new ReportedBug(b.getBugRank(), b.getBugRankCategory().toString(), b.getPriority(),
+					b.getPriorityString(), b.getType(), b.getAbbrev(), b.getBugPattern().getDetailPlainText(),
+					b.getBugPattern().getCategory(), b.getPrimaryClass().getClassName(),
 					b.getAbridgedMessage(), b.getMessage());
-			reportedBugs.add(rb);
+
+			if (b.getPrimaryMethod() != null) {
+				String methodName = b.getPrimaryMethod().getFullMethod(b.getPrimaryClass());
+				rb.setMethod(methodName.substring(methodName.lastIndexOf(".")+1));
+			}
+
+			if (b.getPrimaryField() != null) {
+				rb.setField(b.getPrimaryField().getFieldName());
+			}
+			
+			if (b.getPrimaryLocalVariableAnnotation() != null) {
+				rb.setLocalVariable(b.getPrimaryLocalVariableAnnotation().getName());
+			}
+			
+			reportedBugs.get(filename).add(rb);
 		}
 
 		findBugs.dispose();

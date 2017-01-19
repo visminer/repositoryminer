@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Scanner;
 
@@ -47,7 +48,7 @@ public class GitSCM implements ISCM {
 	private class LinesInfo {
 		public int added = 0, removed = 0;
 	}
-	
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(GitSCM.class);
 
 	private Repository repository;
@@ -67,10 +68,7 @@ public class GitSCM implements ISCM {
 		}
 
 		try {
-			repository = repositoryBuilder.setGitDir(repoFolder).
-					readEnvironment().
-					findGitDir().
-					build();
+			repository = repositoryBuilder.setGitDir(repoFolder).readEnvironment().findGitDir().build();
 		} catch (IOException e) {
 			throw new VisMinerAPIException(ErrorMessage.GIT_REPOSITORY_IOERROR.toString(), e);
 		}
@@ -125,49 +123,78 @@ public class GitSCM implements ISCM {
 	}
 
 	@Override
-	public List<Commit> getCommits(int skip, int maxCount) {
+	public List<Commit> getCommits(int skip, int maxCount, Reference reference, Collection<String> commitsToSkip) {
 		Iterable<RevCommit> revCommits = null;
-		try {
-			revCommits = git.log().all().setSkip(skip).setMaxCount(maxCount).call();
-		} catch (GitAPIException | IOException e) {
-			errorHandler(ErrorMessage.GIT_LOG_COMMIT_ERROR.toString(), e);
+
+		if (reference.getType() == ReferenceType.BRANCH) {
+			revCommits = getCommitsFromBranch(reference.getPath(), skip, maxCount);
+		} else {
+			revCommits = getCommitsFromTag(reference.getPath(), skip, maxCount);
+		}
+
+		if (revCommits == null) {
+			return new ArrayList<Commit>();
 		}
 
 		List<Commit> commits = new ArrayList<Commit>();
 
-		for (RevCommit revCommit : revCommits) {
-			PersonIdent author = revCommit.getAuthorIdent();
-			PersonIdent committer = revCommit.getCommitterIdent();
-
-			Contributor myAuthor = new Contributor(author.getName(), author.getEmailAddress());
-
-			Contributor myCommitter = new Contributor(committer.getName(), committer.getEmailAddress());
-
-			List<String> parents = new ArrayList<String>();
-			for (RevCommit parent : revCommit.getParents())
-				parents.add(parent.getName());
-
-			List<Diff> diffs = null;
-			try {
-				diffs = getDiffsForCommitedFiles(revCommit.getName());
-			} catch (IOException e) {
-				errorHandler(ErrorMessage.GIT_RETRIEVE_CHANGES_ERROR.toString(), e);
+		if (commitsToSkip == null || commitsToSkip.size() == 0) {
+			for (RevCommit revCommit : revCommits) {
+				commits.add(processCommit(revCommit));
 			}
-
-			Commit c = new Commit(revCommit.getName(), revCommit.getFullMessage(), author.getWhen(),
-					committer.getWhen(), null, parents, myAuthor, myCommitter, diffs);
-			commits.add(c);
+		} else {
+			for (RevCommit revCommit : revCommits) {
+				if (!commitsToSkip.contains(revCommit.getName())) {
+					commits.add(processCommit(revCommit));
+				}
+			}
 		}
 
 		return commits;
 	}
 
+	private Commit processCommit(RevCommit revCommit) {
+		PersonIdent author = revCommit.getAuthorIdent();
+		PersonIdent committer = revCommit.getCommitterIdent();
+
+		Contributor myAuthor = new Contributor(author.getName(), author.getEmailAddress());
+
+		Contributor myCommitter = new Contributor(committer.getName(), committer.getEmailAddress());
+
+		List<String> parents = new ArrayList<String>();
+		for (RevCommit parent : revCommit.getParents())
+			parents.add(parent.getName());
+
+		List<Diff> diffs = null;
+		try {
+			diffs = getDiffsForCommitedFiles(revCommit.getName());
+		} catch (IOException e) {
+			errorHandler(ErrorMessage.GIT_RETRIEVE_CHANGES_ERROR.toString(), e);
+		}
+
+		return new Commit(revCommit.getName(), revCommit.getFullMessage(), author.getWhen(), committer.getWhen(), null,
+				parents, myAuthor, myCommitter, diffs);
+	}
+
 	@Override
 	public List<String> getReferenceCommits(String name, ReferenceType type) {
-		if (type == ReferenceType.BRANCH)
-			return getCommitsFromBranch(name);
-		else
-			return getCommitsFromTag(name);
+		Iterable<RevCommit> revCommits;
+		if (type == ReferenceType.BRANCH) {
+			revCommits = getCommitsFromBranch(name, -1, -1);
+		} else {
+			revCommits = getCommitsFromTag(name, -1, -1);
+		}
+
+		if (revCommits == null) {
+			return new ArrayList<String>();
+		}
+
+		List<String> names = new ArrayList<String>();
+		for (RevCommit revCommit : revCommits) {
+			names.add(revCommit.getName());
+		}
+
+		return names;
 	}
 
 	@Override
@@ -213,50 +240,47 @@ public class GitSCM implements ISCM {
 
 		List<DiffEntry> diffs = diffFormatter.scan(oldCommit, currentCommit);
 		List<Diff> changes = new ArrayList<Diff>();
-		
+
 		for (DiffEntry entry : diffs) {
 			RevCommit parentCommit = oldCommit == null ? null
 					: revWalk.parseCommit(ObjectId.fromString(oldCommit.getName()));
 
-			String path = null; // file path of the current commit
-			String oldPath = null; // file path of the previous commit
-			DiffType type = null;
+			Diff diff = processDiff(entry);
+			LinesInfo linesInfo;
 
-			switch (entry.getChangeType()) {
-			case ADD:
-				path = entry.getNewPath();
-				type = DiffType.ADD;
-				break;
+			linesInfo = getLinesAddedAndDeleted(diff.getPath(), parentCommit, revCommit);
 
-			case COPY:
-				path = entry.getNewPath();
-				oldPath = entry.getOldPath();
-				type = DiffType.COPY;
-				break;
+			diff.setLinesAdded(linesInfo.added);
+			diff.setLinesRemoved(linesInfo.removed);
 
-			case DELETE:
-				path = entry.getOldPath();
-				type = DiffType.DELETE;
-				break;
-
-			case MODIFY:
-				path = entry.getNewPath();
-				type = DiffType.MODIFY;
-				break;
-
-			case RENAME:
-				path = entry.getNewPath();
-				oldPath = entry.getOldPath();
-				type = DiffType.RENAME;
-				break;
-			}
-
-			LinesInfo linesInfo = getLinesAddedAndDeleted(path, parentCommit, revCommit);
-			Diff change = new Diff(path, oldPath, StringUtils.encodeToCRC32(path), linesInfo.added, linesInfo.removed, type);
-			changes.add(change);
+			changes.add(diff);
 		}
 
 		return changes;
+	}
+
+	private Diff processDiff(DiffEntry entry) {
+		switch (entry.getChangeType()) {
+		case ADD:
+			return new Diff(entry.getNewPath(), null, StringUtils.encodeToCRC32(entry.getNewPath()), DiffType.ADD);
+
+		case COPY:
+			return new Diff(entry.getNewPath(), entry.getOldPath(), StringUtils.encodeToCRC32(entry.getNewPath()),
+					DiffType.COPY);
+
+		case DELETE:
+			return new Diff(entry.getOldPath(), null, StringUtils.encodeToCRC32(entry.getOldPath()), DiffType.DELETE);
+
+		case MODIFY:
+			return new Diff(entry.getNewPath(), null, StringUtils.encodeToCRC32(entry.getNewPath()), DiffType.MODIFY);
+
+		case RENAME:
+			return new Diff(entry.getNewPath(), entry.getOldPath(), StringUtils.encodeToCRC32(entry.getNewPath()),
+					DiffType.RENAME);
+
+		default:
+			return null;
+		}
 	}
 
 	private LinesInfo getLinesAddedAndDeleted(String path, RevCommit oldCommit, RevCommit currentCommit)
@@ -283,7 +307,7 @@ public class GitSCM implements ISCM {
 		output.close();
 		formatter.close();
 		scanner.close();
-		
+
 		return linesInfo;
 	}
 
@@ -295,10 +319,9 @@ public class GitSCM implements ISCM {
 		}
 	}
 
-	private List<String> getCommitsFromTag(String refName) {
+	private Iterable<RevCommit> getCommitsFromTag(String refName, int skip, int maxCount) {
 		try {
 			List<Ref> call = git.tagList().call();
-			List<String> commits = new ArrayList<String>();
 
 			for (Ref ref : call) {
 				if (ref.getName().equals(refName)) {
@@ -311,30 +334,24 @@ public class GitSCM implements ISCM {
 						log.add(ref.getObjectId());
 					}
 
-					for (RevCommit c : log.call())
-						commits.add(c.getName());
-					break;
+					return log.setSkip(skip).setMaxCount(maxCount).call();
 				}
 			}
-			return commits;
+
+			return null;
 		} catch (GitAPIException | IncorrectObjectTypeException | MissingObjectException e) {
 			errorHandler(ErrorMessage.GIT_BRANCH_COMMITS_ERROR.toString(), e);
 			return null;
 		}
 	}
 
-	private List<String> getCommitsFromBranch(String refName) {
-		Iterable<RevCommit> revCommits = null;
+	private Iterable<RevCommit> getCommitsFromBranch(String refName, int skip, int maxCount) {
 		try {
-			revCommits = git.log().add(repository.resolve(refName)).call();
+			return git.log().add(repository.resolve(refName)).setSkip(skip).setMaxCount(maxCount).call();
 		} catch (RevisionSyntaxException | GitAPIException | IOException e) {
 			errorHandler(ErrorMessage.GIT_TAG_COMMITS_ERROR.toString(), e);
+			return null;
 		}
-
-		List<String> commits = new ArrayList<String>();
-		for (RevCommit c : revCommits)
-			commits.add(c.getName());
-		return commits;
 	}
 
 }

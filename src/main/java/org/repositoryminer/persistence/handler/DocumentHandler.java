@@ -35,12 +35,12 @@ public class DocumentHandler {
 		return findById(id, null);
 	}
 
-	public Document findOne(BasicDBObject whereClause) {
+	public Document findOne(Bson whereClause) {
 		Document doc = collection.find(whereClause).first();
 		return doc;
 	}
 
-	public Document findOne(BasicDBObject whereClause, Bson projection) {
+	public Document findOne(Bson  whereClause, Bson projection) {
 		Document doc = collection.find(whereClause).projection(projection).first();
 		return doc;
 	}
@@ -55,12 +55,12 @@ public class DocumentHandler {
 		return fromCursorToList(cursor);
 	}
 
-	public List<Document> findMany(BasicDBObject whereClause) {
+	public List<Document> findMany(Bson whereClause) {
 		MongoCursor<Document> cursor = collection.find(whereClause).iterator();
 		return fromCursorToList(cursor);
 	}
 
-	public List<Document> findMany(BasicDBObject whereClause, Bson projection) {
+	public List<Document> findMany(Bson whereClause, Bson projection) {
 		MongoCursor<Document> cursor = collection.find(whereClause).projection(projection).iterator();
 		return fromCursorToList(cursor);
 	}
@@ -68,19 +68,19 @@ public class DocumentHandler {
 	public List<Document> fromCursorToList(MongoCursor<Document> cursor) {
 		List<Document> list = new ArrayList<Document>();
 
-		while (cursor.hasNext())
+		while (cursor.hasNext()) {
 			list.add(cursor.next());
+		}
 
 		cursor.close();
-		
 		return list;
 	}
 
-	public DeleteResult deleteOne(BasicDBObject whereClause) {
+	public DeleteResult deleteOne(Bson whereClause) {
 		return collection.deleteOne(whereClause);
 	}
 
-	public DeleteResult deleteMany(BasicDBObject whereClause) {
+	public DeleteResult deleteMany(Bson whereClause) {
 		return collection.deleteMany(whereClause);
 	}
 
@@ -88,15 +88,15 @@ public class DocumentHandler {
 		return collection.deleteMany(new BasicDBObject());
 	}
 
-	public UpdateResult updateOne(BasicDBObject searchQuery, BasicDBObject newDocument) {
+	public UpdateResult updateOne(Bson searchQuery, Bson newDocument) {
 		return collection.updateOne(searchQuery, newDocument);
 	}
 
-	public UpdateResult updateMany(BasicDBObject searchQuery, BasicDBObject newDocument) {
+	public UpdateResult updateMany(Bson searchQuery, Bson newDocument) {
 		return collection.updateMany(searchQuery, newDocument);
 	}
 
-	public UpdateResult updateAll(BasicDBObject newDocument) {
+	public UpdateResult updateAll(Bson newDocument) {
 		return collection.updateMany(new BasicDBObject(), newDocument);
 	}
 

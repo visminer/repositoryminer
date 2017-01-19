@@ -16,16 +16,13 @@ public class RepositoryDocumentHandler extends DocumentHandler {
 		super.collection = Connection.getInstance().getCollection(COLLECTION_NAME);
 	}
 
-	public boolean checkIfRepositoryExistsById(String id) {
-		Document clause = new Document("_id", new ObjectId(id));
-
-		return collection.count(clause) == 1 ? true : false;
+	public boolean checkIfRepositoryExistsById(String name) {
+		Document clause = new Document("name", name);
+		return collection.count(clause) > 0 ? true : false;
 	}
 
-	public List<Document> findRepositoriesByName(String name) {
-		BasicDBObject whereClause = new BasicDBObject();
-		whereClause.put("name", name);
-		return findMany(whereClause);
+	public Document findByName(String name) {
+		return findOne(new BasicDBObject("name", name));
 	}
 
 	public Document findOnlyContributors(String id) {
@@ -33,9 +30,9 @@ public class RepositoryDocumentHandler extends DocumentHandler {
 		return findById(id, projection);
 	}
 
-	public void updateOnlyContributors(Document doc) {
-		Document clause = new Document("_id", doc.get("_id"));
-		Document newDoc = new Document("$set", new Document("contributors", doc.get("contributors")));
+	public void updateOnlyContributors(String id, List<Document> contributors) {
+		Document clause = new Document("_id", new ObjectId(id));
+		Document newDoc = new Document("$set", new Document("contributors", contributors));
 		collection.updateOne(clause, newDoc);
 	}
 	

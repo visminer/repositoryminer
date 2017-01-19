@@ -13,7 +13,6 @@ public class Comment {
 	private float totalHeuristic;
 	private float totalScore;
 	private String comment;
-	private String path;
 	private String clazz;
 	private String method;
 	private List<Pattern> patterns;
@@ -34,7 +33,7 @@ public class Comment {
 	public Document toDocument() {
 		Document doc = new Document();
 		doc.append("id", id).append("total_pattern", totalPattern).append("total_heuristic", totalHeuristic).
-		append("total_score", totalScore).append("comment", comment).append("path", path).append("class", clazz).
+		append("total_score", totalScore).append("comment", comment).append("class", clazz).
 		append("method", method).append("patterns", Pattern.toDocumentList(patterns)).append("heuristics", Heuristic.toDocumentList(heuristics));
 		
 		return doc;
@@ -45,7 +44,7 @@ public class Comment {
 		heuristics = new ArrayList<Heuristic>();
 	}
 	
-	public Comment(int id, float totalPattern, float totalHeuristic, float totalScore, String comment, String path,
+	public Comment(int id, float totalPattern, float totalHeuristic, float totalScore, String comment,
 			String clazz, String method) {
 		this();
 		this.id = id;
@@ -53,7 +52,6 @@ public class Comment {
 		this.totalHeuristic = totalHeuristic;
 		this.totalScore = totalScore;
 		this.comment = comment;
-		this.path = path;
 		this.clazz = clazz;
 		this.method = method;
 	}
@@ -96,14 +94,6 @@ public class Comment {
 
 	public void setComment(String comment) {
 		this.comment = comment;
-	}
-
-	public String getPath() {
-		return path;
-	}
-
-	public void setPath(String path) {
-		this.path = path;
 	}
 
 	public String getClazz() {

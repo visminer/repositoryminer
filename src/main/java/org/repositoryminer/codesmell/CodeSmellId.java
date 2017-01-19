@@ -5,7 +5,6 @@ package org.repositoryminer.codesmell;
  */
 public enum CodeSmellId {
 
-	DUPLICATED_CODE,
 	BRAIN_CLASS,
 	BRAIN_METHOD,
 	COMPLEX_METHOD,

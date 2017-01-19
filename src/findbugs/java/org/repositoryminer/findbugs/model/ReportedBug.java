@@ -7,41 +7,55 @@ import org.bson.Document;
 
 public class ReportedBug {
 
-	private String filename;
 	private int rank;
+	private String rankCategory;
 	private int priority;
+	private String priorityCategory;
 	private String type;
 	private String abbreviation;
-	private String patternCategory;
-	private String className;
-	private int startline;
+	private String description;
+	private String category;
+	private String clazz;
+	private String field;
+	private String method;
+	private String localVariable;
 	private String shortMessage;
 	private String longMessage;
 
 	public ReportedBug() {
 	}
 
-	public ReportedBug(String filename, int rank, int priority, String type, String abbreviation,
-			String patternCategory, String className, int startline, String shortMessage, String longMessage) {
+	public ReportedBug(int rank, String rankCategory, int priority, String priorityCategory, String type,
+			String abbreviation, String description, String category, String clazz, String shortMessage,
+			String longMessage) {
 		super();
-		this.filename = filename;
 		this.rank = rank;
+		this.rankCategory = rankCategory;
 		this.priority = priority;
+		this.priorityCategory = priorityCategory;
 		this.type = type;
 		this.abbreviation = abbreviation;
-		this.patternCategory = patternCategory;
-		this.className = className;
-		this.startline = startline;
+		this.description = description;
+		this.category = category;
+		this.clazz = clazz;
 		this.shortMessage = shortMessage;
 		this.longMessage = longMessage;
 	}
 
-	public String getFilename() {
-		return filename;
-	}
-
-	public void setFilename(String filename) {
-		this.filename = filename;
+	public static List<Document> toDocumentList(List<ReportedBug> reportedBugs) {
+		List<Document> list = new ArrayList<Document>();
+		for (ReportedBug rb : reportedBugs) {
+			Document doc = new Document();
+			doc.append("rank", rb.getRank()).append("rank_category", rb.getRankCategory())
+					.append("priority", rb.getPriority()).append("priority_category", rb.getPriorityCategory())
+					.append("type", rb.getType()).append("abbreviation", rb.getAbbreviation())
+					.append("description", rb.getDescription()).append("category", rb.getCategory())
+					.append("class", rb.getClazz()).append("field", rb.getField()).append("method", rb.getMethod())
+					.append("local_variable", rb.getLocalVariable()).append("short_message", rb.getShortMessage())
+					.append("long_message", rb.getLongMessage());
+			list.add(doc);
+		}
+		return list;
 	}
 
 	public int getRank() {
@@ -52,12 +66,28 @@ public class ReportedBug {
 		this.rank = rank;
 	}
 
+	public String getRankCategory() {
+		return rankCategory;
+	}
+
+	public void setRankCategory(String rankCategory) {
+		this.rankCategory = rankCategory;
+	}
+
 	public int getPriority() {
 		return priority;
 	}
 
 	public void setPriority(int priority) {
 		this.priority = priority;
+	}
+
+	public String getPriorityCategory() {
+		return priorityCategory;
+	}
+
+	public void setPriorityCategory(String priorityCategory) {
+		this.priorityCategory = priorityCategory;
 	}
 
 	public String getType() {
@@ -76,28 +106,52 @@ public class ReportedBug {
 		this.abbreviation = abbreviation;
 	}
 
-	public String getPatternCategory() {
-		return patternCategory;
+	public String getDescription() {
+		return description;
 	}
 
-	public void setPatternCategory(String patternCategory) {
-		this.patternCategory = patternCategory;
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
-	public String getClassName() {
-		return className;
+	public String getCategory() {
+		return category;
 	}
 
-	public void setClassName(String className) {
-		this.className = className;
+	public void setCategory(String category) {
+		this.category = category;
 	}
 
-	public int getStartline() {
-		return startline;
+	public String getClazz() {
+		return clazz;
 	}
 
-	public void setStartline(int startline) {
-		this.startline = startline;
+	public void setClazz(String clazz) {
+		this.clazz = clazz;
+	}
+
+	public String getField() {
+		return field;
+	}
+
+	public void setField(String field) {
+		this.field = field;
+	}
+
+	public String getMethod() {
+		return method;
+	}
+
+	public void setMethod(String method) {
+		this.method = method;
+	}
+
+	public String getLocalVariable() {
+		return localVariable;
+	}
+
+	public void setLocalVariable(String localVariable) {
+		this.localVariable = localVariable;
 	}
 
 	public String getShortMessage() {
@@ -114,20 +168,6 @@ public class ReportedBug {
 
 	public void setLongMessage(String longMessage) {
 		this.longMessage = longMessage;
-	}
-
-	public static List<Document> toDocumentList(List<ReportedBug> reportedBugs) {
-		List<Document> list = new ArrayList<Document>();
-		for (ReportedBug rb : reportedBugs) {
-			Document doc = new Document();
-			doc.append("filename", rb.getFilename()).append("rank", rb.getRank()).append("priority", rb.getPriority())
-					.append("type", rb.getType()).append("abbreviation", rb.getAbbreviation())
-					.append("pattern_category", rb.getPatternCategory()).append("classname", rb.getClassName())
-					.append("startline", rb.getStartline()).append("short_message", rb.getShortMessage())
-					.append("long_message", rb.getLongMessage());
-			list.add(doc);
-		}
-		return list;
 	}
 
 }

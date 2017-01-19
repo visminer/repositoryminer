@@ -6,17 +6,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 
-import org.repositoryminer.codesmell.clazz.IClassCodeSmell;
-import org.repositoryminer.codesmell.project.IProjectCodeSmell;
-import org.repositoryminer.listener.IMiningListener;
-import org.repositoryminer.listener.IPostMiningListener;
-import org.repositoryminer.listener.impl.MiningListener;
-import org.repositoryminer.listener.impl.PostMiningListener;
-import org.repositoryminer.metric.clazz.IClassMetric;
-import org.repositoryminer.metric.project.IProjectMetric;
+import org.repositoryminer.codemetric.direct.IDirectCodeMetric;
+import org.repositoryminer.codemetric.indirect.IIndirectCodeMetric;
+import org.repositoryminer.codesmell.direct.IDirectCodeSmell;
+import org.repositoryminer.codesmell.indirect.IIndirectCodeSmell;
+import org.repositoryminer.listener.mining.IMiningListener;
+import org.repositoryminer.listener.mining.NullMiningListener;
+import org.repositoryminer.listener.postmining.IPostMiningListener;
+import org.repositoryminer.listener.postmining.NullPostMiningListener;
+import org.repositoryminer.mining.local.IncrementalMiningProcessor;
+import org.repositoryminer.mining.local.MiningProcessor;
 import org.repositoryminer.model.Repository;
 import org.repositoryminer.parser.IParser;
-import org.repositoryminer.postprocessing.IPostMiningTask;
+import org.repositoryminer.persistence.handler.RepositoryDocumentHandler;
+import org.repositoryminer.postmining.IPostMiningTask;
+import org.repositoryminer.postmining.PostMiningProcessor;
 import org.repositoryminer.scm.ReferenceType;
 import org.repositoryminer.scm.SCMType;
 
@@ -53,54 +57,131 @@ public class RepositoryMiner {
 	private String path;
 	private String name;
 	private String description;
-	private SCMType scm;
+	private SCMType scm = SCMType.GIT;
 	private String charset = "UTF-8";
-	private int commitCount = 3000;
 
-	private List<IParser> parsers = new ArrayList<IParser>();
-	private List<IClassMetric> classMetrics = new ArrayList<IClassMetric>();
-	private List<IProjectMetric> projectMetrics = new ArrayList<IProjectMetric>();
-	private List<IClassCodeSmell> classCodeSmells = new ArrayList<IClassCodeSmell>();
-	private List<IProjectCodeSmell> projectCodeSmells = new ArrayList<IProjectCodeSmell>();
-	private List<IPostMiningTask> postMiningTasks = new ArrayList<IPostMiningTask>();
-	private List<Entry<String, ReferenceType>> references = new ArrayList<Entry<String, ReferenceType>>();
-	private List<String> snapshots = new ArrayList<String>();
+	private List<IParser> parsers;
 
-	private IMiningListener miningListener =  MiningListener.getDefault();
-	private IPostMiningListener postMiningListener = PostMiningListener.getDefault();
+	private List<IDirectCodeMetric> directCodeMetrics;
+	private List<IIndirectCodeMetric> indirectCodeMetrics;
 
-	/**
-	 * Use this void constructor if parameters are going to be set later
-	 * <p>
-	 * Otherwise, the non-void constructor (
-	 * {@link #RepositoryMiner(String, String, String, SCMType)}) can be used if
-	 * mandatory parameters are known
-	 */
-	public RepositoryMiner() {
+	private List<IDirectCodeSmell> directCodeSmells;
+	private List<IIndirectCodeSmell> indirectCodeSmell;
+
+	private List<Entry<String, ReferenceType>> references;
+	private List<String> snapshots;
+
+	private IMiningListener miningListener = new NullMiningListener();
+	private IPostMiningListener postMiningListener = new NullPostMiningListener();
+	private List<IPostMiningTask> postMiningTasks;
+
+	public boolean addParser(IParser parser) {
+		for (IParser p : getParsers()) {
+			if (p.getLanguage() == parser.getLanguage()) {
+				return false;
+			}
+		}
+
+		parsers.add(parser);
+		return true;
+	}
+
+	public boolean addDirectCodeMetric(IDirectCodeMetric codeMetric) {
+		for (IDirectCodeMetric metric : getDirectCodeMetrics()) {
+			if (metric.getId() == codeMetric.getId()) {
+				return false;
+			}
+		}
+
+		directCodeMetrics.add(codeMetric);
+		return true;
+	}
+
+	public boolean addIndirectCodeMetric(IIndirectCodeMetric codeMetric) {
+		for (IIndirectCodeMetric metric : getIndirectCodeMetrics()) {
+			if (metric.getId() == codeMetric.getId()) {
+				return false;
+			}
+		}
+
+		indirectCodeMetrics.add(codeMetric);
+		return true;
+	}
+
+	public boolean addDirectCodeSmell(IDirectCodeSmell codeSmell) {
+		for (IDirectCodeSmell smell : getDirectCodeSmells()) {
+			if (smell.getId() == codeSmell.getId()) {
+				return false;
+			}
+		}
+
+		directCodeSmells.add(codeSmell);
+		return true;
+	}
+
+	public boolean addIndirectCodeSmell(IIndirectCodeSmell codeSmell) {
+		for (IIndirectCodeSmell smell : getIndirectCodeSmell()) {
+			if (smell.getId() == codeSmell.getId()) {
+				return false;
+			}
+		}
+
+		indirectCodeSmell.add(codeSmell);
+		return true;
+	}
+
+	public boolean addReference(String name, ReferenceType type) {
+		Entry<String, ReferenceType> entry = new AbstractMap.SimpleEntry<String, ReferenceType>(name, type);
+		if (getReferences().contains(entry)) {
+			return false;
+		}
+
+		references.add(entry);
+		return true;
+	}
+
+	public boolean addSnapshot(String snapshot) {
+		if (getSnapshots().contains(snapshot)) {
+			return false;
+		}
+
+		snapshots.add(snapshot);
+		return true;
+	}
+
+	public boolean addPostTaskMining(IPostMiningTask task) {
+		for (IPostMiningTask task2 : getPostMiningTasks()) {
+			if (task2.getTaskName().equals(task.getTaskName())) {
+				return false;
+			}
+		}
+		postMiningTasks.add(task);
+		return true;
 	}
 
 	/**
-	 * Use this non-void constructor if mandatory parameters are known
-	 * <p>
-	 * Otherwise, the void constructor ({@link #RepositoryMiner()} can be used
-	 * if mandatory parameters are not known
-	 * 
 	 * @param path
-	 *            path to versioned project to be mined
+	 *            the project path
 	 * @param name
-	 *            user-friendly name of the project
+	 *            the project name
 	 * @param description
-	 *            extra descriptive information about the project
+	 *            the project description
 	 * @param scm
-	 *            the SCM type ({@link org.repositoryminer.scm.SCMType}) of the
-	 *            mined project
+	 *            the project SCM ({@link org.repositoryminer.scm.SCMType})
 	 */
 	public RepositoryMiner(String path, String name, String description, SCMType scm) {
-		super();
 		this.path = path;
 		this.name = name;
 		this.description = description;
 		this.scm = scm;
+	}
+
+	/**
+	 * @param name
+	 *            the project name
+	 */
+	public RepositoryMiner(String name) {
+		this.name = name;
 	}
 
 	/**
@@ -110,281 +191,209 @@ public class RepositoryMiner {
 	 * this method
 	 * <p>
 	 * 
-	 * @return instance of repository after mining and post-mining are performed
 	 * @throws IOException
 	 */
 	public Repository mine() throws IOException {
-		MiningProcessor processor = new MiningProcessor();
-		PostMiningProcessor postProcessor = new PostMiningProcessor();
-		miningListener.initMining(name);
-
-		return postProcessor.executeTasks(processor.mine(this), this);
-	}
-
-	/**
-	 * Adds a class metric without duplicates
-	 * 
-	 * @param classMetric
-	 * @return true if the metric was added and false otherwise
-	 */
-	public boolean addClassMetric(IClassMetric classMetric) {
-		for (IClassMetric c : this.classMetrics) {
-			if (c.getId().equals(classMetric.getId()))
-				return false;
+		RepositoryDocumentHandler repoDocHandler = new RepositoryDocumentHandler();
+		if (repoDocHandler.checkIfRepositoryExistsById(name)) {
+			IncrementalMiningProcessor processor = new IncrementalMiningProcessor();
+			processor.mine(this);
+		} else {
+			MiningProcessor processor = new MiningProcessor();
+			processor.mine(this);
 		}
-		this.classMetrics.add(classMetric);
-		return true;
-	}
 
-	/**
-	 * Adds a project metric without duplicates
-	 * 
-	 * @param projectMetric
-	 * @return true if the metric was added and false otherwise
-	 */
-	public boolean addProjectMetric(IProjectMetric projectMetric) {
-		for (IProjectMetric p : projectMetrics) {
-			if (p.getId().equals(projectMetric.getId()))
-				return false;
+		if (hasPostMiningTasks()) {
+			PostMiningProcessor postProcessor = new PostMiningProcessor();
+			postProcessor.setListener(postMiningListener);
+			postProcessor.setTasks(getPostMiningTasks());
+			postProcessor.executeTasks(Repository.parseDocument(repoDocHandler.findByName(name)), this);
 		}
-		this.projectMetrics.add(projectMetric);
-		return true;
-	}
-	
-	/**
-	 * Adds a class code smell without duplicates
-	 * 
-	 * @param classCodeSmell
-	 * @return true if the code smell was added and false otherwise
-	 */
-	public boolean addClassCodeSmell(IClassCodeSmell classCodeSmell) {
-		for (IClassCodeSmell c : this.classCodeSmells) {
-			if (c.getId().equals(classCodeSmell.getId()))
-				return false;
-		}
-		this.classCodeSmells.add(classCodeSmell);
-		return true;
+
+		return Repository.parseDocument(repoDocHandler.findByName(name));
 	}
 
-	/**
-	 * Adds a project code smell without duplicates
-	 * 
-	 * @param projectCodeSmell
-	 * @return true if the code smell was added and false otherwise
-	 */
-	public boolean addProjectCodeSmell(IProjectCodeSmell projectCodeSmell) {
-		for (IProjectCodeSmell c : this.projectCodeSmells) {
-			if (c.getId().equals(projectCodeSmell.getId()))
-				return false;
-		}
-		this.projectCodeSmells.add(projectCodeSmell);
-		return true;
+	public boolean hasParsers() {
+		return getParsers().size() > 0;
 	}
 
-	/**
-	 * Adds a parser without duplicates
-	 * 
-	 * @param parser
-	 * @return true if the parser was added and false otherwise
-	 */
-	public boolean addParser(IParser parser) {
-		for (IParser p : this.parsers) {
-			if (p.getLanguage() == parser.getLanguage())
-				return false;
-		}
-		this.parsers.add(parser);
-		return true;
+	public boolean hasDirectCodeMetrics() {
+		return getDirectCodeMetrics().size() > 0;
 	}
 
-	/**
-	 * Adds a post mining task without duplicates
-	 * 
-	 * @param postMiningTask
-	 * @return true if the task was added and false otherwise
-	 */
-	public boolean addPostMiningTask(IPostMiningTask postMiningTask) {
-		for (IPostMiningTask p : this.postMiningTasks) {
-			if (p.getTaskName().equals(postMiningTask.getTaskName()))
-				return false;
-		}
-		this.postMiningTasks.add(postMiningTask);
-		return true;
+	public boolean hasDirectCodeSmells() {
+		return getDirectCodeSmells().size() > 0;
 	}
 
-	/**
-	 * Adds a reference without duplicates
-	 * 
-	 * @param reference
-	 * @return true if the reference was added and false otherwise
-	 */
-	public boolean addReference(String name, ReferenceType type) {
-		Entry<String, ReferenceType> entry = new AbstractMap.SimpleEntry<String, ReferenceType>(name, type);
-		if (this.references.contains(entry))
-			return false;
-
-		references.add(entry);
-		return true;
+	public boolean hasIndirectCodeMetrics() {
+		return getIndirectCodeMetrics().size() > 0;
 	}
 
-	/**
-	 * Adds a snapshot without duplicates
-	 * 
-	 * @param snapshot
-	 * @return
-	 */
-	public boolean addSnapshot(String snapshot) {
-		if (snapshots.contains(snapshot))
-			return false;
-		
-		snapshots.add(snapshot);
-		return true;
-	}
-	
-	public boolean hasClassMetrics() {
-		return !classMetrics.isEmpty();
-	}
-
-	public boolean hasProjectMetrics() {
-		return !projectMetrics.isEmpty();
-	}
-	
-	public boolean hasClassCodeSmells() {
-		return !classCodeSmells.isEmpty();
-	}
-
-	public boolean hasProjectsCodeSmells() {
-		return !projectCodeSmells.isEmpty();
+	public boolean hasIndirectCodeSmells() {
+		return getIndirectCodeSmell().size() > 0;
 	}
 
 	public boolean hasPostMiningTasks() {
-		return !postMiningTasks.isEmpty();
+		return getPostMiningTasks().size() > 0;
 	}
 
-	/**
-	 * @return True if calculation (metrics) and detections (smells/debts)
-	 *         should be performed in commits and False otherwise
-	 */
-	public boolean shouldProcessCommits() {
-		return hasClassCodeSmells() || hasClassMetrics();
-	}
-
-	/**
-	 * @return True if calculation (metrics) and detections (smells/debts)
-	 *         should be performed in references and False otherwise
-	 */
-	public boolean shouldProcessReferences() {
-		return hasProjectsCodeSmells() || hasProjectMetrics();
-	}
+	// getters and setters
 
 	public String getPath() {
 		return path;
 	}
 
-	public RepositoryMiner setPath(String path) {
+	public void setPath(String path) {
 		this.path = path;
-		return this;
 	}
 
 	public String getName() {
 		return name;
 	}
 
-	public RepositoryMiner setName(String name) {
+	public void setName(String name) {
 		this.name = name;
-		return this;
 	}
 
 	public String getDescription() {
 		return description;
 	}
 
-	public RepositoryMiner setDescription(String description) {
+	public void setDescription(String description) {
 		this.description = description;
-		return this;
 	}
 
 	public SCMType getScm() {
 		return scm;
 	}
 
-	public RepositoryMiner setScm(SCMType scm) {
+	public void setScm(SCMType scm) {
 		this.scm = scm;
-		return this;
 	}
 
 	public String getCharset() {
 		return charset;
 	}
 
-	public RepositoryMiner setCharset(String charset) {
+	public void setCharset(String charset) {
 		this.charset = charset;
-		return this;
-	}
-
-	public int getCommitCount() {
-		return commitCount;
-	}
-
-	public void setCommitCount(int commitCount) {
-		this.commitCount = commitCount;
 	}
 
 	public List<IParser> getParsers() {
+		if (parsers == null) {
+			parsers = new ArrayList<IParser>();
+		}
+
 		return parsers;
 	}
 
-	public List<IClassMetric> getClassMetrics() {
-		return classMetrics;
+	public void setParsers(List<IParser> parsers) {
+		this.parsers = parsers;
 	}
 
-	public List<IProjectMetric> getProjectMetrics() {
-		return projectMetrics;
-	}
-
-	public List<IClassCodeSmell> getClassCodeSmells() {
-		return classCodeSmells;
-	}
-
-	public List<IProjectCodeSmell> getProjectCodeSmells() {
-		return projectCodeSmells;
-	}
-
-	public List<IPostMiningTask> getPostMiningTasks() {
-		return postMiningTasks;
-	}
-
-	public RepositoryMiner setMiningListener(IMiningListener listener) {
-		if (listener == null) {
-			throw new NullPointerException("Listener cannot be null");
+	public List<IDirectCodeMetric> getDirectCodeMetrics() {
+		if (directCodeMetrics == null) {
+			directCodeMetrics = new ArrayList<IDirectCodeMetric>();
 		}
-		
-		this.miningListener = listener;
-		return this;
+
+		return directCodeMetrics;
 	}
 
-	public IMiningListener getMiningListener() {
-		return miningListener;
+	public void setDirectCodeMetrics(List<IDirectCodeMetric> directCodeMetrics) {
+		this.directCodeMetrics = directCodeMetrics;
 	}
 
-	public RepositoryMiner setPostMiningListener(IPostMiningListener listener) {
-		if (listener == null) {
-			throw new NullPointerException("Listener cannot be null");
+	public List<IIndirectCodeMetric> getIndirectCodeMetrics() {
+		if (indirectCodeMetrics == null) {
+			indirectCodeMetrics = new ArrayList<IIndirectCodeMetric>();
 		}
-		
-		this.postMiningListener = listener;
-		return this;
+
+		return indirectCodeMetrics;
 	}
 
-	public IPostMiningListener getPostMiningListener() {
-		return postMiningListener;
+	public void setIndirectCodeMetrics(List<IIndirectCodeMetric> indirectCodeMetrics) {
+		this.indirectCodeMetrics = indirectCodeMetrics;
+	}
+
+	public List<IDirectCodeSmell> getDirectCodeSmells() {
+		if (directCodeSmells == null) {
+			directCodeSmells = new ArrayList<IDirectCodeSmell>();
+		}
+
+		return directCodeSmells;
+	}
+
+	public void setDirectCodeSmells(List<IDirectCodeSmell> directCodeSmells) {
+		this.directCodeSmells = directCodeSmells;
+	}
+
+	public List<IIndirectCodeSmell> getIndirectCodeSmell() {
+		if (indirectCodeSmell == null) {
+			indirectCodeSmell = new ArrayList<IIndirectCodeSmell>();
+		}
+
+		return indirectCodeSmell;
+	}
+
+	public void setIndirectCodeSmell(List<IIndirectCodeSmell> indirectCodeSmell) {
+		this.indirectCodeSmell = indirectCodeSmell;
 	}
 
 	public List<Entry<String, ReferenceType>> getReferences() {
+		if (references == null) {
+			references = new ArrayList<Entry<String, ReferenceType>>();
+		}
+
 		return references;
 	}
 
+	public void setReferences(List<Entry<String, ReferenceType>> references) {
+		this.references = references;
+	}
+
 	public List<String> getSnapshots() {
+		if (snapshots == null) {
+			snapshots = new ArrayList<String>();
+		}
+
 		return snapshots;
+	}
+
+	public void setSnapshots(List<String> snapshots) {
+		this.snapshots = snapshots;
+	}
+
+	public IMiningListener getMiningListener() {
+		if (miningListener == null) {
+			miningListener = new NullMiningListener();
+		}
+		return miningListener;
+	}
+
+	public void setMiningListener(IMiningListener miningListener) {
+		this.miningListener = miningListener;
+	}
+
+	public IPostMiningListener getPostMiningListener() {
+		if (postMiningListener == null) {
+			postMiningListener = new NullPostMiningListener();
+		}
+		return postMiningListener;
+	}
+
+	public void setPostMiningListener(IPostMiningListener postMiningListener) {
+		this.postMiningListener = postMiningListener;
+	}
+
+	public List<IPostMiningTask> getPostMiningTasks() {
+		if (postMiningTasks == null) {
+			postMiningTasks = new ArrayList<IPostMiningTask>();
+		}
+		return postMiningTasks;
+	}
+
+	public void setPostMiningTasks(List<IPostMiningTask> postMiningTasks) {
+		this.postMiningTasks = postMiningTasks;
 	}
 
 }
