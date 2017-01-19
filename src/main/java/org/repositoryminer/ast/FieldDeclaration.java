@@ -1,10 +1,12 @@
 package org.repositoryminer.ast;
 
+import java.util.List;
+
 public class FieldDeclaration {
 
 	private String name;
 	private String type;
-	private String modifier;
+	private List<String> modifiers;
 
 	public String getName() {
 		return name;
@@ -22,12 +24,12 @@ public class FieldDeclaration {
 		this.type = type;
 	}
 
-	public String getModifier() {
-		return modifier;
+	public List<String> getModifiers() {
+		return modifiers;
 	}
 
-	public void setModifier(String modifier) {
-		this.modifier = modifier;
+	public void setModifiers(List<String> modifiers) {
+		this.modifiers = modifiers;
 	}
 
 }

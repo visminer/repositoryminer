@@ -9,12 +9,12 @@ import java.util.List;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.ITypeBinding;
-import org.eclipse.jdt.core.dom.Modifier.ModifierKeyword;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.repositoryminer.ast.AST;
 import org.repositoryminer.ast.ClassArchetype;
+import org.repositoryminer.ast.ClassDeclaration;
 import org.repositoryminer.ast.Document;
 import org.repositoryminer.ast.FieldDeclaration;
 import org.repositoryminer.ast.ImportDeclaration;
@@ -22,7 +22,6 @@ import org.repositoryminer.ast.Language;
 import org.repositoryminer.ast.MethodDeclaration;
 import org.repositoryminer.ast.ParameterDeclaration;
 import org.repositoryminer.ast.SuperClassDeclaration;
-import org.repositoryminer.ast.ClassDeclaration;
 import org.repositoryminer.parser.IParser;
 
 /**
@@ -263,9 +262,11 @@ public class JavaParser implements IParser {
 		for (VariableDeclarationFragment vdf : (List<VariableDeclarationFragment>) field.fragments())
 			fieldDecl.setName(vdf.getName().getIdentifier());
 
-		ModifierKeyword modifier = ModifierKeyword.fromFlagValue(field.getModifiers());
-		if (modifier != null)
-			fieldDecl.setModifier(modifier.toString());
+		List<String> modifiers = new ArrayList<String>();
+		for (Object modifier : field.modifiers()) {
+			modifiers.add(modifier.toString());
+		}
+		fieldDecl.setModifiers(modifiers);
 
 		return fieldDecl;
 	}
