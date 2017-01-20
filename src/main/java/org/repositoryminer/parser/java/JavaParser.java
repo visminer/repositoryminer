@@ -9,6 +9,7 @@ import java.util.List;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.ITypeBinding;
+import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
@@ -210,11 +211,13 @@ public class JavaParser implements IParser {
 
 		List<ParameterDeclaration> params = new ArrayList<ParameterDeclaration>();
 		for (SingleVariableDeclaration var : (List<SingleVariableDeclaration>) methodDecl.parameters()) {
+			IVariableBinding varBind = var.resolveBinding();
+			
 			ParameterDeclaration param = new ParameterDeclaration();
-			param.setName(var.getName().getFullyQualifiedName());
-			param.setType(var.getType().toString());
+			param.setName(varBind.getName());
+			param.setType(varBind.getType().getQualifiedName());
 			params.add(param);
-			builder.append(param.getType() + " " + param.getName() + ",");
+			builder.append(param.getType() + ",");
 		}
 
 		if (builder.substring(builder.length() - 1).equals(",")) {
@@ -259,9 +262,10 @@ public class JavaParser implements IParser {
 		ITypeBinding bind = field.getType().resolveBinding();
 		fieldDecl.setType(bind.getQualifiedName());
 
-		for (VariableDeclarationFragment vdf : (List<VariableDeclarationFragment>) field.fragments())
+		for (VariableDeclarationFragment vdf : (List<VariableDeclarationFragment>) field.fragments()) {
 			fieldDecl.setName(vdf.getName().getIdentifier());
-
+		}
+			
 		List<String> modifiers = new ArrayList<String>();
 		for (Object modifier : field.modifiers()) {
 			modifiers.add(modifier.toString());

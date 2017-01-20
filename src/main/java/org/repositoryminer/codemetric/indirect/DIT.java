@@ -73,7 +73,7 @@ public class DIT implements IIndirectCodeMetric {
 		Queue<String> queue = new ArrayDeque<String>();
 		queue.add(""); // "" is the root
 
-		dit.put("", 0);
+		dit.put("", -1);
 
 		while (!queue.isEmpty()) {
 			String s = queue.poll();

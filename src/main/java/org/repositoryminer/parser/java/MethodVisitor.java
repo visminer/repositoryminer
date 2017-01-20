@@ -13,6 +13,7 @@ import org.eclipse.jdt.core.dom.EnhancedForStatement;
 import org.eclipse.jdt.core.dom.ExpressionStatement;
 import org.eclipse.jdt.core.dom.ForStatement;
 import org.eclipse.jdt.core.dom.IBinding;
+import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
@@ -68,8 +69,10 @@ public class MethodVisitor extends ASTVisitor {
 	@Override
 	public boolean visit(IfStatement node) {
 		addStatement(NodeType.IF, node.getExpression().toString(), node.getNodeType());
-		if (node.getElseStatement() != null)
+		if (node.getElseStatement() != null) {
 			addStatement(NodeType.ELSE, null, -1);
+		}
+
 		return true;
 	}
 
@@ -85,11 +88,12 @@ public class MethodVisitor extends ASTVisitor {
 
 	@Override
 	public boolean visit(SwitchCase node) {
-		if (node.isDefault())
+		if (node.isDefault()) {
 			return addStatement(NodeType.SWITCH_DEFAULT, null, node.getNodeType());
-		else
+		}
+		else {
 			return addStatement(NodeType.SWITCH_CASE, node.getExpression().toString(), node.getNodeType());
-
+		}
 	}
 
 	@Override
@@ -119,12 +123,29 @@ public class MethodVisitor extends ASTVisitor {
 
 	@Override
 	public boolean visit(MethodInvocation node) {
-		if (node.resolveMethodBinding() != null) {
-			ITypeBinding type = node.resolveMethodBinding().getDeclaringClass();
-			if (type.isFromSource()) {
-				String expression = type.getQualifiedName() + "." + node.resolveMethodBinding().getName();
-				return addStatement(NodeType.METHOD_INVOCATION, expression, node.getNodeType());
+		IMethodBinding methodBind = node.resolveMethodBinding();
+		if (methodBind != null) {
+			ITypeBinding typeBind = methodBind.getDeclaringClass();
+
+			StringBuilder methodSignature = new StringBuilder(methodBind.getName());
+			methodSignature.append("(");
+
+			for (ITypeBinding tbind : methodBind.getParameterTypes()) {
+				if (tbind.getDeclaringClass() != null) {
+				methodSignature.append(tbind.getDeclaringClass().getQualifiedName()).append(",");
+				} else {
+					methodSignature.append(tbind.getQualifiedName()).append(",");
+				}
 			}
+
+			if (methodSignature.substring(methodSignature.length() - 1).equals(",")) {
+				methodSignature.replace(methodSignature.length() - 1, methodSignature.length(), ")");
+			} else {
+				methodSignature.append(")");
+			}
+
+			String expression = typeBind.getQualifiedName() + "." + methodSignature.toString();
+			return addStatement(NodeType.METHOD_INVOCATION, expression, node.getNodeType());
 		}
 		return true;
 	}
@@ -132,29 +153,39 @@ public class MethodVisitor extends ASTVisitor {
 	@Override
 	public boolean visit(VariableDeclarationExpression node) {
 		String type = node.getType().toString();
-		for (Object f : node.fragments())
+		for (Object f : node.fragments()) {
 			addStatement(NodeType.VARIABLE_DECLARATION, type + " " + f.toString(), node.getNodeType());
+		}
+
 		return true;
 	}
 
 	@Override
 	public boolean visit(VariableDeclarationStatement node) {
 		String type = node.getType().toString();
-		for (Object f : node.fragments())
+		for (Object f : node.fragments()) {
 			addStatement(NodeType.VARIABLE_DECLARATION, type + " " + f.toString(), node.getNodeType());
+		}
+
 		return true;
 	}
 
 	@Override
 	public boolean visit(SimpleName node) {
-		if (node.resolveBinding() != null) {
-			if (node.resolveBinding().getKind() == IBinding.VARIABLE) {
-				IVariableBinding variable = (IVariableBinding) node.resolveBinding();
-				if (variable.getDeclaringClass() != null) {
-					if (variable.isField() && variable.getDeclaringClass().isFromSource()) {
-						String expression = variable.getDeclaringClass().getQualifiedName() + "." + variable.getName();
-						return addStatement(NodeType.FIELD_ACCESS, expression, node.getNodeType());
+		IBinding bind = node.resolveBinding();
+		if (bind != null) {
+			if (bind.getKind() == IBinding.VARIABLE) {
+				IVariableBinding variableBind = (IVariableBinding) bind;
+				if (variableBind.isField()) {
+					String expression = null;
+					
+					if (variableBind.getDeclaringClass() != null) {
+						expression = variableBind.getDeclaringClass().getQualifiedName() + "." + variableBind.getName();
+					} else {
+						expression = variableBind.getType().getQualifiedName() + "." + variableBind.getName();
 					}
+					
+					return addStatement(NodeType.FIELD_ACCESS, expression, node.getNodeType());
 				}
 			}
 		}

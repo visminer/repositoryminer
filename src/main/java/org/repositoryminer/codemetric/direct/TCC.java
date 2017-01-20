@@ -104,13 +104,17 @@ public class TCC extends MethodBasedMetricTemplate {
 		List<String> fields = new ArrayList<String>(2);
 
 		if ((methodInv.startsWith("get") || methodInv.startsWith("set")) && methodInv.length() > 3) {
-			field = methodInv.substring(3);
+			field = methodInv.substring(3, methodInv.indexOf('('));
 		} else if (methodInv.startsWith("is") && methodInv.length() > 2) {
-			field = methodInv.substring(2);
+			field = methodInv.substring(2, methodInv.indexOf('('));
 		} else {
 			return fields;
 		}
 
+		if (field.length() == 0) {
+			return fields;
+		}
+		
 		char c[] = field.toCharArray();
 		c[0] = Character.toLowerCase(c[0]);
 		String field2 = new String(c);
