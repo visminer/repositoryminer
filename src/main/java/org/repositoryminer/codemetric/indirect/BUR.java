@@ -108,17 +108,25 @@ public class BUR implements IIndirectCodeMetric {
 					new Document("metric", CodeMetricId.BUR.toString()).append("value", entry.getValue()));
 		}
 		
+		clean();
+		
+		return result;
+	}
+
+	public void clean() {
 		protFields.clear();
 		protMethods.clear();
 		accessedFields.clear();
 		invokedMethods.clear();
 		kinships.clear();
 		bur.clear();
-		
-		return result;
 	}
-
-	private void calculateBUR() {
+	
+	public Map<String, Float> getBUR() {
+		return bur;
+	}
+	
+	public void calculateBUR() {
 		for (Entry<String, String> kinship : kinships.entrySet()) {
 			if (kinship.getValue() == null || protMethods.get(kinship.getValue()) == null) {
 				// No parent or is not possible find the parent, so the highest

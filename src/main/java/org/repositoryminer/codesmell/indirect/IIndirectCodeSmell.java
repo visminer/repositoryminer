@@ -37,7 +37,7 @@ public interface IIndirectCodeSmell {
 	/**
 	 * @return The result of the metric after process all the source files. This
 	 *         method ought to return a map containing the canonical class name as
-	 *         key and a document with the codesmell value of the class used as key.
+	 *         key and a document with the metric value of the class used as key.
 	 */
 	public Map<String, Document> getResult();
 	

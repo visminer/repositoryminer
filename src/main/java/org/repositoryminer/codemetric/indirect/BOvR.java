@@ -53,7 +53,7 @@ public class BOvR implements IIndirectCodeMetric {
 
 	@Override
 	public Map<String, Document> getResult() {
-		processBOvR();
+		calculateBOvR();
 
 		Map<String, Document> result = new HashMap<String, Document>();
 		for (Entry<String, Float> entry : bovr.entrySet()) {
@@ -61,14 +61,21 @@ public class BOvR implements IIndirectCodeMetric {
 					new Document("metric", CodeMetricId.BOvR.toString()).append("value", entry.getValue()));
 		}
 
-		methodsSignatures.clear();
-		kinships.clear();
-		bovr.clear();
-
+		clean();
 		return result;
 	}
 
-	private void processBOvR() {
+	public void clean() {
+		methodsSignatures.clear();
+		kinships.clear();
+		bovr.clear();
+	}
+	
+	public Map<String, Float> getBOvR() {
+		return bovr;
+	}
+	
+	public void calculateBOvR() {
 		for (Entry<String, String> kinship : kinships.entrySet()) {
 			if (kinship.getValue() == null || methodsSignatures.get(kinship.getValue()) == null) {
 				// No parent or is not possible find the parent, so the highest
