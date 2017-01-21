@@ -6,8 +6,6 @@ import java.util.List;
 import org.bson.Document;
 import org.repositoryminer.ast.AST;
 import org.repositoryminer.ast.AbstractClassDeclaration;
-import org.repositoryminer.ast.ClassArchetype;
-import org.repositoryminer.ast.ClassDeclaration;
 import org.repositoryminer.ast.MethodDeclaration;
 import org.repositoryminer.codemetric.CodeMetricId;
 import org.repositoryminer.codemetric.direct.CYCLO;
@@ -42,23 +40,21 @@ public class ComplexMethod implements IDirectCodeSmell {
 
 	@Override
 	public Document detect(AbstractClassDeclaration type, AST ast) {
-		if (type.getArchetype() == ClassArchetype.CLASS_OR_INTERFACE) {
-			ClassDeclaration cls = (ClassDeclaration) type;
-			List<Document> methods = new ArrayList<Document>();
+		List<Document> methods = new ArrayList<Document>();
 
-			for (MethodDeclaration method : cls.getMethods()) {
-				int cc = ccMetric.calculate(method);
-				if (cc > ccThreshold) {
-					Document mDoc = new Document("signature", method.getName()).append("metrics",
-							new Document(CodeMetricId.CYCLO.toString(), cc));
-					methods.add(mDoc);
-				}
-			}
-
-			if (methods.size() > 0) {
-				return new Document("codesmell", CodeSmellId.COMPLEX_METHOD.toString()).append("methods", methods);
+		for (MethodDeclaration method : type.getMethods()) {
+			int cc = ccMetric.calculate(method);
+			if (cc > ccThreshold) {
+				Document mDoc = new Document("signature", method.getName()).append("metrics",
+						new Document(CodeMetricId.CYCLO.toString(), cc));
+				methods.add(mDoc);
 			}
 		}
+
+		if (methods.size() > 0) {
+			return new Document("codesmell", CodeSmellId.COMPLEX_METHOD.toString()).append("methods", methods);
+		}
+		
 		return null;
 	}
 

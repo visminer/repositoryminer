@@ -6,8 +6,6 @@ import java.util.List;
 import org.bson.Document;
 import org.repositoryminer.ast.AST;
 import org.repositoryminer.ast.AbstractClassDeclaration;
-import org.repositoryminer.ast.ClassArchetype;
-import org.repositoryminer.ast.ClassDeclaration;
 import org.repositoryminer.ast.MethodDeclaration;
 import org.repositoryminer.codemetric.CodeMetricId;
 import org.repositoryminer.codemetric.direct.MLOC;
@@ -33,22 +31,19 @@ public class LongMethod implements IDirectCodeSmell {
 
 	@Override
 	public Document detect(AbstractClassDeclaration type, AST ast) {
-		if (type.getArchetype() == ClassArchetype.CLASS_OR_INTERFACE) {
-			ClassDeclaration cls = (ClassDeclaration) type;
-			List<Document> methods = new ArrayList<Document>();
+		List<Document> methods = new ArrayList<Document>();
 
-			for (MethodDeclaration method : cls.getMethods()) {
-				int mloc = mlocMetric.calculate(method, ast);
-				if (mloc > mlocThreshold) {
-					Document mDoc = new Document("signature", method.getName()).append("metrics",
-							new Document(CodeMetricId.MLOC.toString(), mloc));
-					methods.add(mDoc);
-				}
+		for (MethodDeclaration method : type.getMethods()) {
+			int mloc = mlocMetric.calculate(method, ast);
+			if (mloc > mlocThreshold) {
+				Document mDoc = new Document("signature", method.getName()).append("metrics",
+						new Document(CodeMetricId.MLOC.toString(), mloc));
+				methods.add(mDoc);
 			}
+		}
 
-			if (methods.size() > 0) {
-				return new Document("codesmell", CodeSmellId.LONG_METHOD.toString()).append("methods", methods);
-			}
+		if (methods.size() > 0) {
+			return new Document("codesmell", CodeSmellId.LONG_METHOD.toString()).append("methods", methods);
 		}
 		return null;
 	}

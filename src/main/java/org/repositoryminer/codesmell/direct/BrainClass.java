@@ -3,8 +3,6 @@ package org.repositoryminer.codesmell.direct;
 import org.bson.Document;
 import org.repositoryminer.ast.AST;
 import org.repositoryminer.ast.AbstractClassDeclaration;
-import org.repositoryminer.ast.ClassArchetype;
-import org.repositoryminer.ast.ClassDeclaration;
 import org.repositoryminer.ast.MethodDeclaration;
 import org.repositoryminer.codemetric.CodeMetricId;
 import org.repositoryminer.codemetric.direct.MLOC;
@@ -39,7 +37,7 @@ public class BrainClass implements IDirectCodeSmell {
 
 	public BrainClass() {
 	}
-	
+
 	public BrainClass(int wmcThreshold, float tccThreshold, int nbmThreshold, int locThreshold) {
 		this.wmcThreshold = wmcThreshold;
 		this.tccThreshold = tccThreshold;
@@ -54,34 +52,29 @@ public class BrainClass implements IDirectCodeSmell {
 
 	@Override
 	public Document detect(AbstractClassDeclaration type, AST ast) {
-		if (type.getArchetype() == ClassArchetype.CLASS_OR_INTERFACE) {
-			ClassDeclaration cls = (ClassDeclaration) type;
-			
-			int wmc = wmcMetric.calculate(cls.getMethods());
-			float tcc = tccMetric.calculate(type, cls.getMethods());
+		int wmc = wmcMetric.calculate(type.getMethods());
+		float tcc = tccMetric.calculate(type, type.getMethods());
 
-			int nbm = 0; // number of brain methods
-			int totalMloc = 0; // total number of lines of code from methods
+		int nbm = 0; // number of brain methods
+		int totalMloc = 0; // total number of lines of code from methods
 
-			for (MethodDeclaration method : cls.getMethods()) {
-				totalMloc += mlocMetric.calculate(method, ast);
-				if (brainMethod.detect(type, method, ast)) {
-					nbm++;
-				}
-			}
-			
-			if (detect(nbm, totalMloc, wmc, tcc)) {
-				Document metrics = new Document();
-				metrics.append(CodeMetricId.WMC.toString(), wmc);
-				metrics.append(CodeMetricId.TCC.toString(), tcc);
-				metrics.append(CodeMetricId.LOC.toString(), totalMloc);
-				metrics.append(CodeSmellId.BRAIN_METHOD.toString(), nbm);
-				
-				return new Document("codesmell", new String(CodeSmellId.BRAIN_CLASS.toString())).append("metrics",
-						metrics);
+		for (MethodDeclaration method : type.getMethods()) {
+			totalMloc += mlocMetric.calculate(method, ast);
+			if (brainMethod.detect(type, method, ast)) {
+				nbm++;
 			}
 		}
-		
+
+		if (detect(nbm, totalMloc, wmc, tcc)) {
+			Document metrics = new Document();
+			metrics.append(CodeMetricId.WMC.toString(), wmc);
+			metrics.append(CodeMetricId.TCC.toString(), tcc);
+			metrics.append(CodeMetricId.LOC.toString(), totalMloc);
+			metrics.append(CodeSmellId.BRAIN_METHOD.toString(), nbm);
+
+			return new Document("codesmell", new String(CodeSmellId.BRAIN_CLASS.toString())).append("metrics", metrics);
+		}
+
 		return null;
 	}
 

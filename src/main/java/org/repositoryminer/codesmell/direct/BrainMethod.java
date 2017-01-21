@@ -6,8 +6,6 @@ import java.util.List;
 import org.bson.Document;
 import org.repositoryminer.ast.AST;
 import org.repositoryminer.ast.AbstractClassDeclaration;
-import org.repositoryminer.ast.ClassArchetype;
-import org.repositoryminer.ast.ClassDeclaration;
 import org.repositoryminer.ast.MethodDeclaration;
 import org.repositoryminer.codemetric.CodeMetricId;
 import org.repositoryminer.codemetric.direct.CYCLO;
@@ -57,7 +55,7 @@ public class BrainMethod implements IDirectCodeSmell {
 
 	public BrainMethod() {
 	}
-	
+
 	public BrainMethod(int mlocThreshold, float ccMlocThreshold, int maxNestingThreshold, int noavThreshold) {
 		this.mlocThreshold = mlocThreshold;
 		this.ccThreshold = ccMlocThreshold;
@@ -72,29 +70,27 @@ public class BrainMethod implements IDirectCodeSmell {
 
 	@Override
 	public Document detect(AbstractClassDeclaration type, AST ast) {
-		if (type.getArchetype() == ClassArchetype.CLASS_OR_INTERFACE) {
-			ClassDeclaration cls = (ClassDeclaration) type;
-			List<Document> methods = new ArrayList<Document>();
+		List<Document> methods = new ArrayList<Document>();
 
-			for (MethodDeclaration method : cls.getMethods()) {
-				int cc = ccMetric.calculate(method);
-				int mloc = mlocMetric.calculate(method, ast);
-				int noav = noavMetric.calculate(type, method);
-				int maxNesting = maxNestingMetric.calculate(method);
+		for (MethodDeclaration method : type.getMethods()) {
+			int cc = ccMetric.calculate(method);
+			int mloc = mlocMetric.calculate(method, ast);
+			int noav = noavMetric.calculate(type, method);
+			int maxNesting = maxNestingMetric.calculate(method);
 
-				if (detect(cc, mloc, noav, maxNesting)) {
-					Document metrics = new Document(CodeMetricId.MLOC.toString(), mloc)
-							.append(CodeMetricId.CYCLO.toString(), cc).append(CodeMetricId.NOAV.toString(), noav)
-							.append(CodeMetricId.MAXNESTING.toString(), maxNesting);
-					Document mDoc = new Document("signature", method.getName()).append("metrics", metrics);
-					methods.add(mDoc);
-				}
-			}
-
-			if (methods.size() > 0) {
-				return new Document("codesmell", CodeSmellId.BRAIN_METHOD.toString()).append("methods", methods);
+			if (detect(cc, mloc, noav, maxNesting)) {
+				Document metrics = new Document(CodeMetricId.MLOC.toString(), mloc)
+						.append(CodeMetricId.CYCLO.toString(), cc).append(CodeMetricId.NOAV.toString(), noav)
+						.append(CodeMetricId.MAXNESTING.toString(), maxNesting);
+				Document mDoc = new Document("signature", method.getName()).append("metrics", metrics);
+				methods.add(mDoc);
 			}
 		}
+
+		if (methods.size() > 0) {
+			return new Document("codesmell", CodeSmellId.BRAIN_METHOD.toString()).append("methods", methods);
+		}
+		
 		return null;
 	}
 

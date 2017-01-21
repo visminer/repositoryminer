@@ -3,7 +3,6 @@ package org.repositoryminer.codesmell.direct;
 import org.bson.Document;
 import org.repositoryminer.ast.AST;
 import org.repositoryminer.ast.AbstractClassDeclaration;
-import org.repositoryminer.ast.ClassArchetype;
 import org.repositoryminer.ast.ClassDeclaration;
 import org.repositoryminer.codemetric.CodeMetricId;
 import org.repositoryminer.codemetric.direct.ATFD;
@@ -62,22 +61,19 @@ public class GodClass implements IDirectCodeSmell {
 
 	@Override
 	public Document detect(AbstractClassDeclaration type, AST ast) {
-		if (type.getArchetype() == ClassArchetype.CLASS_OR_INTERFACE) {
-			ClassDeclaration cls = (ClassDeclaration) type;
+		int atfd = atfdMetric.calculate(type, type.getMethods(), false);
+		float tcc = tccMetric.calculate(type, type.getMethods());
+		int wmc = wmcMetric.calculate(type.getMethods());
 
-			int atfd = atfdMetric.calculate(type, cls.getMethods(), false);
-			float tcc = tccMetric.calculate(type, cls.getMethods());
-			int wmc = wmcMetric.calculate(cls.getMethods());
+		if (detect(atfd, wmc, tcc)) {
+			Document metrics = new Document();
+			metrics.append(CodeMetricId.ATFD.toString(), atfd);
+			metrics.append(CodeMetricId.WMC.toString(), wmc);
+			metrics.append(CodeMetricId.TCC.toString(), tcc);
 
-			if (detect(atfd, wmc, tcc)) {
-				Document metrics = new Document();
-				metrics.append(CodeMetricId.ATFD.toString(), atfd);
-				metrics.append(CodeMetricId.WMC.toString(), wmc);
-				metrics.append(CodeMetricId.TCC.toString(), tcc);
-
-				return new Document("codesmell", CodeSmellId.GOD_CLASS.toString()).append("metrics", metrics);
-			}
+			return new Document("codesmell", CodeSmellId.GOD_CLASS.toString()).append("metrics", metrics);
 		}
+		
 		return null;
 	}
 
