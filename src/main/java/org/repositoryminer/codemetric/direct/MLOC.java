@@ -15,14 +15,10 @@ import org.repositoryminer.codemetric.CodeMetricId;
  * MLOC is defined as the number of non-blank and non-comment lines inside
  * method bodies.
  */
-public class MLOC extends MethodBasedMetricTemplate {
+public class MLOC implements IDirectCodeMetric {
 
-	private List<Document> methodsDoc;
-	private LOC locMetric;
-
-	public MLOC() {
-		locMetric = new LOC();
-	}
+	private List<Document> methodsDoc = new ArrayList<Document>();
+	private LOC locMetric = new LOC();
 
 	@Override
 	public CodeMetricId getId() {
@@ -30,11 +26,11 @@ public class MLOC extends MethodBasedMetricTemplate {
 	}
 
 	@Override
-	public Document calculate(AbstractClassDeclaration type, List<MethodDeclaration> methods, AST ast) {
-		methodsDoc = new ArrayList<Document>();
+	public Document calculate(AbstractClassDeclaration type, AST ast) {
+		methodsDoc.clear();
 		int accumulated = 0;
 
-		for (MethodDeclaration method : methods) {
+		for (MethodDeclaration method : type.getMethods()) {
 			int mloc = calculate(method, ast);
 			accumulated += mloc;
 			methodsDoc.add(new Document("method", method.getName()).append("value", mloc));

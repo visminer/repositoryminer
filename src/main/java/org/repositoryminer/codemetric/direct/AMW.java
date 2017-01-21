@@ -3,29 +3,16 @@ package org.repositoryminer.codemetric.direct;
 import org.bson.Document;
 import org.repositoryminer.ast.AST;
 import org.repositoryminer.ast.AbstractClassDeclaration;
-import org.repositoryminer.ast.ClassArchetype;
-import org.repositoryminer.ast.ClassDeclaration;
 import org.repositoryminer.codemetric.CodeMetricId;
 
 public class AMW implements IDirectCodeMetric {
 
-	private WMC wmcMetric;
-	
-	public AMW() {
-		wmcMetric = new WMC();
-	}
+	private WMC wmcMetric = new WMC();
 	
 	@Override
 	public Document calculate(AbstractClassDeclaration type, AST ast) {
-		if (type.getArchetype() != ClassArchetype.CLASS_OR_INTERFACE) {
-			return null;
-		}
-		
-		ClassDeclaration cls = (ClassDeclaration) type;
-		
-		int wmc = wmcMetric.calculate(cls.getMethods());
-		int nom = cls.getMethods().size();
-		
+		int wmc = wmcMetric.calculate(type.getMethods());
+		int nom = type.getMethods().size();
 		return new Document("metric", CodeMetricId.AMW.toString()).append("value", calculate(wmc, nom));
 	}
 
@@ -33,7 +20,6 @@ public class AMW implements IDirectCodeMetric {
 		if (nom == 0) {
 			return 0l;
 		}
-		
 		return wmc * 1l / nom;
 	}
 	

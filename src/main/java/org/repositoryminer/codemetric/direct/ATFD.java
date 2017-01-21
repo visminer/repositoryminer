@@ -19,9 +19,9 @@ import org.repositoryminer.codemetric.CodeMetricId;
  * ATFD is defined as the number of attributes from unrelated classes that are
  * accessed directly or by invoking accessor methods.
  */
-public class ATFD extends MethodBasedMetricTemplate {
+public class ATFD implements IDirectCodeMetric {
 
-	private List<Document> methodsDoc;
+	private List<Document> methodsDoc = new ArrayList<Document>();
 
 	@Override
 	public CodeMetricId getId() {
@@ -29,10 +29,10 @@ public class ATFD extends MethodBasedMetricTemplate {
 	}
 
 	@Override
-	public Document calculate(AbstractClassDeclaration type, List<MethodDeclaration> methods, AST ast) {
-		methodsDoc = new ArrayList<Document>();
-		return new Document("metric", CodeMetricId.ATFD.toString()).append("accumulated", calculate(type, methods, true))
-				.append("methods", methodsDoc);
+	public Document calculate(AbstractClassDeclaration type, AST ast) {
+		methodsDoc.clear();
+		return new Document("metric", CodeMetricId.ATFD.toString())
+				.append("accumulated", calculate(type, type.getMethods(), true)).append("methods", methodsDoc);
 	}
 
 	public int calculate(AbstractClassDeclaration type, List<MethodDeclaration> methods, boolean calculateByMethod) {

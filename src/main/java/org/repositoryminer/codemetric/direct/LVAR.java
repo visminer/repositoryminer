@@ -16,9 +16,9 @@ import org.repositoryminer.codemetric.CodeMetricId;
  * <p>
  * LVAR is defined as the number of local variables inside a method.
  */
-public class LVAR extends MethodBasedMetricTemplate {
+public class LVAR implements IDirectCodeMetric {
 
-	private List<Document> methodsDoc;
+	private List<Document> methodsDoc = new ArrayList<Document>();
 	
 	@Override
 	public CodeMetricId getId() {
@@ -26,11 +26,11 @@ public class LVAR extends MethodBasedMetricTemplate {
 	}
 	
 	@Override
-	public Document calculate(AbstractClassDeclaration type, List<MethodDeclaration> methods, AST ast) {
-		methodsDoc = new ArrayList<Document>();
+	public Document calculate(AbstractClassDeclaration type, AST ast) {
+		methodsDoc.clear();
 		int accumulated = 0;
 		
-		for(MethodDeclaration method : methods){
+		for(MethodDeclaration method : type.getMethods()){
 			int lvar = calculate(method);
 			accumulated += lvar;
 			methodsDoc.add(new Document("method", method.getName()).append("value", lvar));

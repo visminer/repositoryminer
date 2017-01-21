@@ -16,9 +16,9 @@ import org.repositoryminer.codemetric.CodeMetricId;
  * MAXNESTING is defined as the maximum nesting level of control structures
  * within an operation.
  */
-public class MAXNESTING extends MethodBasedMetricTemplate {
+public class MAXNESTING implements IDirectCodeMetric {
 
-	private List<Document> methodsDoc;
+	private List<Document> methodsDoc = new ArrayList<Document>();
 
 	@Override
 	public CodeMetricId getId() {
@@ -26,9 +26,9 @@ public class MAXNESTING extends MethodBasedMetricTemplate {
 	}
 	
 	@Override
-	public Document calculate(AbstractClassDeclaration type, List<MethodDeclaration> methods, AST ast) {
-		methodsDoc = new ArrayList<Document>();
-		for (MethodDeclaration method : methods) {
+	public Document calculate(AbstractClassDeclaration type, AST ast) {
+		methodsDoc.clear();
+		for (MethodDeclaration method : type.getMethods()) {
 			methodsDoc.add(new Document("method", method.getName()).append("value", calculate(method)));
 		}
 		return new Document("metric", CodeMetricId.MAXNESTING.toString()).append("methods", methodsDoc);

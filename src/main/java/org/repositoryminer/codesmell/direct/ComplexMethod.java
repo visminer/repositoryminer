@@ -24,16 +24,14 @@ import org.repositoryminer.codesmell.CodeSmellId;
  */
 public class ComplexMethod implements IDirectCodeSmell {
 
-	private CYCLO ccMetric;
+	private CYCLO ccMetric = new CYCLO();
 
 	private int ccThreshold = 10;
 
 	public ComplexMethod() {
-		ccMetric = new CYCLO();
 	}
 
 	public ComplexMethod(int ccThreshold) {
-		this();
 		this.ccThreshold = ccThreshold;
 	}
 

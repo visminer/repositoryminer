@@ -1,12 +1,8 @@
 package org.repositoryminer.ast;
 
-import java.util.List;
-
 public class ClassDeclaration extends AbstractClassDeclaration{
 
 	private boolean isInterface;
-	private List<MethodDeclaration> methods;
-	private List<FieldDeclaration> fields;
 	private SuperClassDeclaration superClass;
 	
 	public ClassDeclaration() {
@@ -19,22 +15,6 @@ public class ClassDeclaration extends AbstractClassDeclaration{
 
 	public void setInterface(boolean isInterface) {
 		this.isInterface = isInterface;
-	}
-
-	public List<MethodDeclaration> getMethods() {
-		return methods;
-	}
-
-	public void setMethods(List<MethodDeclaration> methods) {
-		this.methods = methods;
-	}
-
-	public List<FieldDeclaration> getFields() {
-		return fields;
-	}
-
-	public void setFields(List<FieldDeclaration> fields) {
-		this.fields = fields;
 	}
 
 	public SuperClassDeclaration getSuperClass() {

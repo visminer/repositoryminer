@@ -14,29 +14,29 @@ import org.repositoryminer.codemetric.CodeMetricId;
  * <p>
  * PAR is defined as the number of parameters per method.
  */
-public class PAR extends MethodBasedMetricTemplate {
+public class PAR implements IDirectCodeMetric {
 
-	private List<Document> methodsDoc;
-	
+	private List<Document> methodsDoc = new ArrayList<Document>();
+
 	@Override
 	public CodeMetricId getId() {
 		return CodeMetricId.PAR;
 	}
-	
+
 	@Override
-	public Document calculate(AbstractClassDeclaration type, List<MethodDeclaration> methods, AST ast) {
-		methodsDoc = new ArrayList<Document>();
+	public Document calculate(AbstractClassDeclaration type, AST ast) {
+		methodsDoc.clear();
 		int accumulated = 0;
-		
-		for(MethodDeclaration method : methods){
+
+		for(MethodDeclaration method : type.getMethods()){
 			int par = calculate(method);
 			accumulated += par;
 			methodsDoc.add(new Document("method", method.getName()).append("value", par));
 		}
-	
+
 		return new Document("metric", CodeMetricId.PAR.toString()).append("accumulated", accumulated).append("methods", methodsDoc);
 	}
-	
+
 	public int calculate(MethodDeclaration method){
 		return method.getParameters() != null ? method.getParameters().size() : 0;
 	}

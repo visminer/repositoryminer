@@ -15,16 +15,14 @@ import org.repositoryminer.codesmell.CodeSmellId;
 
 public class LongMethod implements IDirectCodeSmell {
 
-	private MLOC mlocMetric;
+	private MLOC mlocMetric = new MLOC();
 
 	private int mlocThreshold = 40;
 
 	public LongMethod() {
-		mlocMetric = new MLOC();
 	}
 
 	public LongMethod(int mlocThreshold) {
-		this();
 		this.mlocThreshold = mlocThreshold;
 	}
 

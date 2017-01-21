@@ -40,9 +40,9 @@ import org.repositoryminer.codemetric.CodeMetricId;
  * Each of the resulting tests adds 1 to the value of the metric.
  * </ul>
  */
-public class CYCLO extends MethodBasedMetricTemplate {
+public class CYCLO implements IDirectCodeMetric {
 
-	private List<Document> methodsDoc;
+	private List<Document> methodsDoc  = new ArrayList<Document>();
 
 	@Override
 	public CodeMetricId getId() {
@@ -54,9 +54,9 @@ public class CYCLO extends MethodBasedMetricTemplate {
 	 *      AST, Document)
 	 */
 	@Override
-	public Document calculate(AbstractClassDeclaration type, List<MethodDeclaration> methods, AST ast) {
-		methodsDoc = new ArrayList<Document>();
-		calculate(methods);
+	public Document calculate(AbstractClassDeclaration type, AST ast) {
+		methodsDoc.clear();
+		calculate(type.getMethods());
 		return new Document("metric", CodeMetricId.CYCLO.toString()).append("methods", methodsDoc);
 	}
 

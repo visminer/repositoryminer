@@ -38,22 +38,18 @@ import org.repositoryminer.codesmell.CodeSmellId;
  */
 public class GodClass implements IDirectCodeSmell {
 
-	private ATFD atfdMetric;
-	private WMC wmcMetric;
-	private TCC tccMetric;
+	private ATFD atfdMetric = new ATFD();
+	private WMC wmcMetric = new WMC();
+	private TCC tccMetric = new TCC();
 
 	private int atfdThreshold = 5;
 	private int wmcThreshold = 47;
 	private float tccThreshold = 1.0f / 3.0f;
 
 	public GodClass() {
-		atfdMetric = new ATFD();
-		wmcMetric = new WMC();
-		tccMetric = new TCC();
 	}
 
 	public GodClass(int atfdThreshold, int wmcThreshold, float tccThreshold, int noaThreshold) {
-		this();
 		this.atfdThreshold = atfdThreshold;
 		this.wmcThreshold = wmcThreshold;
 		this.tccThreshold = tccThreshold;

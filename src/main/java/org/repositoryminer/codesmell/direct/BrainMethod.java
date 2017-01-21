@@ -45,10 +45,10 @@ import org.repositoryminer.codesmell.CodeSmellId;
  */
 public class BrainMethod implements IDirectCodeSmell {
 
-	private MLOC mlocMetric;
-	private CYCLO ccMetric;
-	private NOAV noavMetric;
-	private MAXNESTING maxNestingMetric;
+	private MLOC mlocMetric = new MLOC();
+	private CYCLO ccMetric = new CYCLO();
+	private NOAV noavMetric = new NOAV();
+	private MAXNESTING maxNestingMetric = new MAXNESTING();
 
 	private int mlocThreshold = 65;
 	private float ccThreshold = 10;
@@ -56,14 +56,9 @@ public class BrainMethod implements IDirectCodeSmell {
 	private int noavThreshold = 5;
 
 	public BrainMethod() {
-		mlocMetric = new MLOC();
-		ccMetric = new CYCLO();
-		noavMetric = new NOAV();
-		maxNestingMetric = new MAXNESTING();
 	}
-
+	
 	public BrainMethod(int mlocThreshold, float ccMlocThreshold, int maxNestingThreshold, int noavThreshold) {
-		this();
 		this.mlocThreshold = mlocThreshold;
 		this.ccThreshold = ccMlocThreshold;
 		this.maxNestingThreshold = maxNestingThreshold;

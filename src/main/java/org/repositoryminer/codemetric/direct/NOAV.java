@@ -16,16 +16,11 @@ import org.repositoryminer.codemetric.CodeMetricId;
  * measured operation. Variables include parameters, local variables, but also
  * instance variables and global variables.
  */
-public class NOAV extends MethodBasedMetricTemplate {
+public class NOAV implements IDirectCodeMetric {
 
-	private List<Document> methodsDoc;
-	private LVAR lvarMetric;
-	private TCC tccMetric; // TCC and NOAV processes accessed fields the same way
-	
-	public NOAV() {
-		lvarMetric = new LVAR();
-		tccMetric = new TCC();
-	}
+	private List<Document> methodsDoc = new ArrayList<Document>();
+	private LVAR lvarMetric = new LVAR();
+	private TCC tccMetric = new TCC(); // TCC and NOAV processes accessed fields the same way
 	
 	@Override
 	public CodeMetricId getId() {
@@ -33,9 +28,9 @@ public class NOAV extends MethodBasedMetricTemplate {
 	}
 
 	@Override
-	public Document calculate(AbstractClassDeclaration type, List<MethodDeclaration> methods, AST ast) {
-		methodsDoc = new ArrayList<Document>();
-		List<MethodDeclaration> filteredMethods = filterMethods(methods);
+	public Document calculate(AbstractClassDeclaration type, AST ast) {
+		methodsDoc.clear();
+		List<MethodDeclaration> filteredMethods = filterMethods(type.getMethods());
 		
 		for (MethodDeclaration method : filteredMethods) {
 			methodsDoc.add(new Document("method", method.getName()).append("value", calculate(type, method)));

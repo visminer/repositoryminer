@@ -21,7 +21,7 @@ import org.repositoryminer.codemetric.CodeMetricId;
  * The relative number of method pairs of a class that access in common at least
  * one attribute of the measured class.
  */
-public class TCC extends MethodBasedMetricTemplate {
+public class TCC implements IDirectCodeMetric {
 
 	@Override
 	public CodeMetricId getId() {
@@ -29,8 +29,8 @@ public class TCC extends MethodBasedMetricTemplate {
 	}
 
 	@Override
-	public Document calculate(AbstractClassDeclaration type, List<MethodDeclaration> methods, AST ast) {
-		return new Document("metric", CodeMetricId.TCC.toString()).append("value", calculate(type, methods));
+	public Document calculate(AbstractClassDeclaration type, AST ast) {
+		return new Document("metric", CodeMetricId.TCC.toString()).append("value", calculate(type, type.getMethods()));
 	}
 
 	public float calculate(AbstractClassDeclaration type, List<MethodDeclaration> methods) {
@@ -83,11 +83,12 @@ public class TCC extends MethodBasedMetricTemplate {
 				if (stmt.getNodeType().equals(NodeType.FIELD_ACCESS)) {
 					fields.add(target);
 				} else if (stmt.getNodeType().equals(NodeType.METHOD_INVOCATION)) {
-					fields.addAll(processGetOrSetOrIs(target));
+					fields.addAll(processGetOrSetOrIs(target, currType));
 				}
 			}
 
 		}
+		
 		return new ArrayList<String>(fields);
 	}
 
@@ -99,13 +100,13 @@ public class TCC extends MethodBasedMetricTemplate {
 		return false;
 	}
 
-	private Collection<String> processGetOrSetOrIs(String methodInv) {
+	private Collection<String> processGetOrSetOrIs(String methodInv, AbstractClassDeclaration type) {
 		String field;
 		List<String> fields = new ArrayList<String>(2);
 
-		if ((methodInv.startsWith("get") || methodInv.startsWith("set")) && methodInv.length() > 3) {
+		if ((methodInv.startsWith("get") || methodInv.startsWith("set"))) {
 			field = methodInv.substring(3, methodInv.indexOf('('));
-		} else if (methodInv.startsWith("is") && methodInv.length() > 2) {
+		} else if (methodInv.startsWith("is")) {
 			field = methodInv.substring(2, methodInv.indexOf('('));
 		} else {
 			return fields;
@@ -119,7 +120,7 @@ public class TCC extends MethodBasedMetricTemplate {
 		c[0] = Character.toLowerCase(c[0]);
 		String field2 = new String(c);
 
-		for (FieldDeclaration fd : currentFields) {
+		for (FieldDeclaration fd : type.getFields()) {
 			if (fd.getName().equals(field)) {
 				fields.add(field);
 			} else if (fd.getName().equals(field2)) {

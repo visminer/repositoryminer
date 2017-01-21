@@ -27,10 +27,10 @@ import org.repositoryminer.codesmell.CodeSmellId;
  */
 public class BrainClass implements IDirectCodeSmell {
 
-	private WMC wmcMetric;
-	private BrainMethod brainMethod;
-	private TCC tccMetric;
-	private MLOC mlocMetric;
+	private WMC wmcMetric = new WMC();
+	private BrainMethod brainMethod = new BrainMethod();
+	private TCC tccMetric = new TCC();
+	private MLOC mlocMetric = new MLOC();
 
 	private int wmcThreshold = 47;
 	private float tccThreshold = 0.5f;
@@ -38,14 +38,9 @@ public class BrainClass implements IDirectCodeSmell {
 	private int locThreshold = 197;
 
 	public BrainClass() {
-		wmcMetric = new WMC();
-		brainMethod = new BrainMethod();
-		tccMetric = new TCC();
-		mlocMetric = new MLOC();
 	}
-
+	
 	public BrainClass(int wmcThreshold, float tccThreshold, int nbmThreshold, int locThreshold) {
-		this();
 		this.wmcThreshold = wmcThreshold;
 		this.tccThreshold = tccThreshold;
 		this.nbmThreshold = nbmThreshold;
