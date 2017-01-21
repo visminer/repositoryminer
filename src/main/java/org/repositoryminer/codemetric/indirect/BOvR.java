@@ -80,7 +80,7 @@ public class BOvR implements IIndirectCodeMetric {
 			if (kinship.getValue() == null || methodsSignatures.get(kinship.getValue()) == null) {
 				// No parent or is not possible find the parent, so the highest
 				// possible value is used
-				bovr.put(kinship.getKey(), -1f);
+				bovr.put(kinship.getKey(), 0f);
 				continue;
 			}
 

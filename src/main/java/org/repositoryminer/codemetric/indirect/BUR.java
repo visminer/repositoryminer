@@ -131,7 +131,7 @@ public class BUR implements IIndirectCodeMetric {
 			if (kinship.getValue() == null || protMethods.get(kinship.getValue()) == null) {
 				// No parent or is not possible find the parent, so the highest
 				// possible value is used
-				bur.put(kinship.getKey(), -1f);
+				bur.put(kinship.getKey(), 0f);
 				continue;
 			}
 
@@ -141,7 +141,7 @@ public class BUR implements IIndirectCodeMetric {
 			int totalProtected = parentFields.size() + parentMethods.size();
 
 			if (totalProtected == 0) {
-				bur.put(kinship.getKey(), -1f);
+				bur.put(kinship.getKey(), 0f);
 				continue;
 			}
 
