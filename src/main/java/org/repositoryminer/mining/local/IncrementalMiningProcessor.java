@@ -72,10 +72,14 @@ public class IncrementalMiningProcessor {
 						scm.getReferenceCommits(ref.getPath(), ref.getType()));
 			}
 
-			listener.notifyCommitsMiningStart(ref.getName(), ref.getType(), ref.getCommits().size());
-			listener.notifyCommitsMiningEnd(ref.getName(), ref.getType(), updateCommits(ref, commitsToSkip));
+			List<String> commits = ref.getCommits();
+			if (commits != null) {
+				listener.notifyCommitsMiningStart(ref.getName(), ref.getType(), ref.getCommits().size());
+				listener.notifyCommitsMiningEnd(ref.getName(), ref.getType(), updateCommits(ref, commitsToSkip));
 			
-			ref.setCommits(ref.getCommits().subList(0, 1)); // copy only the last commit in the reference
+				ref.setCommits(commits.subList(0, 1)); // copy only the last commit in the reference
+			}
+			
 			ref.setId(refDoc.getObjectId("_id").toString());
 			selectedReferences.add(ref);
 		}
