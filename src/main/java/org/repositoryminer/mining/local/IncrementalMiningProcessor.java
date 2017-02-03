@@ -63,23 +63,20 @@ public class IncrementalMiningProcessor {
 			ref.setRepository(repositoryId);
 			Document refDoc = refDocumentHandler.findByPath(ref.getPath(), repositoryId, Projections.include("_id"));
 
+			ref.setCommits(scm.getReferenceCommits(ref.getPath(), ref.getType()));
+			
 			if (refDoc == null) {
-				ref.setCommits(scm.getReferenceCommits(ref.getPath(), ref.getType()));
 				refDoc = ref.toDocument();
 				refDocumentHandler.insert(refDoc);
 			} else {
 				refDocumentHandler.updateOnlyCommits(refDoc.getObjectId("_id").toString(),
-						scm.getReferenceCommits(ref.getPath(), ref.getType()));
+						ref.getCommits());
 			}
 
-			List<String> commits = ref.getCommits();
-			if (commits != null) {
-				listener.notifyCommitsMiningStart(ref.getName(), ref.getType(), ref.getCommits().size());
-				listener.notifyCommitsMiningEnd(ref.getName(), ref.getType(), updateCommits(ref, commitsToSkip));
+			listener.notifyCommitsMiningStart(ref.getName(), ref.getType(), ref.getCommits().size());
+			listener.notifyCommitsMiningEnd(ref.getName(), ref.getType(), updateCommits(ref, commitsToSkip));
 			
-				ref.setCommits(commits.subList(0, 1)); // copy only the last commit in the reference
-			}
-			
+			ref.setCommits(ref.getCommits().subList(0, 1)); // copy only the last commit in the reference
 			ref.setId(refDoc.getObjectId("_id").toString());
 			selectedReferences.add(ref);
 		}

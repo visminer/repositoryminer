@@ -87,11 +87,8 @@ public class IndirectCodeAnalysisProcessor {
 
 	public void start() throws IOException {
 		for (Reference ref : references) {
-			List<String> commits = ref.getCommits();
-			if (commits != null) {
-				snapshots.remove(ref.getCommits().get(0)); // avoids to process some
-				// commit again
-			}
+			// avoids to process some commit again
+			snapshots.remove(ref.getCommits().get(0));
 		}
 
 		int total = references.size() + snapshots.size();
@@ -105,16 +102,12 @@ public class IndirectCodeAnalysisProcessor {
 
 	public void startIncrementalAnalysis() throws IOException {
 		for (int i = 0; i < references.size(); i++) {
-			List<String> commits = references.get(i).getCommits();
-
-			if (commits != null) {
-				String commitId = references.get(i).getCommits().get(0);
-				if (indirectAnalysisHandler.hasRecord(repositoryId, commitId)) {
-					snapshots.remove(commitId);
-					references.remove(i);
-					i--;
-					updateReferenceInIndirectAnalysis(commitId, references.get(i));
-				}
+			String commitId = references.get(i).getCommits().get(0);
+			if (indirectAnalysisHandler.hasRecord(repositoryId, commitId)) {
+				updateReferenceInIndirectAnalysis(commitId, references.get(i));
+				snapshots.remove(commitId);
+				references.remove(i);
+				i--;
 			}
 		}
 
@@ -138,17 +131,14 @@ public class IndirectCodeAnalysisProcessor {
 		int total = references.size() + snapshots.size();
 
 		for (Reference ref : references) {
-			List<String> commits = ref.getCommits();		
-			if (commits != null) {
-				String commitId = commits.get(0);
+			String commitId = ref.getCommits().get(0);
 
-				listener.notifyIndirectCodeAnalysisProgress(ref.getName(), index, total);
+			listener.notifyIndirectCodeAnalysisProgress(ref.getName(), index, total);
 
-				Commit commit = Commit.parseDocument(commitHandler.findById(commitId, Projections.include("commit_date")));
-				scm.checkout(commitId);
+			Commit commit = Commit.parseDocument(commitHandler.findById(commitId, Projections.include("commit_date")));
+			scm.checkout(commitId);
 
-				processFiles(commit, ref);
-			}
+			processFiles(commit, ref);
 		}
 	}
 
