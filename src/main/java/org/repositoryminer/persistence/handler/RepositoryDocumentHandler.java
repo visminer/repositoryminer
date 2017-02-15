@@ -16,10 +16,16 @@ public class RepositoryDocumentHandler extends DocumentHandler {
 		super.collection = Connection.getInstance().getCollection(COLLECTION_NAME);
 	}
 
-	public boolean checkIfRepositoryExistsById(String name) {
+	public boolean checkIfRepositoryExistsById(String id) {
+		Document clause = new Document("_id",new ObjectId(id));
+		return collection.count(clause) > 0 ? true : false;
+	}
+
+	public boolean checkIfRepositoryExistsByName(String name) {
 		Document clause = new Document("name", name);
 		return collection.count(clause) > 0 ? true : false;
 	}
+
 
 	public Document findByName(String name) {
 		return findOne(new BasicDBObject("name", name));

@@ -37,10 +37,10 @@ import org.repositoryminer.parser.IParser;
 public class JavaParser implements IParser {
 
 	private String[] sourceFolders;
-	
+
 	@Override
 	public String[] getExtensions() {
-		String[] exts = {"java"};
+		String[] exts = { "java" };
 		return exts;
 	}
 
@@ -48,7 +48,7 @@ public class JavaParser implements IParser {
 	public String[] getSourceFolders() {
 		return sourceFolders;
 	}
-	
+
 	@Override
 	public void processSourceFolders(String repositoryPath) {
 		List<String> folders = new ArrayList<String>();
@@ -72,7 +72,7 @@ public class JavaParser implements IParser {
 			}
 		}
 	}
-	
+
 	private boolean validateSourceFolder(File f) {
 
 		File[] fList = f.listFiles(new FileFilter() {
@@ -94,7 +94,7 @@ public class JavaParser implements IParser {
 		return false;
 
 	}
-	
+
 	@Override
 	public Language getLanguage() {
 		return Language.JAVA;
@@ -164,23 +164,23 @@ public class JavaParser implements IParser {
 		return ast;
 	}
 
-	private static org.repositoryminer.ast.AbstractClassDeclaration processType(String packageName, 
+	private static org.repositoryminer.ast.AbstractClassDeclaration processType(String packageName,
 			org.eclipse.jdt.core.dom.TypeDeclaration type) {
-		
+
 		ClassDeclaration clsDecl = new ClassDeclaration();
-		
+
 		if (type.getSuperclassType() != null) {
 			ITypeBinding bind = type.getSuperclassType().resolveBinding();
-			
+
 			SuperClassDeclaration superClass = new SuperClassDeclaration();
 			superClass.setInterface(bind.isInterface());
 			superClass.setName(bind.getQualifiedName());
 			superClass.setPackageDeclaration(bind.getPackage().getName());
 			superClass.setArchetype(ClassArchetype.CLASS_OR_INTERFACE);
-		
+
 			clsDecl.setSuperClass(superClass);
 		}
-		
+
 		clsDecl.setInterface(type.isInterface());
 		clsDecl.setName(packageName + "." + type.getName().getIdentifier());
 
@@ -212,7 +212,7 @@ public class JavaParser implements IParser {
 		List<ParameterDeclaration> params = new ArrayList<ParameterDeclaration>();
 		for (SingleVariableDeclaration var : (List<SingleVariableDeclaration>) methodDecl.parameters()) {
 			IVariableBinding varBind = var.resolveBinding();
-			
+
 			ParameterDeclaration param = new ParameterDeclaration();
 			param.setName(varBind.getName());
 			param.setType(varBind.getType().getQualifiedName());
@@ -258,14 +258,16 @@ public class JavaParser implements IParser {
 	@SuppressWarnings("unchecked")
 	private static FieldDeclaration processField(org.eclipse.jdt.core.dom.FieldDeclaration field) {
 		FieldDeclaration fieldDecl = new FieldDeclaration();
-		
+
 		ITypeBinding bind = field.getType().resolveBinding();
-		fieldDecl.setType(bind.getQualifiedName());
+		if (bind != null) {
+			fieldDecl.setType(bind.getQualifiedName());
+		}
 
 		for (VariableDeclarationFragment vdf : (List<VariableDeclarationFragment>) field.fragments()) {
 			fieldDecl.setName(vdf.getName().getIdentifier());
 		}
-			
+
 		List<String> modifiers = new ArrayList<String>();
 		for (Object modifier : field.modifiers()) {
 			modifiers.add(modifier.toString());

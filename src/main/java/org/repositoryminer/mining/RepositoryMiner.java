@@ -195,7 +195,7 @@ public class RepositoryMiner {
 	 */
 	public Repository mine() throws IOException {
 		RepositoryDocumentHandler repoDocHandler = new RepositoryDocumentHandler();
-		if (repoDocHandler.checkIfRepositoryExistsById(name)) {
+		if (repoDocHandler.checkIfRepositoryExistsByName(name)) {
 			IncrementalMiningProcessor processor = new IncrementalMiningProcessor();
 			processor.mine(this);
 		} else {
