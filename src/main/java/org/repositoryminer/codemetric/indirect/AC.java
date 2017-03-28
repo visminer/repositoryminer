@@ -21,7 +21,7 @@ public class AC implements IIndirectCodeMetric{
 	public void calculate(AbstractClassDeclaration type, AST ast) {		
 		EC ec = new EC();
 		acMap  = new HashMap<>();
-		Map<String, Integer> ecMap = ec.calculae(type);
+		Map<String, Integer> ecMap = ec.calculate(type);
 		for(Entry<String, Integer> entry : ecMap.entrySet()){
 			Map<String, Integer> typeAcRelations = acMap.getOrDefault(entry.getKey(), new HashMap<>());
 			typeAcRelations.put(type.getName(), typeAcRelations.getOrDefault(type.getName(), 1) + 1);

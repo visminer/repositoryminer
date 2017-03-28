@@ -22,7 +22,6 @@ public class EC implements IDirectCodeMetric {
 		typeECMap.clear();
 		Document doc = new Document("metric", getId().toString());
 		if(type.getArchetype() == ClassArchetype.CLASS_OR_INTERFACE){
-			calculateImports(type,ast);
 			calculateFieldEC(type);
 			calculateMethodEC(type);
 			
@@ -47,8 +46,19 @@ public class EC implements IDirectCodeMetric {
 		return typeECMap;
 	}
 	
-	private void calculateFieldEC(AbstractClassDeclaration type) {
-		type.getFields().stream().forEach(field ->  increaseECCount(field.getType()));
+	private void calculateFieldEC(AbstractClassDeclaration type) {		
+		type.getFields().stream().forEach(field ->  {
+			if(field.isGeneric() || field.isPrimitiveType()){
+				return;
+			}
+			if(field.isArrayType())				
+				increaseECCount(field.getArrayTypeName());
+			else if(field.isParametrizedType())
+				field.getParamTypes().forEach(param -> increaseECCount(param));
+			else
+				increaseECCount(field.getType());
+				
+		});
 	}
 	
 	private void increaseECCount(String key){
@@ -58,8 +68,24 @@ public class EC implements IDirectCodeMetric {
 
 	private void calculateMethodEC(AbstractClassDeclaration type) {
 		for(MethodDeclaration md: type.getMethods()){
-			md.getParameters().stream().forEach( param -> increaseECCount(param.getType()));
-			increaseECCount(md.getReturnType());
+			md.getParameters().stream().forEach( param -> {
+				if(param.isPrimitiveType() || param.isGeneric())
+					return;
+				if(param.isArrayType())
+					increaseECCount(param.getArrayTypeName());
+				else if (param.isParametrizedType())
+					param.getParamTypes().forEach(parameter -> increaseECCount(parameter));
+				else 
+					increaseECCount(param.getType());
+			});
+			if(!md.isReturnGeneric() && !md.isReturnPrimitive() && !md.isConstructor()){
+				if(md.isReturnArray())
+					increaseECCount(md.getReturnArrayType());
+				else if(md.isReturnParametrized())
+					md.getReturnParameters().forEach(parameter -> increaseECCount(parameter));
+				else
+					increaseECCount(md.getReturnType());
+			}
 			md.getThrownsExceptions().stream().forEach( thr -> increaseECCount(thr));
 		}
 	}

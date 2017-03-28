@@ -1,5 +1,6 @@
 package org.repositoryminer.ast;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MethodDeclaration {
@@ -14,6 +15,66 @@ public class MethodDeclaration {
 	private boolean isConstructor;
 	private boolean isVarargs;
 	private List<String> thrownsExceptions;
+	
+	private boolean returnPrimitive;
+	private boolean returnArray;
+	private boolean returnGeneric;
+	private boolean returnParametrized;
+	
+	private String returnArrayType;
+	
+	
+	
+	public String getReturnArrayType() {
+		return returnArrayType;
+	}
+
+	public void setReturnArrayType(String returnArrayType) {
+		this.returnArrayType = returnArrayType;
+	}
+
+	private List<String> returnParameters = new ArrayList<>();
+	
+
+	public boolean isReturnPrimitive() {
+		return returnPrimitive;
+	}
+
+	public void setReturnPrimitive(boolean returnPrimitive) {
+		this.returnPrimitive = returnPrimitive;
+	}
+
+	public boolean isReturnArray() {
+		return returnArray;
+	}
+
+	public void setReturnArray(boolean returnArray) {
+		this.returnArray = returnArray;
+	}
+
+	public boolean isReturnGeneric() {
+		return returnGeneric;
+	}
+
+	public void setReturnGeneric(boolean returnGeneric) {
+		this.returnGeneric = returnGeneric;
+	}
+
+	public boolean isReturnParametrized() {
+		return returnParametrized;
+	}
+
+	public void setReturnParametrized(boolean returnParametrized) {
+		this.returnParametrized = returnParametrized;
+	}
+
+	public List<String> getReturnParameters() {
+		return returnParameters;
+	}
+
+	public void setReturnParameters(List<String> returnParameters) {
+		this.returnParameters = returnParameters;
+	}
 
 	public String getName() {
 		return name;
@@ -94,5 +155,10 @@ public class MethodDeclaration {
 	public void setEndPositionInSourceCode(int endPositionInSourceCode) {
 		this.endPositionInSourceCode = endPositionInSourceCode;
 	}
+	
+	public void addReturnParameterType(String qualifiedName) {
+		this.returnParameters.add(qualifiedName);
+	}
+
 
 }

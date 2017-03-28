@@ -13,6 +13,7 @@ import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.QualifiedType;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.Type;
+import org.eclipse.jdt.core.dom.TypeParameter;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.repositoryminer.ast.AST;
 import org.repositoryminer.ast.ClassArchetype;
@@ -219,12 +220,16 @@ public class JavaParser implements IParser {
 			param.setName(varBind.getName());
 			
 			param.setParametrizedType(varBind.getType().isParameterizedType());
+			if(varBind.getType().isParameterizedType())
+				for(ITypeBinding tBinding: varBind.getType().getTypeParameters())
+					param.addParametrizedType(tBinding.getQualifiedName());
 			param.setPrimitiveType(varBind.getType().isPrimitive());			
 			param.setArrayType(varBind.getType().isArray());
 			if(param.isArrayType())
-				param.setType(varBind.getType().getElementType().getQualifiedName());
-			else
-				param.setType(varBind.getType().getQualifiedName());
+				param.setArrayTypeName(varBind.getType().getElementType().getQualifiedName());
+			
+			param.setType(varBind.getType().getQualifiedName());
+			
 			params.add(param);
 			builder.append(param.getType() + ",");
 		}
@@ -258,8 +263,18 @@ public class JavaParser implements IParser {
 		methodDecl.accept(visitor);
 		m.setStatements(visitor.getStatements());
 
-		if (methodDecl.getReturnType2() != null)
+		if (methodDecl.getReturnType2() != null){
 			m.setReturnType(methodDecl.getReturnType2().toString());
+			m.setReturnPrimitive(methodDecl.getReturnType2().isPrimitiveType());
+			m.setReturnArray(methodDecl.getReturnType2().isArrayType());			
+			m.setReturnParametrized(methodDecl.getReturnType2().isParameterizedType());
+			
+			if(m.isReturnArray())
+				m.setReturnArrayType(methodDecl.getReturnType2().resolveBinding().getElementType().getQualifiedName());
+			if(m.isReturnParametrized())
+				for(ITypeBinding binding: methodDecl.getReturnType2().resolveBinding().getTypeParameters())
+					m.addReturnParameterType(binding.getQualifiedName());
+		}
 
 		m.setStartPositionInSourceCode(methodDecl.getStartPosition());
 		m.setEndPositionInSourceCode(methodDecl.getStartPosition() + methodDecl.getLength());
@@ -276,9 +291,16 @@ public class JavaParser implements IParser {
 			fieldDecl.setType(bind.getQualifiedName());
 		}
 
-		fieldDecl.setPrimitiveType(field.getType().isPrimitiveType());
-		fieldDecl.setArrayType(field.getType().isArrayType());	
-		fieldDecl.setParametrizedType(field.getType().isParameterizedType());
+		fieldDecl.setPrimitiveType(bind.isPrimitive());
+		fieldDecl.setArrayType(bind.isArray());	
+		if(bind.isArray())
+			fieldDecl.setArrayTypeName(bind.getElementType().getQualifiedName());
+		fieldDecl.setParametrizedType(bind.isParameterizedType());
+		if(bind.isParameterizedType()){
+			for(ITypeBinding type : bind.getTypeParameters())
+				fieldDecl.addParametrizedType(type.getQualifiedName());
+		}
+		fieldDecl.setGeneric(bind.isGenericType());
 		
 		for (VariableDeclarationFragment vdf : (List<VariableDeclarationFragment>) field.fragments()) {
 			fieldDecl.setName(vdf.getName().getIdentifier());
