@@ -18,7 +18,7 @@ public class AC implements IIndirectCodeMetric{
 	private Map<String, Map<String, Integer>> acMap;
 	
 	@Override
-	public void calculate(AbstractClassDeclaration type, AST ast) {
+	public void calculate(AbstractClassDeclaration type, AST ast) {		
 		EC ec = new EC();
 		acMap  = new HashMap<>();
 		Map<String, Integer> ecMap = ec.calculae(type);
@@ -43,6 +43,8 @@ public class AC implements IIndirectCodeMetric{
 			entry.getValue().entrySet().stream().forEach( relation -> acRelationsDoc.add(new Document("class",relation.getKey()).append("value", relation.getValue())));
 			result.put(entry.getKey(),new Document("metric",this.getId()).append("afferentClasses", acRelationsDoc));
 		}
+		
+		acMap.clear();
 		
 		return result;
 	}

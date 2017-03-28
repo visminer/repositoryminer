@@ -8,6 +8,15 @@ public class AbstractClassDeclaration {
 	private List<MethodDeclaration> methods;
 	private List<FieldDeclaration> fields;
 	private String name;
+	private String fullQualifiedName;
+
+	public String getFullQualifiedName() {
+		return fullQualifiedName;
+	}
+
+	public void setFullQualifiedName(String fullQualifiedName) {
+		this.fullQualifiedName = fullQualifiedName;
+	}
 
 	public ClassArchetype getArchetype() {
 		return archetype;

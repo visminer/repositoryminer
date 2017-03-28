@@ -10,6 +10,7 @@ import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
+import org.eclipse.jdt.core.dom.QualifiedType;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
@@ -182,7 +183,7 @@ public class JavaParser implements IParser {
 		}
 
 		clsDecl.setInterface(type.isInterface());
-		clsDecl.setName(packageName + "." + type.getName().getIdentifier());
+		clsDecl.setName(type.getName().getFullyQualifiedName());
 
 		List<FieldDeclaration> fields = new ArrayList<FieldDeclaration>();
 		for (org.eclipse.jdt.core.dom.FieldDeclaration field : type.getFields()) {
@@ -210,12 +211,20 @@ public class JavaParser implements IParser {
 		builder.append(methodDecl.getName().getFullyQualifiedName()).append("(");
 
 		List<ParameterDeclaration> params = new ArrayList<ParameterDeclaration>();
+		
 		for (SingleVariableDeclaration var : (List<SingleVariableDeclaration>) methodDecl.parameters()) {
 			IVariableBinding varBind = var.resolveBinding();
-
+			
 			ParameterDeclaration param = new ParameterDeclaration();
 			param.setName(varBind.getName());
-			param.setType(varBind.getType().getQualifiedName());
+			
+			param.setParametrizedType(varBind.getType().isParameterizedType());
+			param.setPrimitiveType(varBind.getType().isPrimitive());			
+			param.setArrayType(varBind.getType().isArray());
+			if(param.isArrayType())
+				param.setType(varBind.getType().getElementType().getQualifiedName());
+			else
+				param.setType(varBind.getType().getQualifiedName());
 			params.add(param);
 			builder.append(param.getType() + ",");
 		}
@@ -232,7 +241,10 @@ public class JavaParser implements IParser {
 		List<String> throwsList = new ArrayList<String>();
 		List<Type> types = methodDecl.thrownExceptionTypes();
 		for (Type type : types) {
-			throwsList.add(type.toString());
+			if(type.isQualifiedType())
+				throwsList.add(((QualifiedType)type).getName().getFullyQualifiedName());
+			else
+				throwsList.add(type.toString());
 		}
 		m.setThrownsExceptions(throwsList);
 
@@ -264,6 +276,10 @@ public class JavaParser implements IParser {
 			fieldDecl.setType(bind.getQualifiedName());
 		}
 
+		fieldDecl.setPrimitiveType(field.getType().isPrimitiveType());
+		fieldDecl.setArrayType(field.getType().isArrayType());	
+		fieldDecl.setParametrizedType(field.getType().isParameterizedType());
+		
 		for (VariableDeclarationFragment vdf : (List<VariableDeclarationFragment>) field.fragments()) {
 			fieldDecl.setName(vdf.getName().getIdentifier());
 		}

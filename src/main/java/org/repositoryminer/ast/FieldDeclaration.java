@@ -7,6 +7,27 @@ public class FieldDeclaration {
 	private String name;
 	private String type;
 	private List<String> modifiers;
+	
+	private boolean primitiveType;
+	private boolean arrayType;
+	private boolean parametrizedType;
+
+
+	public boolean isParametrizedType() {
+		return parametrizedType;
+	}
+
+	public void setParametrizedType(boolean parametrizedType) {
+		this.parametrizedType = parametrizedType;
+	}
+
+	public boolean isArrayType() {
+		return arrayType;
+	}
+
+	public void setArrayType(boolean arrayType) {
+		this.arrayType = arrayType;
+	}
 
 	public String getName() {
 		return name;
@@ -31,5 +52,16 @@ public class FieldDeclaration {
 	public void setModifiers(List<String> modifiers) {
 		this.modifiers = modifiers;
 	}
+
+	public boolean isPrimitiveType() {
+		return primitiveType;
+	}
+
+	public void setPrimitiveType(boolean primitiveType) {
+		this.primitiveType = primitiveType;
+	}
+	
+	
+	
 
 }
