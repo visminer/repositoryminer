@@ -1,5 +1,6 @@
 package org.repositoryminer.ast;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class AbstractClassDeclaration {
@@ -9,6 +10,17 @@ public class AbstractClassDeclaration {
 	private List<FieldDeclaration> fields;
 	private String name;
 	private String fullQualifiedName;
+	
+	
+	private List<String> parameters;
+	
+	private boolean isGeneric;
+	
+	
+	public AbstractClassDeclaration(){
+		this.parameters = new ArrayList<>();
+	}
+	
 
 	public String getFullQualifiedName() {
 		return fullQualifiedName;
@@ -48,6 +60,27 @@ public class AbstractClassDeclaration {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+
+	public List<String> getParameters() {
+		return parameters;
+	}
+
+	public void setParameters(List<String> parameters) {
+		this.parameters = parameters;
+	}
+
+	public boolean isGeneric() {
+		return isGeneric;
+	}
+
+	public void setGeneric(boolean isGeneric) {
+		this.isGeneric = isGeneric;
+	}
+	
+	public void addParameter(String parameter){
+		this.parameters.add(parameter);
 	}
 
 }

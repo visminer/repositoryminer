@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.jdt.core.dom.ASTParser;
@@ -13,9 +14,9 @@ import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.QualifiedType;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.Type;
-import org.eclipse.jdt.core.dom.TypeParameter;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.repositoryminer.ast.AST;
+import org.repositoryminer.ast.AbstractClassDeclaration;
 import org.repositoryminer.ast.ClassArchetype;
 import org.repositoryminer.ast.ClassDeclaration;
 import org.repositoryminer.ast.Document;
@@ -173,18 +174,31 @@ public class JavaParser implements IParser {
 
 		if (type.getSuperclassType() != null) {
 			ITypeBinding bind = type.getSuperclassType().resolveBinding();
-
-			SuperClassDeclaration superClass = new SuperClassDeclaration();
-			superClass.setInterface(bind.isInterface());
-			superClass.setName(bind.getQualifiedName());
-			superClass.setPackageDeclaration(bind.getPackage().getName());
-			superClass.setArchetype(ClassArchetype.CLASS_OR_INTERFACE);
-
+			
+			SuperClassDeclaration superClass = extractSuperClass(bind);
 			clsDecl.setSuperClass(superClass);
+			
+		}
+		
+		if(type.resolveBinding().getInterfaces() != null){
+			ITypeBinding[] interfaces = type.resolveBinding().getInterfaces();
+			for(ITypeBinding inter : interfaces){
+				clsDecl.addInterface(extractSuperClass(inter));
+			}
 		}
 
 		clsDecl.setInterface(type.isInterface());
-		clsDecl.setName(type.getName().getFullyQualifiedName());
+		clsDecl.setName(type.resolveBinding().getQualifiedName());
+		if(type.resolveBinding().isGenericType()){
+			clsDecl.setGeneric(true);
+			for(ITypeBinding t : type.resolveBinding().getTypeParameters())
+				if(t.isTypeVariable())
+					try{
+						clsDecl.addParameter(t.getErasure().getQualifiedName());
+					}catch(Exception e){
+						e.printStackTrace();
+					}
+		}
 
 		List<FieldDeclaration> fields = new ArrayList<FieldDeclaration>();
 		for (org.eclipse.jdt.core.dom.FieldDeclaration field : type.getFields()) {
@@ -199,6 +213,23 @@ public class JavaParser implements IParser {
 
 		clsDecl.setMethods(methods);
 		return clsDecl;
+	}
+	
+	
+
+	private static SuperClassDeclaration extractSuperClass(ITypeBinding bind) {
+		SuperClassDeclaration superClass = new SuperClassDeclaration();
+		superClass.setInterface(bind.isInterface());
+		superClass.setName(bind.getQualifiedName());
+		superClass.setPackageDeclaration(bind.getPackage().getName());
+		superClass.setArchetype(ClassArchetype.CLASS_OR_INTERFACE);
+		if(bind.isGenericType()){
+			superClass.setGeneric(true);				
+			for(ITypeBinding param : bind.getTypeParameters()){
+				superClass.addParameter(param.getQualifiedName());
+			}
+		}
+		return superClass;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -297,8 +328,12 @@ public class JavaParser implements IParser {
 			fieldDecl.setArrayTypeName(bind.getElementType().getQualifiedName());
 		fieldDecl.setParametrizedType(bind.isParameterizedType());
 		if(bind.isParameterizedType()){
-			for(ITypeBinding type : bind.getTypeParameters())
-				fieldDecl.addParametrizedType(type.getQualifiedName());
+			for(ITypeBinding type : bind.getTypeArguments())
+				try{
+					fieldDecl.addParametrizedType(type.getErasure().getQualifiedName());
+				}catch(Exception e){
+					e.printStackTrace();
+				}
 		}
 		fieldDecl.setGeneric(bind.isGenericType());
 		

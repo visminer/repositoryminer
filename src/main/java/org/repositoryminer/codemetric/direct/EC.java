@@ -1,7 +1,6 @@
 package org.repositoryminer.codemetric.direct;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +21,7 @@ public class EC implements IDirectCodeMetric {
 		typeECMap.clear();
 		Document doc = new Document("metric", getId().toString());
 		if(type.getArchetype() == ClassArchetype.CLASS_OR_INTERFACE){
+			calculateSuperEC(type);
 			calculateFieldEC(type);
 			calculateMethodEC(type);
 			
@@ -33,6 +33,11 @@ public class EC implements IDirectCodeMetric {
 	}
 
 	
+	private void calculateSuperEC(AbstractClassDeclaration type) {
+		
+	}
+
+
 	private void calculateImports(AbstractClassDeclaration type, AST ast) {
 		ast.getDocument().getImports().stream().forEach( imporT -> increaseECCount(imporT.getName()));
 	}
