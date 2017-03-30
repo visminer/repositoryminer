@@ -15,16 +15,15 @@ import org.repositoryminer.codemetric.direct.EC;
 public class AC implements IIndirectCodeMetric{
 
 	//this map holds the AC metric for each found type
-	private Map<String, Map<String, Integer>> acMap;
+	private Map<String, Map<String, Integer>> acMap = new HashMap<>();
 	
 	@Override
 	public void calculate(AbstractClassDeclaration type, AST ast) {		
 		EC ec = new EC();
-		acMap  = new HashMap<>();
 		Map<String, Integer> ecMap = ec.calculate(type);
 		for(Entry<String, Integer> entry : ecMap.entrySet()){
 			Map<String, Integer> typeAcRelations = acMap.getOrDefault(entry.getKey(), new HashMap<>());
-			typeAcRelations.put(type.getName(), typeAcRelations.getOrDefault(type.getName(), 1) + 1);
+			typeAcRelations.put(type.getName(), entry.getValue());
 			acMap.put(entry.getKey(), typeAcRelations);
 		}
 	}
@@ -37,11 +36,17 @@ public class AC implements IIndirectCodeMetric{
 	@Override
 	public Map<String, Document> getResult() {
 
-		 Map<String, Document> result = new HashMap<>();
+		Map<String, Document> result = new HashMap<>();
 		for(Entry<String, Map<String, Integer>> entry : acMap.entrySet()){
 			List<Document> acRelationsDoc = new ArrayList<>();
-			entry.getValue().entrySet().stream().forEach( relation -> acRelationsDoc.add(new Document("class",relation.getKey()).append("value", relation.getValue())));
-			result.put(entry.getKey(),new Document("metric",this.getId()).append("afferentClasses", acRelationsDoc));
+			entry.getValue().entrySet().stream().forEach( relation -> 
+						acRelationsDoc.add(
+								new Document("class",relation.getKey())
+								.append("value", relation.getValue())));
+			result.put(entry.getKey(),
+							new Document("metric",this.getId().toString())
+								.append("classes", acRelationsDoc)
+								.append("afferentCount", entry.getValue().keySet().size()));
 		}
 		
 		acMap.clear();

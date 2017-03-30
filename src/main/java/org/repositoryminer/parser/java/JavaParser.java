@@ -237,6 +237,7 @@ public class JavaParser implements IParser {
 		MethodDeclaration m = new MethodDeclaration();
 		m.setConstructor(methodDecl.isConstructor());
 		m.setVarargs(methodDecl.isVarargs());
+		
 		StringBuilder builder = null;
 
 		builder = new StringBuilder();
@@ -249,17 +250,20 @@ public class JavaParser implements IParser {
 			
 			ParameterDeclaration param = new ParameterDeclaration();
 			param.setName(varBind.getName());
-			
-			param.setParametrizedType(varBind.getType().isParameterizedType());
-			if(varBind.getType().isParameterizedType())
-				for(ITypeBinding tBinding: varBind.getType().getTypeParameters())
-					param.addParametrizedType(tBinding.getQualifiedName());
 			param.setPrimitiveType(varBind.getType().isPrimitive());			
 			param.setArrayType(varBind.getType().isArray());
-			if(param.isArrayType())
-				param.setArrayTypeName(varBind.getType().getElementType().getQualifiedName());
 			
-			param.setType(varBind.getType().getQualifiedName());
+			param.setParametrizedType(varBind.getType().isParameterizedType());
+			if(varBind.getType().isParameterizedType()){
+				for(ITypeBinding argument : varBind.getType().getTypeArguments())
+					param.addParametrizedType(argument.getQualifiedName());
+				param.setType(varBind.getType().getErasure().getQualifiedName());
+
+			}else if(param.isArrayType()){
+				param.setArrayTypeName(varBind.getType().getElementType().getQualifiedName());
+			}else
+				param.setType(varBind.getType().getQualifiedName());
+
 			
 			params.add(param);
 			builder.append(param.getType() + ",");
@@ -327,7 +331,7 @@ public class JavaParser implements IParser {
 		if(bind.isArray())
 			fieldDecl.setArrayTypeName(bind.getElementType().getQualifiedName());
 		fieldDecl.setParametrizedType(bind.isParameterizedType());
-		if(bind.isParameterizedType()){
+ 		if(bind.isParameterizedType()){
 			for(ITypeBinding type : bind.getTypeArguments())
 				try{
 					fieldDecl.addParametrizedType(type.getErasure().getQualifiedName());

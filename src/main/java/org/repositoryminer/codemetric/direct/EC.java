@@ -9,7 +9,9 @@ import org.bson.Document;
 import org.repositoryminer.ast.AST;
 import org.repositoryminer.ast.AbstractClassDeclaration;
 import org.repositoryminer.ast.ClassArchetype;
+import org.repositoryminer.ast.ClassDeclaration;
 import org.repositoryminer.ast.MethodDeclaration;
+import org.repositoryminer.ast.SuperClassDeclaration;
 import org.repositoryminer.codemetric.CodeMetricId;
 
 public class EC implements IDirectCodeMetric {
@@ -27,28 +29,33 @@ public class EC implements IDirectCodeMetric {
 			
 			List<Document> classesDocument = new ArrayList<>();
 			typeECMap.entrySet().stream().forEach( entry -> classesDocument.add(new Document("class",entry.getKey()).append("value", entry.getValue())));
-			doc.append("classes", classesDocument);
+			doc.append("classes", classesDocument)
+			.append("efferentCount", typeECMap.keySet().size());
 		}
 		return doc;
 	}
 
 	
 	private void calculateSuperEC(AbstractClassDeclaration type) {
-		
-	}
-
-
-	private void calculateImports(AbstractClassDeclaration type, AST ast) {
-		ast.getDocument().getImports().stream().forEach( imporT -> increaseECCount(imporT.getName()));
+		ClassDeclaration clazz = (ClassDeclaration)type;
+		SuperClassDeclaration sclazz = clazz.getSuperClass();
+		if(sclazz != null){
+			increaseECCount(sclazz.getName());
+			if(sclazz.isGeneric())
+				sclazz.getParameters().forEach( parameter -> increaseECCount(parameter));
+		}
+		clazz.getInterfaces().forEach( inter -> increaseECCount(inter.getName()));
 	}
 
 
 	public Map<String, Integer> calculate (AbstractClassDeclaration type){
 		typeECMap.clear();
-
+		calculateSuperEC(type);
 		calculateFieldEC(type);
 		calculateMethodEC(type);
-		return typeECMap;
+		Map<String, Integer> calculo = new HashMap<>(typeECMap);
+		typeECMap.clear();
+		return calculo;
 	}
 	
 	private void calculateFieldEC(AbstractClassDeclaration type) {		
@@ -67,7 +74,8 @@ public class EC implements IDirectCodeMetric {
 	}
 	
 	private void increaseECCount(String key){
-		
+		if(key == null)
+			return;
 		typeECMap.put(key, typeECMap.getOrDefault(key, 0) + 1);		
 	}
 
@@ -78,10 +86,10 @@ public class EC implements IDirectCodeMetric {
 					return;
 				if(param.isArrayType())
 					increaseECCount(param.getArrayTypeName());
-				else if (param.isParametrizedType())
+				else if (param.isParametrizedType()) {
 					param.getParamTypes().forEach(parameter -> increaseECCount(parameter));
-				else 
-					increaseECCount(param.getType());
+				}
+				increaseECCount(param.getType());
 			});
 			if(!md.isReturnGeneric() && !md.isReturnPrimitive() && !md.isConstructor()){
 				if(md.isReturnArray())
