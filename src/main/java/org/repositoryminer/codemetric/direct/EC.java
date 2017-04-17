@@ -30,6 +30,7 @@ public class EC implements IDirectCodeMetric {
 			List<Document> classesDocument = new ArrayList<>();
 			typeECMap.entrySet().stream().forEach( entry -> classesDocument.add(new Document("class",entry.getKey()).append("value", entry.getValue())));
 			doc.append("classes", classesDocument)
+			
 			.append("efferentCount", typeECMap.keySet().size());
 		}
 		return doc;
