@@ -7,12 +7,20 @@ apply plugin: 'maven'
 apply plugin: "com.github.johnrengelman.shadow"
 
 group = 'org.repositoryminer'
-version = '1.6'
+version = '1.7'
 
 description = 'RepositoryMiner'
 
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
+
+sourceSets {
+	main {
+		java{
+			srcDirs = ['src/main/java', 'src/effort/java', 'src/findbugs/java', 'src/excomment/java', 'src/pmd/java']
+		}
+	}	
+}
 
 tasks.withType(JavaCompile) {
 	options.encoding = 'UTF-8'
