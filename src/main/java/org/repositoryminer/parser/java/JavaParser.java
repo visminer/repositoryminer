@@ -4,16 +4,19 @@ import java.io.File;
 import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
+import org.eclipse.jdt.core.dom.QualifiedType;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.repositoryminer.ast.AST;
+import org.repositoryminer.ast.AbstractClassDeclaration;
 import org.repositoryminer.ast.ClassArchetype;
 import org.repositoryminer.ast.ClassDeclaration;
 import org.repositoryminer.ast.Document;
@@ -171,18 +174,31 @@ public class JavaParser implements IParser {
 
 		if (type.getSuperclassType() != null) {
 			ITypeBinding bind = type.getSuperclassType().resolveBinding();
-
-			SuperClassDeclaration superClass = new SuperClassDeclaration();
-			superClass.setInterface(bind.isInterface());
-			superClass.setName(bind.getQualifiedName());
-			superClass.setPackageDeclaration(bind.getPackage().getName());
-			superClass.setArchetype(ClassArchetype.CLASS_OR_INTERFACE);
-
+			
+			SuperClassDeclaration superClass = extractSuperClass(bind);
 			clsDecl.setSuperClass(superClass);
+			
+		}
+		
+		if(type.resolveBinding().getInterfaces() != null){
+			ITypeBinding[] interfaces = type.resolveBinding().getInterfaces();
+			for(ITypeBinding inter : interfaces){
+				clsDecl.addInterface(extractSuperClass(inter));
+			}
 		}
 
 		clsDecl.setInterface(type.isInterface());
-		clsDecl.setName(packageName + "." + type.getName().getIdentifier());
+		clsDecl.setName(type.resolveBinding().getQualifiedName());
+		if(type.resolveBinding().isGenericType()){
+			clsDecl.setGeneric(true);
+			for(ITypeBinding t : type.resolveBinding().getTypeParameters())
+				if(t.isTypeVariable())
+					try{
+						clsDecl.addParameter(t.getErasure().getQualifiedName());
+					}catch(Exception e){
+						e.printStackTrace();
+					}
+		}
 
 		List<FieldDeclaration> fields = new ArrayList<FieldDeclaration>();
 		for (org.eclipse.jdt.core.dom.FieldDeclaration field : type.getFields()) {
@@ -198,24 +214,57 @@ public class JavaParser implements IParser {
 		clsDecl.setMethods(methods);
 		return clsDecl;
 	}
+	
+	
+
+	private static SuperClassDeclaration extractSuperClass(ITypeBinding bind) {
+		SuperClassDeclaration superClass = new SuperClassDeclaration();
+		superClass.setInterface(bind.isInterface());
+		superClass.setName(bind.getQualifiedName());
+		superClass.setPackageDeclaration(bind.getPackage().getName());
+		superClass.setArchetype(ClassArchetype.CLASS_OR_INTERFACE);
+		if(bind.isGenericType()){
+			superClass.setGeneric(true);				
+			for(ITypeBinding param : bind.getTypeParameters()){
+				superClass.addParameter(param.getQualifiedName());
+			}
+		}
+		return superClass;
+	}
 
 	@SuppressWarnings("unchecked")
 	private static MethodDeclaration processMethod(org.eclipse.jdt.core.dom.MethodDeclaration methodDecl) {
 		MethodDeclaration m = new MethodDeclaration();
 		m.setConstructor(methodDecl.isConstructor());
 		m.setVarargs(methodDecl.isVarargs());
+		
 		StringBuilder builder = null;
 
 		builder = new StringBuilder();
 		builder.append(methodDecl.getName().getFullyQualifiedName()).append("(");
 
 		List<ParameterDeclaration> params = new ArrayList<ParameterDeclaration>();
+		
 		for (SingleVariableDeclaration var : (List<SingleVariableDeclaration>) methodDecl.parameters()) {
 			IVariableBinding varBind = var.resolveBinding();
-
+			
 			ParameterDeclaration param = new ParameterDeclaration();
 			param.setName(varBind.getName());
-			param.setType(varBind.getType().getQualifiedName());
+			param.setPrimitiveType(varBind.getType().isPrimitive());			
+			param.setArrayType(varBind.getType().isArray());
+			
+			param.setParametrizedType(varBind.getType().isParameterizedType());
+			if(varBind.getType().isParameterizedType()){
+				for(ITypeBinding argument : varBind.getType().getTypeArguments())
+					param.addParametrizedType(argument.getQualifiedName());
+				param.setType(varBind.getType().getErasure().getQualifiedName());
+
+			}else if(param.isArrayType()){
+				param.setArrayTypeName(varBind.getType().getElementType().getQualifiedName());
+			}else
+				param.setType(varBind.getType().getQualifiedName());
+
+			
 			params.add(param);
 			builder.append(param.getType() + ",");
 		}
@@ -232,7 +281,10 @@ public class JavaParser implements IParser {
 		List<String> throwsList = new ArrayList<String>();
 		List<Type> types = methodDecl.thrownExceptionTypes();
 		for (Type type : types) {
-			throwsList.add(type.toString());
+			if(type.isQualifiedType())
+				throwsList.add(((QualifiedType)type).getName().getFullyQualifiedName());
+			else
+				throwsList.add(type.toString());
 		}
 		m.setThrownsExceptions(throwsList);
 
@@ -246,8 +298,18 @@ public class JavaParser implements IParser {
 		methodDecl.accept(visitor);
 		m.setStatements(visitor.getStatements());
 
-		if (methodDecl.getReturnType2() != null)
+		if (methodDecl.getReturnType2() != null){
 			m.setReturnType(methodDecl.getReturnType2().toString());
+			m.setReturnPrimitive(methodDecl.getReturnType2().isPrimitiveType());
+			m.setReturnArray(methodDecl.getReturnType2().isArrayType());			
+			m.setReturnParametrized(methodDecl.getReturnType2().isParameterizedType());
+			
+			if(m.isReturnArray())
+				m.setReturnArrayType(methodDecl.getReturnType2().resolveBinding().getElementType().getQualifiedName());
+			if(m.isReturnParametrized())
+				for(ITypeBinding binding: methodDecl.getReturnType2().resolveBinding().getTypeParameters())
+					m.addReturnParameterType(binding.getQualifiedName());
+		}
 
 		m.setStartPositionInSourceCode(methodDecl.getStartPosition());
 		m.setEndPositionInSourceCode(methodDecl.getStartPosition() + methodDecl.getLength());
@@ -264,6 +326,21 @@ public class JavaParser implements IParser {
 			fieldDecl.setType(bind.getQualifiedName());
 		}
 
+		fieldDecl.setPrimitiveType(bind.isPrimitive());
+		fieldDecl.setArrayType(bind.isArray());	
+		if(bind.isArray())
+			fieldDecl.setArrayTypeName(bind.getElementType().getQualifiedName());
+		fieldDecl.setParametrizedType(bind.isParameterizedType());
+ 		if(bind.isParameterizedType()){
+			for(ITypeBinding type : bind.getTypeArguments())
+				try{
+					fieldDecl.addParametrizedType(type.getErasure().getQualifiedName());
+				}catch(Exception e){
+					e.printStackTrace();
+				}
+		}
+		fieldDecl.setGeneric(bind.isGenericType());
+		
 		for (VariableDeclarationFragment vdf : (List<VariableDeclarationFragment>) field.fragments()) {
 			fieldDecl.setName(vdf.getName().getIdentifier());
 		}
