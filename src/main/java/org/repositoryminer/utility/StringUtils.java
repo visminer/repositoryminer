@@ -30,5 +30,11 @@ public class StringUtils {
 		checksum.update(bytes, 0, bytes.length);
 		return checksum.getValue();
 	}
+
+	public static String extractClassOfMethod(String method) {
+		int parenthesisIndex = method.indexOf("(");
+		int lastDotBeforeParenthesis = method.substring(0, parenthesisIndex).lastIndexOf(".");
+		return method.substring(0, lastDotBeforeParenthesis);
+	}
 	
 }

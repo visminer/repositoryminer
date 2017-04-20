@@ -11,8 +11,8 @@ version = '1.7'
 
 description = 'RepositoryMiner'
 
-sourceCompatibility = 1.7
-targetCompatibility = 1.7
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 sourceSets {
 	main {
@@ -40,10 +40,19 @@ dependencies {
     compile group: 'net.sourceforge.pmd', name: 'pmd-java', version:'5.5.0'
     compile group: 'com.google.code.findbugs', name: 'findbugs', version: '3.0.1'
     compile group: 'org.apache.commons', name: 'commons-csv', version: '1.4'
+    testCompile "junit:junit:4.11"
 }
 
 shadowJar {
 	manifest {
 		attributes 'Description': 'RepositoryMiner API'
 	}
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs('src/main/java', 'src/effort/java', 'src/excomment/java', 'src/findbugs/java', 'src/pmd/java')
+        }
+    }
 }
