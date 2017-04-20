@@ -70,7 +70,7 @@ public class FeatureEnvy implements IDirectCodeSmell {
 		for (MethodDeclaration methodDeclaration : type.getMethods()) {
 			float laaValue = laaMetric.calculate(type, methodDeclaration);
 			int fdpValue = fdpMetric.calculate(type, methodDeclaration);
-			//sugerir ajuste da métrica para seguir o mesmo padrão das outras métricas
+
 			List<MethodDeclaration> methods = new ArrayList<MethodDeclaration>();
 			methods.add(methodDeclaration);
 			int atfdValue = atfdMetric.calculate(type,methods,true);
