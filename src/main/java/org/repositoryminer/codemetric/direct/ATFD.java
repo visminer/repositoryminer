@@ -58,6 +58,9 @@ public class ATFD implements IDirectCodeMetric {
 
 			if (stmt.getNodeType() == NodeType.FIELD_ACCESS || stmt.getNodeType() == NodeType.METHOD_INVOCATION) {
 				exp = stmt.getExpression();
+				if( stmt.getNodeType().equals(NodeType.METHOD_INVOCATION)){
+					exp = exp.substring(0, exp.indexOf("("));
+				}
 				type = exp.substring(0, exp.lastIndexOf("."));
 			} else {
 				continue;
