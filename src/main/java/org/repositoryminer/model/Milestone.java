@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.bson.Document;
 import org.bson.types.ObjectId;
-import org.repositoryminer.scm.hostingservice.StatusType;
+import org.repositoryminer.hostingservice.StatusType;
 
 public class Milestone {
 

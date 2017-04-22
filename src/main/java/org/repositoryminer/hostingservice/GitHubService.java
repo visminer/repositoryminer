@@ -1,4 +1,4 @@
-package org.repositoryminer.scm.hostingservice;
+package org.repositoryminer.hostingservice;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -14,7 +14,7 @@ import org.eclipse.egit.github.core.service.CollaboratorService;
 import org.eclipse.egit.github.core.service.IssueService;
 import org.eclipse.egit.github.core.service.MilestoneService;
 import org.eclipse.egit.github.core.service.RepositoryService;
-import org.repositoryminer.mining.hosting.HostingServiceMiner;
+import org.repositoryminer.mining.RemoteRepositoryMiner;
 import org.repositoryminer.model.Comment;
 import org.repositoryminer.model.Contributor;
 import org.repositoryminer.model.Event;
@@ -29,10 +29,10 @@ public class GitHubService implements IHostingService {
 	private RepositoryId repositoryId;
 	private CollaboratorService collaboratorServ;
 	private RepositoryService repoServ;
-	private HostingServiceMiner hostingMiner;
+	private RemoteRepositoryMiner hostingMiner;
 
 	// Initializes repository and needed services.
-	private void init(HostingServiceMiner hostingMiner, GitHubClient client) {
+	private void init(RemoteRepositoryMiner hostingMiner, GitHubClient client) {
 		this.repositoryId = new RepositoryId(hostingMiner.getOwner(), hostingMiner.getName());
 		this.issueServ = new IssueService(client);
 		this.milestoneServ = new MilestoneService(client);
@@ -42,14 +42,14 @@ public class GitHubService implements IHostingService {
 	}
 
 	@Override
-	public void connect(HostingServiceMiner hostingMiner, String login, String password) {
+	public void connect(RemoteRepositoryMiner hostingMiner, String login, String password) {
 		GitHubClient client = new GitHubClient();
 		client.setCredentials(login, password);
 		init(hostingMiner, client);
 	}
 
 	@Override
-	public void connect(HostingServiceMiner hostingMiner, String token) {
+	public void connect(RemoteRepositoryMiner hostingMiner, String token) {
 		GitHubClient client = new GitHubClient();
 		client.setOAuth2Token(token);
 		init(hostingMiner, client);

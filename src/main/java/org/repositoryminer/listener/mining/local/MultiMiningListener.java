@@ -1,4 +1,4 @@
-package org.repositoryminer.listener.mining;
+package org.repositoryminer.listener.mining.local;
 
 import java.util.ArrayList;
 import java.util.List;

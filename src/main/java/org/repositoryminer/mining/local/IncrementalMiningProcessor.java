@@ -9,7 +9,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.bson.Document;
-import org.repositoryminer.listener.mining.IMiningListener;
+import org.repositoryminer.listener.mining.local.IMiningListener;
 import org.repositoryminer.mining.RepositoryMiner;
 import org.repositoryminer.model.Commit;
 import org.repositoryminer.model.Contributor;
@@ -146,7 +146,7 @@ public class IncrementalMiningProcessor {
 	}
 
 	private void updateWorkingDirectories(String repositoryId) {
-		WorkingDirectoryProcessor wdProcessor = new WorkingDirectoryProcessor();
+		WorkingTreeProcessor wdProcessor = new WorkingTreeProcessor();
 		wdProcessor.setReferences(selectedReferences);
 		wdProcessor.setVisitedCommits(processedCommits);
 		wdProcessor.setRepositoryId(repositoryId);

@@ -4,7 +4,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.bson.Document;
-import org.repositoryminer.scm.hostingservice.StatusType;
+import org.repositoryminer.hostingservice.StatusType;
 
 public class Issue {
 

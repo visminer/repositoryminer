@@ -12,7 +12,7 @@ import java.util.Properties;
 import org.apache.commons.io.FileUtils;
 import org.repositoryminer.checkstyle.audit.RepositoryMinerAudit;
 import org.repositoryminer.checkstyle.model.StyleProblem;
-import org.repositoryminer.exceptions.RepositoryMinerException;
+import org.repositoryminer.exception.RepositoryMinerException;
 
 import com.google.common.io.Closeables;
 import com.puppycrawl.tools.checkstyle.Checker;

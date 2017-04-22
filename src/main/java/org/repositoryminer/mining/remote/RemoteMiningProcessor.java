@@ -1,39 +1,40 @@
-package org.repositoryminer.mining.hosting;
+package org.repositoryminer.mining.remote;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.bson.Document;
-import org.repositoryminer.exceptions.ErrorMessage;
-import org.repositoryminer.exceptions.RepositoryMinerException;
-import org.repositoryminer.listener.servicemining.IServiceMiningListener;
+import org.repositoryminer.exception.ErrorMessage;
+import org.repositoryminer.exception.RepositoryMinerException;
+import org.repositoryminer.hostingservice.HostingServiceFactory;
+import org.repositoryminer.hostingservice.IHostingService;
+import org.repositoryminer.listener.mining.remote.IRemoteMiningListener;
+import org.repositoryminer.mining.RemoteRepositoryMiner;
 import org.repositoryminer.model.Contributor;
 import org.repositoryminer.model.Issue;
 import org.repositoryminer.model.Milestone;
 import org.repositoryminer.persistence.handler.IssueDocumentHandler;
 import org.repositoryminer.persistence.handler.MilestoneDocumentHandler;
 import org.repositoryminer.persistence.handler.RepositoryDocumentHandler;
-import org.repositoryminer.scm.hostingservice.HostingServiceFactory;
-import org.repositoryminer.scm.hostingservice.IHostingService;
 
-public class HostingProcessor {
+public class RemoteMiningProcessor {
 
 	private IHostingService service;
-	private IServiceMiningListener listener;
-	private HostingServiceMiner hostingServiceMiner;
+	private IRemoteMiningListener listener;
+	private RemoteRepositoryMiner hostingServiceMiner;
 	private String repositoryId;
 
-	public void connectToService(HostingServiceMiner hostingServiceMiner, String login, String password) {
+	public void connectToService(RemoteRepositoryMiner hostingServiceMiner, String login, String password) {
 		init(hostingServiceMiner);
 		service.connect(hostingServiceMiner, login, password);
 	}
 
-	public void connectToService(HostingServiceMiner hostingServiceMiner, String token) {
+	public void connectToService(RemoteRepositoryMiner hostingServiceMiner, String token) {
 		init(hostingServiceMiner);
 		service.connect(hostingServiceMiner, token);
 	}
 
-	private void init(HostingServiceMiner hostingServiceMiner) {
+	private void init(RemoteRepositoryMiner hostingServiceMiner) {
 		this.hostingServiceMiner = hostingServiceMiner;
 		repositoryId = hostingServiceMiner.getRepositoryId();
 		service = HostingServiceFactory.getHostingService(hostingServiceMiner.getServiceType());

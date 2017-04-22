@@ -11,7 +11,7 @@ import java.util.Map.Entry;
 
 import org.apache.commons.io.FilenameUtils;
 import org.bson.Document;
-import org.repositoryminer.listener.mining.IMiningListener;
+import org.repositoryminer.listener.mining.local.IMiningListener;
 import org.repositoryminer.mining.RepositoryMiner;
 import org.repositoryminer.model.Commit;
 import org.repositoryminer.model.Contributor;
@@ -195,7 +195,7 @@ public class MiningProcessor {
 	}
 
 	private void saveWorkingDirectories(String repositoryId) {
-		WorkingDirectoryProcessor wdProcessor = new WorkingDirectoryProcessor();
+		WorkingTreeProcessor wdProcessor = new WorkingTreeProcessor();
 		wdProcessor.setReferences(selectedReferences);
 		wdProcessor.setRepositoryId(repositoryId);
 		wdProcessor.setMiningListener(listener);

@@ -1,4 +1,4 @@
-package org.repositoryminer.scm.hostingservice;
+package org.repositoryminer.hostingservice;
 
 public enum StatusType {
 

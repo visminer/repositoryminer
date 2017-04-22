@@ -11,7 +11,7 @@ import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.repositoryminer.checkstyle.model.StyleProblem;
 import org.repositoryminer.checkstyle.persistence.CheckstyleDocumentHandler;
-import org.repositoryminer.exceptions.RepositoryMinerException;
+import org.repositoryminer.exception.RepositoryMinerException;
 import org.repositoryminer.model.Commit;
 import org.repositoryminer.model.Reference;
 import org.repositoryminer.model.Repository;

@@ -1,6 +1,6 @@
-package org.repositoryminer.listener.servicemining;
+package org.repositoryminer.listener.mining.remote;
 
-public class NullServiceMiningListener implements IServiceMiningListener {
+public class NullRemoteMiningListener implements IRemoteMiningListener {
 
 	@Override
 	public void notifyServiceMiningStart(String name) {

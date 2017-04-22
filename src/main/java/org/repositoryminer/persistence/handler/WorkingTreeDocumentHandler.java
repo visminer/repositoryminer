@@ -6,11 +6,11 @@ import org.repositoryminer.persistence.Connection;
 
 import com.mongodb.BasicDBObject;
 
-public class WorkingDirectoryDocumentHandler extends DocumentHandler{
+public class WorkingTreeDocumentHandler extends DocumentHandler{
 
-	private static final String COLLECTION_NAME = "rm_working_directories";
+	private static final String COLLECTION_NAME = "rm_working_trees";
 
-	public WorkingDirectoryDocumentHandler() {
+	public WorkingTreeDocumentHandler() {
 		super.collection = Connection.getInstance().getCollection(COLLECTION_NAME);
 	}
 	

@@ -1,6 +1,6 @@
 package org.repositoryminer.model;
 
-import org.repositoryminer.scm.hostingservice.IssueCommandType;
+import org.repositoryminer.hostingservice.IssueCommandType;
 
 public class IssueReference {
 

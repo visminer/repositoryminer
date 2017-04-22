@@ -1,4 +1,4 @@
-package org.repositoryminer.exceptions;
+package org.repositoryminer.exception;
 
 public enum ErrorMessage {
 

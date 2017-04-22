@@ -1,4 +1,4 @@
-package org.repositoryminer.listener.mining;
+package org.repositoryminer.listener.mining.local;
 
 import org.repositoryminer.scm.ReferenceType;
 

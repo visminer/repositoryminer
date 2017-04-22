@@ -6,24 +6,24 @@ import java.util.List;
 import java.util.Set;
 
 import org.bson.Document;
-import org.repositoryminer.listener.mining.IMiningListener;
+import org.repositoryminer.listener.mining.local.IMiningListener;
 import org.repositoryminer.model.Diff;
 import org.repositoryminer.model.Reference;
 import org.repositoryminer.model.WorkingDirectory;
 import org.repositoryminer.persistence.handler.CommitDocumentHandler;
 import org.repositoryminer.persistence.handler.ReferenceDocumentHandler;
-import org.repositoryminer.persistence.handler.WorkingDirectoryDocumentHandler;
+import org.repositoryminer.persistence.handler.WorkingTreeDocumentHandler;
 import org.repositoryminer.scm.DiffType;
 
 import com.mongodb.client.model.Projections;
 
-public class WorkingDirectoryProcessor {
+public class WorkingTreeProcessor {
 
 	private static final int COMMIT_RANGE = 1000;
 
 	private CommitDocumentHandler commitHandler;
 	private ReferenceDocumentHandler referenceHandler;
-	private WorkingDirectoryDocumentHandler wdHandler;
+	private WorkingTreeDocumentHandler wdHandler;
 	
 	private Set<String> visitedCommits;
 	private String repositoryId; 
@@ -31,10 +31,10 @@ public class WorkingDirectoryProcessor {
 	private WorkingDirectory workingDirectory;
 	private IMiningListener miningListener;
 	
-	public WorkingDirectoryProcessor() {
+	public WorkingTreeProcessor() {
 		commitHandler = new CommitDocumentHandler();
 		referenceHandler = new ReferenceDocumentHandler();
-		wdHandler = new WorkingDirectoryDocumentHandler();
+		wdHandler = new WorkingTreeDocumentHandler();
 	}
 
 	public void setVisitedCommits(Set<String> visitedCommits) {

@@ -1,9 +1,9 @@
-package org.repositoryminer.mining.hosting;
+package org.repositoryminer.mining;
 
-import org.repositoryminer.listener.servicemining.IServiceMiningListener;
-import org.repositoryminer.listener.servicemining.NullServiceMiningListener;
-import org.repositoryminer.mining.RepositoryMiner;
-import org.repositoryminer.scm.hostingservice.HostingServiceType;
+import org.repositoryminer.hostingservice.HostingServiceType;
+import org.repositoryminer.listener.mining.remote.IRemoteMiningListener;
+import org.repositoryminer.listener.mining.remote.NullRemoteMiningListener;
+import org.repositoryminer.mining.remote.RemoteMiningProcessor;
 
 /**
  * This is the entry point to configure the parameters that enable the
@@ -21,7 +21,7 @@ import org.repositoryminer.scm.hostingservice.HostingServiceType;
  * synchronization will not retrieve some data
  */
 // TODO: Documentation needs refactoring
-public class HostingServiceMiner {
+public class RemoteRepositoryMiner {
 
 	private String repositoryId;
 	private String owner;
@@ -31,12 +31,12 @@ public class HostingServiceMiner {
 	private int issueMaxHops = 1000;
 	private int milestoneMaxHops = 50;
 	
-	private IServiceMiningListener serviceMiningListener = new NullServiceMiningListener();
+	private IRemoteMiningListener serviceMiningListener = new NullRemoteMiningListener();
 	
 	/**
 	 * Use this void constructor if parameters are going to be set later.
 	 */
-	public HostingServiceMiner() {
+	public RemoteRepositoryMiner() {
 	}
 
 	/**
@@ -53,7 +53,7 @@ public class HostingServiceMiner {
 	 *            the web hosting service ({@link HostingServiceType}) we want
 	 *            do the synchronization
 	 */
-	public HostingServiceMiner(String repositoryId, String owner, String name, HostingServiceType serviceType) {
+	public RemoteRepositoryMiner(String repositoryId, String owner, String name, HostingServiceType serviceType) {
 		super();
 		this.repositoryId = repositoryId;
 		this.owner = owner;
@@ -74,7 +74,7 @@ public class HostingServiceMiner {
 	 * @param password
 	 */
 	public void sync(String login, String password) {
-		HostingProcessor hp = new HostingProcessor();
+		RemoteMiningProcessor hp = new RemoteMiningProcessor();
 		hp.connectToService(this, login, password);
 		hp.mine();
 	}
@@ -91,7 +91,7 @@ public class HostingServiceMiner {
 	 * @param token
 	 */
 	public void sync(String token) {
-		HostingProcessor hp = new HostingProcessor();
+		RemoteMiningProcessor hp = new RemoteMiningProcessor();
 		hp.connectToService(this, token);
 		hp.mine();
 	}
@@ -100,7 +100,7 @@ public class HostingServiceMiner {
 		return repositoryId;
 	}
 
-	public HostingServiceMiner setRepositoryId(String repositoryId) {
+	public RemoteRepositoryMiner setRepositoryId(String repositoryId) {
 		this.repositoryId = repositoryId;
 		return this;
 	}
@@ -109,7 +109,7 @@ public class HostingServiceMiner {
 		return owner;
 	}
 
-	public HostingServiceMiner setOwner(String owner) {
+	public RemoteRepositoryMiner setOwner(String owner) {
 		this.owner = owner;
 		return this;
 	}
@@ -118,7 +118,7 @@ public class HostingServiceMiner {
 		return name;
 	}
 
-	public HostingServiceMiner setName(String name) {
+	public RemoteRepositoryMiner setName(String name) {
 		this.name = name;
 		return this;
 	}
@@ -127,7 +127,7 @@ public class HostingServiceMiner {
 		return serviceType;
 	}
 
-	public HostingServiceMiner setServiceType(HostingServiceType serviceType) {
+	public RemoteRepositoryMiner setServiceType(HostingServiceType serviceType) {
 		this.serviceType = serviceType;
 		return this;
 	}
@@ -148,14 +148,14 @@ public class HostingServiceMiner {
 		this.milestoneMaxHops = milestoneMaxHops;
 	}
 
-	public IServiceMiningListener getServiceMiningListener() {
+	public IRemoteMiningListener getServiceMiningListener() {
 		if (serviceMiningListener == null) {
-			serviceMiningListener = new NullServiceMiningListener();
+			serviceMiningListener = new NullRemoteMiningListener();
 		}
 		return serviceMiningListener;
 	}
 
-	public void setServiceMiningListener(IServiceMiningListener serviceMiningListener) {
+	public void setServiceMiningListener(IRemoteMiningListener serviceMiningListener) {
 		this.serviceMiningListener = serviceMiningListener;
 	}
 

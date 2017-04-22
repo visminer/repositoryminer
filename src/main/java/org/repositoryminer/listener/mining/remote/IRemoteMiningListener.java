@@ -1,6 +1,6 @@
-package org.repositoryminer.listener.servicemining;
+package org.repositoryminer.listener.mining.remote;
 
-public interface IServiceMiningListener {
+public interface IRemoteMiningListener {
 
 	void notifyServiceMiningStart(String name);
 

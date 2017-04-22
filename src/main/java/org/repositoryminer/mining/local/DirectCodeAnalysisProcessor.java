@@ -16,7 +16,7 @@ import org.repositoryminer.ast.AST;
 import org.repositoryminer.ast.AbstractClassDeclaration;
 import org.repositoryminer.codemetric.direct.IDirectCodeMetric;
 import org.repositoryminer.codesmell.direct.IDirectCodeSmell;
-import org.repositoryminer.listener.mining.IMiningListener;
+import org.repositoryminer.listener.mining.local.IMiningListener;
 import org.repositoryminer.mining.RepositoryMiner;
 import org.repositoryminer.model.Commit;
 import org.repositoryminer.model.Diff;

@@ -19,7 +19,7 @@ import org.repositoryminer.model.Repository;
 import org.repositoryminer.persistence.handler.CommitDocumentHandler;
 import org.repositoryminer.persistence.handler.ReferenceDocumentHandler;
 import org.repositoryminer.persistence.handler.RepositoryDocumentHandler;
-import org.repositoryminer.persistence.handler.WorkingDirectoryDocumentHandler;
+import org.repositoryminer.persistence.handler.WorkingTreeDocumentHandler;
 import org.repositoryminer.scm.ISCM;
 import org.repositoryminer.scm.ReferenceType;
 import org.repositoryminer.scm.SCMFactory;
@@ -65,7 +65,7 @@ public class FindBugsMiner {
 	private FindBugsDocumentHandler findBugsPersist;
 	private CommitDocumentHandler commitPersist;
 	private ReferenceDocumentHandler refPersist;
-	private WorkingDirectoryDocumentHandler wdPersist;
+	private WorkingTreeDocumentHandler wdPersist;
 
 	private Priority priority = Priority.NORMAL;
 	private Effort effort = Effort.DEFAULT;
@@ -100,7 +100,7 @@ public class FindBugsMiner {
 		findBugsPersist = new FindBugsDocumentHandler();
 		commitPersist = new CommitDocumentHandler();
 		refPersist = new ReferenceDocumentHandler();
-		wdPersist = new WorkingDirectoryDocumentHandler();
+		wdPersist = new WorkingTreeDocumentHandler();
 
 		scm = SCMFactory.getSCM(repository.getScm());
 		scm.open(tmpRepository);
