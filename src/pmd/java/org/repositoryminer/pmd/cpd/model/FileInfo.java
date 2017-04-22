@@ -16,7 +16,7 @@ public class FileInfo {
 	public Document toDocument() {
 		Document doc = new Document();
 		doc.append("begin_line", beginLine).append("end_line", endLine).append("filename", filename)
-				.append("filehash", filehash).append("duplicationPercentage", duplicationPercentage);
+				.append("filehash", filehash).append("duplication_percentage", duplicationPercentage);
 
 		return doc;
 	}
