@@ -34,9 +34,9 @@ public class ExCommentMiner {
 	private static final String[] COMMENTS_HEADER = { "idcomment", "total_pattern", "total_heuristic", "total_score",
 			"comment", "path", "class", "method" };
 	private static final String[] PATTERNS_HEADER = { "idcomment", "pattern", "pattern_score", "pattern_class", "theme",
-	"tdtype" };
+			"tdtype" };
 	private static final String[] HEURISTICS_HEADER = { "idcomment", "heuristic_description", "heuristic_status",
-	"heuristic_score" };
+			"heuristic_score" };
 
 	private String commentsCSV, patternsCSV, heuristicsCSV;
 	private char delimiter = ';';
@@ -86,11 +86,11 @@ public class ExCommentMiner {
 		this.delimiter = delimiter;
 	}
 
-	public void mineToCommit(String hash) throws IOException {
+	public void execute(String hash) throws IOException {
 		persistAnalysis(hash, null);
 	}
 
-	public void mineToReference(String name, ReferenceType type) throws IOException {
+	public void execute(String name, ReferenceType type) throws IOException {
 		Document refDoc = refPersist.findByNameAndType(name, type, repository.getId(), Projections.slice("commits", 1));
 		Reference reference = Reference.parseDocument(refDoc);
 
@@ -111,19 +111,19 @@ public class ExCommentMiner {
 				doc.append("reference_name", ref.getName());
 				doc.append("reference_type", ref.getType().toString());
 			}
-			
+
 			doc.append("commit", commit.getId());
 			doc.append("commit_date", commit.getCommitDate());
 			doc.append("repository", new ObjectId(repository.getId()));
 			doc.append("filename", entry.getKey());
 			doc.append("filehash", StringUtils.encodeToCRC32(entry.getKey()));
-			
+
 			List<Comment> commentsAux = new ArrayList<Comment>(entry.getValue().size());
 			for (Integer i : entry.getValue()) {
 				commentsAux.add(commentsMap.get(i));
 			}
 			doc.append("comments", Comment.toDocumentList(commentsAux));
-			
+
 			documents.add(doc);
 		}
 
@@ -158,12 +158,13 @@ public class ExCommentMiner {
 		List<CSVRecord> records = readCSV(COMMENTS_HEADER, commentsCSV);
 
 		for (CSVRecord record : records) {
-			Comment comment = new Comment(Integer.parseInt(record.get(0)), Float.parseFloat(record.get(1)),
-					Float.parseFloat(record.get(2)), Float.parseFloat(record.get(3)), record.get(4),
-					record.get(6), record.get(7));
+			Comment comment = new Comment(Integer.parseInt(record.get(0)),
+					Float.parseFloat(record.get(1).replaceAll(",", ".")),
+					Float.parseFloat(record.get(2).replaceAll(",", ".")),
+					Float.parseFloat(record.get(3).replaceAll(",", ".")), record.get(4), record.get(6), record.get(7));
 
 			String filename = FilenameUtils.normalize(record.get(5), true);
-			filename = filename.substring(repository.getPath().length()+1);
+			filename = filename.substring(repository.getPath().length() + 1);
 
 			if (!filesMap.containsKey(filename)) {
 				filesMap.put(filename, new ArrayList<Integer>());
@@ -178,8 +179,8 @@ public class ExCommentMiner {
 		List<CSVRecord> records = readCSV(PATTERNS_HEADER, patternsCSV);
 
 		for (CSVRecord record : records) {
-			Pattern pattern = new Pattern(record.get(1), Float.parseFloat(record.get(2)), record.get(3), record.get(4),
-					record.get(5));
+			Pattern pattern = new Pattern(record.get(1), Float.parseFloat(record.get(2).replaceAll(",", ".")),
+					record.get(3), record.get(4), record.get(5));
 
 			Comment comment = commentsMap.get(Integer.parseInt(record.get(0)));
 			if (comment == null) {
@@ -195,7 +196,7 @@ public class ExCommentMiner {
 
 		for (CSVRecord record : records) {
 			Heuristic heuristic = new Heuristic(record.get(1), Integer.parseInt(record.get(2)),
-					Float.parseFloat(record.get(3)));
+					Float.parseFloat(record.get(3).replaceAll(",", ".")));
 
 			Comment comment = commentsMap.get(Integer.parseInt(record.get(0)));
 			if (comment == null) {
