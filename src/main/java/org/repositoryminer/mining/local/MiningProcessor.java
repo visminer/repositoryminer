@@ -185,7 +185,7 @@ public class MiningProcessor {
 		saveReferences(repository.getId());
 		repoHandler.updateOnlyContributors(repository.getId(), Contributor.toDocumentList(contributors));
 
-		saveWorkingDirectories(repository.getId());
+		saveWorkingTrees(repository.getId());
 		calculateAndDetect(tempRepo, repository.getId());
 
 		scm.close();
@@ -194,12 +194,12 @@ public class MiningProcessor {
 		listener.notifyMiningEnd(repositoryMiner.getName());
 	}
 
-	private void saveWorkingDirectories(String repositoryId) {
-		WorkingTreeProcessor wdProcessor = new WorkingTreeProcessor();
-		wdProcessor.setReferences(selectedReferences);
-		wdProcessor.setRepositoryId(repositoryId);
-		wdProcessor.setMiningListener(listener);
-		wdProcessor.processWorkingDirectories();
+	private void saveWorkingTrees(String repositoryId) {
+		WorkingTreeProcessor wtProcessor = new WorkingTreeProcessor();
+		wtProcessor.setReferences(selectedReferences);
+		wtProcessor.setRepositoryId(repositoryId);
+		wtProcessor.setMiningListener(listener);
+		wtProcessor.processWorkingDirectories();
 	}
 
 	/**

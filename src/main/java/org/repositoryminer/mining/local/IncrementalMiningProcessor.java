@@ -135,7 +135,7 @@ public class IncrementalMiningProcessor {
 
 		updateReferences(repository.getId());
 		
-		updateWorkingDirectories(repository.getId());
+		updateWorkingTrees(repository.getId());
 		
 		calculateAndDetect(tempRepo, repository.getId());
 
@@ -145,13 +145,13 @@ public class IncrementalMiningProcessor {
 		listener.notifyMiningEnd(repositoryMiner.getName());
 	}
 
-	private void updateWorkingDirectories(String repositoryId) {
-		WorkingTreeProcessor wdProcessor = new WorkingTreeProcessor();
-		wdProcessor.setReferences(selectedReferences);
-		wdProcessor.setVisitedCommits(processedCommits);
-		wdProcessor.setRepositoryId(repositoryId);
-		wdProcessor.setMiningListener(listener);
-		wdProcessor.processWorkingDirectories();
+	private void updateWorkingTrees(String repositoryId) {
+		WorkingTreeProcessor wtProcessor = new WorkingTreeProcessor();
+		wtProcessor.setReferences(selectedReferences);
+		wtProcessor.setVisitedCommits(processedCommits);
+		wtProcessor.setRepositoryId(repositoryId);
+		wtProcessor.setMiningListener(listener);
+		wtProcessor.processWorkingDirectories();
 	}
 
 	private void loadAllCommits(String repositoryId) {

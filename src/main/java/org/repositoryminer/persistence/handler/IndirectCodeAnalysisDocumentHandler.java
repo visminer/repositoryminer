@@ -10,6 +10,7 @@ import org.repositoryminer.persistence.Connection;
 import org.repositoryminer.scm.ReferenceType;
 
 import com.mongodb.BasicDBObject;
+import com.mongodb.client.model.Filters;
 
 public class IndirectCodeAnalysisDocumentHandler extends DocumentHandler {
 
@@ -43,6 +44,12 @@ public class IndirectCodeAnalysisDocumentHandler extends DocumentHandler {
 		Document clause = new Document("_id", id);
 		Document newDoc = new Document("$set", new Document("reference_name", name).append("reference_type", type.toString()));
 		collection.updateOne(clause, newDoc);
+	}
+
+	public Document findByFileAndSnapshot(long filehash, String snapshot, Bson projection) {
+		Bson clause1 = new BasicDBObject("filehash", filehash);
+		Bson clause2 = new BasicDBObject("commit", snapshot);
+		return findOne(Filters.and(clause1, clause2), projection);
 	}
 	
 }
