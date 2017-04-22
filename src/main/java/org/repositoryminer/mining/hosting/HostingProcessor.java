@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.bson.Document;
 import org.repositoryminer.exceptions.ErrorMessage;
-import org.repositoryminer.exceptions.VisMinerAPIException;
+import org.repositoryminer.exceptions.RepositoryMinerException;
 import org.repositoryminer.listener.servicemining.IServiceMiningListener;
 import org.repositoryminer.model.Contributor;
 import org.repositoryminer.model.Issue;
@@ -43,7 +43,7 @@ public class HostingProcessor {
 	public void mine() {
 		RepositoryDocumentHandler repoDocHandler = new RepositoryDocumentHandler();
 		if (!repoDocHandler.checkIfRepositoryExistsById(repositoryId)) {
-			throw new VisMinerAPIException(ErrorMessage.REPOSITORY_NOT_FOUND.toString());
+			throw new RepositoryMinerException(ErrorMessage.REPOSITORY_NOT_FOUND.toString());
 		}
 
 		listener.notifyServiceMiningStart(hostingServiceMiner.getName());

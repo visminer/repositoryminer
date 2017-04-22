@@ -31,7 +31,7 @@ import org.eclipse.jgit.treewalk.TreeWalk;
 import org.eclipse.jgit.treewalk.filter.PathFilter;
 import org.eclipse.jgit.util.io.DisabledOutputStream;
 import org.repositoryminer.exceptions.ErrorMessage;
-import org.repositoryminer.exceptions.VisMinerAPIException;
+import org.repositoryminer.exceptions.RepositoryMinerException;
 import org.repositoryminer.model.Commit;
 import org.repositoryminer.model.Contributor;
 import org.repositoryminer.model.Diff;
@@ -64,13 +64,13 @@ public class GitSCM implements ISCM {
 		File repoFolder = new File(repositoryPath, ".git");
 
 		if (!repoFolder.exists()) {
-			throw new VisMinerAPIException(ErrorMessage.REPOSITORY_NOT_FOUND.toString());
+			throw new RepositoryMinerException(ErrorMessage.REPOSITORY_NOT_FOUND.toString());
 		}
 
 		try {
 			repository = repositoryBuilder.setGitDir(repoFolder).readEnvironment().findGitDir().build();
 		} catch (IOException e) {
-			throw new VisMinerAPIException(ErrorMessage.GIT_REPOSITORY_IOERROR.toString(), e);
+			throw new RepositoryMinerException(ErrorMessage.GIT_REPOSITORY_IOERROR.toString(), e);
 		}
 
 		git = new Git(repository);
@@ -229,7 +229,7 @@ public class GitSCM implements ISCM {
 	private void errorHandler(String errorMessage, Throwable e) {
 		close();
 		LOGGER.error(errorMessage, e);
-		throw new VisMinerAPIException(errorMessage, e);
+		throw new RepositoryMinerException(errorMessage, e);
 	}
 
 	private List<Diff> getDiffsForCommitedFiles(String commit) throws IOException {
