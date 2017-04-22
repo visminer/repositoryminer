@@ -36,7 +36,7 @@ public class LVAR implements IDirectCodeMetric {
 			methodsDoc.add(new Document("method", method.getName()).append("value", lvar));
 		}
 		
-		return new Document("metric", CodeMetricId.LVAR.toString()).append("accumulated", accumulated).append("methods", methodsDoc);
+		return new Document("metric", CodeMetricId.LVAR.toString()).append("value", accumulated).append("methods", methodsDoc);
 	}
 	
 	public int calculate(MethodDeclaration method){

@@ -70,21 +70,26 @@ public class BOvR implements IIndirectCodeMetric {
 		kinships.clear();
 		bovr.clear();
 	}
-	
+
 	public Map<String, Float> getBOvR() {
 		return bovr;
 	}
-	
+
 	public void calculateBOvR() {
 		for (Entry<String, String> kinship : kinships.entrySet()) {
 			if (kinship.getValue() == null || methodsSignatures.get(kinship.getValue()) == null) {
-				// No parent or is not possible find the parent, so the highest
-				// possible value is used
-				bovr.put(kinship.getKey(), 0f);
+				// No parent or is not possible find the parent
+				bovr.put(kinship.getKey(), -1f);
 				continue;
 			}
 
 			List<String> parentMethods = methodsSignatures.get(kinship.getValue());
+
+			if (parentMethods.size() == 0) {
+				bovr.put(kinship.getKey(), 0f);
+				continue;
+			}
+
 			List<String> childMethods = methodsSignatures.get(kinship.getKey());
 
 			int value = 0;

@@ -18,6 +18,7 @@ import org.repositoryminer.ast.MethodDeclaration;
 import org.repositoryminer.ast.Statement;
 import org.repositoryminer.ast.Statement.NodeType;
 import org.repositoryminer.codemetric.CodeMetricId;
+import org.repositoryminer.codemetric.direct.NProtM;
 
 public class BUR implements IIndirectCodeMetric {
 
@@ -51,6 +52,8 @@ public class BUR implements IIndirectCodeMetric {
 	// Value - BUR metric value
 	private Map<String, Float> bur = new HashMap<String, Float>();
 
+	private NProtM nprotm = new NProtM();
+	
 	@Override
 	public void calculate(AbstractClassDeclaration type, AST ast) {
 		if (!type.getArchetype().equals(ClassArchetype.CLASS_OR_INTERFACE)) {
@@ -62,7 +65,7 @@ public class BUR implements IIndirectCodeMetric {
 		// find protected methods in the class
 		List<String> methodsList = new ArrayList<String>();
 		for (MethodDeclaration method : cls.getMethods()) {
-			if (method.getModifiers().contains("protected")) {
+			if (nprotm.isProtected(method.getModifiers())) {
 				methodsList.add(method.getName());
 			}
 		}
@@ -71,7 +74,7 @@ public class BUR implements IIndirectCodeMetric {
 		// find protected fields in the class
 		List<String> fieldsList = new ArrayList<String>();
 		for (FieldDeclaration field : cls.getFields()) {
-			if (field.getModifiers().contains("protected")) {
+			if (nprotm.isProtected(field.getModifiers())) {
 				fieldsList.add(field.getName());
 			}
 		}
@@ -101,15 +104,15 @@ public class BUR implements IIndirectCodeMetric {
 	@Override
 	public Map<String, Document> getResult() {
 		calculateBUR();
-		
+
 		Map<String, Document> result = new HashMap<String, Document>();
 		for (Entry<String, Float> entry : bur.entrySet()) {
 			result.put(entry.getKey(),
 					new Document("metric", CodeMetricId.BUR.toString()).append("value", entry.getValue()));
 		}
-		
+
 		clean();
-		
+
 		return result;
 	}
 
@@ -121,17 +124,16 @@ public class BUR implements IIndirectCodeMetric {
 		kinships.clear();
 		bur.clear();
 	}
-	
+
 	public Map<String, Float> getBUR() {
 		return bur;
 	}
-	
+
 	public void calculateBUR() {
 		for (Entry<String, String> kinship : kinships.entrySet()) {
 			if (kinship.getValue() == null || protMethods.get(kinship.getValue()) == null) {
-				// No parent or is not possible find the parent, so the highest
-				// possible value is used
-				bur.put(kinship.getKey(), 0f);
+				// No parent or is not possible find the parent
+				bur.put(kinship.getKey(), -1f);
 				continue;
 			}
 

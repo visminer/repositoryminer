@@ -36,7 +36,7 @@ public class MLOC implements IDirectCodeMetric {
 			methodsDoc.add(new Document("method", method.getName()).append("value", mloc));
 		}
 
-		return new Document("metric", CodeMetricId.MLOC.toString()).append("accumulated", accumulated).append("methods",
+		return new Document("metric", CodeMetricId.MLOC.toString()).append("value", accumulated).append("methods",
 				methodsDoc);
 	}
 

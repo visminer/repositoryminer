@@ -22,13 +22,13 @@ public class NProtM implements IDirectCodeMetric {
 		int members = 0;
 
 		for (MethodDeclaration method : methods) {
-			if (method.getModifiers().contains("protected")) {
+			if (isProtected(method.getModifiers())) {
 				members++;
 			}
 		}
 
 		for (FieldDeclaration field : fields) {
-			if (field.getModifiers().contains("protected")) {
+			if (isProtected(field.getModifiers())) {
 				members++;
 			}
 		}
@@ -36,6 +36,14 @@ public class NProtM implements IDirectCodeMetric {
 		return members;
 	}
 
+	public boolean isProtected(List<String> modifiers) {
+		if (modifiers.contains("protected") || (!modifiers.contains("public") && !modifiers.contains("private"))) {
+			return true;
+		}
+		
+		return false;
+	}
+	
 	@Override
 	public CodeMetricId getId() {
 		return CodeMetricId.NProtM;
