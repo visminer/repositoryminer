@@ -17,14 +17,14 @@ public class DirectCodeAnalysisDocumentHandler extends DocumentHandler {
 	}
 
 	public Document getMetrics(long fileHash, String commitHash) {
-		return getByFileAndCommit(fileHash, commitHash, Projections.include("classes.metrics"));
+		return findByFileAndCommit(fileHash, commitHash, Projections.include("classes.metrics"));
 	}
 
 	public Document getCodeSmells(long fileHash, String commitHash) {
-		return getByFileAndCommit(fileHash, commitHash, Projections.include("classes.codesmells"));
+		return findByFileAndCommit(fileHash, commitHash, Projections.include("classes.codesmells"));
 	}
 
-	public Document getByFileAndCommit(long fileHash, String commit, Bson projection) {
+	public Document findByFileAndCommit(long fileHash, String commit, Bson projection) {
 		Bson clause1 = new BasicDBObject("filehash", fileHash);
 		Bson clause2 = new BasicDBObject("commit", commit);
 		return findOne(Filters.and(clause1, clause2), projection);
