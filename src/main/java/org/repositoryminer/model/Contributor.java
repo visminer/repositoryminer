@@ -19,19 +19,25 @@ public class Contributor {
 	private boolean collaborator;
 
 	public static List<Contributor> parseDocuments(List<Document> docs) {
+		if (docs == null) {
+			return new ArrayList<Contributor>();
+		}
+		
 		List<Contributor> contributors = new ArrayList<Contributor>();
 		for (Document doc : docs) {
-			Contributor c = new Contributor(doc.getString("name"), doc.getString("email"));
+			Contributor c = parseDocument(doc);
 			contributors.add(c);
 		}
 		return contributors;
 	}
 	
 	public static Contributor parseDocument(Document doc) {
-		if (doc == null)
+		if (doc == null) {
 			return null;
+		}
 		
-		Contributor c = new Contributor(doc.getString("name"), doc.getString("email"));
+		Contributor c = new Contributor(doc.getString("name"), doc.getString("email"), doc.getString("login"),
+				doc.getString("avatar_url"), doc.getBoolean("collaborator", false));
 		return c;
 	}
 	
@@ -47,6 +53,14 @@ public class Contributor {
 	public Contributor(String name, String login, String avatarUrl, boolean collaborator) {
 		super();
 		this.name = name;
+		this.login = login;
+		this.avatarUrl = avatarUrl;
+		this.collaborator = collaborator;
+	}
+
+	public Contributor(String name, String email, String login, String avatarUrl, boolean collaborator) {
+		this.name = name;
+		this.email = email;
 		this.login = login;
 		this.avatarUrl = avatarUrl;
 		this.collaborator = collaborator;

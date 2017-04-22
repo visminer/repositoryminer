@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.repositoryminer.model.Commit;
+import org.repositoryminer.model.Contributor;
 import org.repositoryminer.model.Reference;
 
 /**
@@ -72,4 +73,6 @@ public interface ISCM {
 	 */
 	public void reset();
 
+	public List<Contributor> getCommitters(String filename, String path);
+	
 }
