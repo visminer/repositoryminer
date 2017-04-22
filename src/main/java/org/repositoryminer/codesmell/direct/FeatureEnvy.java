@@ -73,7 +73,7 @@ public class FeatureEnvy implements IDirectCodeSmell {
 
 			List<MethodDeclaration> methods = new ArrayList<MethodDeclaration>();
 			methods.add(methodDeclaration);
-			int atfdValue = atfdMetric.calculate(type,methods,true);
+			int atfdValue = atfdMetric.calculate(type);
 			
 			if (detect(laaValue, atfdValue, fdpValue)) {
 				Document metrics = new Document(CodeMetricId.LAA.toString(), laaValue)
