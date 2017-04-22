@@ -1,15 +1,12 @@
 package org.repositoryminer.findbugs;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.repositoryminer.findbugs.model.ReportedBug;
 
 import edu.umd.cs.findbugs.BugInstance;
@@ -22,14 +19,13 @@ import edu.umd.cs.findbugs.config.UserPreferences;
 
 public class FindBugsExecutor {
 
-	private String rootDir;
 	private int bugPriority;
 	private AnalysisFeatureSetting[] effort;
 	private String userPrefsEffort;
 
-	public FindBugsExecutor(String rootDir) {
-		this.rootDir = rootDir;
-	}
+	private Set<String> analysisClasspath;
+	private Set<String> auxiliaryClasspath;
+	private Set<String> sourceDirectories;
 
 	public Map<String, List<ReportedBug>> execute() throws IOException, InterruptedException, IllegalStateException {
 		FindBugs2 findBugs = new FindBugs2();
@@ -64,22 +60,22 @@ public class FindBugsExecutor {
 
 			ReportedBug rb = new ReportedBug(b.getBugRank(), b.getBugRankCategory().toString(), b.getPriority(),
 					b.getPriorityString(), b.getType(), b.getAbbrev(), b.getBugPattern().getDetailPlainText(),
-					b.getBugPattern().getCategory(), b.getPrimaryClass().getClassName(),
-					b.getAbridgedMessage(), b.getMessage());
+					b.getBugPattern().getCategory(), b.getPrimaryClass().getClassName(), b.getAbridgedMessage(),
+					b.getMessage());
 
 			if (b.getPrimaryMethod() != null) {
 				String methodName = b.getPrimaryMethod().getFullMethod(b.getPrimaryClass());
-				rb.setMethod(methodName.substring(methodName.lastIndexOf(".")+1));
+				rb.setMethod(methodName.substring(methodName.lastIndexOf(".") + 1));
 			}
 
 			if (b.getPrimaryField() != null) {
 				rb.setField(b.getPrimaryField().getFieldName());
 			}
-			
+
 			if (b.getPrimaryLocalVariableAnnotation() != null) {
 				rb.setLocalVariable(b.getPrimaryLocalVariableAnnotation().getName());
 			}
-			
+
 			reportedBugs.get(filename).add(rb);
 		}
 
@@ -87,29 +83,19 @@ public class FindBugsExecutor {
 		return reportedBugs;
 	}
 
-	private List<File> getFilesToAnalyze() {
-		final String[] suffix = { "class", "java" };
-		File root = new File(rootDir);
-		Collection<File> files = FileUtils.listFiles(root, suffix, true);
-		return new ArrayList<File>(files);
-	}
-
 	private Project getProject() throws IOException, IllegalStateException {
 		Project findBugsProject = new Project();
-		List<File> files = getFilesToAnalyze();
 
-		boolean hasClass = false;
-
-		for (File file : files) {
-			String ext = FilenameUtils.getExtension(file.getName());
-			findBugsProject.addFile(file.getCanonicalPath());
-			if (ext.equals("class")) {
-				hasClass = true;
-			}
+		for (String clsPath : analysisClasspath) {
+			findBugsProject.addFile(clsPath);
 		}
 
-		if (!hasClass) {
-			throw new IllegalStateException("Findbugs needs compiled source codes.");
+		for (String clsPath : auxiliaryClasspath) {
+			findBugsProject.addAuxClasspathEntry(clsPath);
+		}
+
+		for (String srcDir : sourceDirectories) {
+			findBugsProject.addSourceDir(srcDir);
 		}
 
 		return findBugsProject;
@@ -125,6 +111,18 @@ public class FindBugsExecutor {
 
 	public void setUserPrefsEffort(String userPrefsEffort) {
 		this.userPrefsEffort = userPrefsEffort;
+	}
+
+	public void setAnalysisClasspath(Set<String> analysisClasspath) {
+		this.analysisClasspath = analysisClasspath;
+	}
+
+	public void setAuxiliaryClasspath(Set<String> auxiliaryClasspath) {
+		this.auxiliaryClasspath = auxiliaryClasspath;
+	}
+
+	public void setSourceDirectories(Set<String> sourceDirectories) {
+		this.sourceDirectories = sourceDirectories;
 	}
 
 }
