@@ -108,7 +108,7 @@ public class RefusedParentBequest implements IIndirectCodeSmell {
 
 		for (Entry<String, Integer> nprotmMap : nprotm.entrySet()) {
 			String clazz = nprotmMap.getKey();
-			if (bur.get(clazz) == null || bovr.get(clazz) == null) {
+			if (bur.get(clazz) == null || bovr.get(clazz) == null || bovr.get(clazz) == -1f || bovr.get(clazz) == -1f) {
 				continue;
 			}
 

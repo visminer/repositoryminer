@@ -53,7 +53,7 @@ public class BrainClass implements IDirectCodeSmell {
 	@Override
 	public Document detect(AbstractClassDeclaration type, AST ast) {
 		int wmc = wmcMetric.calculate(type.getMethods());
-		float tcc = tccMetric.calculate(type, type.getMethods());
+		float tcc = tccMetric.calculate(type);
 
 		int nbm = 0; // number of brain methods
 		int totalMloc = 0; // total number of lines of code from methods

@@ -61,8 +61,8 @@ public class GodClass implements IDirectCodeSmell {
 
 	@Override
 	public Document detect(AbstractClassDeclaration type, AST ast) {
-		int atfd = atfdMetric.calculate(type, type.getMethods(), false);
-		float tcc = tccMetric.calculate(type, type.getMethods());
+		int atfd = atfdMetric.calculate(type);
+		float tcc = tccMetric.calculate(type);
 		int wmc = wmcMetric.calculate(type.getMethods());
 
 		if (detect(atfd, wmc, tcc)) {
@@ -78,8 +78,8 @@ public class GodClass implements IDirectCodeSmell {
 	}
 
 	public boolean detect(AbstractClassDeclaration type, ClassDeclaration cls) {
-		int atfd = atfdMetric.calculate(type, cls.getMethods(), false);
-		float tcc = tccMetric.calculate(type, cls.getMethods());
+		int atfd = atfdMetric.calculate(type);
+		float tcc = tccMetric.calculate(type);
 		int wmc = wmcMetric.calculate(cls.getMethods());
 
 		return atfd > atfdThreshold && wmc >= wmcThreshold && tcc < tccThreshold;
