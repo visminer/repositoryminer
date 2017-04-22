@@ -30,11 +30,11 @@ public class TCC implements IDirectCodeMetric {
 
 	@Override
 	public Document calculate(AbstractClassDeclaration type, AST ast) {
-		return new Document("metric", CodeMetricId.TCC.toString()).append("value", calculate(type, type.getMethods()));
+		return new Document("metric", CodeMetricId.TCC.toString()).append("value", calculate(type));
 	}
 
-	public float calculate(AbstractClassDeclaration type, List<MethodDeclaration> methods) {
-		List<MethodDeclaration> methodList = filterMethods(methods);
+	public float calculate(AbstractClassDeclaration type) {
+		List<MethodDeclaration> methodList = filterMethods(type.getMethods());
 		int n = methodList.size();
 		int npc = (n * (n - 1)) / 2; // Number of possible connected methods
 		int ndc = 0; // number of directly connected methods
@@ -48,12 +48,11 @@ public class TCC implements IDirectCodeMetric {
 			}
 		}
 
-		float tcc = 0;
 		if (npc > 0) {
-			tcc = (float) ndc / npc;
+			return (float) ndc / npc;
 		}
 
-		return tcc;
+		return 0;
 	}
 
 	private List<MethodDeclaration> filterMethods(List<MethodDeclaration> methods) {
