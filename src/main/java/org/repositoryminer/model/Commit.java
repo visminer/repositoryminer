@@ -19,6 +19,7 @@ public class Commit {
 	private Date commitDate;
 	private String repository;
 	private List<String> parents;
+	private boolean merge;
 	private Contributor author;
 	private Contributor committer;
 	private List<Diff> diffs;
@@ -41,7 +42,7 @@ public class Commit {
 	public static Commit parseDocument(Document commitDoc, List<String> parents) {
 		Commit commit = new Commit(commitDoc.getString("_id"), commitDoc.getString("message"),
 				commitDoc.getDate("authored_date"), commitDoc.getDate("commit_date"),
-				null, parents,
+				null, parents, commitDoc.getBoolean("merge"),
 				Contributor.parseDocument((Document) commitDoc.get("author")),
 				Contributor.parseDocument((Document) commitDoc.get("committer")),
 				Diff.parseDocuments((List<Document>) commitDoc.get("diffs")));
@@ -58,7 +59,7 @@ public class Commit {
 		Document doc = new Document();
 		doc.append("_id", id).append("message", message).append("authored_date", authoredDate)
 				.append("commit_date", commitDate).append("repository", new ObjectId(repository))
-				.append("parents", parents).append("author", author.toDocument())
+				.append("parents", parents).append("merge", merge).append("author", author.toDocument())
 				.append("committer", committer.toDocument()).append("diffs", Diff.toDocumentList(diffs));
 		return doc;
 	}
@@ -72,7 +73,7 @@ public class Commit {
 	}
 
 	public Commit(String id, String message, Date authoredDate, Date commitDate, String repository,
-			List<String> parents, Contributor author, Contributor committer, List<Diff> diffs) {
+			List<String> parents, boolean merge, Contributor author, Contributor committer, List<Diff> diffs) {
 		super();
 		this.id = id;
 		this.message = message;
@@ -80,6 +81,7 @@ public class Commit {
 		this.commitDate = commitDate;
 		this.repository = repository;
 		this.parents = parents;
+		this.merge = merge;
 		this.author = author;
 		this.committer = committer;
 		this.diffs = diffs;
@@ -131,6 +133,14 @@ public class Commit {
 
 	public void setParents(List<String> parents) {
 		this.parents = parents;
+	}
+
+	public boolean isMerge() {
+		return merge;
+	}
+
+	public void setMerge(boolean merge) {
+		this.merge = merge;
 	}
 
 	public Contributor getAuthor() {

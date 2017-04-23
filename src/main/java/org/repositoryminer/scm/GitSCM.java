@@ -21,7 +21,6 @@ import org.eclipse.jgit.errors.IncorrectObjectTypeException;
 import org.eclipse.jgit.errors.MissingObjectException;
 import org.eclipse.jgit.errors.NoWorkTreeException;
 import org.eclipse.jgit.errors.RevisionSyntaxException;
-import org.eclipse.jgit.lib.AnyObjectId;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.PersonIdent;
 import org.eclipse.jgit.lib.Ref;
@@ -175,7 +174,7 @@ public class GitSCM implements ISCM {
 		}
 
 		return new Commit(revCommit.getName(), revCommit.getFullMessage(), author.getWhen(), committer.getWhen(), null,
-				parents, myAuthor, myCommitter, diffs);
+				parents, (parents.size() > 1), myAuthor, myCommitter, diffs);
 	}
 
 	@Override
@@ -234,23 +233,17 @@ public class GitSCM implements ISCM {
 		throw new RepositoryMinerException(errorMessage, e);
 	}
 
-	private List<Diff> getDiffsForCommitedFiles(String commit) throws IOException {
-		RevCommit revCommit = revWalk.parseCommit(ObjectId.fromString(commit));
-		AnyObjectId currentCommit = repository.resolve(commit);
-		AnyObjectId oldCommit = revCommit.getParentCount() > 0 ? repository.resolve(revCommit.getParent(0).getName())
-				: null;
+	private List<Diff> getDiffsForCommitedFiles(final String hash) throws IOException {
+		final RevCommit commit = revWalk.parseCommit(ObjectId.fromString(hash));
+		final RevCommit parentCommit = commit.getParentCount() > 0
+				? revWalk.parseCommit(ObjectId.fromString(commit.getParent(0).getName())) : null;
 
-		List<DiffEntry> diffs = diffFormatter.scan(oldCommit, currentCommit);
-		List<Diff> changes = new ArrayList<Diff>();
+		final List<DiffEntry> diffs = diffFormatter.scan(parentCommit, commit);
+		final List<Diff> changes = new ArrayList<Diff>();
 
 		for (DiffEntry entry : diffs) {
-			RevCommit parentCommit = oldCommit == null ? null
-					: revWalk.parseCommit(ObjectId.fromString(oldCommit.getName()));
-
 			Diff diff = processDiff(entry);
-			LinesInfo linesInfo;
-
-			linesInfo = getLinesAddedAndDeleted(diff.getPath(), parentCommit, revCommit);
+			LinesInfo linesInfo = getLinesAddedAndDeleted(diff.getPath(), parentCommit, commit);
 
 			diff.setLinesAdded(linesInfo.added);
 			diff.setLinesRemoved(linesInfo.removed);
@@ -261,7 +254,7 @@ public class GitSCM implements ISCM {
 		return changes;
 	}
 
-	private Diff processDiff(DiffEntry entry) {
+	private Diff processDiff(final DiffEntry entry) {
 		switch (entry.getChangeType()) {
 		case ADD:
 			return new Diff(entry.getNewPath(), null, StringUtils.encodeToCRC32(entry.getNewPath()), DiffType.ADD);
@@ -285,25 +278,26 @@ public class GitSCM implements ISCM {
 		}
 	}
 
-	private LinesInfo getLinesAddedAndDeleted(String path, RevCommit oldCommit, RevCommit currentCommit)
-			throws IOException {
-		ByteArrayOutputStream output = new ByteArrayOutputStream();
-		DiffFormatter formatter = new DiffFormatter(output);
+	private LinesInfo getLinesAddedAndDeleted(final String filepath, final RevCommit parentCommit,
+			final RevCommit commit) throws IOException {
+		final ByteArrayOutputStream output = new ByteArrayOutputStream();
+		final DiffFormatter formatter = new DiffFormatter(output);
+
 		formatter.setRepository(repository);
 		formatter.setContext(0);
+		formatter.setPathFilter(PathFilter.create(filepath));
+		formatter.format(parentCommit, commit);
 
-		formatter.setPathFilter(PathFilter.create(path));
-		formatter.format(oldCommit, currentCommit);
-
-		Scanner scanner = new Scanner(output.toString());
-		LinesInfo linesInfo = new LinesInfo();
+		final Scanner scanner = new Scanner(output.toString());
+		final LinesInfo linesInfo = new LinesInfo();
 
 		while (scanner.hasNextLine()) {
 			String line = scanner.nextLine();
-			if (line.startsWith("+") && !line.startsWith("+++"))
+			if (line.startsWith("+") && !line.startsWith("+++")) {
 				linesInfo.added++;
-			else if (line.startsWith("-") && !line.startsWith("---"))
+			} else if (line.startsWith("-") && !line.startsWith("---")) {
 				linesInfo.removed++;
+			}
 		}
 
 		output.close();
@@ -313,7 +307,7 @@ public class GitSCM implements ISCM {
 		return linesInfo;
 	}
 
-	private void makeCheckout(String point) {
+	private void makeCheckout(final String point) {
 		try {
 			git.checkout().setStartPoint(point).setAllPaths(true).setForce(true).call();
 		} catch (GitAPIException e) {
@@ -321,9 +315,9 @@ public class GitSCM implements ISCM {
 		}
 	}
 
-	private Iterable<RevCommit> getCommitsFromTag(String refName, int skip, int maxCount) {
+	private Iterable<RevCommit> getCommitsFromTag(final String refName, final int skip, final int maxCount) {
 		try {
-			List<Ref> call = git.tagList().call();
+			final List<Ref> call = git.tagList().call();
 
 			for (Ref ref : call) {
 				if (ref.getName().equals(refName)) {
@@ -347,7 +341,7 @@ public class GitSCM implements ISCM {
 		}
 	}
 
-	private Iterable<RevCommit> getCommitsFromBranch(String refName, int skip, int maxCount) {
+	private Iterable<RevCommit> getCommitsFromBranch(final String refName, final int skip, final int maxCount) {
 		try {
 			return git.log().add(repository.resolve(refName)).setSkip(skip).setMaxCount(maxCount).call();
 		} catch (RevisionSyntaxException | GitAPIException | IOException e) {
@@ -357,11 +351,11 @@ public class GitSCM implements ISCM {
 	}
 
 	@Override
-	public List<Contributor> getCommitters(String filename, String reference) {
-		Map<String, Contributor> contributors = new HashMap<String, Contributor>();
+	public List<Contributor> getCommitters(final String filename, final String reference) {
+		final Map<String, Contributor> contributors = new HashMap<String, Contributor>();
 
 		try {
-			Iterable<RevCommit> commits = git.log().add(repository.resolve(reference)).addPath(filename).call();
+			final Iterable<RevCommit> commits = git.log().add(repository.resolve(reference)).addPath(filename).call();
 
 			for (RevCommit commit : commits) {
 				PersonIdent author = commit.getAuthorIdent();
@@ -383,7 +377,7 @@ public class GitSCM implements ISCM {
 				}
 			}
 
-			List<Contributor> contribsList = new ArrayList<Contributor>(contributors.size());
+			final List<Contributor> contribsList = new ArrayList<Contributor>(contributors.size());
 			for (Contributor c : contributors.values()) {
 				contribsList.add(c);
 			}
