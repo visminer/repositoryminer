@@ -84,7 +84,7 @@ public class CPDMiner {
 
 	public void prepare() throws IOException {
 		File repositoryFolder = new File(repository.getPath());
-		String tempRepository = FileUtils.copyFolderToTmp(repositoryFolder.getAbsolutePath(), repository.getName());
+		tempRepository = FileUtils.copyFolderToTmp(repositoryFolder.getAbsolutePath(), repository.getName());
 		
 		scm = SCMFactory.getSCM(repository.getScm());
 		scm.open(tempRepository);
