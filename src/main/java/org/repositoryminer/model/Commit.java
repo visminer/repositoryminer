@@ -42,7 +42,7 @@ public class Commit {
 	public static Commit parseDocument(Document commitDoc, List<String> parents) {
 		Commit commit = new Commit(commitDoc.getString("_id"), commitDoc.getString("message"),
 				commitDoc.getDate("authored_date"), commitDoc.getDate("commit_date"),
-				null, parents, commitDoc.getBoolean("merge"),
+				null, parents, commitDoc.getBoolean("merge", false),
 				Contributor.parseDocument((Document) commitDoc.get("author")),
 				Contributor.parseDocument((Document) commitDoc.get("committer")),
 				Diff.parseDocuments((List<Document>) commitDoc.get("diffs")));
@@ -68,13 +68,11 @@ public class Commit {
 	}
 
 	public Commit(String id) {
-		super();
 		this.id = id;
 	}
 
 	public Commit(String id, String message, Date authoredDate, Date commitDate, String repository,
 			List<String> parents, boolean merge, Contributor author, Contributor committer, List<Diff> diffs) {
-		super();
 		this.id = id;
 		this.message = message;
 		this.authoredDate = authoredDate;
