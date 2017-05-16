@@ -1,11 +1,11 @@
-package org.repositoryminer.model;
+package org.repositoryminer.remoteminer.model;
 
 import java.util.Date;
 import java.util.List;
 
 import org.bson.Document;
 import org.bson.types.ObjectId;
-import org.repositoryminer.hostingservice.StatusType;
+import org.repositoryminer.remoteminer.hostingservice.StatusType;
 
 public class Milestone {
 

@@ -1,4 +1,4 @@
-package org.repositoryminer.hostingservice;
+package org.repositoryminer.remoteminer.hostingservice;
 
 import java.util.List;
 

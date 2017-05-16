@@ -8,8 +8,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
-import org.repositoryminer.hostingservice.IssueCommandType;
 import org.repositoryminer.model.IssueReference;
+import org.repositoryminer.remoteminer.hostingservice.IssueCommandType;
 
 public class IssueExtractor {
 

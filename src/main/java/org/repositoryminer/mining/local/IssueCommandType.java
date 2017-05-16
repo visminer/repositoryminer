@@ -1,4 +1,4 @@
-package org.repositoryminer.hostingservice;
+package org.repositoryminer.mining.local;
 
 import java.util.HashMap;
 import java.util.Map;

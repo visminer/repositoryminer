@@ -1,4 +1,6 @@
-package org.repositoryminer.hostingservice;
+package org.repositoryminer.remoteminer.hostingservice;
+
+import org.repositoryminer.hostingservice.StatusType;
 
 public enum StatusType {
 

@@ -1,4 +1,4 @@
-package org.repositoryminer.hostingservice;
+package org.repositoryminer.remoteminer.hostingservice;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -14,6 +14,8 @@ import org.eclipse.egit.github.core.service.CollaboratorService;
 import org.eclipse.egit.github.core.service.IssueService;
 import org.eclipse.egit.github.core.service.MilestoneService;
 import org.eclipse.egit.github.core.service.RepositoryService;
+import org.repositoryminer.hostingservice.IHostingService;
+import org.repositoryminer.hostingservice.StatusType;
 import org.repositoryminer.mining.RemoteRepositoryMiner;
 import org.repositoryminer.model.Comment;
 import org.repositoryminer.model.Contributor;

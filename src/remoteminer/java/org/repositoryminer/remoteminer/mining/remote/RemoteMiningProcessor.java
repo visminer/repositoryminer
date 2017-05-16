@@ -1,4 +1,4 @@
-package org.repositoryminer.mining.remote;
+package org.repositoryminer.remoteminer.mining.remote;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,8 +6,6 @@ import java.util.List;
 import org.bson.Document;
 import org.repositoryminer.exception.ErrorMessage;
 import org.repositoryminer.exception.RepositoryMinerException;
-import org.repositoryminer.hostingservice.HostingServiceFactory;
-import org.repositoryminer.hostingservice.IHostingService;
 import org.repositoryminer.listener.mining.remote.IRemoteMiningListener;
 import org.repositoryminer.mining.RemoteRepositoryMiner;
 import org.repositoryminer.model.Contributor;
@@ -16,6 +14,8 @@ import org.repositoryminer.model.Milestone;
 import org.repositoryminer.persistence.handler.IssueDocumentHandler;
 import org.repositoryminer.persistence.handler.MilestoneDocumentHandler;
 import org.repositoryminer.persistence.handler.RepositoryDocumentHandler;
+import org.repositoryminer.remoteminer.hostingservice.HostingServiceFactory;
+import org.repositoryminer.remoteminer.hostingservice.IHostingService;
 
 public class RemoteMiningProcessor {
 

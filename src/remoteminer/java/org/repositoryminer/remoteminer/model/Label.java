@@ -1,4 +1,4 @@
-package org.repositoryminer.model;
+package org.repositoryminer.remoteminer.model;
 
 import java.util.ArrayList;
 import java.util.List;
