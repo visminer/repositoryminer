@@ -3,8 +3,6 @@ package org.repositoryminer.remoteminer.hostingservice;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.repositoryminer.hostingservice.IssueCommandType;
-
 public enum IssueCommandType {
 
 	CLOSE("close"),

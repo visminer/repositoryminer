@@ -14,15 +14,13 @@ import org.eclipse.egit.github.core.service.CollaboratorService;
 import org.eclipse.egit.github.core.service.IssueService;
 import org.eclipse.egit.github.core.service.MilestoneService;
 import org.eclipse.egit.github.core.service.RepositoryService;
-import org.repositoryminer.hostingservice.IHostingService;
-import org.repositoryminer.hostingservice.StatusType;
-import org.repositoryminer.mining.RemoteRepositoryMiner;
-import org.repositoryminer.model.Comment;
 import org.repositoryminer.model.Contributor;
-import org.repositoryminer.model.Event;
-import org.repositoryminer.model.Issue;
-import org.repositoryminer.model.Label;
-import org.repositoryminer.model.Milestone;
+import org.repositoryminer.remoteminer.mining.RemoteRepositoryMiner;
+import org.repositoryminer.remoteminer.model.Comment;
+import org.repositoryminer.remoteminer.model.Event;
+import org.repositoryminer.remoteminer.model.Issue;
+import org.repositoryminer.remoteminer.model.Label;
+import org.repositoryminer.remoteminer.model.Milestone;
 
 public class GitHubService implements IHostingService {
 

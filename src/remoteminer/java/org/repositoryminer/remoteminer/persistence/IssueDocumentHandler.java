@@ -1,7 +1,8 @@
-package org.repositoryminer.persistence.handler;
+package org.repositoryminer.remoteminer.persistence;
 
 import org.bson.types.ObjectId;
 import org.repositoryminer.persistence.Connection;
+import org.repositoryminer.persistence.handler.DocumentHandler;
 
 import com.mongodb.BasicDBObject;
 

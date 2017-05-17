@@ -12,7 +12,7 @@ import org.repositoryminer.codemetric.CodeMetricId;
  * not amount much into methods (to better justify its existence), it helps out
  * other classes in encapsulating generic collections of metrics, as in, for
  * instance,
- * {@link org.repositoryminer.mining.local.DirectCodeAnalysisProcessor#processCommitMetrics}.
+ * {@link org.repositoryminer.mining.DirectCodeAnalysisProcessor#processCommitMetrics}.
  * <p>
  * We also aim for any future necessary evolution of the class to contain
  * further processing beyond the calculation of the metrics.

@@ -1,4 +1,4 @@
-package org.repositoryminer.mining.local;
+package org.repositoryminer.mining;
 
 import java.util.ArrayList;
 import java.util.Iterator;

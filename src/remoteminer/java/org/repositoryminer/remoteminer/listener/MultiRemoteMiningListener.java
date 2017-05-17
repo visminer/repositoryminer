@@ -1,4 +1,4 @@
-package org.repositoryminer.listener.mining.remote;
+package org.repositoryminer.remoteminer.listener;
 
 import java.util.ArrayList;
 import java.util.List;

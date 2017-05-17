@@ -1,6 +1,7 @@
-package org.repositoryminer.persistence.handler;
+package org.repositoryminer.remoteminer.persistence;
 
 import org.repositoryminer.persistence.Connection;
+import org.repositoryminer.persistence.handler.DocumentHandler;
 
 public class DefectMetricsDocumentHandler extends DocumentHandler {
 

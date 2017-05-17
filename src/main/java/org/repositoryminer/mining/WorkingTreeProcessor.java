@@ -1,4 +1,4 @@
-package org.repositoryminer.mining.local;
+package org.repositoryminer.mining;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.bson.Document;
-import org.repositoryminer.listener.mining.local.IMiningListener;
+import org.repositoryminer.listener.mining.IMiningListener;
 import org.repositoryminer.model.Diff;
 import org.repositoryminer.model.Reference;
 import org.repositoryminer.model.WorkingDirectory;

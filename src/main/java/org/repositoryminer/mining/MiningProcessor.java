@@ -1,4 +1,4 @@
-package org.repositoryminer.mining.local;
+package org.repositoryminer.mining;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,8 +11,7 @@ import java.util.Map.Entry;
 
 import org.apache.commons.io.FilenameUtils;
 import org.bson.Document;
-import org.repositoryminer.listener.mining.local.IMiningListener;
-import org.repositoryminer.mining.RepositoryMiner;
+import org.repositoryminer.listener.mining.IMiningListener;
 import org.repositoryminer.model.Commit;
 import org.repositoryminer.model.Contributor;
 import org.repositoryminer.model.Reference;
@@ -57,7 +56,7 @@ import org.repositoryminer.utility.FileUtils;
  * </ul>
  * At least one of the lists must be populated so to get the mining process
  * started. The lists are then injected in a instance of
- * {@link org.repositoryminer.mining.local.DirectCodeAnalysisProcessor} which is
+ * {@link org.repositoryminer.mining.DirectCodeAnalysisProcessor} which is
  * capable of performing the actual calculations and detections.
  * <p>
  * Raised exceptions are:

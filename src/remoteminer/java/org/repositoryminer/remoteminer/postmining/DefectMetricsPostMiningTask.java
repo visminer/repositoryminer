@@ -1,4 +1,4 @@
-package org.repositoryminer.postmining;
+package org.repositoryminer.remoteminer.postmining;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -13,9 +13,10 @@ import org.repositoryminer.model.Diff;
 import org.repositoryminer.model.Reference;
 import org.repositoryminer.model.Repository;
 import org.repositoryminer.persistence.handler.CommitDocumentHandler;
-import org.repositoryminer.persistence.handler.DefectMetricsDocumentHandler;
-import org.repositoryminer.persistence.handler.IssueDocumentHandler;
 import org.repositoryminer.persistence.handler.ReferenceDocumentHandler;
+import org.repositoryminer.postmining.IPostMiningTask;
+import org.repositoryminer.remoteminer.persistence.DefectMetricsDocumentHandler;
+import org.repositoryminer.remoteminer.persistence.IssueDocumentHandler;
 
 /**
  * <h1>Defect-proneness measurement</h1>

@@ -1,7 +1,5 @@
 package org.repositoryminer.remoteminer.hostingservice;
 
-import org.repositoryminer.hostingservice.StatusType;
-
 public enum StatusType {
 
 	OPEN("open"), CLOSED("closed");

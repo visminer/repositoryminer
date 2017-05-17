@@ -1,4 +1,4 @@
-package org.repositoryminer.mining.local;
+package org.repositoryminer.mining;
 
 import java.io.IOException;
 import java.util.AbstractMap;
@@ -9,8 +9,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.bson.Document;
-import org.repositoryminer.listener.mining.local.IMiningListener;
-import org.repositoryminer.mining.RepositoryMiner;
+import org.repositoryminer.listener.mining.IMiningListener;
 import org.repositoryminer.model.Commit;
 import org.repositoryminer.model.Contributor;
 import org.repositoryminer.model.Reference;

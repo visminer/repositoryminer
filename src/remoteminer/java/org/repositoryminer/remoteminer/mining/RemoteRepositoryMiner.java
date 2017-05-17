@@ -1,9 +1,9 @@
 package org.repositoryminer.remoteminer.mining;
 
-import org.repositoryminer.listener.mining.remote.IRemoteMiningListener;
-import org.repositoryminer.listener.mining.remote.NullRemoteMiningListener;
+import org.repositoryminer.mining.RepositoryMiner;
 import org.repositoryminer.remoteminer.hostingservice.HostingServiceType;
-import org.repositoryminer.remoteminer.mining.remote.RemoteMiningProcessor;
+import org.repositoryminer.remoteminer.listener.IRemoteMiningListener;
+import org.repositoryminer.remoteminer.listener.NullRemoteMiningListener;
 
 /**
  * This is the entry point to configure the parameters that enable the

@@ -1,8 +1,8 @@
 package org.repositoryminer.remoteminer.hostingservice;
 
-import org.repositoryminer.hostingservice.GitHubService;
-import org.repositoryminer.hostingservice.HostingServiceType;
-import org.repositoryminer.hostingservice.IHostingService;
+import org.repositoryminer.remoteminer.hostingservice.GitHubService;
+import org.repositoryminer.remoteminer.hostingservice.HostingServiceType;
+import org.repositoryminer.remoteminer.hostingservice.IHostingService;
 
 public class HostingServiceFactory {
 

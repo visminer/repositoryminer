@@ -1,4 +1,4 @@
-package org.repositoryminer.listener.mining.remote;
+package org.repositoryminer.remoteminer.listener;
 
 public class ConsoleRemoteMiningListener implements IRemoteMiningListener {
 

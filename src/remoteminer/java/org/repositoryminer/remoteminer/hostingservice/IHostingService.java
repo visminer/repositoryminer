@@ -2,10 +2,10 @@ package org.repositoryminer.remoteminer.hostingservice;
 
 import java.util.List;
 
-import org.repositoryminer.mining.RemoteRepositoryMiner;
+import org.repositoryminer.remoteminer.mining.RemoteRepositoryMiner;
 import org.repositoryminer.model.Contributor;
-import org.repositoryminer.model.Issue;
-import org.repositoryminer.model.Milestone;
+import org.repositoryminer.remoteminer.model.Issue;
+import org.repositoryminer.remoteminer.model.Milestone;
 
 public interface IHostingService {
 
