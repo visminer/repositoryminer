@@ -33,20 +33,23 @@ public class TechnicalDebtAnalyzer {
 		final List<TechnicalDebtIndicator> codeDebt = new ArrayList<TechnicalDebtIndicator>(10);
 		final List<TechnicalDebtIndicator> desingDebt = new ArrayList<TechnicalDebtIndicator>(8);
 		
+		// Indicators for both design and code debts
 		codeDebt.add(TechnicalDebtIndicator.AUTOMATIC_STATIC_ANALYSIS_ISSUES);
 		codeDebt.add(TechnicalDebtIndicator.GOD_CLASS);
 		codeDebt.add(TechnicalDebtIndicator.COMPLEX_METHOD);
 		codeDebt.add(TechnicalDebtIndicator.DUPLICATED_CODE);
 		codeDebt.add(TechnicalDebtIndicator.DATA_CLASS);
 		codeDebt.add(TechnicalDebtIndicator.BRAIN_METHOD);
+		codeDebt.add(TechnicalDebtIndicator.FEATURE_ENVY);
 		codeDebt.add(TechnicalDebtIndicator.REFUSED_PARENT_BEQUEST);
-		
 		desingDebt.addAll(codeDebt);
 		
+		// Indicators to code debt
 		codeDebt.add(TechnicalDebtIndicator.CODE_WITHOUT_STANDARDS);
 		codeDebt.add(TechnicalDebtIndicator.SLOW_ALGORITHM);
 		codeDebt.add(TechnicalDebtIndicator.MULTITHREAD_CORRECTNESS);
 		
+		// Indicators to design debt
 		desingDebt.add(TechnicalDebtIndicator.DEPTH_OF_INHERITANCE_TREE);
 		
 		debts.put(TechnicalDebtId.CODE_DEBT, codeDebt);
@@ -89,12 +92,12 @@ public class TechnicalDebtAnalyzer {
 	@SuppressWarnings("unchecked")
 	private void persistAnalysis(final String commitId, final Reference ref) {
 		final Commit commit = Commit.parseDocument(commitPersist.findById(commitId, Projections.include("commit_date")));
-		final Document wd = wtHandler.findById(commit.getId());
+		final Document wt = wtHandler.findById(commit.getId());
 
 		scm.open(repository.getPath());
 		
 		final List<Document> documents = new ArrayList<Document>();
-		for (Document file : (List<Document>) wd.get("files")) {
+		for (Document file : (List<Document>) wt.get("files")) {
 			final Map<TechnicalDebtIndicator, Integer> indicators = indicatorsAnalyzer.detect(file.getString("file"),
 					file.getString("checkout"), commit.getId());
 

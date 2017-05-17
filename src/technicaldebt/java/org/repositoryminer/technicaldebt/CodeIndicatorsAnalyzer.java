@@ -45,7 +45,7 @@ public class CodeIndicatorsAnalyzer {
 		}
 	}
 
-	public void detecCodeSmells(long filehash, String filestate, String snapshot) {
+	private void detecCodeSmells(long filehash, String filestate, String snapshot) {
 		Document doc = directAnalysisHandler.findByFileAndCommit(filehash, filestate, Projections.include("classes"));
 		processClasses(doc);
 
@@ -82,7 +82,7 @@ public class CodeIndicatorsAnalyzer {
 		}
 	}
 
-	public void detectDuplicatedCode(long fileshash, String snapshot) {
+	private void detectDuplicatedCode(long fileshash, String snapshot) {
 		long occurrences = cpdHandler
 				.count(Filters.and(Filters.eq("files_info.filehash", fileshash), Filters.eq("commit", snapshot)));
 
@@ -92,7 +92,7 @@ public class CodeIndicatorsAnalyzer {
 	}
 
 	@SuppressWarnings("unchecked")
-	public void detectBugs(long fileshash, String snapshot) {
+	private void detectBugs(long fileshash, String snapshot) {
 		Document doc = bugHandler.findOne(
 				Filters.and(Filters.eq("filehash", fileshash), Filters.eq("commit", snapshot)),
 				Projections.include("bugs.category"));
@@ -123,7 +123,7 @@ public class CodeIndicatorsAnalyzer {
 	}
 
 	@SuppressWarnings("unchecked")
-	public void detectStyleProblems(long fileshash, String snapshot) {
+	private void detectStyleProblems(long fileshash, String snapshot) {
 		Document doc = checkstyleHandler.findOne(
 				Filters.and(Filters.eq("filehash", fileshash), Filters.eq("commit", snapshot)),
 				Projections.include("style_problems.line"));
