@@ -18,7 +18,7 @@ sourceSets {
 	main {
 		java{
 			srcDirs = ['src/main/java', 'src/effort/java', 'src/findbugs/java', 'src/excomment/java', 'src/pmd/java',
-			'src/checkstyle/java', 'src/technicaldebt/java']
+			'src/checkstyle/java', 'src/technicaldebt/java', 'src/remoteminer/java']
 		}
 	}	
 }

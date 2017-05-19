@@ -6,6 +6,7 @@ import java.util.List;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
+import org.repositoryminer.persistence.Connection;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.MongoCollection;
@@ -17,6 +18,20 @@ public class DocumentHandler {
 
 	protected MongoCollection<Document> collection = null;
 
+	public DocumentHandler() {}
+	
+	public DocumentHandler(final String collectionName) {
+		collection = Connection.getInstance().getCollection(collectionName);
+	}
+	
+	public long count() {
+		return collection.count();
+	}
+	
+	public long count(Bson where) {
+		return collection.count(where);
+	}
+	
 	public void insert(Document document) {
 		collection.insertOne(document);
 	}

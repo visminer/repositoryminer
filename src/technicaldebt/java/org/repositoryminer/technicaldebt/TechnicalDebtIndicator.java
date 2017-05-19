@@ -10,6 +10,7 @@ public enum TechnicalDebtIndicator {
 	MULTITHREAD_CORRECTNESS,
 	AUTOMATIC_STATIC_ANALYSIS_ISSUES,
 	DATA_CLASS,
+	FEATURE_ENVY,
 	REFUSED_PARENT_BEQUEST,
 	DEPTH_OF_INHERITANCE_TREE,
 	CODE_WITHOUT_STANDARDS;
@@ -20,7 +21,6 @@ public enum TechnicalDebtIndicator {
 				return indicator;
 			}
 		}
-		
 		return null;
 	}
 	
