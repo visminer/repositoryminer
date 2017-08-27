@@ -1,0 +1,34 @@
+apply plugin: 'java'
+apply plugin: 'maven'
+
+group = 'org.repositoryminer'
+version = '1.7'
+
+description = 'RepositoryMiner'
+
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+
+sourceSets {
+	main {
+		java{
+			srcDirs = ['src/main/java']
+		}
+	}	
+}
+
+tasks.withType(JavaCompile) {
+	options.encoding = 'UTF-8'
+}
+
+repositories {
+     maven { url "https://repo.eclipse.org/content/repositories/egit-releases" }
+     maven { url "http://repo.maven.apache.org/maven2" }
+}
+
+dependencies {
+    compile group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version:'4.4.0.201606070830-r'
+    compile group: 'org.eclipse.jdt', name: 'org.eclipse.jdt.core', version:'3.10.0'
+    compile group: 'org.mongodb', name: 'mongo-java-driver', version:'3.2.2'
+    compile group: 'org.slf4j', name: 'slf4j-simple', version:'1.7.21'
+}
