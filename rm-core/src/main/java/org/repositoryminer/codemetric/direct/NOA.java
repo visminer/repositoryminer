@@ -1,25 +1,29 @@
 package org.repositoryminer.codemetric.direct;
 
-import org.bson.Document;
 import org.repositoryminer.ast.AST;
-import org.repositoryminer.ast.AbstractClassDeclaration;
-import org.repositoryminer.codemetric.CodeMetricId;
+import org.repositoryminer.ast.AbstractMethod;
+import org.repositoryminer.ast.AbstractType;
 
-/**
- * <h1>Number of attributes</h1>
- * <p>
- * NOA is defined as the number of attributes in a class.
- */
 public class NOA implements IDirectCodeMetric {
 
 	@Override
-	public CodeMetricId getId() {
-		return CodeMetricId.NOA;
+	public Object calculateFromFile(AST ast) {
+		return null;
 	}
 
 	@Override
-	public Document calculate(AbstractClassDeclaration type, AST ast) {
-		return new Document("metric", CodeMetricId.NOA.toString()).append("value", type.getFields().size());
+	public Object calculateFromClass(AST ast, AbstractType type) {
+		return type.getFields().size();
+	}
+
+	@Override
+	public Object calculateFromMethod(AST ast, AbstractType type, AbstractMethod method) {
+		return null;
+	}
+
+	@Override
+	public String getMetric() {
+		return "NOA";
 	}
 
 }

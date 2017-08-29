@@ -2,32 +2,43 @@ package org.repositoryminer.codemetric.direct;
 
 import java.util.List;
 
-import org.bson.Document;
 import org.repositoryminer.ast.AST;
-import org.repositoryminer.ast.AbstractClassDeclaration;
-import org.repositoryminer.ast.FieldDeclaration;
-import org.repositoryminer.ast.MethodDeclaration;
-import org.repositoryminer.codemetric.CodeMetricId;
+import org.repositoryminer.ast.AbstractField;
+import org.repositoryminer.ast.AbstractMethod;
+import org.repositoryminer.ast.AbstractType;
 
 public class NProtM implements IDirectCodeMetric {
 
 	@Override
-	public Document calculate(AbstractClassDeclaration type, AST ast) {
-		return new Document("metric", CodeMetricId.NProtM.toString()).append("value",
-				calculate(type.getMethods(), type.getFields()));
-
+	public Object calculateFromFile(AST ast) {
+		return null;
 	}
 
-	public int calculate(List<MethodDeclaration> methods, List<FieldDeclaration> fields) {
+	@Override
+	public Object calculateFromClass(AST ast, AbstractType type) {
+		return calculate(type.getMethods(), type.getFields());
+	}
+
+	@Override
+	public Object calculateFromMethod(AST ast, AbstractType type, AbstractMethod method) {
+		return null;
+	}
+
+	@Override
+	public String getMetric() {
+		return "NPROTM";
+	}
+
+	public int calculate(List<AbstractMethod> methods, List<AbstractField> fields) {
 		int members = 0;
 
-		for (MethodDeclaration method : methods) {
+		for (AbstractMethod method : methods) {
 			if (isProtected(method.getModifiers())) {
 				members++;
 			}
 		}
 
-		for (FieldDeclaration field : fields) {
+		for (AbstractField field : fields) {
 			if (isProtected(field.getModifiers())) {
 				members++;
 			}
@@ -40,13 +51,7 @@ public class NProtM implements IDirectCodeMetric {
 		if (modifiers.contains("protected") || (!modifiers.contains("public") && !modifiers.contains("private"))) {
 			return true;
 		}
-		
 		return false;
-	}
-	
-	@Override
-	public CodeMetricId getId() {
-		return CodeMetricId.NProtM;
 	}
 
 }

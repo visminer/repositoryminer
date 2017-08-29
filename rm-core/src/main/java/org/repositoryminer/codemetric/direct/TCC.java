@@ -6,35 +6,37 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.bson.Document;
 import org.repositoryminer.ast.AST;
-import org.repositoryminer.ast.AbstractClassDeclaration;
-import org.repositoryminer.ast.FieldDeclaration;
-import org.repositoryminer.ast.MethodDeclaration;
-import org.repositoryminer.ast.Statement;
-import org.repositoryminer.ast.Statement.NodeType;
-import org.repositoryminer.codemetric.CodeMetricId;
+import org.repositoryminer.ast.AbstractField;
+import org.repositoryminer.ast.AbstractMethod;
+import org.repositoryminer.ast.AbstractStatement;
+import org.repositoryminer.ast.AbstractType;
+import org.repositoryminer.ast.NodeType;
 
-/**
- * <h1>Tight Class Cohesion</h1>
- * <p>
- * The relative number of method pairs of a class that access in common at least
- * one attribute of the measured class.
- */
 public class TCC implements IDirectCodeMetric {
 
 	@Override
-	public CodeMetricId getId() {
-		return CodeMetricId.TCC;
+	public Object calculateFromFile(AST ast) {
+		return null;
 	}
 
 	@Override
-	public Document calculate(AbstractClassDeclaration type, AST ast) {
-		return new Document("metric", CodeMetricId.TCC.toString()).append("value", calculate(type));
+	public Object calculateFromClass(AST ast, AbstractType type) {
+		return calculate(type);
 	}
 
-	public float calculate(AbstractClassDeclaration type) {
-		List<MethodDeclaration> methodList = filterMethods(type.getMethods());
+	@Override
+	public Object calculateFromMethod(AST ast, AbstractType type, AbstractMethod method) {
+		return null;
+	}
+
+	@Override
+	public String getMetric() {
+		return "TCC";
+	}
+
+	public float calculate(AbstractType type) {
+		List<AbstractMethod> methodList = filterMethods(type.getMethods());
 		int n = methodList.size();
 		int npc = (n * (n - 1)) / 2; // Number of possible connected methods
 		int ndc = 0; // number of directly connected methods
@@ -55,21 +57,20 @@ public class TCC implements IDirectCodeMetric {
 		return 0;
 	}
 
-	private List<MethodDeclaration> filterMethods(List<MethodDeclaration> methods) {
-		List<MethodDeclaration> methodList = new ArrayList<MethodDeclaration>();
-		for (MethodDeclaration m : methods) {
+	private List<AbstractMethod> filterMethods(List<AbstractMethod> methods) {
+		List<AbstractMethod> methodList = new ArrayList<AbstractMethod>();
+		for (AbstractMethod m : methods) {
 			if (!(m.getModifiers().contains("abstract") || m.isConstructor()))
 				methodList.add(m);
 		}
 		return methodList;
 	}
 
-	public List<String> processAccessedFields(AbstractClassDeclaration currType, MethodDeclaration method) {
+	public List<String> processAccessedFields(AbstractType currType, AbstractMethod method) {
 		Set<String> fields = new HashSet<String>();
 
-		for (Statement stmt : method.getStatements()) {
+		for (AbstractStatement stmt : method.getStatements()) {
 			String exp, type, target;
-
 			if (stmt.getNodeType() == NodeType.FIELD_ACCESS || stmt.getNodeType() == NodeType.METHOD_INVOCATION) {
 				exp = stmt.getExpression();
 				type = exp.substring(0, exp.lastIndexOf("."));
@@ -87,7 +88,7 @@ public class TCC implements IDirectCodeMetric {
 			}
 
 		}
-		
+
 		return new ArrayList<String>(fields);
 	}
 
@@ -99,7 +100,7 @@ public class TCC implements IDirectCodeMetric {
 		return false;
 	}
 
-	private Collection<String> processGetOrSetOrIs(String methodInv, AbstractClassDeclaration type) {
+	private Collection<String> processGetOrSetOrIs(String methodInv, AbstractType type) {
 		String field;
 		List<String> fields = new ArrayList<String>(2);
 
@@ -114,12 +115,12 @@ public class TCC implements IDirectCodeMetric {
 		if (field.length() == 0) {
 			return fields;
 		}
-		
+
 		char c[] = field.toCharArray();
 		c[0] = Character.toLowerCase(c[0]);
 		String field2 = new String(c);
 
-		for (FieldDeclaration fd : type.getFields()) {
+		for (AbstractField fd : type.getFields()) {
 			if (fd.getName().equals(field)) {
 				fields.add(field);
 			} else if (fd.getName().equals(field2)) {

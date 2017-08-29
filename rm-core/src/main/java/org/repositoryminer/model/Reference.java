@@ -5,11 +5,9 @@ import java.util.List;
 
 import org.bson.Document;
 import org.bson.types.ObjectId;
-import org.repositoryminer.scm.ReferenceType;
 
 /**
- * This class represents the "reference" object in the database. This class
- * represents a reference.
+ * This class represents a reference (e.g. branches and tags).
  */
 public class Reference {
 
@@ -17,60 +15,56 @@ public class Reference {
 	private String repository;
 	private String name;
 	private String path;
-	private ReferenceType type;
+	private String type;
 	private List<String> commits;
 
-	@SuppressWarnings("unchecked")
-	public static List<Reference> parseDocuments(List<Document> refsDocs, ReferenceType type) {
+	/**
+	 * Converts a list of documents to references.
+	 * 
+	 * @param documents
+	 *            the documents.
+	 * @return a list of references.
+	 */
+	public static List<Reference> parseDocuments(List<Document> documents) {
 		List<Reference> refs = new ArrayList<Reference>();
-		for (Document doc : refsDocs) {
-			if (ReferenceType.valueOf(doc.getString("type")) == type) {
-				List<String> commits = new ArrayList<String>();
-				
-				for (String o : (List<String>) doc.get("commits")) {
-					commits.add(o);
-				}
-				
-				Reference r = new Reference(doc.get("_id").toString(), doc.get("repository").toString(), doc.getString("name"),
-						doc.getString("path"), type, commits);
-				refs.add(r);
-			}
-		}
-		return refs;
-	}
-
-	public static List<Reference> parseDocuments(List<Document> refsDocs) {
-		List<Reference> refs = new ArrayList<Reference>();
-		for (Document doc : refsDocs) {
+		for (Document doc : documents) {
 			refs.add(parseDocument(doc));
 		}
 		return refs;
 	}
 
+	/**
+	 * Converts a document to a reference.
+	 * 
+	 * @param document
+	 *            the document.
+	 * @return a reference.
+	 */
 	@SuppressWarnings("unchecked")
-	public static Reference parseDocument(Document refDoc) {
-		List<String> commits = new ArrayList<String>();
-		for (String o : (List<String>) refDoc.get("commits")) {
-			commits.add(o);
-		}
-		Reference r = new Reference(refDoc.get("_id").toString(), refDoc.get("repository").toString(), refDoc.getString("name"),
-				refDoc.getString("path"), ReferenceType.valueOf(refDoc.getString("type")), commits);
-		
+	public static Reference parseDocument(Document document) {
+		Reference r = new Reference(document.get("_id").toString(), document.get("repository").toString(),
+				document.getString("name"), document.getString("path"), document.getString("type"),
+				document.get("commits", List.class));
+
 		return r;
 	}
-	
+
+	/**
+	 * Converts a reference to a document.
+	 * 
+	 * @return a document.
+	 */
 	public Document toDocument() {
 		Document doc = new Document();
 		doc.append("repository", new ObjectId(repository)).append("name", name).append("path", path)
-				.append("type", type.toString()).append("commits", commits);
+				.append("type", type).append("commits", commits);
 		return doc;
 	}
 
 	public Reference() {
 	}
 
-	public Reference(String id, String repository, String name, String path, ReferenceType type,
-			List<String> commits) {
+	public Reference(String id, String repository, String name, String path, String type, List<String> commits) {
 		super();
 		this.id = id;
 		this.repository = repository;
@@ -112,11 +106,11 @@ public class Reference {
 		this.path = path;
 	}
 
-	public ReferenceType getType() {
+	public String getType() {
 		return type;
 	}
 
-	public void setType(ReferenceType type) {
+	public void setType(String type) {
 		this.type = type;
 	}
 

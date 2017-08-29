@@ -1,62 +1,45 @@
 package org.repositoryminer.codemetric.direct;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
-import org.bson.Document;
 import org.repositoryminer.ast.AST;
-import org.repositoryminer.ast.AbstractClassDeclaration;
-import org.repositoryminer.ast.MethodDeclaration;
-import org.repositoryminer.ast.Statement;
-import org.repositoryminer.ast.Statement.NodeType;
-import org.repositoryminer.codemetric.CodeMetricId;
+import org.repositoryminer.ast.AbstractMethod;
+import org.repositoryminer.ast.AbstractStatement;
+import org.repositoryminer.ast.AbstractType;
+import org.repositoryminer.ast.NodeType;
 
-/**
- * <h1>Foreign Data Provider</h1>
- * <p>
- * FDP is defined as the number of classes in which the attributes accessed - in conformity 
- * with the ATFD metric - are defined.
- */
 public class FDP implements IDirectCodeMetric {
 
 	@Override
-	public CodeMetricId getId() {
-		return CodeMetricId.FDP;
+	public Object calculateFromFile(AST ast) {
+		return null;
 	}
-
 
 	@Override
-	public Document calculate(AbstractClassDeclaration type, AST ast) {
-		Document cycloDocs = new Document("name", getId().toString());
-		
-		cycloDocs.append("methods", calculate(type)); 
-		
-		return cycloDocs;
+	public Object calculateFromClass(AST ast, AbstractType type) {
+		return null;
 	}
 
-	public List<Document> calculate(AbstractClassDeclaration type) {
-		
-		List<Document> fdpDocs = new ArrayList<Document>();
-		
-		for (MethodDeclaration methodDeclaration : type.getMethods()) {
-			float fdp = calculate(type, methodDeclaration);
-			fdpDocs.add(new Document("method", methodDeclaration.getName()).append("value", fdp));
-		}
-		
-		return fdpDocs;
+	@Override
+	public Object calculateFromMethod(AST ast, AbstractType type, AbstractMethod method) {
+		return calculate(type, method);
 	}
 
-	public int calculate(AbstractClassDeclaration currType,MethodDeclaration methodDeclaration) {
+	@Override
+	public String getMetric() {
+		return "FDP";
+	}
+
+	public int calculate(AbstractType currType, AbstractMethod methodDeclaration) {
 		Set<String> accessedClass = new HashSet<String>();
 
-		for (Statement stmt : methodDeclaration.getStatements()) {
+		for (AbstractStatement stmt : methodDeclaration.getStatements()) {
 			String exp, type;
 
 			if (stmt.getNodeType() == NodeType.FIELD_ACCESS || stmt.getNodeType() == NodeType.METHOD_INVOCATION) {
 				exp = stmt.getExpression();
-				if( stmt.getNodeType().equals(NodeType.METHOD_INVOCATION)){
+				if (stmt.getNodeType().equals(NodeType.METHOD_INVOCATION)) {
 					exp = exp.substring(0, exp.indexOf("("));
 				}
 				type = exp.substring(0, exp.lastIndexOf("."));
@@ -79,7 +62,7 @@ public class FDP implements IDirectCodeMetric {
 		}
 
 		return accessedClass.size();
-		
+
 	}
-	
+
 }

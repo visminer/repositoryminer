@@ -1,63 +1,40 @@
 package org.repositoryminer.codemetric.direct;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
-import org.bson.Document;
 import org.repositoryminer.ast.AST;
-import org.repositoryminer.ast.AbstractClassDeclaration;
-import org.repositoryminer.ast.MethodDeclaration;
-import org.repositoryminer.ast.Statement;
-import org.repositoryminer.ast.Statement.NodeType;
-import org.repositoryminer.codemetric.CodeMetricId;
+import org.repositoryminer.ast.AbstractMethod;
+import org.repositoryminer.ast.AbstractStatement;
+import org.repositoryminer.ast.AbstractType;
+import org.repositoryminer.ast.NodeType;
 
-/**
- * <h1>Access To Foreign Data</h1>
- * <p>
- * ATFD is defined as the number of attributes from unrelated classes that are
- * accessed directly or by invoking accessor methods.
- */
 public class ATFD implements IDirectCodeMetric {
 
 	@Override
-	public CodeMetricId getId() {
-		return CodeMetricId.ATFD;
+	public Object calculateFromFile(AST ast) {
+		return null;
 	}
 
 	@Override
-	public Document calculate(AbstractClassDeclaration type, AST ast) {
-		List<Document> methodsDoc = new ArrayList<Document>();
-
-		int atfdCls = 0;
-		for (MethodDeclaration mDeclaration : type.getMethods()) {
-			int atfdMethod = calculate(type, mDeclaration);
-			atfdCls += atfdMethod;
-			
-			methodsDoc.add(new Document("method", mDeclaration.getName()).append("value",
-					atfdMethod));
-		}
-
-		return new Document("metric", CodeMetricId.ATFD.toString())
-				.append("value", atfdCls).append("methods", methodsDoc);
+	public Object calculateFromClass(AST ast, AbstractType type) {
+		return null;
 	}
 
-	public int calculate(AbstractClassDeclaration type) {
-		int atfdClass = 0;
-
-		for (MethodDeclaration mDeclaration : type.getMethods()) {
-			int atfdMethod = calculate(type, mDeclaration);
-			atfdClass += atfdMethod;
-		}
-
-		return atfdClass;
+	@Override
+	public Object calculateFromMethod(AST ast, AbstractType type, AbstractMethod method) {
+		return calculate(type, method);
 	}
 
-	public int calculate(AbstractClassDeclaration currType, MethodDeclaration method) {
+	@Override
+	public String getMetric() {
+		return "ATFD";
+	}
+
+	public int calculate(AbstractType currType, AbstractMethod method) {
 		Set<String> accessedFields = new HashSet<String>();
 
-		for (Statement stmt : method.getStatements()) {
+		for (AbstractStatement stmt : method.getStatements()) {
 			String exp, type;
 
 			if (stmt.getNodeType() == NodeType.FIELD_ACCESS || stmt.getNodeType() == NodeType.METHOD_INVOCATION) {
@@ -68,8 +45,9 @@ public class ATFD implements IDirectCodeMetric {
 			}
 
 			if (stmt.getNodeType().equals(NodeType.FIELD_ACCESS)) {
-				if (!currType.getName().equals(type))
+				if (!currType.getName().equals(type)) {
 					accessedFields.add(exp.toLowerCase());
+				}
 			} else if (stmt.getNodeType().equals(NodeType.METHOD_INVOCATION)) {
 				String methodInv = exp.substring(exp.lastIndexOf(".") + 1);
 				if (!currType.getName().equals(type)) {

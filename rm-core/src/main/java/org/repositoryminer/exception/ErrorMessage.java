@@ -1,5 +1,8 @@
 package org.repositoryminer.exception;
 
+/**
+ * This class defines error messages.
+ */
 public enum ErrorMessage {
 
 	AST_GENERATOR_FACTORY_ERROR("It was impossible to create an instance of an ASTGenerator."),
@@ -15,7 +18,8 @@ public enum ErrorMessage {
 	GIT_REPOSITORY_IOERROR("GIT - It was impossible to analyze the repository, some unexpected IO error has ocurred."),
 	SCM_NOT_FOUND("Not found SCM system."),
 	DUPLICATE_REPOSITORY("Repository already exists in database."),
-	REPOSITORY_NOT_FOUND("Repository not found.");
+	REPOSITORY_NOT_FOUND("Repository not found."),
+	JDT_HAS_NO_BINDING_RECOVERY("JDT binding was not activated.");
 	
 	private String message;
 	

@@ -1,52 +1,37 @@
 package org.repositoryminer.codemetric.direct;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.bson.Document;
 import org.repositoryminer.ast.AST;
-import org.repositoryminer.ast.AbstractClassDeclaration;
-import org.repositoryminer.ast.MethodDeclaration;
-import org.repositoryminer.ast.Statement;
-import org.repositoryminer.ast.Statement.NodeType;
-import org.repositoryminer.codemetric.CodeMetricId;
+import org.repositoryminer.ast.AbstractMethod;
+import org.repositoryminer.ast.AbstractStatement;
+import org.repositoryminer.ast.AbstractType;
+import org.repositoryminer.ast.NodeType;
 
-/**
- * <h1>Locality Attribute Accesses</h1>
- * <p>
- * LAA is defined as the number of attributes from the method's definition
- * class, divided by the total number of variables accessed (including
- * attributes used via accessor methods), whereby the number of local attributes
- * accessed is comuted in conformity with LAA specifications.
- */
 public class LAA implements IDirectCodeMetric {
 
 	@Override
-	public Document calculate(AbstractClassDeclaration type, AST ast) {
-		Document cycloDocs = new Document("name", getId().toString());
-
-		cycloDocs.append("methods", calculate(type));
-
-		return cycloDocs;
+	public Object calculateFromFile(AST ast) {
+		return null;
 	}
 
-	public List<Document> calculate(AbstractClassDeclaration type) {
-
-		List<Document> ccDocs = new ArrayList<Document>();
-
-		for (MethodDeclaration methodDeclaration : type.getMethods()) {
-			float laaValue = calculate(type, methodDeclaration);
-
-			ccDocs.add(new Document("method", methodDeclaration.getName()).append("value", laaValue));
-		}
-
-		return ccDocs;
+	@Override
+	public Object calculateFromClass(AST ast, AbstractType type) {
+		return null;
 	}
 
-	public float calculate(AbstractClassDeclaration type, MethodDeclaration methodDeclaration) {
+	@Override
+	public Object calculateFromMethod(AST ast, AbstractType type, AbstractMethod method) {
+		return calculate(type, method);
+	}
+
+	@Override
+	public String getMetric() {
+		return "LAA";
+	}
+
+	public float calculate(AbstractType type, AbstractMethod methodDeclaration) {
 		int totalAttributeAccessed = 0;
 
-		for (Statement statement : methodDeclaration.getStatements()) {
+		for (AbstractStatement statement : methodDeclaration.getStatements()) {
 			String exp = statement.getExpression();
 
 			if (statement.getNodeType().equals(NodeType.FIELD_ACCESS)) {
@@ -64,11 +49,6 @@ public class LAA implements IDirectCodeMetric {
 
 		return totalAttributeAccessed == 0 ? 0 : type.getFields().size() * 1.0f / totalAttributeAccessed;
 
-	}
-
-	@Override
-	public CodeMetricId getId() {
-		return CodeMetricId.LAA;
 	}
 
 }

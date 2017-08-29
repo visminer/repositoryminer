@@ -1,29 +1,23 @@
 package org.repositoryminer.parser;
 
 import org.repositoryminer.ast.AST;
-import org.repositoryminer.ast.Language;
 
+/**
+ * This interface defines a parser to a programming language.
+ */
 public interface IParser {
 
 	/**
-	 * @param repositoryPath
-	 *            the repository path. Used to help the parser to process the
-	 *            AST detecting source folders. This method is called every time
-	 *            that snapshot is changed.
-	 */
-	public void processSourceFolders(String repositoryPath);
-
-	/**
-	 * @param filePath
+	 * @param project
+	 *            the project path.
+	 * @param filename
 	 *            the file path.
 	 * @param source
 	 *            the source code.
-	 * @param charset
-	 *            the charset.
-	 *            
+	 * 
 	 * @return the AST representing the source code.
 	 */
-	public AST generate(String filePath, String source, String charset);
+	public AST generate(String filename, String source);
 
 	/**
 	 * @return the extensions supported by the parser
@@ -31,14 +25,15 @@ public interface IParser {
 	public String[] getExtensions();
 
 	/**
-	 * @return source folders found by the parser in the project
+	 * @return the programming language supported by the parser
 	 */
-	public String[] getSourceFolders();
+	public String getLanguage();
 
 	/**
-	 * @return a constant to identify the programming language supported by the
-	 *         parser
+	 * Scans the repository to find source folders.
+	 * @param project
+	 *            the project path.
 	 */
-	public Language getLanguage();
+	public void scanRepository(String repositoryPath);
 
 }

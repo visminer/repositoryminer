@@ -2,32 +2,44 @@ package org.repositoryminer.codemetric.direct;
 
 import java.util.List;
 
-import org.bson.Document;
 import org.repositoryminer.ast.AST;
-import org.repositoryminer.ast.AbstractClassDeclaration;
-import org.repositoryminer.ast.FieldDeclaration;
-import org.repositoryminer.ast.MethodDeclaration;
-import org.repositoryminer.codemetric.CodeMetricId;
+import org.repositoryminer.ast.AbstractField;
+import org.repositoryminer.ast.AbstractMethod;
+import org.repositoryminer.ast.AbstractType;
 
 public class NOAM implements IDirectCodeMetric {
 
 	@Override
-	public Document calculate(AbstractClassDeclaration type, AST ast) {
-		return new Document("metric", CodeMetricId.NOAM.toString()).append("value",
-				calculate(type.getMethods(), type.getFields()));
+	public Object calculateFromFile(AST ast) {
+		return null;
 	}
 
-	public int calculate(List<MethodDeclaration> methods, List<FieldDeclaration> fields) {
+	@Override
+	public Object calculateFromClass(AST ast, AbstractType type) {
+		return calculate(type.getMethods(), type.getFields());
+	}
+
+	@Override
+	public Object calculateFromMethod(AST ast, AbstractType type, AbstractMethod method) {
+		return null;
+	}
+
+	@Override
+	public String getMetric() {
+		return "NOAM";
+	}
+
+	public int calculate(List<AbstractMethod> methods, List<AbstractField> fields) {
 		int accessorMehtods = 0;
-		for (MethodDeclaration method : methods) {
+		for (AbstractMethod method : methods) {
 			if (method.getModifiers().contains("public") && isAcessor(method.getName(), fields)) {
 				accessorMehtods++;
 			}
 		}
 		return accessorMehtods;
 	}
-	
-	public boolean isAcessor(String signature, List<FieldDeclaration> fields) {
+
+	public boolean isAcessor(String signature, List<AbstractField> fields) {
 		String field;
 
 		if (signature.startsWith("get") || signature.startsWith("set")) {
@@ -46,18 +58,13 @@ public class NOAM implements IDirectCodeMetric {
 		c[0] = Character.toLowerCase(c[0]);
 		String field2 = new String(c);
 
-		for (FieldDeclaration fd : fields) {
+		for (AbstractField fd : fields) {
 			if (fd.getName().equals(field) || fd.getName().equals(field2)) {
 				return true;
 			}
 		}
 
 		return false;
-	}
-	
-	@Override
-	public CodeMetricId getId() {
-		return CodeMetricId.NOAM;
 	}
 
 }

@@ -8,8 +8,7 @@ import org.bson.Document;
 import org.bson.types.ObjectId;
 
 /**
- * This class represents the "commit" object in the database. This class
- * represents a commit.
+ * This class represents a commit.
  */
 public class Commit {
 
@@ -20,59 +19,64 @@ public class Commit {
 	private String repository;
 	private List<String> parents;
 	private boolean merge;
-	private Contributor author;
-	private Contributor committer;
-	private List<Diff> diffs;
-	private List<IssueReference> issueReferences;
+	private PersonIdent author;
+	private PersonIdent committer;
+	private List<Change> diffs;
 
-	@SuppressWarnings("unchecked")
-	public static List<Commit> parseDocuments(List<Document> commitsDocs) {
+	/**
+	 * Converts database documents to commits.
+	 * 
+	 * @param documents
+	 *            the documents from database.
+	 * @return a list of commits.
+	 */
+	public static List<Commit> parseDocuments(List<Document> documents) {
 		List<Commit> commits = new ArrayList<Commit>();
-		for (Document doc : commitsDocs) {
-			List<String> parents = new ArrayList<String>();
-			for (String p : (List<String>) doc.get("parents")) {
-				parents.add(p);
-			}
-			commits.add(parseDocument(doc, parents));
+		for (Document doc : documents) {
+			commits.add(parseDocument(doc));
 		}
 		return commits;
 	}
 
+	/**
+	 * Converts a document to a commit.
+	 * 
+	 * @param document
+	 *            the document.
+	 * @return a commit.
+	 */
 	@SuppressWarnings("unchecked")
-	public static Commit parseDocument(Document commitDoc, List<String> parents) {
-		Commit commit = new Commit(commitDoc.getString("_id"), commitDoc.getString("message"),
-				commitDoc.getDate("authored_date"), commitDoc.getDate("commit_date"),
-				null, parents, commitDoc.getBoolean("merge", false),
-				Contributor.parseDocument((Document) commitDoc.get("author")),
-				Contributor.parseDocument((Document) commitDoc.get("committer")),
-				Diff.parseDocuments((List<Document>) commitDoc.get("diffs")));
+	public static Commit parseDocument(Document document) {
+		Commit commit = new Commit(document.getString("_id"), document.getString("message"),
+				document.getDate("authored_date"), document.getDate("commit_date"), null,
+				document.get("parents", List.class), document.getBoolean("merge", false),
+				PersonIdent.parseDocument(document.get("author", Document.class)),
+				PersonIdent.parseDocument(document.get("committer", Document.class)),
+				Change.parseDocuments(document.get("diffs", List.class)));
 
-		commit.setRepository(commitDoc.get("repository") != null ? commitDoc.get("repository").toString() : "");
+		commit.setRepository(document.get("repository") != null ? document.get("repository").toString() : "");
 		return commit;
 	}
 
-	public static Commit parseDocument(Document commitDoc) {
-		return parseDocument(commitDoc, new ArrayList<String>());
-	}
-
+	/**
+	 * Converts the commit to a document.
+	 * 
+	 * @return a document.
+	 */
 	public Document toDocument() {
 		Document doc = new Document();
 		doc.append("_id", id).append("message", message).append("authored_date", authoredDate)
-				.append("commit_date", commitDate).append("repository", new ObjectId(repository))
-				.append("parents", parents).append("merge", merge).append("author", author.toDocument())
-				.append("committer", committer.toDocument()).append("diffs", Diff.toDocumentList(diffs));
+		.append("commit_date", commitDate).append("repository", new ObjectId(repository))
+		.append("parents", parents).append("merge", merge).append("author", author.toDocument())
+		.append("committer", committer.toDocument()).append("diffs", Change.toDocumentList(diffs));
 		return doc;
 	}
 
 	public Commit() {
 	}
 
-	public Commit(String id) {
-		this.id = id;
-	}
-
 	public Commit(String id, String message, Date authoredDate, Date commitDate, String repository,
-			List<String> parents, boolean merge, Contributor author, Contributor committer, List<Diff> diffs) {
+			List<String> parents, boolean merge, PersonIdent author, PersonIdent committer, List<Change> diffs) {
 		this.id = id;
 		this.message = message;
 		this.authoredDate = authoredDate;
@@ -141,38 +145,30 @@ public class Commit {
 		this.merge = merge;
 	}
 
-	public Contributor getAuthor() {
+	public PersonIdent getAuthor() {
 		return author;
 	}
 
-	public void setAuthor(Contributor author) {
+	public void setAuthor(PersonIdent author) {
 		this.author = author;
 	}
 
-	public Contributor getCommitter() {
+	public PersonIdent getCommitter() {
 		return committer;
 	}
 
-	public void setCommitter(Contributor committer) {
+	public void setCommitter(PersonIdent committer) {
 		this.committer = committer;
 	}
 
-	public List<Diff> getDiffs() {
+	public List<Change> getDiffs() {
 		return diffs;
 	}
 
-	public void setDiffs(List<Diff> diffs) {
+	public void setDiffs(List<Change> diffs) {
 		this.diffs = diffs;
 	}
 
-	public List<IssueReference> getIssueReferences() {
-		return issueReferences;
-	}
-
-	public void setIssueReferences(List<IssueReference> issueReferences) {
-		this.issueReferences = issueReferences;
-	}
-	
 	@Override
 	public int hashCode() {
 		final int prime = 31;

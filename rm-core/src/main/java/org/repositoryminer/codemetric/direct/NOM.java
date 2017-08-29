@@ -1,25 +1,29 @@
 package org.repositoryminer.codemetric.direct;
 
-import org.bson.Document;
 import org.repositoryminer.ast.AST;
-import org.repositoryminer.ast.AbstractClassDeclaration;
-import org.repositoryminer.codemetric.CodeMetricId;
+import org.repositoryminer.ast.AbstractMethod;
+import org.repositoryminer.ast.AbstractType;
 
-/**
- * <h1>Number of Methods</h1>
- * <p>
- * NOM is defined as the number of the methods inside a class.
- */
 public class NOM implements IDirectCodeMetric {
 
 	@Override
-	public CodeMetricId getId() {
-		return CodeMetricId.NOM;
+	public Object calculateFromFile(AST ast) {
+		return ast.getMethods().size();
 	}
 
 	@Override
-	public Document calculate(AbstractClassDeclaration type, AST ast) {
-		return new Document("metric", CodeMetricId.NOM.toString()).append("value", type.getMethods().size());
+	public Object calculateFromClass(AST ast, AbstractType type) {
+		return type.getMethods().size();
+	}
+
+	@Override
+	public Object calculateFromMethod(AST ast, AbstractType type, AbstractMethod method) {
+		return null;
+	}
+
+	@Override
+	public String getMetric() {
+		return "NOM";
 	}
 
 }

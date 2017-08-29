@@ -3,47 +3,60 @@ package org.repositoryminer.model;
 import java.util.List;
 
 import org.bson.Document;
-import org.repositoryminer.scm.SCMType;
 
+/**
+ * This class represents a repository.
+ */
 public class Repository {
 
 	private String id;
 	private String name;
 	private String path;
+	private String scm;
 	private String description;
-	private SCMType scm;
-	private List<Contributor> contributors;
+	private List<PersonIdent> contributors;
 
+	/**
+	 * Converts a repository to a document.
+	 * 
+	 * @return the document.
+	 */
 	public Document toDocument() {
 		Document doc = new Document();
-		doc.append("name", name).append("path", path).append("description", description).append("scm", scm.toString());
+		doc.append("_id", id).append("name", name).append("path", path).append("scm", scm)
+				.append("description", description).append("contributors", PersonIdent.toDocumentList(contributors));
 		return doc;
 	}
 
-	public static Repository parseDocument(Document repositoryDoc) {
-		if (repositoryDoc == null)
+	/**
+	 * Converts a document to a repository.
+	 * 
+	 * @param document
+	 *            the document.
+	 * @return a repository.
+	 */
+	@SuppressWarnings("unchecked")
+	public static Repository parseDocument(Document document) {
+		if (document == null) {
 			return null;
-		
-		Repository repository = new Repository(repositoryDoc.getObjectId("_id").toString(),
-				repositoryDoc.getString("name"), repositoryDoc.getString("path"),
-				repositoryDoc.getString("description"), SCMType.valueOf(repositoryDoc.getString("scm")));
+		}
 
-		return repository;
-	}
-
-	public Repository(org.repositoryminer.mining.RepositoryMiner repo) {
-		this(null, repo.getName(), repo.getPath(), repo.getDescription(), repo.getScm());
+		return new Repository(document.getString("_id"), document.getString("name"), document.getString("path"),
+				document.getString("scm"), document.getString("description"),
+				PersonIdent.parseDocuments(document.get("contributors", List.class)));
 	}
 
 	public Repository() {
 	}
-	
-	public Repository(String id, String name, String path, String description, SCMType scm) {
+
+	public Repository(String id, String name, String path, String scm, String description,
+			List<PersonIdent> contributors) {
 		this.id = id;
 		this.name = name;
 		this.path = path;
-		this.description = description;
 		this.scm = scm;
+		this.description = description;
+		this.contributors = contributors;
 	}
 
 	public String getId() {
@@ -70,6 +83,14 @@ public class Repository {
 		this.path = path;
 	}
 
+	public String getScm() {
+		return scm;
+	}
+
+	public void setScm(String scm) {
+		this.scm = scm;
+	}
+
 	public String getDescription() {
 		return description;
 	}
@@ -78,19 +99,11 @@ public class Repository {
 		this.description = description;
 	}
 
-	public SCMType getScm() {
-		return scm;
-	}
-
-	public void setScm(SCMType scm) {
-		this.scm = scm;
-	}
-
-	public List<Contributor> getContributors() {
+	public List<PersonIdent> getContributors() {
 		return contributors;
 	}
 
-	public void setContributors(List<Contributor> contributors) {
+	public void setContributors(List<PersonIdent> contributors) {
 		this.contributors = contributors;
 	}
 

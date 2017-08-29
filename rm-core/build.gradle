@@ -31,4 +31,5 @@ dependencies {
     compile group: 'org.eclipse.jdt', name: 'org.eclipse.jdt.core', version:'3.10.0'
     compile group: 'org.mongodb', name: 'mongo-java-driver', version:'3.2.2'
     compile group: 'org.slf4j', name: 'slf4j-simple', version:'1.7.21'
+    compile group: 'commons-io', name: 'commons-io', version: '2.5'
 }
