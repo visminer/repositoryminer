@@ -11,6 +11,8 @@ import org.repositoryminer.ast.NodeType;
 
 public class ATFD implements IDirectCodeMetric {
 
+	Set<String> clazzLevelValue = new HashSet<String>();
+
 	@Override
 	public Object calculateFromFile(AST ast) {
 		return null;
@@ -18,7 +20,9 @@ public class ATFD implements IDirectCodeMetric {
 
 	@Override
 	public Object calculateFromClass(AST ast, AbstractType type) {
-		return null;
+		int result = clazzLevelValue.size();
+		clazzLevelValue.clear();
+		return result;
 	}
 
 	@Override
@@ -47,14 +51,18 @@ public class ATFD implements IDirectCodeMetric {
 			if (stmt.getNodeType().equals(NodeType.FIELD_ACCESS)) {
 				if (!currType.getName().equals(type)) {
 					accessedFields.add(exp.toLowerCase());
+					clazzLevelValue.add(exp.toLowerCase());
 				}
 			} else if (stmt.getNodeType().equals(NodeType.METHOD_INVOCATION)) {
 				String methodInv = exp.substring(exp.lastIndexOf(".") + 1);
 				if (!currType.getName().equals(type)) {
 					if ((methodInv.startsWith("get") || methodInv.startsWith("set")) && methodInv.length() > 3) {
 						accessedFields.add((type + "." + methodInv.substring(3)).toLowerCase());
-					} else if (methodInv.startsWith("is") && methodInv.length() > 2)
+						clazzLevelValue.add((type + "." + methodInv.substring(3)).toLowerCase());
+					} else if (methodInv.startsWith("is") && methodInv.length() > 2) {
 						accessedFields.add((type + "." + methodInv.substring(2)).toLowerCase());
+						clazzLevelValue.add((type + "." + methodInv.substring(2)).toLowerCase());
+					}
 				}
 			}
 		}
