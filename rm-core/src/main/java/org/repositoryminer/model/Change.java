@@ -10,7 +10,7 @@ import org.bson.Document;
  */
 public class Change {
 
-	private String newPath;
+	private String path;
 	private String oldPath;
 	private int linesAdded;
 	private int linesRemoved;
@@ -29,7 +29,7 @@ public class Change {
 			return changes;
 
 		for (Document doc : documents) {
-			Change change = new Change(doc.getString("new_path"), doc.getString("old_path"),
+			Change change = new Change(doc.getString("path"), doc.getString("old_path"),
 					doc.getInteger("lines_added", 0), doc.getInteger("lines_removed", 0),
 					ChangeType.valueOf(doc.getString("type")));
 			changes.add(change);
@@ -48,7 +48,7 @@ public class Change {
 		List<Document> list = new ArrayList<Document>();
 		for (Change c : changes) {
 			Document doc = new Document();
-			doc.append("new_path", c.getNewPath()).append("old_path", c.getOldPath())
+			doc.append("path", c.getPath()).append("old_path", c.getOldPath())
 			.append("lines_added", c.getLinesAdded()).append("lines_removed", c.getLinesRemoved())
 			.append("type", c.getType().toString());
 			list.add(doc);
@@ -59,20 +59,20 @@ public class Change {
 	public Change() {
 	}
 
-	public Change(String newPath, String oldPath, int linesAdded, int linesRemoved, ChangeType type) {
-		this.newPath = newPath;
+	public Change(String path, String oldPath, int linesAdded, int linesRemoved, ChangeType type) {
+		this.path = path;
 		this.oldPath = oldPath;
 		this.linesAdded = linesAdded;
 		this.linesRemoved = linesRemoved;
 		this.type = type;
 	}
 
-	public String getNewPath() {
-		return newPath;
+	public String getPath() {
+		return path;
 	}
 
-	public void setNewPath(String newPath) {
-		this.newPath = newPath;
+	public void setPath(String path) {
+		this.path = path;
 	}
 
 	public String getOldPath() {

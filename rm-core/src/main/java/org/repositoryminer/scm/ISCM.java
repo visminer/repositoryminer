@@ -1,5 +1,6 @@
 package org.repositoryminer.scm;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.repositoryminer.model.Commit;
@@ -33,18 +34,20 @@ public interface ISCM {
 	 *            defines how many commits should be skipped before the fetch.
 	 * @param maxCount
 	 *            defines how many commits should be fetch.
-	 * @param hash
+	 * @param endPoint
 	 *            defines the end point.
+	 * @param commitsToSkip
+	 *            defines which commits should not be processed and returned
 	 * @return the commits until some point.
 	 */
-	public List<Commit> getCommits(int skip, int maxCount, String hash);
+	public List<Commit> getCommits(int skip, int maxCount, String endPoint, Collection<String> commitsToSkip);
 
 	/**
-	 * @param hash
+	 * @param endPoint
 	 *            defines the end point.
 	 * @return the commits names until some point.
 	 */
-	public List<String> getCommitsNames(String hash);
+	public List<String> getCommitsNames(String endPoint);
 
 	/**
 	 * Does a checkout to a given point.
