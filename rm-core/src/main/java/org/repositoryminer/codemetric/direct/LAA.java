@@ -32,7 +32,18 @@ public class LAA implements IDirectCodeMetric {
 		int totalAttributeAccessed = 0;
 
 		for (AbstractStatement statement : methodDeclaration.getStatements()) {
-			String exp = statement.getExpression();
+			String exp, clazz;
+
+			if (statement.getNodeType() == NodeType.FIELD_ACCESS || statement.getNodeType() == NodeType.METHOD_INVOCATION) {
+				exp = statement.getExpression();
+				clazz = exp.substring(0, exp.lastIndexOf("."));
+				
+				if (!type.getName().equals(clazz)) {
+					continue;
+				}
+			} else {
+				continue;
+			}
 
 			if (statement.getNodeType().equals(NodeType.FIELD_ACCESS)) {
 				totalAttributeAccessed++;

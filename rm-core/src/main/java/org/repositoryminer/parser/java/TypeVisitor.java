@@ -18,6 +18,7 @@ import org.repositoryminer.ast.AbstractEnumConstant;
 import org.repositoryminer.ast.AbstractField;
 import org.repositoryminer.ast.AbstractMethod;
 import org.repositoryminer.ast.AbstractParameter;
+import org.repositoryminer.ast.AbstractStatement;
 
 public class TypeVisitor extends ASTVisitor {
 
@@ -108,7 +109,7 @@ public class TypeVisitor extends ASTVisitor {
 		AbstractMethod method = new AbstractMethod();
 		method.setConstructor(node.isConstructor());
 		method.setVarargs(node.isVarargs());
-		
+
 		StringBuilder builder = null;
 		builder = new StringBuilder();
 		builder.append(node.getName().getIdentifier()).append("(");
@@ -143,11 +144,15 @@ public class TypeVisitor extends ASTVisitor {
 		}
 		method.setModifiers(modifiers);
 
-		MethodVisitor visitor = new MethodVisitor();
-		node.getBody().accept(visitor);
 		
-		method.setMaxDepth(visitor.getMaxDepth());
-		method.setStatements(visitor.getStatements());
+		if (node.getBody() != null) {
+			MethodVisitor visitor = new MethodVisitor();
+			node.getBody().accept(visitor);
+			method.setMaxDepth(visitor.getMaxDepth());
+			method.setStatements(visitor.getStatements());
+		} else {
+			method.setStatements(new ArrayList<AbstractStatement>());
+		}
 
 		if (node.getReturnType2() != null) {
 			method.setReturnType(node.getReturnType2().resolveBinding().getQualifiedName());
@@ -155,7 +160,7 @@ public class TypeVisitor extends ASTVisitor {
 
 		method.setStartPosition(node.getStartPosition());
 		method.setEndPosition(node.getStartPosition() + node.getLength() - 1);
-		
+
 		methods.add(method);
 		return true;
 	}

@@ -1,6 +1,8 @@
 package org.repositoryminer.parser.java;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -8,7 +10,7 @@ import org.apache.commons.io.FileUtils;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.repositoryminer.ast.AST;
+import org.repositoryminer.ast.AST;import org.repositoryminer.ast.AbstractMethod;
 import org.repositoryminer.exception.ErrorMessage;
 import org.repositoryminer.exception.RepositoryMinerException;
 import org.repositoryminer.parser.IParser;
@@ -25,7 +27,7 @@ import org.repositoryminer.parser.IParser;
 public class JavaParser implements IParser {
 
 	private static final String[] EXTENSIONS = { "java" };
-	private List<String> srcFolders;
+	private List<String> srcFolders = new ArrayList<String>();
 	private String[] classpath;
 	
 	public JavaParser(String[] classpath) {
@@ -45,14 +47,16 @@ public class JavaParser implements IParser {
 	@Override
 	public void scanRepository(String repositoryPath) {
 		File rootDir = new File(repositoryPath);
+		srcFolders.clear();
 		Collection<File> files = FileUtils.listFiles(rootDir, EXTENSIONS, true);
+		
 		for (File f : files) {
 			srcFolders.add(f.getParentFile().getAbsolutePath());
 		}
 	}
 
 	@Override
-	public AST generate(String filename, String source) {
+	public AST generate(String filename, String source, String charset) {
 		AST ast = new AST();
 		ast.setName(filename);
 		ast.setSource(source);
@@ -75,8 +79,10 @@ public class JavaParser implements IParser {
 			clsPath[0] = System.getProperty("java.home") + "/lib/rt.jar" ;
 		}
 
-		parser.setEnvironment(clsPath, srcFolders.toArray(new String[srcFolders.size()]), new String[] { "UTF-8" },
-				true);
+		String[] encoding = new String[srcFolders.size()];
+		Arrays.fill(encoding, charset);
+		
+		parser.setEnvironment(clsPath, srcFolders.toArray(new String[srcFolders.size()]), encoding, true);
 		parser.setSource(source.toCharArray());
 
 		CompilationUnit cu = (CompilationUnit) parser.createAST(null);
@@ -88,6 +94,11 @@ public class JavaParser implements IParser {
 		FileVisitor visitor = new FileVisitor();
 		cu.accept(visitor);
 
+		ast.setImports(visitor.getImports());
+		ast.setPackageDeclaration(visitor.getPackageName());
+		ast.setTypes(visitor.getTypes());
+		ast.setMethods(new ArrayList<AbstractMethod>());
+		
 		return ast;
 	}
 

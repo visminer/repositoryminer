@@ -83,13 +83,13 @@ public class MethodVisitor extends ASTVisitor {
 
 	@Override
 	public boolean visit(EnhancedForStatement node) {
-		statements.add(new AbstractStatement(NodeType.FOR, node.getExpression().toString()));
+		statements.add(new AbstractStatement(NodeType.FOR, node.getExpression() != null ? node.getExpression().toString() : ""));
 		return true;
 	}
 
 	@Override
 	public boolean visit(ForStatement node) {
-		statements.add(new AbstractStatement(NodeType.FOR, node.getExpression().toString()));
+		statements.add(new AbstractStatement(NodeType.FOR, node.getExpression() != null ? node.getExpression().toString() : ""));
 		return true;
 	}
 
@@ -166,8 +166,10 @@ public class MethodVisitor extends ASTVisitor {
 		if (bind.getKind() == IBinding.VARIABLE) {
 			IVariableBinding varBind = (IVariableBinding) bind;
 			if (varBind.isField()) {
-				statements.add(new AbstractStatement(NodeType.FIELD_ACCESS,
-						varBind.getDeclaringClass().getQualifiedName() + "." + varBind.getName()));
+				if (varBind.getDeclaringClass() != null) {
+					statements.add(new AbstractStatement(NodeType.FIELD_ACCESS,
+							varBind.getDeclaringClass().getQualifiedName() + "." + varBind.getName()));
+				}
 			}
 		} else if (bind.getKind() == IBinding.METHOD) {
 			IMethodBinding mBind = (IMethodBinding) bind;
@@ -191,7 +193,12 @@ public class MethodVisitor extends ASTVisitor {
 		for (ITypeBinding type : types) {
 			expression.append(type.getQualifiedName() + ",");
 		}
-		expression.setCharAt(expression.length() - 1, ')');
+
+		if (types.length > 0) {
+			expression.setCharAt(expression.length() - 1, ')');
+		} else {
+			expression.append(')');
+		}
 	}
 
 }

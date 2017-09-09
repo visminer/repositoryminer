@@ -62,6 +62,9 @@ public class PersonIdent {
 	 * @return a list of documents.
 	 */
 	public static List<Document> toDocumentList(Collection<PersonIdent> personIdents) {
+		if (personIdents == null) {
+			return new ArrayList<Document>();
+		}
 		List<Document> list = new ArrayList<Document>();
 		for (PersonIdent c : personIdents) {
 			list.add(c.toDocument());

@@ -30,8 +30,7 @@ public class LOC implements IDirectCodeMetric {
 	@Override
 	public Object calculateFromMethod(AST ast, AbstractType type, AbstractMethod method) {
 		String m = ast.getSource().substring(method.getStartPosition(), method.getEndPosition());
-		String body = m.substring(m.indexOf('{'));
-		return calculate(body);
+		return m.contains("{") ? calculate(m.substring(m.indexOf('{'))) : 0;
 	}
 
 	@Override

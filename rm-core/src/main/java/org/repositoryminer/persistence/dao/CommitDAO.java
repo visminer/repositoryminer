@@ -44,6 +44,8 @@ public class CommitDAO extends GenericDAO {
 	/**
 	 * Retrieves commits from a id list. The commits are ordered by commit date.
 	 * 
+	 * @param repositoryId
+	 *            the repository id.
 	 * @param idList
 	 *            the id list.
 	 * @param projection
@@ -51,7 +53,8 @@ public class CommitDAO extends GenericDAO {
 	 * @return a list of commits.
 	 */
 	public List<Document> findByIdList(List<String> idList, Bson projection) {
-		MongoCursor<Document> cursor = collection.find(Filters.in("_id", idList))
+		MongoCursor<Document> cursor = collection
+				.find(Filters.in("_id", idList))
 				.sort(new BasicDBObject("commit_date", 1)).projection(projection).iterator();
 		return fromCursorToList(cursor);
 	}

@@ -14,10 +14,12 @@ public interface IParser {
 	 *            the file path.
 	 * @param source
 	 *            the source code.
+	 * @param charset
+	 *            the source code charset.
 	 * 
 	 * @return the AST representing the source code.
 	 */
-	public AST generate(String filename, String source);
+	public AST generate(String filename, String source, String charset);
 
 	/**
 	 * @return the extensions supported by the parser
@@ -31,6 +33,7 @@ public interface IParser {
 
 	/**
 	 * Scans the repository to find source folders.
+	 * 
 	 * @param project
 	 *            the project path.
 	 */
