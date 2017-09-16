@@ -7,7 +7,6 @@ import org.repositoryminer.ast.AbstractType;
 public class NOAV implements IDirectCodeMetric {
 
 	private LVAR lvarMetric = new LVAR();
-	private TCC tccMetric = new TCC(); // TCC and NOAV processes accessed fields the same way
 
 	@Override
 	public Object calculateFromFile(AST ast) {
@@ -21,9 +20,6 @@ public class NOAV implements IDirectCodeMetric {
 
 	@Override
 	public Object calculateFromMethod(AST ast, AbstractType type, AbstractMethod method) {
-		if (method.getModifiers().contains("abstract")) {
-			return null;
-		}
 		return calculate(type, method);
 	}
 
@@ -33,9 +29,9 @@ public class NOAV implements IDirectCodeMetric {
 	}
 
 	public int calculate(AbstractType currType, AbstractMethod method) {
-		int accessFields = tccMetric.processAccessedFields(currType, method).size();
+		int accessFields = LAA.countAccessedFields(method);
 		int nVar = lvarMetric.calculate(method);
-		int nParams = method.getParameters() != null ? method.getParameters().size() : 0;
+		int nParams = method.getParameters().size();
 		return accessFields + nVar + nParams;
 	}
 

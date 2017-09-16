@@ -22,9 +22,9 @@ public interface IParser {
 	public AST generate(String filename, String source, String charset);
 
 	/**
-	 * @return the extensions supported by the parser
+	 * @return true if the file is supported by the parser or false otherwise
 	 */
-	public String[] getExtensions();
+	public boolean accept(String filepath);
 
 	/**
 	 * @return the programming language supported by the parser

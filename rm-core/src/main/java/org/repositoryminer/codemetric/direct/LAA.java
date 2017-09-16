@@ -1,7 +1,12 @@
 package org.repositoryminer.codemetric.direct;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.repositoryminer.ast.AST;
+import org.repositoryminer.ast.AbstractFieldAccess;
 import org.repositoryminer.ast.AbstractMethod;
+import org.repositoryminer.ast.AbstractMethodInvocation;
 import org.repositoryminer.ast.AbstractStatement;
 import org.repositoryminer.ast.AbstractType;
 import org.repositoryminer.ast.NodeType;
@@ -28,38 +33,27 @@ public class LAA implements IDirectCodeMetric {
 		return "LAA";
 	}
 
-	public float calculate(AbstractType type, AbstractMethod methodDeclaration) {
-		int totalAttributeAccessed = 0;
-
-		for (AbstractStatement statement : methodDeclaration.getStatements()) {
-			String exp, clazz;
-
-			if (statement.getNodeType() == NodeType.FIELD_ACCESS || statement.getNodeType() == NodeType.METHOD_INVOCATION) {
-				exp = statement.getExpression();
-				clazz = exp.substring(0, exp.lastIndexOf("."));
-				
-				if (!type.getName().equals(clazz)) {
-					continue;
+	public float calculate(AbstractType type, AbstractMethod method) {
+		int countFields = countAccessedFields(method);
+		return countFields > 0 ? (type.getFields().size() * 1.0f) / countFields : 0;
+	}
+	
+	public static int countAccessedFields(AbstractMethod method) {
+		Set<String> accessedFields = new HashSet<String>();
+		for (AbstractStatement stmt : method.getStatements()) {
+			if (stmt.getNodeType() == NodeType.FIELD_ACCESS) {
+				AbstractFieldAccess fieldAccess = (AbstractFieldAccess) stmt;
+				accessedFields.add(fieldAccess.getDeclaringClass() + '.' + fieldAccess.getExpression());
+			} else if (stmt.getNodeType() == NodeType.METHOD_INVOCATION) {
+				AbstractMethodInvocation methodInvocation = (AbstractMethodInvocation) stmt;
+				if (methodInvocation.isAccessor()) {
+					accessedFields.add(methodInvocation.getDeclaringClass() + '.' + methodInvocation.getExpression());
 				}
 			} else {
 				continue;
 			}
-
-			if (statement.getNodeType().equals(NodeType.FIELD_ACCESS)) {
-				totalAttributeAccessed++;
-			} else if (statement.getNodeType().equals(NodeType.METHOD_INVOCATION)) {
-				exp = exp.substring(0, exp.indexOf("("));
-				String methodInv = exp.substring(exp.lastIndexOf(".") + 1);
-				if ((methodInv.startsWith("get") || methodInv.startsWith("set")) && methodInv.length() > 3) {
-					totalAttributeAccessed++;
-				} else if (methodInv.startsWith("is") && methodInv.length() > 2)
-					totalAttributeAccessed++;
-
-			}
 		}
-
-		return totalAttributeAccessed == 0 ? 0 : type.getFields().size() * 1.0f / totalAttributeAccessed;
-
+		return accessedFields.size();
 	}
 
 }

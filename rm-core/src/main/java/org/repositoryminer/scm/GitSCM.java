@@ -250,7 +250,7 @@ public class GitSCM implements ISCM {
 
 		for (DiffEntry entry : diffEntries) {
 			Change change = processChange(entry);
-			setLinesAddedAndDeleted(change, parentCommit, commit);
+			analyzeCodeChurn(change, parentCommit, commit);
 			changes.add(change);
 		}
 
@@ -279,7 +279,7 @@ public class GitSCM implements ISCM {
 		}
 	}
 
-	private void setLinesAddedAndDeleted(Change change, RevCommit parentCommit,
+	private void analyzeCodeChurn(Change change, RevCommit parentCommit,
 			 RevCommit commit) throws IOException {
 		 ByteArrayOutputStream output = new ByteArrayOutputStream();
 		 DiffFormatter formatter = new DiffFormatter(output);

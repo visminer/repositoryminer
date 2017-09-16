@@ -18,6 +18,8 @@ public class AbstractMethod {
 	private List<AbstractParameter> parameters;
 	private List<String> thrownsExceptions;
 	private int maxDepth;
+	private boolean accessor;
+	private String accessoredField;
 
 	public String getName() {
 		return name;
@@ -105,6 +107,22 @@ public class AbstractMethod {
 
 	public void setMaxDepth(int maxDepth) {
 		this.maxDepth = maxDepth;
+	}
+
+	public boolean isAccessor() {
+		return accessor;
+	}
+
+	public void setAccessor(boolean accessor) {
+		this.accessor = accessor;
+	}
+
+	public String getAccessoredField() {
+		return accessoredField;
+	}
+
+	public void setAccessoredField(String accessoredField) {
+		this.accessoredField = accessoredField;
 	}
 
 }

@@ -5,24 +5,44 @@ package org.repositoryminer.ast;
  */
 public class AbstractMethodInvocation extends AbstractStatement {
 
-	private String declaringExpression;
+	private String declaringClass;
+	private boolean accessor;
+	private String accessedField;
 
 	public AbstractMethodInvocation() {
 		super(NodeType.METHOD_INVOCATION);
 	}
 
-	public AbstractMethodInvocation(String expression, String declaringExpression) {
+	public AbstractMethodInvocation(String expression, String declaringClass, boolean accessor, String accessedField) {
 		this();
 		setExpression(expression);
-		this.declaringExpression = declaringExpression;
-	}
-	
-	public String getDeclaringExpression() {
-		return declaringExpression;
+		this.declaringClass = declaringClass;
+		this.accessor = accessor;
+		this.accessedField = accessedField;
 	}
 
-	public void setDeclaringExpression(String declaringExpression) {
-		this.declaringExpression = declaringExpression;
+	public String getDeclaringClass() {
+		return declaringClass;
+	}
+
+	public void setDeclaringClass(String declaringClass) {
+		this.declaringClass = declaringClass;
+	}
+
+	public boolean isAccessor() {
+		return accessor;
+	}
+
+	public void setAccessor(boolean accessor) {
+		this.accessor = accessor;
+	}
+
+	public String getAccessedField() {
+		return accessedField;
+	}
+
+	public void setAccessedField(String accessedField) {
+		this.accessedField = accessedField;
 	}
 
 }

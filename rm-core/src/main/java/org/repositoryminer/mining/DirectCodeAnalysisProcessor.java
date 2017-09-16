@@ -5,11 +5,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import org.apache.commons.io.FilenameUtils;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.repositoryminer.ast.AST;
@@ -30,7 +27,7 @@ import com.mongodb.client.model.Projections;
 
 public class DirectCodeAnalysisProcessor {
 
-	private static final int COMMIT_RANGE = 3000;
+	private static final int COMMIT_RANGE = 1000;
 
 	private ISCM scm;
 	private RepositoryMiner repositoryMiner;
@@ -38,7 +35,6 @@ public class DirectCodeAnalysisProcessor {
 	private String repositoryPath;
 
 	private List<String> selectedCommits;
-	private Map<String, IParser> parsers;
 
 	private DirectCodeAnalysisDAO directAnalysisHandler = new DirectCodeAnalysisDAO();
 	private CommitDAO commitPersistence = new CommitDAO();
@@ -61,13 +57,6 @@ public class DirectCodeAnalysisProcessor {
 	}
 
 	public void start() throws IOException {
-		parsers = new HashMap<String, IParser>();
-		for (IParser p : repositoryMiner.getParsers()) {
-			for (String ext : p.getExtensions()) {
-				parsers.put(ext, p);
-			}
-		}
-
 		int begin = 0;
 		int end = Math.min(selectedCommits.size(), COMMIT_RANGE);
 
@@ -93,23 +82,26 @@ public class DirectCodeAnalysisProcessor {
 			for (Change diff : commit.getDiffs()) {
 				if (diff.getType() != ChangeType.DELETE) {
 					processDiff(diff.getPath(), commit);
-					
 				}
 			}
 		}
 	}
 
 	private void processDiff(String filePath, Commit commit) throws IOException {
-		String ext = FilenameUtils.getExtension(filePath);
-		IParser currParser = parsers.get(ext);
-
-		if (currParser == null) {
+		IParser parser = null;
+		for (IParser p : repositoryMiner.getParsers()) {
+			if (p.accept(filePath)) {
+				parser = p;
+				break;
+			}
+		}
+		
+		if (parser == null) {
 			return;
 		}
 
 		File f = new File(repositoryPath, filePath);
 
-		// This used to treat links to folders
 		if (f.isDirectory()) {
 			return;
 		}
@@ -120,7 +112,7 @@ public class DirectCodeAnalysisProcessor {
 		}
 
 		String source = new String(data, repositoryMiner.getRepositoryCharset());
-		AST ast = currParser.generate(filePath, source, repositoryMiner.getRepositoryCharset());
+		AST ast = parser.generate(filePath, source, repositoryMiner.getRepositoryCharset());
 		processFile(commit, filePath, ast);
 	}
 

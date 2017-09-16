@@ -17,7 +17,6 @@ public class WMC implements IDirectCodeMetric {
 
 	@Override
 	public Object calculateFromClass(AST ast, AbstractType type) {
-		// TODO Auto-generated method stub
 		return calculate(type.getMethods());
 	}
 

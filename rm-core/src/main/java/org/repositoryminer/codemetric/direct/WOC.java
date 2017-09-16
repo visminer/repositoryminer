@@ -9,8 +9,6 @@ import org.repositoryminer.ast.AbstractType;
 
 public class WOC implements IDirectCodeMetric {
 
-	private NOAM noam = new NOAM();
-
 	@Override
 	public Object calculateFromFile(AST ast) {
 		return null;
@@ -44,17 +42,13 @@ public class WOC implements IDirectCodeMetric {
 		for (AbstractMethod method : methods) {
 			if (method.getModifiers().contains("public")) {
 				publicMembers++;
-				if (!noam.isAcessor(method.getName(), fields)) {
+				if (!method.isAccessor()) {
 					functionalMembers++;
 				}
 			}
 		}
 
-		if (publicMembers == 0) {
-			return 0f;
-		}
-
-		return functionalMembers * 1.0f / publicMembers;
+		return publicMembers == 0 ? 0 : functionalMembers * 1.0f / publicMembers;
 	}
 
 }

@@ -8,6 +8,7 @@ import org.eclipse.jdt.core.dom.AnnotationTypeMemberDeclaration;
 import org.eclipse.jdt.core.dom.EnumConstantDeclaration;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
+import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
@@ -88,15 +89,19 @@ public class TypeVisitor extends ASTVisitor {
 	@Override
 	public boolean visit(FieldDeclaration node) {
 		List<AbstractField> fields2 = new ArrayList<>();
-		String type = node.getType().resolveBinding().getQualifiedName();
+		ITypeBinding bind = node.getType().resolveBinding();
+		String type = bind.getQualifiedName();
 
 		List<String> modifiers = new ArrayList<String>();
 		for (Object modifier : node.modifiers()) {
 			modifiers.add(modifier.toString());
 		}
 
+		boolean primitive = bind.isPrimitive();
+		boolean builtIn = type.startsWith("java.") || type.startsWith("javax.") ? true : false;
+		
 		for (VariableDeclarationFragment vdf : (List<VariableDeclarationFragment>) node.fragments()) {
-			fields2.add(new AbstractField(vdf.getName().getIdentifier(), type, modifiers));
+			fields2.add(new AbstractField(vdf.getName().getIdentifier(), type, modifiers, primitive, builtIn));
 		}
 
 		fields.addAll(fields2);
@@ -130,6 +135,7 @@ public class TypeVisitor extends ASTVisitor {
 
 		method.setName(builder.toString());
 		method.setParameters(params);
+		verifyAccessorMethod(method);
 
 		List<String> throwsList = new ArrayList<String>();
 		List<Type> types = node.thrownExceptionTypes();
@@ -160,9 +166,34 @@ public class TypeVisitor extends ASTVisitor {
 
 		method.setStartPosition(node.getStartPosition());
 		method.setEndPosition(node.getStartPosition() + node.getLength() - 1);
-
+		
 		methods.add(method);
 		return true;
 	}
 
+	public void verifyAccessorMethod(AbstractMethod method) {
+		String name = method.getName();
+		String field = null;
+		
+		if ((name.startsWith("get") || name.startsWith("set")) && name.length() > 3) {
+			field = name.substring(3);
+		} else if (name.startsWith("is") && name.length() > 2) {
+			field = name.substring(2);
+		} else {
+			return;
+		}
+
+		char c[] = field.toCharArray();
+		c[0] = Character.toLowerCase(c[0]);
+		String field2 = new String(c);
+
+		for (AbstractField fd : fields) {
+			if (fd.getName().equals(field) || fd.getName().equals(field2)) {
+				method.setAccessor(true);
+				method.setAccessoredField(fd.getName());
+				break;
+			}
+		}
+	}
+	
 }

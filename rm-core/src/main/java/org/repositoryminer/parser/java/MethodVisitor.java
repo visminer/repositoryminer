@@ -20,12 +20,12 @@ import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.SimpleName;
-import org.eclipse.jdt.core.dom.SuperConstructorInvocation;
 import org.eclipse.jdt.core.dom.SwitchCase;
 import org.eclipse.jdt.core.dom.SwitchStatement;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
+import org.repositoryminer.ast.AbstractFieldAccess;
 import org.repositoryminer.ast.AbstractMethodInvocation;
 import org.repositoryminer.ast.AbstractStatement;
 import org.repositoryminer.ast.AbstractVariableDeclaration;
@@ -83,13 +83,15 @@ public class MethodVisitor extends ASTVisitor {
 
 	@Override
 	public boolean visit(EnhancedForStatement node) {
-		statements.add(new AbstractStatement(NodeType.FOR, node.getExpression() != null ? node.getExpression().toString() : ""));
+		statements.add(new AbstractStatement(NodeType.FOR,
+				node.getExpression() != null ? node.getExpression().toString() : ""));
 		return true;
 	}
 
 	@Override
 	public boolean visit(ForStatement node) {
-		statements.add(new AbstractStatement(NodeType.FOR, node.getExpression() != null ? node.getExpression().toString() : ""));
+		statements.add(new AbstractStatement(NodeType.FOR,
+				node.getExpression() != null ? node.getExpression().toString() : ""));
 		return true;
 	}
 
@@ -139,11 +141,6 @@ public class MethodVisitor extends ASTVisitor {
 		return true;
 	}
 
-	@Override
-	public boolean visit(SuperConstructorInvocation node) {
-		return true;
-	}
-
 	@SuppressWarnings("unchecked")
 	@Override
 	public boolean visit(VariableDeclarationStatement node) {
@@ -158,47 +155,48 @@ public class MethodVisitor extends ASTVisitor {
 	@Override
 	public boolean visit(SimpleName node) {
 		IBinding bind = node.resolveBinding();
-
-		if (bind == null) {
-			return true;
-		}
-
 		if (bind.getKind() == IBinding.VARIABLE) {
 			IVariableBinding varBind = (IVariableBinding) bind;
 			if (varBind.isField()) {
-				if (varBind.getDeclaringClass() != null) {
-					statements.add(new AbstractStatement(NodeType.FIELD_ACCESS,
-							varBind.getDeclaringClass().getQualifiedName() + "." + varBind.getName()));
-				}
+				String type = varBind.getType().getQualifiedName();
+				statements.add(new AbstractFieldAccess(varBind.getName(), type,
+						varBind.getDeclaringClass().getQualifiedName(), varBind.getType().isPrimitive(),
+						type.startsWith("java") || type.startsWith("javax") ? true : false));
 			}
 		} else if (bind.getKind() == IBinding.METHOD) {
 			IMethodBinding mBind = (IMethodBinding) bind;
-			statements.add(analyzeMethodInvocation(mBind));
+			analyzeMethodInvocation(mBind);
 		}
 		return true;
 	}
 
-	private AbstractMethodInvocation analyzeMethodInvocation(IMethodBinding bind) {
-		StringBuilder expression = new StringBuilder(
-				bind.getDeclaringClass().getQualifiedName() + "." + bind.getName() + "(");
-		StringBuilder declExpression = new StringBuilder(bind.getName() + "(");
+	private void analyzeMethodInvocation(IMethodBinding mBind) {
+		AbstractMethodInvocation methodInv = new AbstractMethodInvocation();
+		methodInv.setDeclaringClass(mBind.getDeclaringClass().getQualifiedName());
 
-		populateMethodInvocationExpression(expression, bind.getParameterTypes());
-		populateMethodInvocationExpression(declExpression, bind.getMethodDeclaration().getParameterTypes());
-
-		return new AbstractMethodInvocation(expression.toString(), declExpression.toString());
-	}
-
-	private void populateMethodInvocationExpression(StringBuilder expression, ITypeBinding[] types) {
-		for (ITypeBinding type : types) {
-			expression.append(type.getQualifiedName() + ",");
+		StringBuilder parameters = new StringBuilder();
+		for (ITypeBinding type : mBind.getParameterTypes()) {
+			parameters.append(type.getQualifiedName() + ",");
 		}
 
-		if (types.length > 0) {
-			expression.setCharAt(expression.length() - 1, ')');
+		if (mBind.getParameterTypes().length > 0) {
+			parameters.deleteCharAt(parameters.length() - 1);
+		}
+		methodInv.setExpression(mBind.getName()+'('+parameters.toString()+')');
+
+		String fieldName = null;
+		if ((mBind.getName().startsWith("get") || mBind.getName().startsWith("set")) && mBind.getName().length() > 3) {
+			fieldName = mBind.getName().substring(3);
+		} else if (mBind.getName().startsWith("is") && mBind.getName().length() > 2) {
+			fieldName = mBind.getName().substring(2);
 		} else {
-			expression.append(')');
+			statements.add(methodInv);
+			return;
 		}
+
+		methodInv.setAccessor(true);
+		methodInv.setAccessedField(Character.toLowerCase(fieldName.charAt(0)) + fieldName.substring(1));
+		statements.add(methodInv);
 	}
 
 }
