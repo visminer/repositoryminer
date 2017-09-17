@@ -1,5 +1,7 @@
 package org.repositoryminer.codemetric.direct;
 
+import java.math.BigDecimal;
+
 import org.repositoryminer.ast.AST;
 import org.repositoryminer.ast.AbstractMethod;
 import org.repositoryminer.ast.AbstractType;
@@ -7,7 +9,7 @@ import org.repositoryminer.ast.AbstractType;
 public class AMW implements IDirectCodeMetric {
 
 	private WMC wmcMetric = new WMC();
-	
+
 	@Override
 	public Object calculateFromFile(AST ast) {
 		return null;
@@ -34,7 +36,7 @@ public class AMW implements IDirectCodeMetric {
 		if (nom == 0) {
 			return 0l;
 		}
-		return wmc * 1l / nom;
+		return new BigDecimal(wmc * 1f / nom).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue();
 	}
-	
+
 }

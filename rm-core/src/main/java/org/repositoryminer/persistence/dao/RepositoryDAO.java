@@ -3,6 +3,7 @@ package org.repositoryminer.persistence.dao;
 import java.util.List;
 
 import org.bson.Document;
+import org.bson.types.ObjectId;
 
 import com.mongodb.client.model.Filters;
 
@@ -37,7 +38,7 @@ public class RepositoryDAO extends GenericDAO {
 	 *            the contributors.
 	 */
 	public void updateOnlyContributors(String id, List<Document> contributors) {
-		collection.updateOne(Filters.eq("_id", id), new Document("$set", new Document("contributors", contributors)));
+		collection.updateOne(Filters.eq("_id", new ObjectId(id)), new Document("$set", new Document("contributors", contributors)));
 	}
 
 }

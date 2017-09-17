@@ -30,9 +30,13 @@ import org.repositoryminer.ast.AbstractMethodInvocation;
 import org.repositoryminer.ast.AbstractStatement;
 import org.repositoryminer.ast.AbstractVariableDeclaration;
 import org.repositoryminer.ast.NodeType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MethodVisitor extends ASTVisitor {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(MethodVisitor.class);
+	
 	private List<AbstractStatement> statements = new ArrayList<>();
 	private int maxDepth = 0;
 	private int depth = 0;
@@ -155,12 +159,18 @@ public class MethodVisitor extends ASTVisitor {
 	@Override
 	public boolean visit(SimpleName node) {
 		IBinding bind = node.resolveBinding();
+		if (bind == null) {
+			LOGGER.warn("Bind not solve to "+node.toString()+" at position "+node.getStartPosition()+".");
+			return true;
+		}
+		
 		if (bind.getKind() == IBinding.VARIABLE) {
 			IVariableBinding varBind = (IVariableBinding) bind;
 			if (varBind.isField()) {
 				String type = varBind.getType().getQualifiedName();
 				statements.add(new AbstractFieldAccess(varBind.getName(), type,
-						varBind.getDeclaringClass().getQualifiedName(), varBind.getType().isPrimitive(),
+						varBind.getDeclaringClass() != null ? varBind.getDeclaringClass().getQualifiedName() : null,
+						varBind.getType().isPrimitive(),
 						type.startsWith("java") || type.startsWith("javax") ? true : false));
 			}
 		} else if (bind.getKind() == IBinding.METHOD) {
@@ -182,7 +192,7 @@ public class MethodVisitor extends ASTVisitor {
 		if (mBind.getParameterTypes().length > 0) {
 			parameters.deleteCharAt(parameters.length() - 1);
 		}
-		methodInv.setExpression(mBind.getName()+'('+parameters.toString()+')');
+		methodInv.setExpression(mBind.getName() + '(' + parameters.toString() + ')');
 
 		String fieldName = null;
 		if ((mBind.getName().startsWith("get") || mBind.getName().startsWith("set")) && mBind.getName().length() > 3) {

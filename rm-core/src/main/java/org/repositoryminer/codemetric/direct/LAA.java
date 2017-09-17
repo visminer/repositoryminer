@@ -1,5 +1,6 @@
 package org.repositoryminer.codemetric.direct;
 
+import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -35,7 +36,8 @@ public class LAA implements IDirectCodeMetric {
 
 	public float calculate(AbstractType type, AbstractMethod method) {
 		int countFields = countAccessedFields(method);
-		return countFields > 0 ? (type.getFields().size() * 1.0f) / countFields : 0;
+		float result = countFields > 0 ? (type.getFields().size() * 1.0f) / countFields : 0;
+		return new BigDecimal(result).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue();
 	}
 	
 	public static int countAccessedFields(AbstractMethod method) {

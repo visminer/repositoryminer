@@ -1,5 +1,6 @@
 package org.repositoryminer.codemetric.direct;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -59,7 +60,8 @@ public class TCC implements IDirectCodeMetric {
 			}
 		}
 
-		return npc > 0 ? ndc * 1.0f / npc : 0;
+		float result = npc > 0 ? ndc * 1.0f / npc : 0;
+		return new BigDecimal(result).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue();
 	}
 
 	public List<String> processAccessedFields(AbstractType currType, AbstractMethod method) {

@@ -67,7 +67,11 @@ public class FileVisitor extends ASTVisitor {
 		}
 
 		clazz.setInterface(node.isInterface());
-		clazz.setName(node.getName().getFullyQualifiedName());
+		if (packageName != null) {
+			clazz.setName(packageName+'.'+node.getName().getFullyQualifiedName());
+		} else {
+			clazz.setName(node.getName().getFullyQualifiedName());
+		}
 
 		TypeVisitor visitor = new TypeVisitor();
 		node.accept(visitor);
@@ -84,7 +88,12 @@ public class FileVisitor extends ASTVisitor {
 	@Override
 	public boolean visit(EnumDeclaration node) {
 		AbstractEnum absEnum = new AbstractEnum();
-		absEnum.setName(node.getName().getFullyQualifiedName());
+		
+		if (packageName != null) {
+			absEnum.setName(packageName+'.'+node.getName().getFullyQualifiedName());
+		} else {
+			absEnum.setName(node.getName().getFullyQualifiedName());
+		}
 
 		TypeVisitor visitor = new TypeVisitor();
 		node.accept(visitor);
@@ -102,7 +111,12 @@ public class FileVisitor extends ASTVisitor {
 	@Override
 	public boolean visit(AnnotationTypeDeclaration node) {
 		AbstractAnnotation absAnnotation = new AbstractAnnotation();
-		absAnnotation.setName(node.getName().getFullyQualifiedName());
+		
+		if (packageName != null) {
+			absAnnotation.setName(packageName+'.'+node.getName().getFullyQualifiedName());
+		} else {
+			absAnnotation.setName(node.getName().getFullyQualifiedName());
+		}
 
 		TypeVisitor visitor = new TypeVisitor();
 		node.accept(visitor);

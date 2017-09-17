@@ -28,10 +28,10 @@ public class GodClass implements IDirectCodeSmell {
 		int wmc = wmcMetric.calculate(type.getMethods());
 
 		for (AbstractMethod method : type.getMethods()) {
-			atfdMetric.calculate(type, method);
+			atfdMetric.calculateFromMethod(ast, type, method);
 		}
 		int atfd = (Integer) atfdMetric.calculateFromClass(null, null);
-
+		
 		return detect(atfd, wmc, tcc);
 	}
 

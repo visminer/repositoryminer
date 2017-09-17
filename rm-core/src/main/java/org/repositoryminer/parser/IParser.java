@@ -14,12 +14,10 @@ public interface IParser {
 	 *            the file path.
 	 * @param source
 	 *            the source code.
-	 * @param charset
-	 *            the source code charset.
 	 * 
 	 * @return the AST representing the source code.
 	 */
-	public AST generate(String filename, String source, String charset);
+	public AST generate(String filename, String source);
 
 	/**
 	 * @return true if the file is supported by the parser or false otherwise

@@ -5,11 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.filefilter.HiddenFileFilter;
-import org.apache.commons.io.filefilter.NotFileFilter;
-import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
@@ -29,24 +25,36 @@ import org.repositoryminer.parser.IParser;
 
 public class JavaParser implements IParser {
 
-	private List<String> srcFolders = new ArrayList<String>(2);
-	private String[] classpath;
-	private List<String> foundSrcFolders;
+	private List<String[]> srcFolders = new ArrayList<String[]>();
+	private String[] classpath = new String[1];
+	
+	private String[] classpathSrcFolder;
+	private String[] currSrcFolder;
+	private String[] encoding;
 	private ASTParser parser = ASTParser.newParser(org.eclipse.jdt.core.dom.AST.JLS8);
 
 	public JavaParser() {
-		// Adding commong source folders
-		srcFolders.add("src");
-		srcFolders.add("src/main/java");
+		// Adding common source folders as default
+		srcFolders.add(new String[] {"src"});
+		srcFolders.add(new String[] {"src/main/java"});
+		
+		// Setting the defult classpath
+		classpath[0] = FilenameUtils.normalize(System.getProperty("java.home"), true) + "/lib/rt.jar" ;
 	}
 
 	@Override
 	public boolean accept(String filepath) {
-		for (String folder : foundSrcFolders) {
-			if (filepath.startsWith(folder)) {
-				return true;
+		if(filepath.endsWith(".java")) {
+				if (currSrcFolder == null || currSrcFolder.length == 0) {
+					return true;
+				}
+				
+				for (String folder : currSrcFolder) {
+					if (filepath.startsWith(folder)) {
+						return true;
+					}
+				}
 			}
-		}
 		return false;
 	}
 
@@ -57,22 +65,38 @@ public class JavaParser implements IParser {
 
 	@Override
 	public void scanRepository(String repositoryPath) {
-		File dir = new File(repositoryPath);
-		foundSrcFolders = new ArrayList<String>();
-
-		for (File folder : FileUtils.listFilesAndDirs(dir, new NotFileFilter(TrueFileFilter.INSTANCE),
-				HiddenFileFilter.VISIBLE)) {
-			String normalizedPath = FilenameUtils.normalize(folder.getAbsolutePath(), true);
-			for (String srcFolder : srcFolders) {
-				if (normalizedPath.endsWith(srcFolder)) {
-					foundSrcFolders.add(normalizedPath);
+		currSrcFolder = null;
+		if (srcFolders == null || srcFolders.size() == 0) {
+			return;
+		}
+		
+		for (String[] folders : srcFolders) {
+			boolean selected = true;
+			for (String folder : folders) {
+				if (!new File(repositoryPath, folder).exists()) {
+					System.out.println("me achou " +folder);
+					selected = false;
+					break;
 				}
+			}
+			
+			if (selected) {
+				currSrcFolder = folders;
+				
+				encoding = new String[currSrcFolder.length];
+				Arrays.fill(encoding, "utf-8");
+				
+				classpathSrcFolder = new String[currSrcFolder.length];
+				for (int i = 0; i < currSrcFolder.length; i++) {
+					classpathSrcFolder[i] = repositoryPath+"/"+currSrcFolder[i];
+				}
+				break;
 			}
 		}
 	}
 
 	@Override
-	public AST generate(String filename, String source, String charset) {
+	public AST generate(String filename, String source) {
 		AST ast = new AST();
 		ast.setName(filename);
 		ast.setSource(source);
@@ -83,21 +107,12 @@ public class JavaParser implements IParser {
 		parser.setCompilerOptions(JavaCore.getOptions());
 		parser.setUnitName(filename);
 
-		String[] clsPath;
-
-		if (classpath != null && classpath.length > 0) {
-			clsPath = new String[classpath.length+1];
-			clsPath[0] = FilenameUtils.normalize(System.getProperty("java.home"), true) + "/lib/rt.jar" ;
-			System.arraycopy(classpath, 0, clsPath, 1, classpath.length);
+		if (currSrcFolder != null) {
+			parser.setEnvironment(classpath, classpathSrcFolder, encoding, true);
 		} else {
-			clsPath = new String[1];
-			clsPath[0] = FilenameUtils.normalize(System.getProperty("java.home"), true) + "/lib/rt.jar" ;
+			System.out.println("olá1aaaaaaaaaaaaaaa");
+			parser.setEnvironment(classpath, null, null, true);
 		}
-
-		String[] encoding = new String[foundSrcFolders.size()];
-		Arrays.fill(encoding, charset);
-
-		parser.setEnvironment(clsPath, foundSrcFolders.toArray(new String[foundSrcFolders.size()]),encoding, true);
 		parser.setSource(source.toCharArray());
 
 		CompilationUnit cu = (CompilationUnit) parser.createAST(null);
@@ -117,11 +132,11 @@ public class JavaParser implements IParser {
 		return ast;
 	}
 
-	public List<String> getSrcFolders() {
+	public List<String[]> getSrcFolders() {
 		return srcFolders;
 	}
 
-	public void setSrcFolders(List<String> srcFolders) {
+	public void setSrcFolders(List<String[]> srcFolders) {
 		this.srcFolders = srcFolders;
 	}
 
@@ -130,7 +145,8 @@ public class JavaParser implements IParser {
 	}
 
 	public void setClasspath(String[] classpath) {
-		this.classpath = classpath;
+		this.classpath = Arrays.copyOf(classpath, classpath.length + 1);
+		this.classpath[this.classpath.length] = FilenameUtils.normalize(System.getProperty("java.home"), true) + "/lib/rt.jar" ;
 	}
 
 }

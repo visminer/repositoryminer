@@ -22,11 +22,15 @@ import org.repositoryminer.persistence.dao.CommitDAO;
 import org.repositoryminer.persistence.dao.DirectCodeAnalysisDAO;
 import org.repositoryminer.scm.ISCM;
 import org.repositoryminer.util.HashingUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.mongodb.client.model.Projections;
 
 public class DirectCodeAnalysisProcessor {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(DirectCodeAnalysisProcessor.class);
+	
 	private static final int COMMIT_RANGE = 1000;
 
 	private ISCM scm;
@@ -88,6 +92,11 @@ public class DirectCodeAnalysisProcessor {
 	}
 
 	private void processDiff(String filePath, Commit commit) throws IOException {
+		File f = new File(repositoryPath, filePath);
+		if (f.isDirectory()) {
+			return;
+		}
+		
 		IParser parser = null;
 		for (IParser p : repositoryMiner.getParsers()) {
 			if (p.accept(filePath)) {
@@ -96,13 +105,8 @@ public class DirectCodeAnalysisProcessor {
 			}
 		}
 		
+		LOGGER.info("Processing file "+filePath+" at state "+commit.getId());
 		if (parser == null) {
-			return;
-		}
-
-		File f = new File(repositoryPath, filePath);
-
-		if (f.isDirectory()) {
 			return;
 		}
 
@@ -111,8 +115,8 @@ public class DirectCodeAnalysisProcessor {
 			return;
 		}
 
-		String source = new String(data, repositoryMiner.getRepositoryCharset());
-		AST ast = parser.generate(filePath, source, repositoryMiner.getRepositoryCharset());
+		String source = new String(data, "utf-8");
+		AST ast = parser.generate(filePath, source);
 		processFile(commit, filePath, ast);
 	}
 

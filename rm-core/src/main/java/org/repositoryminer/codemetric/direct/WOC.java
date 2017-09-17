@@ -1,5 +1,6 @@
 package org.repositoryminer.codemetric.direct;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.repositoryminer.ast.AST;
@@ -48,7 +49,8 @@ public class WOC implements IDirectCodeMetric {
 			}
 		}
 
-		return publicMembers == 0 ? 0 : functionalMembers * 1.0f / publicMembers;
+		float result = publicMembers == 0 ? 0 : functionalMembers * 1.0f / publicMembers;
+		return new BigDecimal(result).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue();
 	}
 
 }

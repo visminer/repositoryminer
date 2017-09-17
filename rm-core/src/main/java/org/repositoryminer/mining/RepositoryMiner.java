@@ -14,7 +14,6 @@ public class RepositoryMiner {
 	private String repositoryPath;
 	private String repositoryName;
 	private String repositoryDescription;
-	private String repositoryCharset = "UTF-8";
 	
 	private ISCM scm;
 
@@ -61,14 +60,6 @@ public class RepositoryMiner {
 
 	public void setRepositoryDescription(String repositoryDescription) {
 		this.repositoryDescription = repositoryDescription;
-	}
-
-	public String getRepositoryCharset() {
-		return repositoryCharset;
-	}
-
-	public void setRepositoryCharset(String repositoryCharset) {
-		this.repositoryCharset = repositoryCharset;
 	}
 
 	public ISCM getScm() {
