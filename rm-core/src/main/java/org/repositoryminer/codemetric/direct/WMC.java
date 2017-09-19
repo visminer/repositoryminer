@@ -1,41 +1,23 @@
 package org.repositoryminer.codemetric.direct;
 
-import java.util.List;
-
 import org.repositoryminer.ast.AST;
 import org.repositoryminer.ast.AbstractMethod;
 import org.repositoryminer.ast.AbstractType;
 
+@DirectMetricProperties(id = MetricId.WMC, requisites = { MetricId.CYCLO })
 public class WMC implements IDirectCodeMetric {
 
-	private CYCLO cc = new CYCLO();
+	private static final MetricId ID = MetricId.WMC;
 
 	@Override
-	public Object calculateFromFile(AST ast) {
-		return null;
-	}
-
-	@Override
-	public Object calculateFromClass(AST ast, AbstractType type) {
-		return calculate(type.getMethods());
-	}
-
-	@Override
-	public Object calculateFromMethod(AST ast, AbstractType type, AbstractMethod method) {
-		return null;
-	}
-
-	@Override
-	public String getMetric() {
-		return "WMC";
-	}
-
-	public int calculate(List<AbstractMethod> methods) {
-		int wmc = 0;
-		for (AbstractMethod method : methods) {
-			wmc += cc.calculate(method);
+	public void calculate(AST ast) {
+		for (AbstractType type : ast.getTypes()) {
+			int wmc = 0;
+			for (AbstractMethod method : type.getMethods()) {
+				wmc += (Integer) method.getMetrics().get(MetricId.CYCLO);
+			}
+			type.getMetrics().put(ID, wmc);
 		}
-		return wmc;
 	}
 
 }

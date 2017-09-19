@@ -1,6 +1,7 @@
 package org.repositoryminer.mining;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.repositoryminer.codemetric.direct.IDirectCodeMetric;
@@ -79,6 +80,9 @@ public class RepositoryMiner {
 	}
 
 	public List<IDirectCodeMetric> getDirectCodeMetrics() {
+		if (directCodeMetrics == null) {
+			directCodeMetrics = new ArrayList<IDirectCodeMetric>();
+		}
 		return directCodeMetrics;
 	}
 
@@ -87,6 +91,9 @@ public class RepositoryMiner {
 	}
 
 	public List<IDirectCodeSmell> getDirectCodeSmells() {
+		if (directCodeSmells == null) {
+			directCodeSmells = new ArrayList<IDirectCodeSmell>();
+		}
 		return directCodeSmells;
 	}
 

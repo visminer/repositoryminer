@@ -3,16 +3,11 @@ package org.repositoryminer.codesmell.direct;
 import org.repositoryminer.ast.AST;
 import org.repositoryminer.ast.AbstractMethod;
 import org.repositoryminer.ast.AbstractType;
-import org.repositoryminer.codemetric.direct.LOC;
-import org.repositoryminer.codemetric.direct.TCC;
-import org.repositoryminer.codemetric.direct.WMC;
+import org.repositoryminer.codemetric.direct.MetricId;
 
+@DirectCodeSmellProperties(id = CodeSmellId.BRAIN_CLASS, requisites = { CodeSmellId.BRAIN_METHOD }, metrics = {
+		MetricId.WMC, MetricId.TCC, MetricId.LOC })
 public class BrainClass implements IDirectCodeSmell {
-
-	private WMC wmcMetric = new WMC();
-	private BrainMethod brainMethodCodeSmell = new BrainMethod();
-	private TCC tccMetric = new TCC();
-	private LOC locMetric = new LOC();
 
 	private int wmcThreshold = 47;
 	private float tccThreshold = 0.5f;
@@ -20,40 +15,23 @@ public class BrainClass implements IDirectCodeSmell {
 	private int locThreshold = 195;
 
 	@Override
-	public boolean calculateFromFile(AST ast) {
-		return false;
-	}
+	public void detect(AST ast) {
+		for (AbstractType type : ast.getTypes()) {
+			int wmc = (Integer) type.getMetrics().get(MetricId.WMC);
+			float tcc = (Float) type.getMetrics().get(MetricId.TCC);
+			int loc = (Integer) type.getMetrics().get(MetricId.LOC);
+			int nbm = 0;
 
-	@Override
-	public boolean calculateFromClass(AST ast, AbstractType type) {
-		int wmc = (Integer) wmcMetric.calculateFromClass(ast, type);
-		float tcc = (Float) tccMetric.calculateFromClass(ast, type);
-		int loc = (Integer) locMetric.calculateFromClass(ast, type);
-
-		int nbm = 0;
-		for (AbstractMethod method : type.getMethods()) {
-			if (brainMethodCodeSmell.calculateFromMethod(ast, type, method)) {
-				nbm++;
+			for (AbstractMethod method : type.getMethods()) {
+				if (method.getCodeSmells().contains(CodeSmellId.BRAIN_METHOD)) {
+					nbm++;
+				}
 			}
 
-			// Only two brain method are enough to satisfy the code smell detection, more
-			// than this is an overhead
-			if (nbm == 2) {
-				break;
+			if (detect(nbm, loc, wmc, tcc)) {
+				type.getCodeSmells().add(CodeSmellId.BRAIN_CLASS);
 			}
 		}
-		
-		return detect(nbm, loc, wmc, tcc);
-	}
-
-	@Override
-	public boolean calculateFromMethod(AST ast, AbstractType type, AbstractMethod method) {
-		return false;
-	}
-
-	@Override
-	public String getCodeSmell() {
-		return "BRAIN CLASS";
 	}
 
 	public boolean detect(int nbm, int loc, int wmc, float tcc) {

@@ -1,29 +1,18 @@
 package org.repositoryminer.codemetric.direct;
 
 import org.repositoryminer.ast.AST;
-import org.repositoryminer.ast.AbstractMethod;
 import org.repositoryminer.ast.AbstractType;
 
+@DirectMetricProperties(id = MetricId.NOA)
 public class NOA implements IDirectCodeMetric {
 
-	@Override
-	public Object calculateFromFile(AST ast) {
-		return null;
-	}
+	private static final MetricId ID = MetricId.NOA;
 
 	@Override
-	public Object calculateFromClass(AST ast, AbstractType type) {
-		return type.getFields().size();
-	}
-
-	@Override
-	public Object calculateFromMethod(AST ast, AbstractType type, AbstractMethod method) {
-		return null;
-	}
-
-	@Override
-	public String getMetric() {
-		return "NOA";
+	public void calculate(AST ast) {
+		for (AbstractType type : ast.getTypes()) {
+			type.getMetrics().put(ID, type.getFields().size());
+		}
 	}
 
 }

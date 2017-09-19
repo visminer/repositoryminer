@@ -11,28 +11,21 @@ import org.repositoryminer.ast.AbstractStatement;
 import org.repositoryminer.ast.AbstractType;
 import org.repositoryminer.ast.NodeType;
 
+@DirectMetricProperties(id = MetricId.FDP)
 public class FDP implements IDirectCodeMetric {
 
+	private static final MetricId ID = MetricId.FDP;
+	
 	@Override
-	public Object calculateFromFile(AST ast) {
-		return null;
+	public void calculate(AST ast) {
+		for (AbstractType type : ast.getTypes()) {
+			for (AbstractMethod method : type.getMethods()) {
+				int fdp = calculate(type, method);
+				method.getMetrics().put(ID, fdp);
+			}
+		}
 	}
-
-	@Override
-	public Object calculateFromClass(AST ast, AbstractType type) {
-		return null;
-	}
-
-	@Override
-	public Object calculateFromMethod(AST ast, AbstractType type, AbstractMethod method) {
-		return calculate(type, method);
-	}
-
-	@Override
-	public String getMetric() {
-		return "FDP";
-	}
-
+	
 	public int calculate(AbstractType currType, AbstractMethod method) {
 		Set<String> accessedClasses = new HashSet<String>();
 		for (AbstractStatement stmt : method.getStatements()) {

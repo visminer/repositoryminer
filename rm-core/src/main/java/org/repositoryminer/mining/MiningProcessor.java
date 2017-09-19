@@ -128,6 +128,10 @@ public class MiningProcessor {
 	 * @throws IOException
 	 */
 	private void calculateAndDetect(String tempRepo, String repositoryId) throws IOException {
+		if (repositoryMiner.getDirectCodeMetrics().size() == 0 && repositoryMiner.getDirectCodeSmells().size() == 0) {
+			return;
+		}
+		
 		DirectCodeAnalysisProcessor processor = new DirectCodeAnalysisProcessor();
 		processor.setSelectedCommits(new ArrayList<String>(selectedCommits));
 		processor.setSCM(scm);

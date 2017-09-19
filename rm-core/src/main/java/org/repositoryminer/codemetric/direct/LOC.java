@@ -7,35 +7,41 @@ import org.repositoryminer.ast.AST;
 import org.repositoryminer.ast.AbstractMethod;
 import org.repositoryminer.ast.AbstractType;
 
+@DirectMetricProperties(id = MetricId.LOC)
 public class LOC implements IDirectCodeMetric {
 
 	private Pattern pattern;
+	private static final MetricId ID = MetricId.LOC;
 
 	public LOC() {
 		pattern = Pattern.compile("(\r\n)|(\n)|(\r)");
 	}
 
 	@Override
-	public Object calculateFromFile(AST ast) {
-		return calculate(ast.getSource());
+	public void calculate(AST ast) {
+		ast.getMetrics().put(ID, calculate(ast.getSource()));
+		
+		for (AbstractMethod method : ast.getMethods()) {
+			method.getMetrics().put(ID, calculate(ast, method));
+		}
+		
+		for (AbstractType type : ast.getTypes()) {
+			type.getMetrics().put(ID, calculate(ast, type));
+			for (AbstractMethod method : type.getMethods()) {
+				method.getMetrics().put(ID, calculate(ast, method));
+			}
+		}
 	}
 
-	@Override
-	public Object calculateFromClass(AST ast, AbstractType type) {
+	public int calculate(AST ast, AbstractType type) {
 		String clazz = ast.getSource().substring(type.getStartPosition(), type.getEndPosition());
 		String body = clazz.substring(clazz.indexOf('{'));
 		return calculate(body);
 	}
 
-	@Override
-	public Object calculateFromMethod(AST ast, AbstractType type, AbstractMethod method) {
+	public int calculate(AST ast, AbstractMethod method) {
 		String m = ast.getSource().substring(method.getStartPosition(), method.getEndPosition());
 		return m.contains("{") ? calculate(m.substring(m.indexOf('{'))) : 0;
-	}
-
-	@Override
-	public String getMetric() {
-		return "LOC";
 	}
 
 	public int calculate(String source) {
@@ -45,7 +51,6 @@ public class LOC implements IDirectCodeMetric {
 
 		int lines = 1;
 		Matcher matcher = pattern.matcher(source);
-
 		while (matcher.find()) {
 			lines++;
 		}

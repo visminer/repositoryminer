@@ -8,26 +8,16 @@ import org.repositoryminer.ast.AbstractField;
 import org.repositoryminer.ast.AbstractMethod;
 import org.repositoryminer.ast.AbstractType;
 
+@DirectMetricProperties(id = MetricId.WOC)
 public class WOC implements IDirectCodeMetric {
 
-	@Override
-	public Object calculateFromFile(AST ast) {
-		return null;
-	}
+	private static final MetricId ID = MetricId.WOC;
 
 	@Override
-	public Object calculateFromClass(AST ast, AbstractType type) {
-		return calculate(type.getMethods(), type.getFields());
-	}
-
-	@Override
-	public Object calculateFromMethod(AST ast, AbstractType type, AbstractMethod method) {
-		return null;
-	}
-
-	@Override
-	public String getMetric() {
-		return "WOC";
+	public void calculate(AST ast) {
+		for (AbstractType type : ast.getTypes()) {
+			type.getMetrics().put(ID, calculate(type.getMethods(), type.getFields()));
+		}
 	}
 
 	public float calculate(List<AbstractMethod> methods, List<AbstractField> fields) {

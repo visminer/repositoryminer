@@ -11,32 +11,20 @@ import org.repositoryminer.ast.AbstractStatement;
 import org.repositoryminer.ast.AbstractType;
 import org.repositoryminer.ast.NodeType;
 
+@DirectMetricProperties(id = MetricId.ATFD)
 public class ATFD implements IDirectCodeMetric {
 
-	private int atfdClass;
-
 	@Override
-	public Object calculateFromFile(AST ast) {
-		return null;
-	}
-
-	@Override
-	public Object calculateFromClass(AST ast, AbstractType type) {
-		int temp = atfdClass;
-		atfdClass = 0;
-		return temp;
-	}
-
-	@Override
-	public Object calculateFromMethod(AST ast, AbstractType type, AbstractMethod method) {
-		int atfd = calculate(type, method);
-		atfdClass += atfd;
-		return atfd;
-	}
-
-	@Override
-	public String getMetric() {
-		return "ATFD";
+	public void calculate(AST ast) {
+		for (AbstractType type : ast.getTypes()) {
+			int atfdClass = 0;
+			for (AbstractMethod method : type.getMethods()) {
+				int atfdMethod = calculate(type, method);
+				atfdClass += atfdMethod;
+				method.getMetrics().put(MetricId.ATFD, atfdMethod);
+			}
+			type.getMetrics().put(MetricId.ATFD, atfdClass);
+		}
 	}
 
 	public int calculate(AbstractType currType, AbstractMethod method) {

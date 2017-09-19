@@ -3,33 +3,20 @@ package org.repositoryminer.codemetric.direct;
 import java.math.BigDecimal;
 
 import org.repositoryminer.ast.AST;
-import org.repositoryminer.ast.AbstractMethod;
 import org.repositoryminer.ast.AbstractType;
 
+@DirectMetricProperties(id = MetricId.AMW, requisites = {MetricId.WMC, MetricId.NOM})
 public class AMW implements IDirectCodeMetric {
 
-	private WMC wmcMetric = new WMC();
+	private static final MetricId ID = MetricId.AMW;
 
 	@Override
-	public Object calculateFromFile(AST ast) {
-		return null;
-	}
-
-	@Override
-	public Object calculateFromClass(AST ast, AbstractType type) {
-		int wmc = wmcMetric.calculate(type.getMethods());
-		int nom = type.getMethods().size();
-		return calculate(wmc, nom);
-	}
-
-	@Override
-	public Object calculateFromMethod(AST ast, AbstractType type, AbstractMethod method) {
-		return null;
-	}
-
-	@Override
-	public String getMetric() {
-		return "AMW";
+	public void calculate(AST ast) {
+		for (AbstractType type : ast.getTypes()) {
+			int wmc = (Integer) type.getMetrics().get(MetricId.WMC);
+			int nom = (Integer) type.getMetrics().get(MetricId.NOM);
+			type.getMetrics().put(ID, calculate(wmc, nom));
+		}
 	}
 
 	public float calculate(int wmc, int nom) {

@@ -12,26 +12,19 @@ import org.repositoryminer.ast.AbstractStatement;
 import org.repositoryminer.ast.AbstractType;
 import org.repositoryminer.ast.NodeType;
 
+@DirectMetricProperties(id = MetricId.LAA)
 public class LAA implements IDirectCodeMetric {
 
-	@Override
-	public Object calculateFromFile(AST ast) {
-		return null;
-	}
+	private static final MetricId ID = MetricId.LAA;
 
 	@Override
-	public Object calculateFromClass(AST ast, AbstractType type) {
-		return null;
-	}
-
-	@Override
-	public Object calculateFromMethod(AST ast, AbstractType type, AbstractMethod method) {
-		return calculate(type, method);
-	}
-
-	@Override
-	public String getMetric() {
-		return "LAA";
+	public void calculate(AST ast) {
+		for (AbstractType type : ast.getTypes()) {
+			for (AbstractMethod method : type.getMethods()) {
+				float laa = calculate(type, method);
+				method.getMetrics().put(ID, laa);
+			}
+		}
 	}
 
 	public float calculate(AbstractType type, AbstractMethod method) {
@@ -39,7 +32,7 @@ public class LAA implements IDirectCodeMetric {
 		float result = countFields > 0 ? (type.getFields().size() * 1.0f) / countFields : 0;
 		return new BigDecimal(result).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue();
 	}
-	
+
 	public static int countAccessedFields(AbstractMethod method) {
 		Set<String> accessedFields = new HashSet<String>();
 		for (AbstractStatement stmt : method.getStatements()) {

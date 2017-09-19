@@ -13,7 +13,7 @@ public class Repository {
 	private String key;
 	private String name;
 	private String path;
-	private String scm;
+	private SCMType scm;
 	private String description;
 	private List<PersonIdent> contributors;
 
@@ -24,7 +24,7 @@ public class Repository {
 	 */
 	public Document toDocument() {
 		Document doc = new Document();
-		doc.append("key", key).append("name", name).append("path", path).append("scm", scm)
+		doc.append("key", key).append("name", name).append("path", path).append("scm", scm.toString())
 		.append("description", description).append("contributors", PersonIdent.toDocumentList(contributors));
 		return doc;
 	}
@@ -43,14 +43,14 @@ public class Repository {
 		}
 
 		return new Repository(doc.getObjectId("_id").toHexString(), doc.getString("key"), doc.getString("name"),
-				doc.getString("path"), doc.getString("scm"), doc.getString("description"),
+				doc.getString("path"), SCMType.valueOf(doc.getString("scm")), doc.getString("description"),
 				PersonIdent.parseDocuments(doc.get("contributors", List.class)));
 	}
 
 	public Repository() {
 	}
 
-	public Repository(String id, String key, String name, String path, String scm, String description,
+	public Repository(String id, String key, String name, String path, SCMType scm, String description,
 			List<PersonIdent> contributors) {
 		this.id = id;
 		this.key = key;
@@ -93,11 +93,11 @@ public class Repository {
 		this.path = path;
 	}
 
-	public String getScm() {
+	public SCMType getScm() {
 		return scm;
 	}
 
-	public void setScm(String scm) {
+	public void setScm(SCMType scm) {
 		this.scm = scm;
 	}
 

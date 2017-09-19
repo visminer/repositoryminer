@@ -15,7 +15,7 @@ public class Reference {
 	private String repository;
 	private String name;
 	private String path;
-	private String type;
+	private ReferenceType type;
 	private List<String> commits;
 
 	/**
@@ -43,8 +43,8 @@ public class Reference {
 	@SuppressWarnings("unchecked")
 	public static Reference parseDocument(Document document) {
 		Reference r = new Reference(document.get("_id").toString(), document.get("repository").toString(),
-				document.getString("name"), document.getString("path"), document.getString("type"),
-				document.get("commits", List.class));
+				document.getString("name"), document.getString("path"),
+				ReferenceType.valueOf(document.getString("type")), document.get("commits", List.class));
 
 		return r;
 	}
@@ -57,15 +57,14 @@ public class Reference {
 	public Document toDocument() {
 		Document doc = new Document();
 		doc.append("repository", new ObjectId(repository)).append("name", name).append("path", path)
-				.append("type", type).append("commits", commits);
+		.append("type", type.toString()).append("commits", commits);
 		return doc;
 	}
 
 	public Reference() {
 	}
 
-	public Reference(String id, String repository, String name, String path, String type, List<String> commits) {
-		super();
+	public Reference(String id, String repository, String name, String path, ReferenceType type, List<String> commits) {
 		this.id = id;
 		this.repository = repository;
 		this.name = name;
@@ -106,11 +105,11 @@ public class Reference {
 		this.path = path;
 	}
 
-	public String getType() {
+	public ReferenceType getType() {
 		return type;
 	}
 
-	public void setType(String type) {
+	public void setType(ReferenceType type) {
 		this.type = type;
 	}
 

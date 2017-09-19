@@ -1,6 +1,15 @@
 package org.repositoryminer.ast;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Map.Entry;
+
+import org.repositoryminer.codemetric.direct.MetricId;
+import org.repositoryminer.codesmell.direct.CodeSmellId;
 
 /**
  * This class represents a method declaration.
@@ -20,6 +29,8 @@ public class AbstractMethod {
 	private int maxDepth;
 	private boolean accessor;
 	private String accessoredField;
+	private Map<MetricId, Object> metrics = new HashMap<MetricId, Object>();
+	private Set<CodeSmellId> codeSmells = new HashSet<CodeSmellId>();
 
 	public String getName() {
 		return name;
@@ -123,6 +134,38 @@ public class AbstractMethod {
 
 	public void setAccessoredField(String accessoredField) {
 		this.accessoredField = accessoredField;
+	}
+
+	public Map<MetricId, Object> getMetrics() {
+		return metrics;
+	}
+
+	public void setMetrics(Map<MetricId, Object> metrics) {
+		this.metrics = metrics;
+	}
+
+	public Map<String, Object> convertMetrics() {
+		Map<String, Object> result = new HashMap<String, Object>();
+		for (Entry<MetricId, Object> entry : metrics.entrySet()) {
+			result.put(entry.getKey().toString(), entry.getValue());
+		}
+		return result;
+	}
+	
+	public List<String> convertCodeSmells() {
+		List<String> result = new ArrayList<String>();
+		for (CodeSmellId codeSmell : codeSmells) {
+			result.add(codeSmell.toString());
+		}
+		return result;
+	}
+	
+	public Set<CodeSmellId> getCodeSmells() {
+		return codeSmells;
+	}
+
+	public void setCodeSmells(Set<CodeSmellId> codeSmells) {
+		this.codeSmells = codeSmells;
 	}
 
 }

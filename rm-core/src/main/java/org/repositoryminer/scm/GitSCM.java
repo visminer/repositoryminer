@@ -35,6 +35,8 @@ import org.repositoryminer.model.Change;
 import org.repositoryminer.model.ChangeType;
 import org.repositoryminer.model.Commit;
 import org.repositoryminer.model.Reference;
+import org.repositoryminer.model.ReferenceType;
+import org.repositoryminer.model.SCMType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,8 +52,8 @@ public class GitSCM implements ISCM {
 	private String repoPath;
 
 	@Override
-	public String getSCM() {
-		return "GIT";
+	public SCMType getSCM() {
+		return SCMType.GIT;
 	}
 
 	@Override
@@ -99,7 +101,7 @@ public class GitSCM implements ISCM {
 			}
 
 			int i = b.getName().lastIndexOf("/") + 1;
-			Reference r = new Reference(null, null, b.getName().substring(i), b.getName(), "BRANCH", null);
+			Reference r = new Reference(null, null, b.getName().substring(i), b.getName(), ReferenceType.BRANCH, null);
 			refs.add(r);
 		}
 
@@ -112,7 +114,7 @@ public class GitSCM implements ISCM {
 
 		for (Ref t : tags) {
 			int i = t.getName().lastIndexOf("/") + 1;
-			Reference r = new Reference(null, null, t.getName().substring(i), t.getName(), "TAG", null);
+			Reference r = new Reference(null, null, t.getName().substring(i), t.getName(), ReferenceType.TAG, null);
 			refs.add(r);
 		}
 

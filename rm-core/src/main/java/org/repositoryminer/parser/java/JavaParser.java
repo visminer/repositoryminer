@@ -35,7 +35,6 @@ public class JavaParser implements IParser {
 
 	public JavaParser() {
 		// Adding common source folders as default
-		srcFolders.add(new String[] {"src"});
 		srcFolders.add(new String[] {"src/main/java"});
 		
 		// Setting the defult classpath

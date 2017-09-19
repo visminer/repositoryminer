@@ -4,33 +4,27 @@ import org.repositoryminer.ast.AST;
 import org.repositoryminer.ast.AbstractMethod;
 import org.repositoryminer.ast.AbstractType;
 
+@DirectMetricProperties(id = MetricId.NOAV, requisites = { MetricId.LVAR })
 public class NOAV implements IDirectCodeMetric {
 
-	private LVAR lvarMetric = new LVAR();
+	private static final MetricId ID = MetricId.NOAV;
 
 	@Override
-	public Object calculateFromFile(AST ast) {
-		return null;
+	public void calculate(AST ast) {
+		for (AbstractMethod method : ast.getMethods()) {
+			method.getMetrics().put(ID, calculate(method));
+		}
+
+		for (AbstractType type : ast.getTypes()) {
+			for (AbstractMethod method : type.getMethods()) {
+				method.getMetrics().put(ID, calculate(method));
+			}
+		}
 	}
 
-	@Override
-	public Object calculateFromClass(AST ast, AbstractType type) {
-		return null;
-	}
-
-	@Override
-	public Object calculateFromMethod(AST ast, AbstractType type, AbstractMethod method) {
-		return calculate(type, method);
-	}
-
-	@Override
-	public String getMetric() {
-		return "NOAV";
-	}
-
-	public int calculate(AbstractType currType, AbstractMethod method) {
+	public int calculate(AbstractMethod method) {
 		int accessFields = LAA.countAccessedFields(method);
-		int nVar = lvarMetric.calculate(method);
+		int nVar = (Integer) method.getMetrics().get(MetricId.LVAR);
 		int nParams = method.getParameters().size();
 		return accessFields + nVar + nParams;
 	}

@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.repositoryminer.model.Commit;
 import org.repositoryminer.model.Reference;
+import org.repositoryminer.model.SCMType;
 
 /**
  * Interface that define what is needed to support a repository.
@@ -14,7 +15,7 @@ public interface ISCM {
 	/**
 	 * @return The supported version control system name.
 	 */
-	public String getSCM();
+	public SCMType getSCM();
 
 	/**
 	 * Prepare the repository to analysis.

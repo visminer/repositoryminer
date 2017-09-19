@@ -14,26 +14,16 @@ import org.repositoryminer.ast.AbstractStatement;
 import org.repositoryminer.ast.AbstractType;
 import org.repositoryminer.ast.NodeType;
 
+@DirectMetricProperties(id = MetricId.TCC)
 public class TCC implements IDirectCodeMetric {
 
-	@Override
-	public Object calculateFromFile(AST ast) {
-		return null;
-	}
+	private static final MetricId ID = MetricId.TCC;
 
 	@Override
-	public Object calculateFromClass(AST ast, AbstractType type) {
-		return calculate(type);
-	}
-
-	@Override
-	public Object calculateFromMethod(AST ast, AbstractType type, AbstractMethod method) {
-		return null;
-	}
-
-	@Override
-	public String getMetric() {
-		return "TCC";
+	public void calculate(AST ast) {
+		for (AbstractType type : ast.getTypes()) {
+			type.getMetrics().put(ID, calculate(type));
+		}
 	}
 
 	public float calculate(AbstractType type) {
@@ -42,7 +32,7 @@ public class TCC implements IDirectCodeMetric {
 			if (!(m.getModifiers().contains("abstract") || m.isConstructor()))
 				methodList.add(m);
 		}
-		
+
 		int n = methodList.size();
 		int npc = (n * (n - 1)) / 2;
 		int ndc = 0;

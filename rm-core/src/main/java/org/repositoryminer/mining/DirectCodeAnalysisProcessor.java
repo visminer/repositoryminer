@@ -5,14 +5,22 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.repositoryminer.ast.AST;
 import org.repositoryminer.ast.AbstractMethod;
 import org.repositoryminer.ast.AbstractType;
+import org.repositoryminer.codemetric.direct.DirectMetricProperties;
 import org.repositoryminer.codemetric.direct.IDirectCodeMetric;
+import org.repositoryminer.codemetric.direct.MetricFactory;
+import org.repositoryminer.codemetric.direct.MetricId;
+import org.repositoryminer.codesmell.direct.CodeSmellFactory;
+import org.repositoryminer.codesmell.direct.CodeSmellId;
+import org.repositoryminer.codesmell.direct.DirectCodeSmellProperties;
 import org.repositoryminer.codesmell.direct.IDirectCodeSmell;
 import org.repositoryminer.model.Change;
 import org.repositoryminer.model.ChangeType;
@@ -30,7 +38,7 @@ import com.mongodb.client.model.Projections;
 public class DirectCodeAnalysisProcessor {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(DirectCodeAnalysisProcessor.class);
-	
+
 	private static final int COMMIT_RANGE = 1000;
 
 	private ISCM scm;
@@ -42,6 +50,9 @@ public class DirectCodeAnalysisProcessor {
 
 	private DirectCodeAnalysisDAO directAnalysisHandler = new DirectCodeAnalysisDAO();
 	private CommitDAO commitPersistence = new CommitDAO();
+
+	private Map<MetricId, IDirectCodeMetric> metrics = new LinkedHashMap<MetricId, IDirectCodeMetric>();
+	private Map<CodeSmellId, IDirectCodeSmell> codeSmells = new LinkedHashMap<CodeSmellId, IDirectCodeSmell>();
 
 	public void setRepositoryData(String repositoryId, String repositoryPath) {
 		this.repositoryId = repositoryId;
@@ -63,6 +74,9 @@ public class DirectCodeAnalysisProcessor {
 	public void start() throws IOException {
 		int begin = 0;
 		int end = Math.min(selectedCommits.size(), COMMIT_RANGE);
+
+		sortCodeSmells();
+		sortMetrics();
 
 		while (end < selectedCommits.size()) {
 			processCommits(selectedCommits.subList(begin, end), begin, selectedCommits.size());
@@ -96,7 +110,7 @@ public class DirectCodeAnalysisProcessor {
 		if (f.isDirectory()) {
 			return;
 		}
-		
+
 		IParser parser = null;
 		for (IParser p : repositoryMiner.getParsers()) {
 			if (p.accept(filePath)) {
@@ -104,8 +118,8 @@ public class DirectCodeAnalysisProcessor {
 				break;
 			}
 		}
-		
-		LOGGER.info("Processing file "+filePath+" at state "+commit.getId());
+
+		LOGGER.info("Processing file " + filePath + " at state " + commit.getId());
 		if (parser == null) {
 			return;
 		}
@@ -120,6 +134,71 @@ public class DirectCodeAnalysisProcessor {
 		processFile(commit, filePath, ast);
 	}
 
+	private void sortCodeSmells() {
+		processCodeSmellsOrder(repositoryMiner.getDirectCodeSmells());
+	}
+
+	private void processCodeSmellsOrder(List<IDirectCodeSmell> directCodeSmells) {
+		for (IDirectCodeSmell codeSmell : directCodeSmells) {
+			DirectCodeSmellProperties props = codeSmell.getClass().getAnnotation(DirectCodeSmellProperties.class);
+			verifyCodeSmellBeforeCalculation(codeSmell, props);
+		}
+	}
+
+	private void verifyCodeSmellBeforeCalculation(IDirectCodeSmell codeSmell, DirectCodeSmellProperties props) {
+		if (props.requisites().length == 0 && !codeSmells.containsKey(props.id())) {
+			codeSmells.put(props.id(), codeSmell);
+		} else if (!codeSmells.containsKey(props.id())) {
+			processCodeSmellRequisites(props.requisites());
+			codeSmells.put(props.id(), codeSmell);
+		}
+	}
+
+	private void processCodeSmellRequisites(CodeSmellId[] requisites) {
+		for (CodeSmellId codeSmellId : requisites) {
+			IDirectCodeSmell codeSmell = CodeSmellFactory.getDirectCodeSmell(codeSmellId);
+			DirectCodeSmellProperties props = codeSmell.getClass().getAnnotation(DirectCodeSmellProperties.class);
+			verifyCodeSmellBeforeCalculation(codeSmell, props);
+		}
+	}
+
+	private void sortMetrics() {
+		processMetricsOrder(repositoryMiner.getDirectCodeMetrics());
+		List<IDirectCodeMetric> directMetrics = new ArrayList<IDirectCodeMetric>();
+		
+		for (IDirectCodeSmell codeSmell : codeSmells.values()) {
+			DirectCodeSmellProperties props = codeSmell.getClass().getAnnotation(DirectCodeSmellProperties.class);
+			for (MetricId metricId : props.metrics()) {
+				directMetrics.add(MetricFactory.getDirectCodeMetric(metricId));
+			}
+		}
+		processMetricsOrder(directMetrics);
+	}
+
+	private void processMetricsOrder(List<IDirectCodeMetric> directMetrics) {
+		for (IDirectCodeMetric metric : directMetrics) {
+			DirectMetricProperties props = metric.getClass().getAnnotation(DirectMetricProperties.class);
+			verifyMetricBeforeCalculation(metric, props);
+		}
+	}
+
+	private void processMetricRequisites(MetricId[] requisites) {
+		for (MetricId metricId : requisites) {
+			IDirectCodeMetric metric = MetricFactory.getDirectCodeMetric(metricId);
+			DirectMetricProperties props = metric.getClass().getAnnotation(DirectMetricProperties.class);
+			verifyMetricBeforeCalculation(metric, props);
+		}
+	}
+
+	private void verifyMetricBeforeCalculation(IDirectCodeMetric metric, DirectMetricProperties props) {
+		if (props.requisites().length == 0 && !metrics.containsKey(props.id())) {
+			metrics.put(props.id(), metric);
+		} else if (!metrics.containsKey(props.id())) {
+			processMetricRequisites(props.requisites());
+			metrics.put(props.id(), metric);
+		}
+	}
+
 	private void processFile(Commit commit, String filename, AST ast) {
 		Document doc = new Document();
 		doc.append("commit", commit.getId());
@@ -128,91 +207,36 @@ public class DirectCodeAnalysisProcessor {
 		doc.append("repository", new ObjectId(repositoryId));
 		doc.append("filename_hash", HashingUtils.encodeToCRC32(filename));
 
-		List<Document> docTypes = new ArrayList<Document>();
-		for (AbstractType type : ast.getTypes()) {
-			List<Document> docMethods = new ArrayList<Document>();
-			for (AbstractMethod method : type.getMethods()) {
-				docMethods.add(processMethod(ast, type, method));
-			}
-			docTypes.add(processClass(ast, type).append("methods", docMethods));
+		for (IDirectCodeMetric metric : metrics.values()) {
+			metric.calculate(ast);
 		}
 
-		doc.putAll(processFile(ast));
+		for (IDirectCodeSmell codeSmell : codeSmells.values()) {
+			codeSmell.detect(ast);
+		}
+		
+		doc.append("metrics", ast.convertMetrics());
+
+		List<Document> docMethods1 = new ArrayList<Document>();
+		for (AbstractMethod method : ast.getMethods()) {
+			docMethods1.add(new Document("name", method.getName()).append("metrics", method.convertMetrics())
+					.append("code_smells", method.convertCodeSmells()));
+		}
+		doc.append("methods", docMethods1);
+
+		List<Document> docTypes = new ArrayList<Document>();
+		for (AbstractType type : ast.getTypes()) {
+			List<Document> docMethods2 = new ArrayList<Document>();
+			for (AbstractMethod method : type.getMethods()) {
+				docMethods2.add(new Document("name", method.getName()).append("metrics", method.convertMetrics())
+						.append("code_smells", method.convertCodeSmells()));
+			}
+			docTypes.add(new Document("name", type.getName()).append("metrics", type.convertMetrics())
+					.append("code_smells", type.convertCodeSmells()).append("methods", docMethods2));
+		}
 		doc.append("types", docTypes);
 
 		directAnalysisHandler.insert(doc);
-	}
-
-	private Document processFile(AST ast) {
-		Document fileDoc = new Document();
-
-		Document metricsDoc = new Document();
-		for (IDirectCodeMetric metric : repositoryMiner.getDirectCodeMetrics()) {
-			Object value = metric.calculateFromFile(ast);
-			if (value != null) {
-				metricsDoc.append(metric.getMetric(), value);
-			}
-		}
-		fileDoc.append("metrics", metricsDoc);
-
-		List<String> codeSmells = new ArrayList<String>();
-		for (IDirectCodeSmell codeSmell : repositoryMiner.getDirectCodeSmells()) {
-			if (codeSmell.calculateFromFile(ast)) {
-				codeSmells.add(codeSmell.getCodeSmell());
-			}
-		}
-		fileDoc.append("code_smells", codeSmells);
-
-		return fileDoc;
-	}
-
-	private Document processClass(AST ast, AbstractType type) {
-		Document clazzDoc = new Document();
-		clazzDoc.append("name", type.getName());
-		clazzDoc.append("type", type.getNodeType().toString());
-
-		Document metricsDoc = new Document();
-		for (IDirectCodeMetric metric : repositoryMiner.getDirectCodeMetrics()) {
-			Object value = metric.calculateFromClass(ast, type);
-			if (value != null) {
-				metricsDoc.append(metric.getMetric(), value);
-			}
-		}
-		clazzDoc.append("metrics", metricsDoc);
-
-		List<String> codeSmells = new ArrayList<String>();
-		for (IDirectCodeSmell codeSmell : repositoryMiner.getDirectCodeSmells()) {
-			if (codeSmell.calculateFromClass(ast, type)) {
-				codeSmells.add(codeSmell.getCodeSmell());
-			}
-		}
-		clazzDoc.append("code_smells", codeSmells);
-
-		return clazzDoc;
-	}
-
-	private Document processMethod(AST ast, AbstractType type, AbstractMethod method) {
-		Document methodDoc = new Document();
-		methodDoc.append("name", method.getName());
-
-		Document metricsDoc = new Document();
-		for (IDirectCodeMetric metric : repositoryMiner.getDirectCodeMetrics()) {
-			Object value = metric.calculateFromMethod(ast, type, method);
-			if (value != null) {
-				metricsDoc.append(metric.getMetric(), value);
-			}
-		}
-		methodDoc.append("metrics", metricsDoc);
-
-		List<String> codeSmells = new ArrayList<String>();
-		for (IDirectCodeSmell codeSmell : repositoryMiner.getDirectCodeSmells()) {
-			if (codeSmell.calculateFromMethod(ast, type, method)) {
-				codeSmells.add(codeSmell.getCodeSmell());
-			}
-		}
-		methodDoc.append("code_smells", codeSmells);
-
-		return methodDoc;
 	}
 
 }

@@ -9,26 +9,22 @@ import org.repositoryminer.ast.AbstractStatement;
 import org.repositoryminer.ast.AbstractType;
 import org.repositoryminer.ast.NodeType;
 
+@DirectMetricProperties(id = MetricId.LVAR)
 public class LVAR implements IDirectCodeMetric {
 
-	@Override
-	public Object calculateFromFile(AST ast) {
-		return null;
-	}
+	private static final MetricId ID = MetricId.LVAR;
 
 	@Override
-	public Object calculateFromClass(AST ast, AbstractType type) {
-		return null;
-	}
+	public void calculate(AST ast) {
+		for (AbstractMethod method : ast.getMethods()) {
+			method.getMetrics().put(ID, calculate(method));
+		}
 
-	@Override
-	public Object calculateFromMethod(AST ast, AbstractType type, AbstractMethod method) {
-		return calculate(method);
-	}
-
-	@Override
-	public String getMetric() {
-		return "LVAR";
+		for (AbstractType type : ast.getTypes()) {
+			for (AbstractMethod method : type.getMethods()) {
+				method.getMetrics().put(ID, calculate(method));
+			}
+		}
 	}
 
 	public int calculate(AbstractMethod method) {
