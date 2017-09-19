@@ -5,6 +5,7 @@ import java.util.List;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
+import org.repositoryminer.model.ReferenceType;
 
 import com.mongodb.client.model.Filters;
 
@@ -59,6 +60,20 @@ public class ReferenceDAO extends GenericDAO {
 	public void updateOnlyCommits(String id, List<String> commits) {
 		collection.updateOne(Filters.eq("_id", new ObjectId(id)),
 				new Document("$set", new Document("commits", commits)));
+	}
+
+	/**
+	 * Retrieves a reference by name and type.
+	 * 
+	 * @param name
+	 * @param type
+	 * @param repositoryId
+	 * @param projection
+	 * @return
+	 */
+	public Document findByNameAndType(String name, ReferenceType type, String repositoryId, Bson projection) {
+		return findOne(Filters.and(Filters.eq("name", name), Filters.eq("type", type.toString()), Filters.eq("repository", new ObjectId(repositoryId))),
+				projection);
 	}
 
 }
