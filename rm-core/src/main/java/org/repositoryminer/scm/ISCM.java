@@ -36,10 +36,10 @@ public interface ISCM {
 
 	/**
 	 * @param reference
-	 *            the reference name.
+	 *            the reference.
 	 * @return all commits associated to the reference.
 	 */
-	public List<String> getCommits(String reference);
+	public List<String> getCommitsNames(Reference reference);
 
 	/**
 	 * Does a checkout to a given point.

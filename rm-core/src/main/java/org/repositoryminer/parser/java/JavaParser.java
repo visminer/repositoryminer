@@ -28,7 +28,7 @@ public class JavaParser implements IParser {
 
 	private static final String[] EXTENSIONS = {"java"};
 	
-	private List<String[]> srcFolders = new ArrayList<String[]>();
+	private List<String[]> srcFolders;
 	private String[] classpath = new String[1];
 	
 	private String[] classpathSrcFolder;
@@ -37,11 +37,7 @@ public class JavaParser implements IParser {
 	private ASTParser parser = ASTParser.newParser(org.eclipse.jdt.core.dom.AST.JLS8);
 
 	public JavaParser() {
-		// Adding common source folders as default
-		srcFolders.add(new String[] {"src/main/java"});
-		
-		// Setting the defult classpath
-		classpath[0] = FilenameUtils.normalize(System.getProperty("java.home"), true) + "/lib/rt.jar" ;
+		classpath[0] = FilenameUtils.normalize(System.getProperty("java.home"), true) + "/lib/rt.jar";
 	}
 
 	@Override
@@ -81,7 +77,6 @@ public class JavaParser implements IParser {
 			boolean selected = true;
 			for (String folder : folders) {
 				if (!new File(repositoryPath, folder).exists()) {
-					System.out.println("me achou " +folder);
 					selected = false;
 					break;
 				}
@@ -89,14 +84,12 @@ public class JavaParser implements IParser {
 			
 			if (selected) {
 				currSrcFolder = folders;
-				
 				encoding = new String[currSrcFolder.length];
 				Arrays.fill(encoding, "utf-8");
 				
 				classpathSrcFolder = new String[currSrcFolder.length];
-				for (int i = 0; i < currSrcFolder.length; i++) {
+				for (int i = 0; i < currSrcFolder.length; i++)
 					classpathSrcFolder[i] = repositoryPath+"/"+currSrcFolder[i];
-				}
 				break;
 			}
 		}
@@ -114,12 +107,11 @@ public class JavaParser implements IParser {
 		parser.setCompilerOptions(JavaCore.getOptions());
 		parser.setUnitName(filename);
 
-		if (currSrcFolder != null) {
+		if (currSrcFolder != null)
 			parser.setEnvironment(classpath, classpathSrcFolder, encoding, true);
-		} else {
-			System.out.println("olá1aaaaaaaaaaaaaaa");
+		else
 			parser.setEnvironment(classpath, null, null, true);
-		}
+		
 		parser.setSource(source.toCharArray());
 
 		CompilationUnit cu = (CompilationUnit) parser.createAST(null);
@@ -153,7 +145,7 @@ public class JavaParser implements IParser {
 
 	public void setClasspath(String[] classpath) {
 		this.classpath = Arrays.copyOf(classpath, classpath.length + 1);
-		this.classpath[this.classpath.length] = FilenameUtils.normalize(System.getProperty("java.home"), true) + "/lib/rt.jar" ;
+		this.classpath[this.classpath.length - 1] = FilenameUtils.normalize(System.getProperty("java.home"), true) + "/lib/rt.jar";
 	}
 
 }

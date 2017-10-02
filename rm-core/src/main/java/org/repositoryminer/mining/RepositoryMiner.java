@@ -2,6 +2,7 @@ package org.repositoryminer.mining;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 import org.repositoryminer.codesmell.ICodeSmell;
 import org.repositoryminer.metric.IMetric;
@@ -20,7 +21,7 @@ public class RepositoryMiner {
 	private List<IParser> parsers;
 	private List<IMetric> metrics;
 	private List<ICodeSmell> codeSmells;
-	private List<String> references;
+	private Set<ReferenceEntry> references;
 
 	public void mine() throws IOException {
 		RepositoryDAO repoDocHandler = new RepositoryDAO();
@@ -112,11 +113,11 @@ public class RepositoryMiner {
 		this.codeSmells = codeSmells;
 	}
 
-	public List<String> getReferences() {
+	public Set<ReferenceEntry> getReferences() {
 		return references;
 	}
 
-	public void setReferences(List<String> references) {
+	public void setReferences(Set<ReferenceEntry> references) {
 		this.references = references;
 	}
 

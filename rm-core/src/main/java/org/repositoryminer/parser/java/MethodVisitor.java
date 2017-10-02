@@ -148,7 +148,11 @@ public class MethodVisitor extends ASTVisitor {
 	@SuppressWarnings("unchecked")
 	@Override
 	public boolean visit(VariableDeclarationStatement node) {
-		String type = node.getType().resolveBinding().getQualifiedName();
+		ITypeBinding bind = node.getType().resolveBinding();
+		String type = null;
+		if (bind != null)
+			type = bind.getQualifiedName();
+			
 		for (VariableDeclarationFragment frag : (List<VariableDeclarationFragment>) node.fragments()) {
 			statements.add(new AbstractVariableDeclaration(frag.getName().getIdentifier(), type,
 					frag.getInitializer() != null ? frag.getInitializer().toString() : null));

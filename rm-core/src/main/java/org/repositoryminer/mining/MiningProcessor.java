@@ -88,7 +88,7 @@ public class MiningProcessor {
 		List<Reference> references = scm.getReferences();
 
 		for (Reference ref : references) {
-			List<String> commits = scm.getCommits(ref.getPath());
+			List<String> commits = scm.getCommitsNames(ref);
 
 			ref.setRepository(repositoryId);
 			ref.setCommits(commits);
@@ -96,9 +96,10 @@ public class MiningProcessor {
 			Document refDoc = ref.toDocument();
 			refDocumentHandler.insert(refDoc);
 
-			if (rm.hasReferences()) {
+			if (rm.hasReferences() && rm.getReferences().contains(new ReferenceEntry(ref.getName(), ref.getType()))) {
 				Collections.reverse(commits);
 				selectedCommits.addAll(commits);
+				System.out.println(selectedCommits.size());
 			}
 		}
 	}

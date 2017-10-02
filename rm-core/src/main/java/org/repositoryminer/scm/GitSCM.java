@@ -8,10 +8,13 @@ import java.util.List;
 import java.util.Scanner;
 
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.LogCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.diff.DiffEntry;
 import org.eclipse.jgit.diff.DiffFormatter;
 import org.eclipse.jgit.diff.RawTextComparator;
+import org.eclipse.jgit.errors.IncorrectObjectTypeException;
+import org.eclipse.jgit.errors.MissingObjectException;
 import org.eclipse.jgit.errors.RevisionSyntaxException;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.PersonIdent;
@@ -128,14 +131,23 @@ public class GitSCM implements ISCM {
 	}
 
 	@Override
-	public List<String> getCommits(String reference) {
-		List<String> names = new ArrayList<String>();
-		try {
-			for (RevCommit revCommit : git.log().add(repository.resolve(reference)).call())
-				names.add(revCommit.getName());
-		} catch (RevisionSyntaxException | GitAPIException | IOException e) {
-			errorHandler(ErrorMessage.GIT_LOG_COMMIT_ERROR.toString(), e);
+	public List<String> getCommitsNames(Reference reference) {
+		Iterable<RevCommit> revCommits;
+		if (reference.getType() == ReferenceType.BRANCH) {
+			revCommits = getCommitsFromBranch(reference.getName());
+		} else {
+			revCommits = getCommitsFromTag(reference.getName());
 		}
+
+		if (revCommits == null) {
+			return new ArrayList<String>();
+		}
+
+		List<String> names = new ArrayList<String>();
+		for (RevCommit revCommit : revCommits) {
+			names.add(revCommit.getName());
+		}
+
 		return names;
 	}
 
@@ -264,4 +276,34 @@ public class GitSCM implements ISCM {
 		change.setLinesRemoved(removed);
 	}
 
+	private Iterable<RevCommit> getCommitsFromTag(final String refName) {
+		try {
+			final List<Ref> call = git.tagList().call();
+			for (Ref ref : call) {
+				if (ref.getName().endsWith(refName)) {
+					LogCommand log = git.log();
+					Ref peeledRef = repository.peel(ref);
+
+					if (peeledRef.getPeeledObjectId() != null)
+						return log.add(peeledRef.getPeeledObjectId()).call();
+					else
+						return log.add(ref.getObjectId()).call();
+				}
+			}
+			return null;
+		} catch (GitAPIException | IncorrectObjectTypeException | MissingObjectException e) {
+			errorHandler(ErrorMessage.GIT_BRANCH_COMMITS_ERROR.toString(), e);
+			return null;
+		}
+	}
+
+	private Iterable<RevCommit> getCommitsFromBranch(final String refName) {
+		try {
+			return git.log().add(repository.resolve(refName)).call();
+		} catch (RevisionSyntaxException | GitAPIException | IOException e) {
+			errorHandler(ErrorMessage.GIT_TAG_COMMITS_ERROR.toString(), e);
+			return null;
+		}
+	}
+	
 }
