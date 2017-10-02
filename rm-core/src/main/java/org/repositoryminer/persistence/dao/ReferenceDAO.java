@@ -1,16 +1,17 @@
 package org.repositoryminer.persistence.dao;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
-import org.repositoryminer.model.ReferenceType;
+import org.repositoryminer.domain.ReferenceType;
 
 import com.mongodb.client.model.Filters;
 
 /**
- * This class handles rm_reference collection operations.
+ * This class handles rm_reference collection.
  */
 public class ReferenceDAO extends GenericDAO {
 
@@ -45,8 +46,24 @@ public class ReferenceDAO extends GenericDAO {
 	 *            the query projection.
 	 * @return list of references.
 	 */
-	public List<Document> getByRepository(String repositoryId, Bson projection) {
+	public List<Document> findByRepository(String repositoryId, Bson projection) {
 		return findMany(Filters.eq("repository", new ObjectId(repositoryId)), projection);
+	}
+
+	/**
+	 * Finds a reference that contains certain commit.
+	 * 
+	 * @param repositoryId
+	 *            the repository id.
+	 * @param commitId
+	 *            the commit id.
+	 * @param projection
+	 *            the query projection.
+	 * @return a reference.
+	 */
+	public Document findByCommit(String repositoryId, String commitId, Bson projection) {
+		return findOne(Filters.and(Filters.eq("repository", new ObjectId(repositoryId)),
+				Filters.in("commits", Arrays.asList(commitId))), projection);
 	}
 
 	/**
@@ -63,17 +80,21 @@ public class ReferenceDAO extends GenericDAO {
 	}
 
 	/**
-	 * Retrieves a reference by name and type.
+	 * Finds a reference by name and type.
 	 * 
-	 * @param name
-	 * @param type
 	 * @param repositoryId
+	 *            the repository id
+	 * @param name
+	 *            the reference name
+	 * @param type
+	 *            the reference type
 	 * @param projection
-	 * @return
+	 *            the query projection
+	 * @return a reference.
 	 */
 	public Document findByNameAndType(String name, ReferenceType type, String repositoryId, Bson projection) {
-		return findOne(Filters.and(Filters.eq("name", name), Filters.eq("type", type.toString()), Filters.eq("repository", new ObjectId(repositoryId))),
-				projection);
+		return findOne(Filters.and(Filters.eq("repository", new ObjectId(repositoryId)), Filters.eq("name", name),
+				Filters.eq("type", type.toString())), projection);
 	}
 
 }

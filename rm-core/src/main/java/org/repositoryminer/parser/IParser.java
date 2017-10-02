@@ -27,7 +27,7 @@ public interface IParser {
 	/**
 	 * @return the programming language supported by the parser
 	 */
-	public String getLanguage();
+	public Language getLanguage();
 
 	/**
 	 * Scans the repository to find source folders.
@@ -37,4 +37,6 @@ public interface IParser {
 	 */
 	public void scanRepository(String repositoryPath);
 
+	public String[] getExtensions();
+	
 }

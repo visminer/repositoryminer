@@ -16,7 +16,7 @@ import com.mongodb.client.result.UpdateResult;
 import org.repositoryminer.persistence.Connection;
 
 /**
- * This class handles generic collections operations.
+ * This class handles a generic collection.
  */
 public class GenericDAO {
 

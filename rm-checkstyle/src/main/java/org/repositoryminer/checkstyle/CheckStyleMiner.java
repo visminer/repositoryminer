@@ -11,11 +11,11 @@ import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.repositoryminer.checkstyle.model.StyleProblem;
 import org.repositoryminer.checkstyle.persistence.CheckstyleAuditDAO;
+import org.repositoryminer.domain.Commit;
+import org.repositoryminer.domain.Reference;
+import org.repositoryminer.domain.ReferenceType;
+import org.repositoryminer.domain.Repository;
 import org.repositoryminer.exception.RepositoryMinerException;
-import org.repositoryminer.model.Commit;
-import org.repositoryminer.model.Reference;
-import org.repositoryminer.model.ReferenceType;
-import org.repositoryminer.model.Repository;
 import org.repositoryminer.persistence.dao.CommitDAO;
 import org.repositoryminer.persistence.dao.ReferenceDAO;
 import org.repositoryminer.persistence.dao.RepositoryDAO;
@@ -60,14 +60,13 @@ public class CheckStyleMiner {
 	public void execute(String name, ReferenceType type) {
 		final Document refDoc = refPersist.findByNameAndType(name, type, repository.getId(), Projections.slice("commits", 1));
 		final Reference reference = Reference.parseDocument(refDoc);
-
 		final String commitId = reference.getCommits().get(0);
 		persistAnalysis(commitId, reference);
 	}
 	
 	public void prepare() throws IOException {
 		File repositoryFolder = new File(repository.getPath());
-		String tempRepository = RMFileUtils.copyFolderToTmp(repositoryFolder.getAbsolutePath(), repository.getName());
+		tempRepository = RMFileUtils.copyFolderToTmp(repositoryFolder.getAbsolutePath(), repository.getName());
 		
 		scm = SCMFactory.getSCM(repository.getScm());
 		scm.open(tempRepository);
@@ -99,7 +98,7 @@ public class CheckStyleMiner {
 			Document doc = new Document();
 			
 			if (ref != null) {
-				doc.append("reference", ref.getName());
+				doc.append("reference", ref.getPath());
 			}
 			
 			doc.append("commit", commit.getId());

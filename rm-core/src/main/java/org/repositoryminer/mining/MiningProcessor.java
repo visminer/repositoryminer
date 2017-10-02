@@ -3,16 +3,19 @@ package org.repositoryminer.mining;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.io.FilenameUtils;
 import org.bson.Document;
-import org.repositoryminer.model.Commit;
-import org.repositoryminer.model.PersonIdent;
-import org.repositoryminer.model.Reference;
-import org.repositoryminer.model.Repository;
+import org.repositoryminer.domain.Commit;
+import org.repositoryminer.domain.PersonIdent;
+import org.repositoryminer.domain.Reference;
+import org.repositoryminer.domain.Repository;
+import org.repositoryminer.exception.RepositoryMinerException;
 import org.repositoryminer.persistence.dao.CommitDAO;
 import org.repositoryminer.persistence.dao.ReferenceDAO;
 import org.repositoryminer.persistence.dao.RepositoryDAO;
@@ -21,63 +24,9 @@ import org.repositoryminer.util.RMFileUtils;
 
 public class MiningProcessor {
 
-	private static final int COMMITS_RANGE = 3000;
-
 	private ISCM scm;
-
-	private RepositoryMiner repositoryMiner;
-
-	private List<Reference> selectedReferences = new ArrayList<Reference>();
-	private Set<String> selectedCommits = new HashSet<String>();
-	private Set<PersonIdent> contributors = new HashSet<PersonIdent>();
-
-	private void saveReferences(String repositoryId) {
-		ReferenceDAO refDocumentHandler = new ReferenceDAO();
-		List<Reference> references = scm.getReferences();
-
-		for (Reference ref : references) {
-			ref.setRepository(repositoryId);
-			ref.setCommits(scm.getCommitsNames(ref.getPath()));
-
-			Document refDoc = ref.toDocument();
-			refDocumentHandler.insert(refDoc);
-
-			saveCommits(repositoryId, ref);
-
-			// copy only the last commit in the reference after saving in the database to
-			// save memory
-			ref.setCommits(ref.getCommits().subList(0, 1));
-			ref.setId(refDoc.getObjectId("_id").toString());
-			selectedReferences.add(ref);
-		}
-	}
-
-	private int saveCommits(String repositoryId, Reference reference) {
-		CommitDAO documentHandler = new CommitDAO();
-
-		int skip = 0;
-		int acceptedCommits = 0;
-
-		List<Commit> commits = scm.getCommits(skip, COMMITS_RANGE, reference.getPath(), selectedCommits);
-
-		while (commits.size() > 0) {
-			List<Document> commitsDoc = new ArrayList<Document>();
-			acceptedCommits += commits.size();
-
-			for (Commit commit : commits) {
-				commit.setRepository(repositoryId);
-				contributors.add(commit.getCommitter());
-				commitsDoc.add(commit.toDocument());
-				selectedCommits.add(commit.getId());
-			}
-
-			documentHandler.insertMany(commitsDoc);
-			skip += COMMITS_RANGE;
-			commits = scm.getCommits(skip, COMMITS_RANGE, reference.getPath(), selectedCommits);
-		}
-
-		return acceptedCommits;
-	}
+	private RepositoryMiner rm;
+	private Set<String> selectedCommits = new LinkedHashSet<String>();
 
 	/**
 	 * Starts the mining process
@@ -89,11 +38,10 @@ public class MiningProcessor {
 	 * @throws IOException
 	 */
 	public void mine(RepositoryMiner rm) throws IOException {
-		this.repositoryMiner = rm;
-
 		File repositoryFolder = new File(rm.getRepositoryPath());
 		String tempRepo = RMFileUtils.copyFolderToTmp(repositoryFolder.getAbsolutePath(), rm.getRepositoryName());
 
+		this.rm = rm;
 		scm = rm.getScm();
 		scm.open(tempRepo);
 
@@ -109,35 +57,63 @@ public class MiningProcessor {
 		repository.setId(repoDoc.get("_id").toString());
 
 		saveReferences(repository.getId());
-		repoHandler.updateOnlyContributors(repository.getId(), PersonIdent.toDocumentList(contributors));
+		repoHandler.updateOnlyContributors(repository.getId(),
+				PersonIdent.toDocumentList(saveCommits(repository.getId())));
 
-		calculateAndDetect(tempRepo, repository.getId());
+		startCodeAnalysis(repository.getId(), tempRepo);
 
 		scm.close();
 		RMFileUtils.deleteFolder(tempRepo);
 	}
 
-	/**
-	 * Performs both the calculation (metrics) and detections (smells/debts) on the
-	 * targeted project.
-	 * 
-	 * @param repositoryMiner
-	 *            instance of {@link org.repositoryminer.mining.RepositoryMiner}
-	 * @param tempPath
-	 *            temporary repository path to access the files content
-	 * @throws IOException
-	 */
-	private void calculateAndDetect(String tempRepo, String repositoryId) throws IOException {
-		if (repositoryMiner.getDirectCodeMetrics().size() == 0 && repositoryMiner.getDirectCodeSmells().size() == 0) {
+	private void startCodeAnalysis(String repoId, String repoPath) {
+		if (!rm.hasParsers() || selectedCommits.size() == 0)
 			return;
-		}
 		
-		DirectCodeAnalysisProcessor processor = new DirectCodeAnalysisProcessor();
-		processor.setSelectedCommits(new ArrayList<String>(selectedCommits));
-		processor.setSCM(scm);
-		processor.setRepositoryMiner(repositoryMiner);
-		processor.setRepositoryData(repositoryId, tempRepo);
-		processor.start();
+		CodeAnalysisProcessor codeAnalysis = new CodeAnalysisProcessor();
+		codeAnalysis.setRepoId(repoId);
+		codeAnalysis.setRepoPath(repoPath);
+		codeAnalysis.setRm(rm);
+		codeAnalysis.setSelectedCommits(selectedCommits);
+		
+		try {
+			codeAnalysis.start();
+		} catch (IOException e) {
+			throw new RepositoryMinerException(e.getMessage());
+		}
+	}
+
+	private void saveReferences(String repositoryId) {
+		ReferenceDAO refDocumentHandler = new ReferenceDAO();
+		List<Reference> references = scm.getReferences();
+
+		for (Reference ref : references) {
+			List<String> commits = scm.getCommits(ref.getPath());
+
+			ref.setRepository(repositoryId);
+			ref.setCommits(commits);
+
+			Document refDoc = ref.toDocument();
+			refDocumentHandler.insert(refDoc);
+
+			if (rm.hasReferences()) {
+				Collections.reverse(commits);
+				selectedCommits.addAll(commits);
+			}
+		}
+	}
+
+	private Set<PersonIdent> saveCommits(String repositoryId) {
+		CommitDAO documentHandler = new CommitDAO();
+		Set<PersonIdent> contributors = new HashSet<PersonIdent>();
+
+		for (Commit commit : scm.getCommits()) {
+			commit.setRepository(repositoryId);
+			contributors.add(commit.getCommitter());
+			documentHandler.insert(commit.toDocument());
+		}
+
+		return contributors;
 	}
 
 }

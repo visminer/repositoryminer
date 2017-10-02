@@ -1,11 +1,10 @@
 package org.repositoryminer.scm;
 
-import java.util.Collection;
 import java.util.List;
 
-import org.repositoryminer.model.Commit;
-import org.repositoryminer.model.Reference;
-import org.repositoryminer.model.SCMType;
+import org.repositoryminer.domain.Commit;
+import org.repositoryminer.domain.Reference;
+import org.repositoryminer.domain.SCMType;
 
 /**
  * Interface that define what is needed to support a repository.
@@ -13,7 +12,7 @@ import org.repositoryminer.model.SCMType;
 public interface ISCM {
 
 	/**
-	 * @return The supported version control system name.
+	 * @return The supported version control system type.
 	 */
 	public SCMType getSCM();
 
@@ -26,46 +25,33 @@ public interface ISCM {
 	public void open(String path);
 
 	/**
-	 * @return List all references (e.g. tags and branches).
+	 * @return all references (e.g. tags and branches).
 	 */
 	public List<Reference> getReferences();
 
 	/**
-	 * @param skip
-	 *            defines how many commits should be skipped before the fetch.
-	 * @param maxCount
-	 *            defines how many commits should be fetch.
-	 * @param endPoint
-	 *            defines the end point.
-	 * @param commitsToSkip
-	 *            defines which commits should not be processed and returned
-	 * @return the commits until some point.
+	 * @return all commits.
 	 */
-	public List<Commit> getCommits(int skip, int maxCount, String endPoint, Collection<String> commitsToSkip);
+	public List<Commit> getCommits();
 
 	/**
-	 * @param endPoint
-	 *            defines the end point.
-	 * @return the commits names until some point.
+	 * @param reference
+	 *            the reference name.
+	 * @return all commits associated to the reference.
 	 */
-	public List<String> getCommitsNames(String endPoint);
+	public List<String> getCommits(String reference);
 
 	/**
 	 * Does a checkout to a given point.
 	 * 
-	 * @param hash
-	 *            defines the checkout point.
+	 * @param point
+	 *            the checkout point.
 	 */
-	public void checkout(String hash);
+	public void checkout(String point);
 
 	/**
 	 * Terminates the analysis and free resources.
 	 */
 	public void close();
-
-	/**
-	 * Resets the current repository state.
-	 */
-	public void reset();
 
 }

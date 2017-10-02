@@ -1,6 +1,6 @@
 package org.repositoryminer.scm;
 
-import org.repositoryminer.model.SCMType;
+import org.repositoryminer.domain.SCMType;
 
 public class SCMFactory {
 

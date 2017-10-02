@@ -1,12 +1,12 @@
 package org.repositoryminer.mining;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
-import org.repositoryminer.codemetric.direct.IDirectCodeMetric;
-import org.repositoryminer.codesmell.direct.IDirectCodeSmell;
+import org.repositoryminer.codesmell.ICodeSmell;
+import org.repositoryminer.metric.IMetric;
 import org.repositoryminer.parser.IParser;
+import org.repositoryminer.persistence.dao.RepositoryDAO;
 import org.repositoryminer.scm.ISCM;
 
 public class RepositoryMiner {
@@ -17,30 +17,47 @@ public class RepositoryMiner {
 	private String repositoryDescription;
 	
 	private ISCM scm;
-
 	private List<IParser> parsers;
-	private List<IDirectCodeMetric> directCodeMetrics;
-	private List<IDirectCodeSmell> directCodeSmells;
-
+	private List<IMetric> metrics;
+	private List<ICodeSmell> codeSmells;
 	private List<String> references;
 
 	public void mine() throws IOException {
-		MiningProcessor processor = new MiningProcessor();
-		processor.mine(this);
+		RepositoryDAO repoDocHandler = new RepositoryDAO();
+		if (!repoDocHandler.wasMined(repositoryKey)) {
+			MiningProcessor processor = new MiningProcessor();
+			processor.mine(this);
+		}
+	}
+
+	public boolean hasParsers() {
+		return parsers != null && parsers.size() > 0;
+	}
+	
+	public boolean hasMetrics() {
+		return metrics != null && metrics.size() > 0;
+	}
+	
+	public boolean hasCodeSmells() {
+		return codeSmells != null && codeSmells.size() > 0;
+	}
+	
+	public boolean hasReferences() {
+		return references != null && references.size() > 0;
 	}
 	
 	/*** Getters and Setters ***/
-
-	public String getRepositoryPath() {
-		return repositoryPath;
-	}
-
+	
 	public String getRepositoryKey() {
 		return repositoryKey;
 	}
 
 	public void setRepositoryKey(String repositoryKey) {
 		this.repositoryKey = repositoryKey;
+	}
+
+	public String getRepositoryPath() {
+		return repositoryPath;
 	}
 
 	public void setRepositoryPath(String repositoryPath) {
@@ -79,26 +96,20 @@ public class RepositoryMiner {
 		this.parsers = parsers;
 	}
 
-	public List<IDirectCodeMetric> getDirectCodeMetrics() {
-		if (directCodeMetrics == null) {
-			directCodeMetrics = new ArrayList<IDirectCodeMetric>();
-		}
-		return directCodeMetrics;
+	public List<IMetric> getMetrics() {
+		return metrics;
 	}
 
-	public void setDirectCodeMetrics(List<IDirectCodeMetric> directCodeMetrics) {
-		this.directCodeMetrics = directCodeMetrics;
+	public void setMetrics(List<IMetric> metrics) {
+		this.metrics = metrics;
 	}
 
-	public List<IDirectCodeSmell> getDirectCodeSmells() {
-		if (directCodeSmells == null) {
-			directCodeSmells = new ArrayList<IDirectCodeSmell>();
-		}
-		return directCodeSmells;
+	public List<ICodeSmell> getCodeSmells() {
+		return codeSmells;
 	}
 
-	public void setDirectCodeSmells(List<IDirectCodeSmell> directCodeSmells) {
-		this.directCodeSmells = directCodeSmells;
+	public void setCodeSmells(List<ICodeSmell> codeSmells) {
+		this.codeSmells = codeSmells;
 	}
 
 	public List<String> getReferences() {

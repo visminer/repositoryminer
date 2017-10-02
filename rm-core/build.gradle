@@ -4,7 +4,7 @@ apply plugin: 'maven'
 group = 'org.repositoryminer'
 version = '1.7'
 
-description = 'RepositoryMiner'
+description = 'RepositoryMiner Core'
 
 sourceCompatibility = 1.7
 targetCompatibility = 1.7

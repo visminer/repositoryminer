@@ -8,8 +8,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.repositoryminer.codemetric.direct.MetricId;
-import org.repositoryminer.codesmell.direct.CodeSmellId;
+import org.repositoryminer.codesmell.CodeSmellID;
+import org.repositoryminer.metric.MetricID;
 
 /**
  * This class represents an abstract type declaration.
@@ -24,8 +24,8 @@ public class AbstractType {
 	private NodeType nodeType;
 	private List<AbstractMethod> methods;
 	private List<AbstractField> fields;
-	private Map<MetricId, Object> metrics = new HashMap<MetricId, Object>();
-	private Set<CodeSmellId> codeSmells = new HashSet<CodeSmellId>();
+	private Map<MetricID, Object> metrics = new HashMap<MetricID, Object>();
+	private Set<CodeSmellID> codeSmells = new HashSet<CodeSmellID>();
 
 	public String getName() {
 		return name;
@@ -75,13 +75,13 @@ public class AbstractType {
 		this.fields = fields;
 	}
 
-	public Map<MetricId, Object> getMetrics() {
+	public Map<MetricID, Object> getMetrics() {
 		return metrics;
 	}
 
 	public Map<String, Object> convertMetrics() {
 		Map<String, Object> result = new HashMap<String, Object>();
-		for (Entry<MetricId, Object> entry : metrics.entrySet()) {
+		for (Entry<MetricID, Object> entry : metrics.entrySet()) {
 			result.put(entry.getKey().toString(), entry.getValue());
 		}
 		return result;
@@ -89,21 +89,21 @@ public class AbstractType {
 	
 	public List<String> convertCodeSmells() {
 		List<String> result = new ArrayList<String>();
-		for (CodeSmellId codeSmell : codeSmells) {
+		for (CodeSmellID codeSmell : codeSmells) {
 			result.add(codeSmell.toString());
 		}
 		return result;
 	}
 	
-	public void setMetrics(Map<MetricId, Object> metrics) {
+	public void setMetrics(Map<MetricID, Object> metrics) {
 		this.metrics = metrics;
 	}
 
-	public Set<CodeSmellId> getCodeSmells() {
+	public Set<CodeSmellID> getCodeSmells() {
 		return codeSmells;
 	}
 
-	public void setCodeSmells(Set<CodeSmellId> codeSmells) {
+	public void setCodeSmells(Set<CodeSmellID> codeSmells) {
 		this.codeSmells = codeSmells;
 	}
 

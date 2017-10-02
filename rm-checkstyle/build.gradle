@@ -4,7 +4,7 @@ apply plugin: 'maven'
 group = 'org.repositoryminer.checkstyle'
 version = '1.7'
 
-description = 'RepositoryMiner CheckStyle Module'
+description = 'RepositoryMiner CheckStyle Integration'
 
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
@@ -29,4 +29,5 @@ dependencies {
 	compile group: 'com.puppycrawl.tools', name: 'checkstyle', version: '7.4'
     compile group: 'org.mongodb', name: 'mongo-java-driver', version:'3.2.2'
     compile group: 'commons-io', name: 'commons-io', version: '2.5'
+    compile group: 'org.slf4j', name: 'slf4j-simple', version:'1.7.21'
 }

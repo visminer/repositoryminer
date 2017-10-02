@@ -11,7 +11,7 @@ import com.mongodb.client.MongoCursor;
 import com.mongodb.client.model.Filters;
 
 /**
- * This class handles rm_commit collection operations.
+ * This class handles rm_commit collection.
  */
 public class CommitDAO extends GenericDAO {
 

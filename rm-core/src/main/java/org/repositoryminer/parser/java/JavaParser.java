@@ -14,6 +14,7 @@ import org.repositoryminer.ast.AbstractMethod;
 import org.repositoryminer.exception.ErrorMessage;
 import org.repositoryminer.exception.RepositoryMinerException;
 import org.repositoryminer.parser.IParser;
+import org.repositoryminer.parser.Language;
 
 /**
  * Java AST generator
@@ -25,6 +26,8 @@ import org.repositoryminer.parser.IParser;
 
 public class JavaParser implements IParser {
 
+	private static final String[] EXTENSIONS = {"java"};
+	
 	private List<String[]> srcFolders = new ArrayList<String[]>();
 	private String[] classpath = new String[1];
 	
@@ -42,6 +45,11 @@ public class JavaParser implements IParser {
 	}
 
 	@Override
+	public String[] getExtensions() {
+		return EXTENSIONS;
+	}
+	
+	@Override
 	public boolean accept(String filepath) {
 		if(filepath.endsWith(".java")) {
 				if (currSrcFolder == null || currSrcFolder.length == 0) {
@@ -58,8 +66,8 @@ public class JavaParser implements IParser {
 	}
 
 	@Override
-	public String getLanguage() {
-		return "java";
+	public Language getLanguage() {
+		return Language.JAVA;
 	}
 
 	@Override

@@ -3,12 +3,13 @@ package org.repositoryminer.persistence.dao;
 import java.util.List;
 
 import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 
 import com.mongodb.client.model.Filters;
 
 /**
- * This class handles rm_repository collection operations.
+ * This class handles rm_repository collection.
  */
 public class RepositoryDAO extends GenericDAO {
 
@@ -19,14 +20,27 @@ public class RepositoryDAO extends GenericDAO {
 	}
 
 	/**
+	 * Finds a repository by its key.
+	 * 
+	 * @param key
+	 *            the repository key.
+	 * @param projection
+	 *            the query projection.
+	 * @return the found repository.
+	 */
+	public Document findByKey(String key, Bson projection) {
+		return findOne(Filters.eq("key", key), projection);
+	}
+
+	/**
 	 * Checks if a repository was already mined.
 	 * 
 	 * @param id
 	 *            the repository id.
 	 * @return true if the repository was mined or false otherwise.
 	 */
-	public boolean wasMined(String id) {
-		return super.count(Filters.eq("_id", id)) > 0;
+	public boolean wasMined(String key) {
+		return super.count(Filters.eq("key", key)) > 0;
 	}
 
 	/**
@@ -38,7 +52,8 @@ public class RepositoryDAO extends GenericDAO {
 	 *            the contributors.
 	 */
 	public void updateOnlyContributors(String id, List<Document> contributors) {
-		collection.updateOne(Filters.eq("_id", new ObjectId(id)), new Document("$set", new Document("contributors", contributors)));
+		collection.updateOne(Filters.eq("_id", new ObjectId(id)),
+				new Document("$set", new Document("contributors", contributors)));
 	}
 
 }

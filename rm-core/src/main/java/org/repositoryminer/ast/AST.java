@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.repositoryminer.codemetric.direct.MetricId;
+import org.repositoryminer.metric.MetricID;
 
 /**
  * This class represents the file and is also the Abstract Syntax Tree root
@@ -20,7 +20,7 @@ public class AST {
 	private List<AbstractMethod> methods;
 	private List<AbstractImport> imports;
 	private String packageDeclaration;
-	private Map<MetricId, Object> metrics = new HashMap<MetricId, Object>();
+	private Map<MetricID, Object> metrics = new HashMap<MetricID, Object>();
 
 	public String getName() {
 		return name;
@@ -78,17 +78,17 @@ public class AST {
 		this.packageDeclaration = packageDeclaration;
 	}
 
-	public Map<MetricId, Object> getMetrics() {
+	public Map<MetricID, Object> getMetrics() {
 		return metrics;
 	}
 
-	public void setMetrics(Map<MetricId, Object> metrics) {
+	public void setMetrics(Map<MetricID, Object> metrics) {
 		this.metrics = metrics;
 	}
 
 	public Map<String, Object> convertMetrics() {
 		Map<String, Object> result = new HashMap<String, Object>();
-		for (Entry<MetricId, Object> entry : metrics.entrySet()) {
+		for (Entry<MetricID, Object> entry : metrics.entrySet()) {
 			result.put(entry.getKey().toString(), entry.getValue());
 		}
 		return result;
