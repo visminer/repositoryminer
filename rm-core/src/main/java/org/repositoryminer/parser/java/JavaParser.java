@@ -4,7 +4,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.dom.ASTParser;
@@ -26,39 +28,23 @@ import org.repositoryminer.parser.Language;
 
 public class JavaParser implements IParser {
 
-	private static final String[] EXTENSIONS = {"java"};
-	
-	private List<String[]> srcFolders;
-	private String[] classpath = new String[1];
-	
-	private String[] classpathSrcFolder;
-	private String[] currSrcFolder;
-	private String[] encoding;
+	private static final String[] EXTENSIONS = { "java", "jar" };
+
 	private ASTParser parser = ASTParser.newParser(org.eclipse.jdt.core.dom.AST.JLS8);
+	private String[] classpath;
+	private String[] srcFolders;
+	private String[] encoding;
 
-	public JavaParser() {
-		classpath[0] = FilenameUtils.normalize(System.getProperty("java.home"), true) + "/lib/rt.jar";
-	}
-
+	private List<String> userClasspath;
+	
 	@Override
 	public String[] getExtensions() {
 		return EXTENSIONS;
 	}
-	
+
 	@Override
 	public boolean accept(String filepath) {
-		if(filepath.endsWith(".java")) {
-				if (currSrcFolder == null || currSrcFolder.length == 0) {
-					return true;
-				}
-				
-				for (String folder : currSrcFolder) {
-					if (filepath.startsWith(folder)) {
-						return true;
-					}
-				}
-			}
-		return false;
+		return filepath.endsWith(".java");
 	}
 
 	@Override
@@ -68,31 +54,21 @@ public class JavaParser implements IParser {
 
 	@Override
 	public void scanRepository(String repositoryPath) {
-		currSrcFolder = null;
-		if (srcFolders == null || srcFolders.size() == 0) {
-			return;
+		List<File> files = (List<File>) FileUtils.listFiles(new File(repositoryPath), EXTENSIONS, true);
+		Set<String> jars = SrcFolderDetector.findJars(files);
+		Set<String> folders = SrcFolderDetector.findSrcFolders(files);
+
+		encoding = new String[folders.size()];
+		Arrays.fill(encoding, "UTF-8");
+		srcFolders = folders.toArray(new String[folders.size()]);
+
+		List<String> classpathTemp = new ArrayList<String>();
+		classpathTemp.add(System.getProperty("java.home").replace("\\", "/") + "/lib/rt.jar");
+		classpathTemp.addAll(jars);
+		if (userClasspath != null) {
+			classpathTemp.addAll(userClasspath);
 		}
-		
-		for (String[] folders : srcFolders) {
-			boolean selected = true;
-			for (String folder : folders) {
-				if (!new File(repositoryPath, folder).exists()) {
-					selected = false;
-					break;
-				}
-			}
-			
-			if (selected) {
-				currSrcFolder = folders;
-				encoding = new String[currSrcFolder.length];
-				Arrays.fill(encoding, "utf-8");
-				
-				classpathSrcFolder = new String[currSrcFolder.length];
-				for (int i = 0; i < currSrcFolder.length; i++)
-					classpathSrcFolder[i] = repositoryPath+"/"+currSrcFolder[i];
-				break;
-			}
-		}
+		classpath = classpathTemp.toArray(new String[classpathTemp.size()]);
 	}
 
 	@Override
@@ -107,11 +83,7 @@ public class JavaParser implements IParser {
 		parser.setCompilerOptions(JavaCore.getOptions());
 		parser.setUnitName(filename);
 
-		if (currSrcFolder != null)
-			parser.setEnvironment(classpath, classpathSrcFolder, encoding, true);
-		else
-			parser.setEnvironment(classpath, null, null, true);
-		
+		parser.setEnvironment(classpath, srcFolders, encoding, true);
 		parser.setSource(source.toCharArray());
 
 		CompilationUnit cu = (CompilationUnit) parser.createAST(null);
@@ -131,21 +103,28 @@ public class JavaParser implements IParser {
 		return ast;
 	}
 
-	public List<String[]> getSrcFolders() {
-		return srcFolders;
+	public List<String> getUserClasspath() {
+		return userClasspath;
 	}
 
-	public void setSrcFolders(List<String[]> srcFolders) {
-		this.srcFolders = srcFolders;
-	}
+	public void setUserClasspath(List<String> userClasspath) {
+		if (userClasspath == null)
+			return;
 
-	public String[] getClasspath() {
-		return classpath;
-	}
+		String[] exts = { "jar" };
+		List<String> jarFiles = new ArrayList<String>();
 
-	public void setClasspath(String[] classpath) {
-		this.classpath = Arrays.copyOf(classpath, classpath.length + 1);
-		this.classpath[this.classpath.length - 1] = FilenameUtils.normalize(System.getProperty("java.home"), true) + "/lib/rt.jar";
+		for (String file : userClasspath) {
+			if (FilenameUtils.isExtension(file, "jar")) {
+				jarFiles.add(file);
+			} else {
+				List<File> jars = (List<File>) FileUtils.listFiles(new File(file), exts, true);
+				for (File jar : jars)
+					jarFiles.add(jar.getAbsolutePath());
+			}
+		}
+
+		this.userClasspath = jarFiles;
 	}
 
 }

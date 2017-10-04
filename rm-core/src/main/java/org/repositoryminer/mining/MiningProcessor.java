@@ -99,7 +99,6 @@ public class MiningProcessor {
 			if (rm.hasReferences() && rm.getReferences().contains(new ReferenceEntry(ref.getName(), ref.getType()))) {
 				Collections.reverse(commits);
 				selectedCommits.addAll(commits);
-				System.out.println(selectedCommits.size());
 			}
 		}
 	}
