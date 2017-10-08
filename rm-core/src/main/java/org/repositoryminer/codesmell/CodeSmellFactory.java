@@ -2,7 +2,7 @@ package org.repositoryminer.codesmell;
 
 public class CodeSmellFactory {
 
-	public static ICodeSmell getDirectCodeSmell(CodeSmellID id) {
+	public static ICodeSmell getCodeSmell(CodeSmellID id) {
 		switch (id) {
 		case BRAIN_CLASS:
 			return new BrainClass();

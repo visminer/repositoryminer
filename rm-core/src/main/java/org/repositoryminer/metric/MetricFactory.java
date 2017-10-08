@@ -2,7 +2,7 @@ package org.repositoryminer.metric;
 
 public class MetricFactory {
 
-	public static IMetric getDirectCodeMetric(MetricID id) {
+	public static IMetric getMetric(MetricID id) {
 		switch (id) {
 		case AMW:
 			return new AMW();

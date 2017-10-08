@@ -146,7 +146,7 @@ public class CodeAnalysisProcessor {
 		if (metricParam.getRequiredMetrics() != null) {
 			for (MetricID id: metricParam.getRequiredMetrics()) {
 				if (!metrics.containsKey(id)) {
-					IMetric metric = MetricFactory.getDirectCodeMetric(id);
+					IMetric metric = MetricFactory.getMetric(id);
 					if (metric.getRequiredMetrics() == null)
 						metrics.put(id, metric);
 					else
@@ -162,7 +162,7 @@ public class CodeAnalysisProcessor {
 	private void visitCodeSmell(ICodeSmell codeSmellParam) {
 		if (codeSmellParam.getRequiredMetrics() != null) {
 			for (MetricID id : codeSmellParam.getRequiredMetrics()) {
-				IMetric metric = MetricFactory.getDirectCodeMetric(id);
+				IMetric metric = MetricFactory.getMetric(id);
 				visitMetric(metric);
 			}
 		}
@@ -170,7 +170,7 @@ public class CodeAnalysisProcessor {
 		if (codeSmellParam.getRequiredCodeSmells() != null) {
 			for (CodeSmellID id : codeSmellParam.getRequiredCodeSmells()) {
 				if (!codeSmells.containsKey(id)) {
-					ICodeSmell codeSmell = CodeSmellFactory.getDirectCodeSmell(id);
+					ICodeSmell codeSmell = CodeSmellFactory.getCodeSmell(id);
 					if (codeSmell.getRequiredCodeSmells() == null)
 						codeSmells.put(id, codeSmell);
 					else

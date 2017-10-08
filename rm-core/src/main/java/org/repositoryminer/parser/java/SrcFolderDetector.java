@@ -1,4 +1,5 @@
 package org.repositoryminer.parser.java;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -30,7 +31,7 @@ public class SrcFolderDetector {
 			BufferedReader buffer = null;
 			try {
 				buffer = new BufferedReader(new FileReader(file));
-				
+
 				String line = null;
 				String pkg = null;
 
@@ -48,7 +49,7 @@ public class SrcFolderDetector {
 					String folder = file.getParentFile().getAbsolutePath();
 					srcFolders.add(folder.substring(0, folder.length() - pkg.length() - 1));
 				}
-				
+
 				buffer.close();
 			} catch (IOException e) {
 				continue;
@@ -60,9 +61,8 @@ public class SrcFolderDetector {
 						continue;
 					}
 			}
-			
-		}
 
+		}
 
 		return srcFolders;
 	}
