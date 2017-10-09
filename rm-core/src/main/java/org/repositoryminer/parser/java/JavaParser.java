@@ -38,11 +38,6 @@ public class JavaParser implements IParser {
 	private List<String> userClasspath;
 	
 	@Override
-	public String[] getExtensions() {
-		return EXTENSIONS;
-	}
-
-	@Override
 	public boolean accept(String filepath) {
 		return filepath.endsWith(".java");
 	}

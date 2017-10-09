@@ -8,8 +8,6 @@ import org.repositoryminer.ast.AST;
 public interface IParser {
 
 	/**
-	 * @param project
-	 *            the project path.
 	 * @param filename
 	 *            the file path.
 	 * @param source
@@ -30,13 +28,10 @@ public interface IParser {
 	public Language getLanguage();
 
 	/**
-	 * Scans the repository to find source folders.
+	 * Access the repository to do some preparations (e.g. scan the repository to find source folders).
 	 * 
-	 * @param project
-	 *            the project path.
+	 * @param repositoryPath the repository path.
 	 */
 	public void scanRepository(String repositoryPath);
 
-	public String[] getExtensions();
-	
 }
