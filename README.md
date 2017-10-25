@@ -43,45 +43,47 @@ import org.repositoryminer.scm.GitSCM;
 
 public class Main {
 	public static void main(String[] args) throws IOException {
-		// Connects with the database
+		// Connects with the database.
 		Connection conn = Connection.getInstance();
 		conn.connect("mongodb://localhost", "test_database");
 
-		// This class is the main interface of core module
+		// This class is the main interface of core module.
 		RepositoryMiner rm = new RepositoryMiner();
 
-		// Here we set the basic repository informations
+		// Here we set the basic repository informations.
+		// Pay attention to rm.setRepositoryKey, in this method you will 
+		// set an unique identifier for the repository.
 		rm.setRepositoryKey("junit4");
 		rm.setRepositoryName("Junit4");
 		rm.setRepositoryDescription("A programmer-oriented testing framework for Java.");
 		rm.setRepositoryPath("/home/felipe/git/junit4");
 
-		// Here we set the SCM
+		// Here we set the SCM.
 		rm.setScm(new GitSCM());
 
 		// The steps below are optional, if you no want to do any code analysis just
-		// call rm.mine method
+		// call rm.mine method.
 
-		// Here we set the parser for the programming languages
+		// Here we set the parser for the programming languages.
 		List<IParser> parsers = new ArrayList<>();
 		parsers.add(new JavaParser());
 		rm.setParsers(parsers);
 
-		// Here we set the software metrics
+		// Here we set the software metrics.
 		List<IMetric> metrics = Arrays.asList(new LOC(), new CYCLO());
 		rm.setMetrics(metrics);
 
-		// Here we set the code smells
+		// Here we set the code smells.
 		List<ICodeSmell> codeSmells = Arrays.asList(new GodClass(), new LongMethod());
 		rm.setCodeSmells(codeSmells);
 
 		// Here we set the references(tag or branches) that we want to perform the code
-		// analysis
+		// analysis.
 		Set<ReferenceEntry> refs = new HashSet<ReferenceEntry>();
 		refs.add(new ReferenceEntry("master", ReferenceType.BRANCH));
 		rm.setReferences(refs);
 
-		// This method starts the mining
+		// This method starts the mining.
 		rm.mine();
 	}
 }
