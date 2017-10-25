@@ -24,7 +24,7 @@ Below we show how execute the modules, take a  look at our wiki too. There we pr
 
 ## RM-Core
 
-Below follows an example how to execute the rm-core project. This code is just a sample, for more options of metrics check the package `org.repositoryminer.metric`, for more Code Smells check `org.repositoryminer.codesmell` and for more parsers check `org.repositoryminer.parser`.
+Below follows an example how to execute the rm-core project. This code is just a sample, for more options of metrics check the package `org.repositoryminer.metric`, for more Code Smells checks `org.repositoryminer.codesmell` and for more parsers checks `org.repositoryminer.parser`.
 
 ```java
 import org.repositoryminer.codesmell.GodClass;
