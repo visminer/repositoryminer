@@ -22,6 +22,71 @@ The API is very simple and straight foward. After added our project as dependenc
 
 Below we show how execute the modules, take a  look at our wiki too. There we provide some explanations and interesting link about the tool.
 
+## RM-Core
+
+Below follows an example how to execute the rm-core project. This code is just a sample, for more options of metrics check the package `org.repositoryminer.metric`, for more Code Smells check `org.repositoryminer.codesmell` and for more parsers check `org.repositoryminer.parser`.
+
+```java
+import org.repositoryminer.codesmell.GodClass;
+import org.repositoryminer.codesmell.ICodeSmell;
+import org.repositoryminer.codesmell.LongMethod;
+import org.repositoryminer.domain.ReferenceType;
+import org.repositoryminer.metric.CYCLO;
+import org.repositoryminer.metric.IMetric;
+import org.repositoryminer.metric.LOC;
+import org.repositoryminer.mining.ReferenceEntry;
+import org.repositoryminer.mining.RepositoryMiner;
+import org.repositoryminer.parser.IParser;
+import org.repositoryminer.parser.java.JavaParser;
+import org.repositoryminer.persistence.Connection;
+import org.repositoryminer.scm.GitSCM;
+
+public class Main {
+	public static void main(String[] args) throws IOException {
+		// Connects with the database
+		Connection conn = Connection.getInstance();
+		conn.connect("mongodb://localhost", "test_database");
+
+		// This class is the main interface of core module
+		RepositoryMiner rm = new RepositoryMiner();
+
+		// Here we set the basic repository informations
+		rm.setRepositoryKey("junit4");
+		rm.setRepositoryName("Junit4");
+		rm.setRepositoryDescription("A programmer-oriented testing framework for Java.");
+		rm.setRepositoryPath("/home/felipe/git/junit4");
+
+		// Here we set the SCM
+		rm.setScm(new GitSCM());
+
+		// The steps below are optional, if you no want to do any code analysis just
+		// call rm.mine method
+
+		// Here we set the parser for the programming languages
+		List<IParser> parsers = new ArrayList<>();
+		parsers.add(new JavaParser());
+		rm.setParsers(parsers);
+
+		// Here we set the software metrics
+		List<IMetric> metrics = Arrays.asList(new LOC(), new CYCLO());
+		rm.setMetrics(metrics);
+
+		// Here we set the code smells
+		List<ICodeSmell> codeSmells = Arrays.asList(new GodClass(), new LongMethod());
+		rm.setCodeSmells(codeSmells);
+
+		// Here we set the references(tag or branches) that we want to perform the code
+		// analysis
+		Set<ReferenceEntry> refs = new HashSet<ReferenceEntry>();
+		refs.add(new ReferenceEntry("master", ReferenceType.BRANCH));
+		rm.setReferences(refs);
+
+		// This method starts the mining
+		rm.mine();
+	}
+}
+```
+
 # How do I cite RepositoryMiner?
 ```
 @INPROCEEDINGS{170925,
