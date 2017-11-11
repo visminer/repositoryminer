@@ -1,0 +1,1 @@
+include ":repositoryminer", ":repositoryminer-checkstyle", ":repositoryminer-findbugs", ":repositoryminer-metrics", ":repositoryminer-pmd", ":repositoryminer-web-scm"
