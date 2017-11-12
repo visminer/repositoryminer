@@ -19,7 +19,7 @@ repositories {
 }
 
 dependencies {
-    compile project(':repositoryminer')
+    compile project(':repositoryminer-core')
     compile group: 'org.mongodb', name: 'mongo-java-driver', version:'3.2.2'
     compile group: 'org.slf4j', name: 'slf4j-simple', version:'1.7.21'
     compile group: 'commons-io', name: 'commons-io', version: '2.5'
