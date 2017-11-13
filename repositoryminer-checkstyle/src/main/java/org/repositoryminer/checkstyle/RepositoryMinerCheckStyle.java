@@ -16,10 +16,10 @@ import org.repositoryminer.util.StringUtils;
 
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 
-public class RMCheckStyle extends SnapshotAnalysisPlugin<CheckStyleConfig> {
+public class RepositoryMinerCheckStyle extends SnapshotAnalysisPlugin<CheckStyleConfig> {
 
 	@Override
-	public boolean run(String snapshot, CheckStyleConfig config) {
+	public void run(String snapshot, CheckStyleConfig config) {
 		scm.checkout(snapshot);
 		CheckStyleExecutor executor = new CheckStyleExecutor(tmpRepository);
 		
@@ -47,7 +47,7 @@ public class RMCheckStyle extends SnapshotAnalysisPlugin<CheckStyleConfig> {
 
 		List<Document> documents = new ArrayList<Document>(result.size());
 		for (Entry<String, List<StyleProblem>> file : result.entrySet()) {
-			Document doc = new Document("commit", commit.getId()).
+			Document doc = new Document("commit", commit.getHash()).
 					append("filehash", StringUtils.encodeToCRC32(file.getKey())).
 					append("commit_date", commit.getCommitterDate()).
 					append("repository", repositoryId).
@@ -58,7 +58,6 @@ public class RMCheckStyle extends SnapshotAnalysisPlugin<CheckStyleConfig> {
 		}
 
 		new CheckstyleAuditDAO().insertMany(documents);
-		return true;
 	}
 
 }

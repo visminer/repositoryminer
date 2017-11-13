@@ -17,7 +17,7 @@ import org.repositoryminer.web.scm.hostingservice.HostingServiceType;
  * <b>We encourage the use of access tokens instead of passwords, because is
  * more secure.</b>
  */
-public class RemoteMiningConfig {
+public class WebSCMConfig {
 
 	private String owner;
 	private String name;
@@ -40,7 +40,7 @@ public class RemoteMiningConfig {
 	 *            service.
 	 * 
 	 */
-	public RemoteMiningConfig(String owner, String name, HostingServiceType serviceType, String username,
+	public WebSCMConfig(String owner, String name, HostingServiceType serviceType, String username,
 			String token) {
 		this.owner = owner;
 		this.name = name;
@@ -53,7 +53,7 @@ public class RemoteMiningConfig {
 		return owner;
 	}
 
-	public RemoteMiningConfig setOwner(String owner) {
+	public WebSCMConfig setOwner(String owner) {
 		this.owner = owner;
 		return this;
 	}
@@ -62,7 +62,7 @@ public class RemoteMiningConfig {
 		return name;
 	}
 
-	public RemoteMiningConfig setName(String name) {
+	public WebSCMConfig setName(String name) {
 		this.name = name;
 		return this;
 	}
@@ -71,7 +71,7 @@ public class RemoteMiningConfig {
 		return serviceType;
 	}
 
-	public RemoteMiningConfig setServiceType(HostingServiceType serviceType) {
+	public WebSCMConfig setServiceType(HostingServiceType serviceType) {
 		this.serviceType = serviceType;
 		return this;
 	}

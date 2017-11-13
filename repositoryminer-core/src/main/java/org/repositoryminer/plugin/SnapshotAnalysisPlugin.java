@@ -34,7 +34,7 @@ public abstract class SnapshotAnalysisPlugin<T> {
 		scm.open(tmpRepository);
 	}
 
-	public abstract boolean run(String snapshot, T config);
+	public abstract void run(String snapshot, T config);
 
 	public void finish() throws IOException {
 		scm.close();

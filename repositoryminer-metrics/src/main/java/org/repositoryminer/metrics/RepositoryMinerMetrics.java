@@ -16,10 +16,10 @@ import org.repositoryminer.metrics.parser.Parser;
 import org.repositoryminer.metrics.persistence.CodeAnalysisConfigDAO;
 import org.repositoryminer.plugin.SnapshotAnalysisPlugin;
 
-public class RMMetrics extends SnapshotAnalysisPlugin<MetricsConfig> {
+public class RepositoryMinerMetrics extends SnapshotAnalysisPlugin<MetricsConfig> {
 
 	@Override
-	public boolean run(String snapshot, MetricsConfig config) {
+	public void run(String snapshot, MetricsConfig config) {
 		if (!config.isValid()) {
 			throw new RepositoryMinerException(
 					"Invalid configuration, check if has parser and code metrics or codes mells.");
@@ -39,8 +39,6 @@ public class RMMetrics extends SnapshotAnalysisPlugin<MetricsConfig> {
 		} catch (IOException e) {
 			throw new RepositoryMinerException(e);
 		}
-
-		return true;
 	}
 
 	private ObjectId persistAnalysisConfig(List<Parser> usedParsers, Collection<CodeMetric> calculatedMetrics,

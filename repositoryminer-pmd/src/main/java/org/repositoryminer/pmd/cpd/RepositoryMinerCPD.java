@@ -11,10 +11,10 @@ import org.repositoryminer.plugin.SnapshotAnalysisPlugin;
 import org.repositoryminer.pmd.cpd.model.Occurrence;
 import org.repositoryminer.pmd.cpd.persistence.CPDDAO;
 
-public class RMCPD extends SnapshotAnalysisPlugin<CPDConfig> {
+public class RepositoryMinerCPD extends SnapshotAnalysisPlugin<CPDConfig> {
 
 	@Override
-	public boolean run(String snapshot, CPDConfig config) {
+	public void run(String snapshot, CPDConfig config) {
 		scm.checkout(snapshot);
 
 		CPDExecutor cpdExecutor = new CPDExecutor(tmpRepository);
@@ -38,7 +38,7 @@ public class RMCPD extends SnapshotAnalysisPlugin<CPDConfig> {
 
 		List<Document> documents = new ArrayList<Document>(occurrences.size());
 		for (Occurrence occurence : occurrences) {
-			Document doc = new Document("commit", commit.getId()).
+			Document doc = new Document("commit", commit.getHash()).
 					append("commit_date", commit.getCommitterDate()).
 					append("repository", repositoryId).
 					append("tokens_threshold", config.getTokensThreshold());
@@ -48,8 +48,6 @@ public class RMCPD extends SnapshotAnalysisPlugin<CPDConfig> {
 		}
 
 		new CPDDAO().insertMany(documents);
-
-		return true;
 	}
 
 }

@@ -28,7 +28,7 @@ import edu.umd.cs.findbugs.Priorities;
 import edu.umd.cs.findbugs.config.AnalysisFeatureSetting;
 import edu.umd.cs.findbugs.config.UserPreferences;
 
-public class RMFindBugs extends SnapshotAnalysisPlugin<FindBugsConfig> {
+public class RepositoryMinerFindBugs extends SnapshotAnalysisPlugin<FindBugsConfig> {
 
 	private static final String[] EXTENSION_FILE_FILTER = { "java" };
 
@@ -51,7 +51,7 @@ public class RMFindBugs extends SnapshotAnalysisPlugin<FindBugsConfig> {
 	}
 
 	@Override
-	public boolean run(String snapshot, FindBugsConfig config) {
+	public void run(String snapshot, FindBugsConfig config) {
 		scm.checkout(snapshot);
 
 		FindBugsExecutor findBugsExecutor = new FindBugsExecutor();
@@ -78,7 +78,7 @@ public class RMFindBugs extends SnapshotAnalysisPlugin<FindBugsConfig> {
 		List<Document> documents = new ArrayList<>();
 
 		for (Entry<String, List<ReportedBug>> bug : reportedBugs.entrySet()) {
-			Document doc = new Document("commit", commit.getId()).append("commit_date", commit.getCommitterDate())
+			Document doc = new Document("commit", commit.getHash()).append("commit_date", commit.getCommitterDate())
 					.append("repository", repositoryId);
 
 			String filename = null;
@@ -96,7 +96,6 @@ public class RMFindBugs extends SnapshotAnalysisPlugin<FindBugsConfig> {
 		}
 
 		new FindBugsDAO().insertMany(documents);
-		return true;
 	}
 
 	private List<String> getFiles(String dir) {

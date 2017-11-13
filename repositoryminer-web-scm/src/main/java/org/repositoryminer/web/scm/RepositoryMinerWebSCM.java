@@ -12,16 +12,16 @@ import org.repositoryminer.web.scm.model.Milestone;
 import org.repositoryminer.web.scm.persistence.IssueDAO;
 import org.repositoryminer.web.scm.persistence.MilestoneDAO;
 
-public class RemoteMiningProcessor extends MiningPlugin<RemoteMiningConfig>{
+public class RepositoryMinerWebSCM extends MiningPlugin<WebSCMConfig>{
 
 	private IHostingService service;
 	
-	public RemoteMiningProcessor(String repositoryKey) {
+	public RepositoryMinerWebSCM(String repositoryKey) {
 		super(repositoryKey);
 	}
 
 	@Override
-	public void mine(RemoteMiningConfig config) {
+	public void mine(WebSCMConfig config) {
 		service = HostingServiceFactory.getHostingService(config.getServiceType());
 		service.connect(config, config.getUsername(), config.getToken());
 		

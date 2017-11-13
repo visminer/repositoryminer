@@ -13,7 +13,7 @@ public class Issue {
 	private Date closedAt;
 	private Date createdAt;
 	private int number;
-	private StatusType status;
+	private String status;
 	private String title;
 	private Date updatedAt;
 	private String body;
@@ -26,7 +26,7 @@ public class Issue {
 	public Document toDocument() {
 		Document doc = new Document();
 		doc.append("creator", creator).append("assignee", assignee).append("closed_at", closedAt)
-				.append("created_at", createdAt).append("number", number).append("status", status.toString())
+				.append("created_at", createdAt).append("number", number).append("status", status)
 				.append("title", title).append("updated_at", updatedAt).append("body", body)
 				.append("milestone", milestone).append("repository", repository)
 				.append("labels", Label.toDocumentList(labels)).append("comments", Comment.toDocumentList(comments))
@@ -38,7 +38,7 @@ public class Issue {
 	public Issue() {
 	}
 
-	public Issue(String creator, Date closedAt, Date createdAt, int number, StatusType status, String title,
+	public Issue(String creator, Date closedAt, Date createdAt, int number, String status, String title,
 			Date updatedAt, String body) {
 		super();
 		this.creator = creator;
@@ -91,11 +91,11 @@ public class Issue {
 		this.number = number;
 	}
 
-	public StatusType getStatus() {
+	public String getStatus() {
 		return status;
 	}
 
-	public void setStatus(StatusType status) {
+	public void setStatus(String status) {
 		this.status = status;
 	}
 

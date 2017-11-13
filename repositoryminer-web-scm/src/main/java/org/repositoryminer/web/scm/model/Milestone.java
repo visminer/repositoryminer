@@ -9,7 +9,7 @@ import org.bson.types.ObjectId;
 public class Milestone {
 
 	private int number;
-	private StatusType status;
+	private String status;
 	private String title;
 	private String description;
 	private String creator;
@@ -22,7 +22,7 @@ public class Milestone {
 	
 	public Document toDocument() {
 		Document doc = new Document();
-		doc.append("number", number).append("status", status.toString()).append("title", title)
+		doc.append("number", number).append("status", status).append("title", title)
 				.append("description", description).append("creator", creator).append("opened_issues", openedIssues)
 				.append("closed_issues", closedIssues).append("created_at", createdAt).append("due_on", dueOn)
 				.append("repository", repository).append("issues", issues);
@@ -31,7 +31,7 @@ public class Milestone {
 
 	public Milestone() {}
 	
-	public Milestone(int number, StatusType status, String title, String description, int openedIssues,
+	public Milestone(int number, String status, String title, String description, int openedIssues,
 			int closedIssues, Date createdAt, Date dueOn) {
 		super();
 		this.number = number;
@@ -52,11 +52,11 @@ public class Milestone {
 		this.number = number;
 	}
 
-	public StatusType getStatus() {
+	public String getStatus() {
 		return status;
 	}
 
-	public void setStatus(StatusType status) {
+	public void setStatus(String status) {
 		this.status = status;
 	}
 

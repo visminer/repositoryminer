@@ -2,7 +2,7 @@ package org.repositoryminer.web.scm.hostingservice;
 
 import java.util.List;
 
-import org.repositoryminer.web.scm.RemoteMiningConfig;
+import org.repositoryminer.web.scm.WebSCMConfig;
 import org.repositoryminer.web.scm.model.Issue;
 import org.repositoryminer.web.scm.model.Milestone;
 
@@ -16,7 +16,7 @@ public interface IHostingService {
 	 * @param username
 	 * @param token
 	 */
-	public void connect(RemoteMiningConfig config, String username, String token);
+	public void connect(WebSCMConfig config, String username, String token);
 
 	/**
 	 * @return All issues from web repository service.

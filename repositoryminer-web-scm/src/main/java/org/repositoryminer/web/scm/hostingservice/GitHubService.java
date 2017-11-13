@@ -15,13 +15,12 @@ import org.eclipse.egit.github.core.client.PageIterator;
 import org.eclipse.egit.github.core.service.IssueService;
 import org.eclipse.egit.github.core.service.MilestoneService;
 import org.repositoryminer.RepositoryMinerException;
-import org.repositoryminer.web.scm.RemoteMiningConfig;
+import org.repositoryminer.web.scm.WebSCMConfig;
 import org.repositoryminer.web.scm.model.Comment;
 import org.repositoryminer.web.scm.model.Event;
 import org.repositoryminer.web.scm.model.Issue;
 import org.repositoryminer.web.scm.model.Label;
 import org.repositoryminer.web.scm.model.Milestone;
-import org.repositoryminer.web.scm.model.StatusType;
 
 public class GitHubService implements IHostingService {
 
@@ -31,7 +30,7 @@ public class GitHubService implements IHostingService {
 
 
 	@Override
-	public void connect(RemoteMiningConfig config, String username, String token) {
+	public void connect(WebSCMConfig config, String username, String token) {
 		GitHubClient client = new GitHubClient();
 		client.setCredentials(username, token);
 		
@@ -49,7 +48,7 @@ public class GitHubService implements IHostingService {
 		try {
 			for (org.eclipse.egit.github.core.Issue izzue : issueServ.getIssues(repositoryId, parameters)) {
 				Issue issue = new Issue(izzue.getUser().getLogin(), izzue.getClosedAt(), izzue.getCreatedAt(),
-						izzue.getNumber(), StatusType.parse(izzue.getState()), izzue.getTitle(), izzue.getUpdatedAt(),
+						izzue.getNumber(), izzue.getState(), izzue.getTitle(), izzue.getUpdatedAt(),
 						izzue.getBody());
 
 				if (izzue.getAssignee() != null) {
@@ -86,7 +85,7 @@ public class GitHubService implements IHostingService {
 
 		try {
 			for (org.eclipse.egit.github.core.Milestone mile : milestoneServ.getMilestones(repositoryId, "all")) {
-				Milestone mileDB = new Milestone(mile.getNumber(), StatusType.parse(mile.getState()), mile.getTitle(),
+				Milestone mileDB = new Milestone(mile.getNumber(), mile.getState(), mile.getTitle(),
 						mile.getDescription(), mile.getOpenIssues(), mile.getClosedIssues(), mile.getCreatedAt(),
 						mile.getDueOn());
 
@@ -128,10 +127,12 @@ public class GitHubService implements IHostingService {
 				for (IssueEvent issueEvent : issueEvents) {
 					Event event = new Event();
 					event.setDescription(issueEvent.getEvent());
+					
 					User user = issueEvent.getActor();
 					if (user != null) {
 						event.setCreator(user.getName());
 					}
+					
 					event.setCreatedAt(issueEvent.getCreatedAt());
 					event.setCommitId(issueEvent.getCommitId());
 
