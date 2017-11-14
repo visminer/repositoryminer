@@ -27,6 +27,24 @@ public class RMFileUtils {
 	}
 
 	/**
+	 * Retrieves all the sub directories from a root directory.
+	 * 
+	 * @param path
+	 *            the root path.
+	 * @return the sub directories.
+	 */
+	public static List<String> getAllDirsAsString(String path) {
+		List<File> dirs = (List<File>) FileUtils.listFilesAndDirs(new File(path), new NotFileFilter(TrueFileFilter.INSTANCE),
+				DirectoryFileFilter.DIRECTORY);
+		List<String> dirsNames = new ArrayList<>();
+		
+		for (File f : dirs) {
+			dirsNames.add(f.getAbsolutePath());
+		}
+		return dirsNames;
+	}
+	
+	/**
 	 * Copies a folder to another location with a new name.
 	 * 
 	 * @param srcFolder

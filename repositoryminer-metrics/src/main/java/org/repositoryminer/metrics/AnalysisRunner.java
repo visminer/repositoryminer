@@ -76,7 +76,7 @@ public class AnalysisRunner {
 	public void setParsers(List<Parser> parsers) {
 		for (Parser p : parsers) {
 			if (p.getSourceFolders() == null || p.getSourceFolders().length == 0) {
-				p.setSourceFolders(RMFileUtils.getAllDirs(repository).toArray(new String[0]));
+				p.setSourceFolders(RMFileUtils.getAllDirsAsString(repository).toArray(new String[0]));
 			} else {
 				p.setSourceFolders(RMFileUtils.concatFilePath(repository, p.getSourceFolders()));
 			}
