@@ -10,7 +10,6 @@ import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.repositoryminer.metrics.ast.AST;
@@ -29,6 +28,7 @@ import org.repositoryminer.metrics.report.ClassReport;
 import org.repositoryminer.metrics.report.FileReport;
 import org.repositoryminer.metrics.report.MethodReport;
 import org.repositoryminer.metrics.report.ProjectReport;
+import org.repositoryminer.util.RMFileUtils;
 
 public class AnalysisRunner {
 
@@ -38,6 +38,12 @@ public class AnalysisRunner {
 	private Map<CodeSmellId, CodeSmell> codeSmellsToDetect = new LinkedHashMap<>();
 	private Map<String, Parser> parsersToUse = new LinkedHashMap<>();
 	private Map<Language, String[]> sourceFolders = new LinkedHashMap<>();
+
+	private String repository;
+
+	public AnalysisRunner(String repository) {
+		this.repository = repository;
+	}
 
 	public Collection<CodeMetric> getCalculatedMetrics() {
 		return metricsToCalculate.values();
@@ -69,22 +75,21 @@ public class AnalysisRunner {
 
 	public void setParsers(List<Parser> parsers) {
 		for (Parser p : parsers) {
-			sourceFolders.put(p.getId(), p.getSourceFolders());
+			if (p.getSourceFolders() == null || p.getSourceFolders().length == 0) {
+				p.setSourceFolders(RMFileUtils.getAllDirs(repository).toArray(new String[0]));
+			} else {
+				p.setSourceFolders(RMFileUtils.concatFilePath(repository, p.getSourceFolders()));
+			}
+
 			for (String ext : p.getExtensions()) {
 				parsersToUse.put(ext, p);
 			}
 		}
 	}
 
-	public void run(String repository, ObjectId analysisConfigId) throws IOException {
-		// updates all the source folders to the temporary path.
-		for (String[] folders : sourceFolders.values()) {
-			for (int i = 0; i < folders.length; i++) {
-				folders[i] = FilenameUtils.normalize(new File(repository, folders[i]).getAbsolutePath(), true);
-			}
-		}
-
-		for (File file : FileUtils.listFiles(new File(repository), TrueFileFilter.INSTANCE, TrueFileFilter.INSTANCE)) {
+	public void run(ObjectId analysisConfigId) throws IOException {
+		for (File file : FileUtils.listFiles(new File(repository), parsersToUse.keySet().toArray(new String[0]),
+				true)) {
 			analyzeFile(file, repository);
 		}
 
@@ -101,18 +106,16 @@ public class AnalysisRunner {
 		persistData(analysisConfigId);
 	}
 
-
 	private void analyzeFile(File file, String repository) throws IOException {
 		Parser parser = parsersToUse.get(FilenameUtils.getExtension(file.getAbsolutePath()));
 		if (parser == null) {
 			return;
 		}
 
-		String filename = FilenameUtils.normalize(file.getAbsolutePath(), true).
-				substring(repository.length() + 1);
-		
-		AST ast = parser.generate(filename, 
-				FileUtils.readFileToString(file, "UTF-8"), sourceFolders.get(parser.getId()));
+		String filename = FilenameUtils.normalize(file.getAbsolutePath(), true).substring(repository.length() + 1);
+
+		AST ast = parser.generate(filename, FileUtils.readFileToString(file, "UTF-8"),
+				sourceFolders.get(parser.getId()));
 
 		FileReport fr = new FileReport(ast.getName());
 		for (AbstractType type : ast.getTypes()) {
@@ -156,7 +159,7 @@ public class AnalysisRunner {
 	// Check if the metric requisites are being calculated in the correct order.
 	private void visitMetric(CodeMetric codeMetric) {
 		if (codeMetric.getRequiredMetrics() != null) {
-			for (CodeMetricId id: codeMetric.getRequiredMetrics()) {
+			for (CodeMetricId id : codeMetric.getRequiredMetrics()) {
 				if (!metricsToCalculate.containsKey(id)) {
 					visitMetric(MetricFactory.getMetric(id));
 				}
@@ -168,8 +171,8 @@ public class AnalysisRunner {
 		}
 	}
 
-	/* checks if the code smells are being detected in the correct order based on theirs requisites, 
-	   and also make sure that the needed metrics were calculated too. */
+	// checks if the code smells are being detected in the correct order based on
+	// theirs requisites, and also make sure that the needed metrics were calculated too.
 	private void visitCodeSmell(CodeSmell codeSmellParam) {
 		if (codeSmellParam.getRequiredMetrics() != null) {
 			for (CodeMetricId id : codeSmellParam.getRequiredMetrics()) {

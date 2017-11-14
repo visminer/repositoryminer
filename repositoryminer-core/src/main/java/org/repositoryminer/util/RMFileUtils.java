@@ -110,5 +110,23 @@ public class RMFileUtils {
 		}
 		return newPaths;
 	}
-
+	
+	/**
+	 * Concatenates a list of children file paths with a parent file path.
+	 * 
+	 * @param parent
+	 *            the parent file path.
+	 * @param children
+	 *            the list of children file paths.
+	 * @return a list of absolute file path compound by the parent and the children
+	 *         concatenated.
+	 */
+	public static String[] concatFilePath(String parent, String[] children) {
+		String[] newPaths = new String[children.length];
+		for (int i = 0; i < children.length; i++) {
+			newPaths[i] = concatFilePath(parent, children[i]);
+		}
+		return newPaths;
+	}
+	
 }

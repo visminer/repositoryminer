@@ -27,7 +27,7 @@ public class RepositoryMinerMetrics extends SnapshotAnalysisPlugin<MetricsConfig
 
 		scm.checkout(snapshot);
 
-		AnalysisRunner runner = new AnalysisRunner();
+		AnalysisRunner runner = new AnalysisRunner(tmpRepository);
 		runner.setCodeMetrics(config.getCodeMetrics());
 		runner.setCodeSmells(config.getCodeSmells());
 		runner.setParsers(config.getParsers());
@@ -35,7 +35,7 @@ public class RepositoryMinerMetrics extends SnapshotAnalysisPlugin<MetricsConfig
 		ObjectId configId = persistAnalysisConfig(config.getParsers(), runner.getCalculatedMetrics(),
 				runner.getDetectedCodeSmells());
 		try {
-			runner.run(tmpRepository, configId);
+			runner.run(configId);
 		} catch (IOException e) {
 			throw new RepositoryMinerException(e);
 		}
