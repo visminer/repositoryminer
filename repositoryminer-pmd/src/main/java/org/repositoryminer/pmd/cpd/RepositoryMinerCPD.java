@@ -8,7 +8,7 @@ import org.bson.Document;
 import org.repositoryminer.RepositoryMinerException;
 import org.repositoryminer.domain.Commit;
 import org.repositoryminer.plugin.SnapshotAnalysisPlugin;
-import org.repositoryminer.pmd.cpd.model.Occurrence;
+import org.repositoryminer.pmd.cpd.model.Match;
 import org.repositoryminer.pmd.cpd.persistence.CPDDAO;
 
 public class RepositoryMinerCPD extends SnapshotAnalysisPlugin<CPDConfig> {
@@ -27,23 +27,23 @@ public class RepositoryMinerCPD extends SnapshotAnalysisPlugin<CPDConfig> {
 		cpdExecutor.setLanguages(config.getLanguages());
 		cpdExecutor.setMinTokens(config.getTokensThreshold());
 
-		List<Occurrence> occurrences;
+		List<Match> matches;
 		try {
-			occurrences = cpdExecutor.execute();
+			matches = cpdExecutor.execute();
 		} catch (IOException e) {
 			throw new RepositoryMinerException("Can not execute PMD/CPD.", e); 
 		}
 
 		Commit commit = scm.getHEAD();
 
-		List<Document> documents = new ArrayList<Document>(occurrences.size());
-		for (Occurrence occurence : occurrences) {
+		List<Document> documents = new ArrayList<Document>(matches.size());
+		for (Match match : matches) {
 			Document doc = new Document("commit", commit.getHash()).
 					append("commit_date", commit.getCommitterDate()).
 					append("repository", repositoryId).
 					append("tokens_threshold", config.getTokensThreshold());
 
-			doc.putAll(occurence.toDocument());
+			doc.putAll(match.toDocument());
 			documents.add(doc);
 		}
 
