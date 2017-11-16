@@ -33,10 +33,10 @@ public class LAA extends CodeMetric {
 		}
 	}
 
-	public float calculate(AbstractType type, AbstractMethod method) {
+	public double calculate(AbstractType type, AbstractMethod method) {
 		int countFields = countAccessedFields(method);
-		float result = countFields > 0 ? (type.getFields().size() * 1.0f) / countFields : 0;
-		return new BigDecimal(result).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue();
+		double result = countFields > 0 ? (type.getFields().size() * 1.0) / countFields : 0;
+		return new BigDecimal(result).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
 	}
 
 	public static int countAccessedFields(AbstractMethod method) {

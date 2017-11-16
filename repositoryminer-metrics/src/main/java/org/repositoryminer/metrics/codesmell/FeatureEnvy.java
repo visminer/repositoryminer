@@ -12,7 +12,7 @@ public class FeatureEnvy extends CodeSmell {
 
 	private static final CodeMetricId[] REQUIRED_METRICS = { CodeMetricId.LAA, CodeMetricId.ATFD, CodeMetricId.FDP };
 
-	private float laaThreshold = 0.33f;
+	private double laaThreshold = 0.33;
 	private int atfdThreshold = 5;
 	private int fdpThreshold = 5;
 
@@ -20,7 +20,7 @@ public class FeatureEnvy extends CodeSmell {
 		init();
 	}
 
-	public FeatureEnvy(float laaThreshold, int atfdThreshold, int fdpThreshold) {
+	public FeatureEnvy(double laaThreshold, int atfdThreshold, int fdpThreshold) {
 		this.laaThreshold = laaThreshold;
 		this.atfdThreshold = atfdThreshold;
 		this.fdpThreshold = fdpThreshold;
@@ -41,7 +41,7 @@ public class FeatureEnvy extends CodeSmell {
 	public void detect(FileReport fileReport, ProjectReport projectReport) {
 		for (ClassReport cr : fileReport.getClasses()) {
 			for (MethodReport mr : cr.getMethods()) {
-				float laa = mr.getMetricsReport().getCodeMetric(CodeMetricId.LAA, Float.class);
+				double laa = mr.getMetricsReport().getCodeMetric(CodeMetricId.LAA, Double.class);
 				int fdp = mr.getMetricsReport().getCodeMetric(CodeMetricId.FDP, Integer.class);
 				int atfd = mr.getMetricsReport().getCodeMetric(CodeMetricId.ATFD, Integer.class);
 				if (detect(laa, atfd, fdp)) {
@@ -51,17 +51,17 @@ public class FeatureEnvy extends CodeSmell {
 		}
 	}
 
-	private boolean detect(float laaValue, int atfdValue, int fdpValue) {
+	private boolean detect(double laaValue, int atfdValue, int fdpValue) {
 		return (atfdValue > atfdThreshold) && (laaValue < laaThreshold) && (fdpValue <= fdpThreshold);
 	}
 
 	/*** GETTERS AND SETTERS ***/
 
-	public float getLaaThreshold() {
+	public double getLaaThreshold() {
 		return laaThreshold;
 	}
 
-	public void setLaaThreshold(float laaThreshold) {
+	public void setLaaThreshold(double laaThreshold) {
 		this.laaThreshold = laaThreshold;
 	}
 

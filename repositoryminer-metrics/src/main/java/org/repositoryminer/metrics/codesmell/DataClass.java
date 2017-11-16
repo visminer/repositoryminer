@@ -11,7 +11,7 @@ public class DataClass extends CodeSmell {
 
 	private static final CodeMetricId[] REQUIRED_METRICS = { CodeMetricId.WOC, CodeMetricId.NOPA, CodeMetricId.NOAM, CodeMetricId.WMC };
 
-	private float wocThreshold = 0.33f;
+	private double wocThreshold = 0.33;
 	private int wmcThreshold1 = 31;
 	private int wmcThreshold2 = 47;
 	private int publicMembersThreshold1 = 5;
@@ -21,7 +21,7 @@ public class DataClass extends CodeSmell {
 		init();
 	}
 
-	public DataClass(float wocThreshold, int wmcThreshold1, int wmcThreshold2, int publicMembersThreshold1, int publicMembersThreshold2) {
+	public DataClass(double wocThreshold, int wmcThreshold1, int wmcThreshold2, int publicMembersThreshold1, int publicMembersThreshold2) {
 		this.wocThreshold = wocThreshold;
 		this.wmcThreshold1 = wmcThreshold1;
 		this.wmcThreshold2 = wmcThreshold2;
@@ -45,7 +45,7 @@ public class DataClass extends CodeSmell {
 	@Override
 	public void detect(FileReport fileReport, ProjectReport projectReport) {
 		for (ClassReport cr : fileReport.getClasses()) {
-			float woc = cr.getMetricsReport().getCodeMetric(CodeMetricId.WOC, Float.class);
+			double woc = cr.getMetricsReport().getCodeMetric(CodeMetricId.WOC, Double.class);
 			int nopa = cr.getMetricsReport().getCodeMetric(CodeMetricId.NOPA, Integer.class);
 			int noam = cr.getMetricsReport().getCodeMetric(CodeMetricId.NOAM, Integer.class);
 			int wmc = cr.getMetricsReport().getCodeMetric(CodeMetricId.WMC, Integer.class);
@@ -55,7 +55,7 @@ public class DataClass extends CodeSmell {
 		}
 	}
 
-	private boolean detect(float woc, int nopa, int noam, int wmc) {
+	private boolean detect(double woc, int nopa, int noam, int wmc) {
 		int publicMembers = nopa + noam;
 		boolean offerManyData = woc < wocThreshold;
 		boolean isNotComplex = (publicMembers > publicMembersThreshold1 && wmc < wmcThreshold1)
@@ -65,11 +65,11 @@ public class DataClass extends CodeSmell {
 
 	/*** GETTERS AND SETTERS ***/
 
-	public float getWocThreshold() {
+	public double getWocThreshold() {
 		return wocThreshold;
 	}
 
-	public void setWocThreshold(float wocThreshold) {
+	public void setWocThreshold(double wocThreshold) {
 		this.wocThreshold = wocThreshold;
 	}
 

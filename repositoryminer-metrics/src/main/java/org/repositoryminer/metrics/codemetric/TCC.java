@@ -31,7 +31,7 @@ public class TCC extends CodeMetric {
 		}
 	}
 
-	public float calculate(AbstractType type) {
+	public double calculate(AbstractType type) {
 		List<AbstractMethod> methodList = new ArrayList<AbstractMethod>();
 		for (AbstractMethod m : type.getMethods()) {
 			if (!(m.getModifiers().contains("abstract") || m.isConstructor())) {
@@ -56,8 +56,8 @@ public class TCC extends CodeMetric {
 			}
 		}
 
-		float result = npc > 0 ? ndc * 1.0f / npc : 0;
-		return new BigDecimal(result).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue();
+		double result = npc > 0 ? ndc * 1.0 / npc : 0;
+		return new BigDecimal(result).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
 	}
 
 	public List<String> processAccessedFields(AbstractType currType, AbstractMethod method) {

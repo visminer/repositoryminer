@@ -27,11 +27,11 @@ public class AMW extends CodeMetric {
 		}
 	}
 
-	public float calculate(int wmc, int nom) {
+	public double calculate(int wmc, int nom) {
 		if (nom == 0) {
 			return 0l;
 		}
-		return new BigDecimal(wmc * 1f / nom).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue();
+		return new BigDecimal(wmc * 1.0 / nom).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
 	}
 
 	@Override

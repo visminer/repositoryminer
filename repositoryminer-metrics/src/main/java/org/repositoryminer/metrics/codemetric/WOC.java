@@ -25,7 +25,7 @@ public class WOC extends CodeMetric {
 		}
 	}
 
-	public float calculate(List<AbstractMethod> methods, List<AbstractField> fields) {
+	public double calculate(List<AbstractMethod> methods, List<AbstractField> fields) {
 		int publicMembers = 0;
 		int functionalMembers = 0;
 
@@ -44,8 +44,8 @@ public class WOC extends CodeMetric {
 			}
 		}
 
-		float result = publicMembers == 0 ? 0 : functionalMembers * 1.0f / publicMembers;
-		return new BigDecimal(result).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue();
+		double result = publicMembers == 0 ? 0 : functionalMembers * 1.0 / publicMembers;
+		return new BigDecimal(result).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
 	}
 
 	@Override

@@ -13,13 +13,13 @@ public class GodClass extends CodeSmell {
 
 	private int atfdThreshold = 5;
 	private int wmcThreshold = 47;
-	private float tccThreshold = 0.33f;
+	private double tccThreshold = 0.33;
 
 	public GodClass() {
 		init();
 	}
 
-	public GodClass(int atfdThreshold, int wmcThreshold, float tccThreshold) {
+	public GodClass(int atfdThreshold, int wmcThreshold, double tccThreshold) {
 		this.atfdThreshold = atfdThreshold;
 		this.wmcThreshold = wmcThreshold;
 		this.tccThreshold = tccThreshold;
@@ -41,14 +41,14 @@ public class GodClass extends CodeSmell {
 		for (ClassReport cr : fileReport.getClasses()) {
 			int atfd = cr.getMetricsReport().getCodeMetric(CodeMetricId.ATFD, Integer.class);
 			int wmc = cr.getMetricsReport().getCodeMetric(CodeMetricId.WMC, Integer.class);
-			float tcc = cr.getMetricsReport().getCodeMetric(CodeMetricId.TCC, Float.class);
+			double tcc = cr.getMetricsReport().getCodeMetric(CodeMetricId.TCC, Double.class);
 			if (detect(atfd, wmc, tcc)) {
 				cr.getMetricsReport().setCodeSmell(CodeSmellId.GOD_CLASS);
 			}
 		}
 	}
 
-	public boolean detect(int atfd, int wmc, float tcc) {
+	public boolean detect(int atfd, int wmc, double tcc) {
 		return (atfd > atfdThreshold) && (wmc >= wmcThreshold) && (tcc < tccThreshold);
 	}
 
@@ -71,11 +71,11 @@ public class GodClass extends CodeSmell {
 		this.wmcThreshold = wmcThreshold;
 	}
 
-	public float getTccThreshold() {
+	public double getTccThreshold() {
 		return tccThreshold;
 	}
 
-	public void setTccThreshold(float tccThreshold) {
+	public void setTccThreshold(double tccThreshold) {
 		this.tccThreshold = tccThreshold;
 	}
 
