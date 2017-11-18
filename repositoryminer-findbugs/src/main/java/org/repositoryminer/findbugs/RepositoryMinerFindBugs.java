@@ -53,7 +53,11 @@ public class RepositoryMinerFindBugs extends SnapshotAnalysisPlugin<FindBugsConf
 	@Override
 	public void run(String snapshot, FindBugsConfig config) {
 		scm.checkout(snapshot);
+		Commit commit = scm.getHEAD();
 
+		FindBugsDAO dao = new FindBugsDAO();
+		dao.deleteByCommit(commit.getHash());
+		
 		FindBugsExecutor findBugsExecutor = new FindBugsExecutor();
 		findBugsExecutor.setBugPriority(prioritiesMap.get(config.getPriority()));
 		findBugsExecutor.setEffort(effortsMap.get(config.getEffort()));
@@ -73,7 +77,6 @@ public class RepositoryMinerFindBugs extends SnapshotAnalysisPlugin<FindBugsConf
 			throw new RepositoryMinerException("Can not execute findbugs.", e);
 		}
 
-		Commit commit = scm.getHEAD();
 		List<String> files = getFiles(tmpRepository);
 		List<Document> documents = new ArrayList<>();
 
@@ -95,7 +98,7 @@ public class RepositoryMinerFindBugs extends SnapshotAnalysisPlugin<FindBugsConf
 			documents.add(doc);
 		}
 
-		new FindBugsDAO().insertMany(documents);
+		dao.insertMany(documents);
 	}
 
 	private List<String> getFiles(String dir) {

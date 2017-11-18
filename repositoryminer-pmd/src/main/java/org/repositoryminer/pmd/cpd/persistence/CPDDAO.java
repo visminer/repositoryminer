@@ -8,6 +8,7 @@ import org.bson.conversions.Bson;
 import org.repositoryminer.persistence.GenericDAO;
 
 import com.mongodb.BasicDBObject;
+import com.mongodb.client.model.Filters;
 
 public class CPDDAO extends GenericDAO {
 
@@ -31,6 +32,10 @@ public class CPDDAO extends GenericDAO {
 		where.add(new BasicDBObject("commit", commit));
 		
 		return findMany(new BasicDBObject("$and", where), projection);
+	}
+	
+	public void deleteByCommit(String hash) {
+		deleteMany(Filters.eq("commit", hash));
 	}
 	
 }

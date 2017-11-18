@@ -129,23 +129,28 @@ public class GitSCM implements ISCM {
 
 	@Override
 	public Commit getHEAD() {
+		return resolve(Constants.HEAD);
+	}
+
+	@Override
+	public Commit resolve(String reference) {
 		RevWalk revWalk = null;
 
 		try {
-			ObjectId head = git.getRepository().resolve(Constants.HEAD);
+			ObjectId ref = git.getRepository().resolve(reference);
 			revWalk = new RevWalk(git.getRepository());
-			RevCommit revCommit = revWalk.parseCommit(head);
+			RevCommit revCommit = revWalk.parseCommit(ref);
 
 			return new Commit(revCommit.getName(), revCommit.getCommitterIdent().getWhen());
 		} catch (RevisionSyntaxException | IOException e) {
-			throw new RepositoryMinerException("Error getting the HEAD.", e);
+			throw new RepositoryMinerException("Error getting the commit from " + reference + ".", e);
 		} finally {
 			if (revWalk != null) {
 				revWalk.close();
 			}
 		}
 	}
-
+	
 	@Override
 	public List<String> getCommitsNames(Reference reference) {
 		LOG.info(String.format("Extracting the commit from reference %s.", reference.getName()));

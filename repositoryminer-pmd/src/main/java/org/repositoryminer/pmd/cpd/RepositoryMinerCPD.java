@@ -16,7 +16,11 @@ public class RepositoryMinerCPD extends SnapshotAnalysisPlugin<CPDConfig> {
 	@Override
 	public void run(String snapshot, CPDConfig config) {
 		scm.checkout(snapshot);
+		Commit commit = scm.getHEAD();
 
+		CPDDAO dao = new CPDDAO();
+		dao.deleteByCommit(commit.getHash());
+		
 		CPDExecutor cpdExecutor = new CPDExecutor(tmpRepository);
 		cpdExecutor.setCharset("UTF-8");
 		
@@ -34,8 +38,6 @@ public class RepositoryMinerCPD extends SnapshotAnalysisPlugin<CPDConfig> {
 			throw new RepositoryMinerException("Can not execute PMD/CPD.", e); 
 		}
 
-		Commit commit = scm.getHEAD();
-
 		List<Document> documents = new ArrayList<Document>(matches.size());
 		for (Match match : matches) {
 			Document doc = new Document("commit", commit.getHash()).
@@ -47,7 +49,7 @@ public class RepositoryMinerCPD extends SnapshotAnalysisPlugin<CPDConfig> {
 			documents.add(doc);
 		}
 
-		new CPDDAO().insertMany(documents);
+		dao.insertMany(documents);
 	}
 
 }

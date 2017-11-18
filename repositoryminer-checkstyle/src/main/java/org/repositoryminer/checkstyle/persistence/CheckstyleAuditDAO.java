@@ -20,5 +20,9 @@ public class CheckstyleAuditDAO extends GenericDAO {
 		Bson clause2 = new BasicDBObject("commit", commit);
 		return findOne(Filters.and(clause1, clause2), projection);
 	}
+
+	public void deleteByCommit(String hash) {
+		deleteMany(Filters.eq("commit", hash));
+	}
 	
 }

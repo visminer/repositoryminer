@@ -27,4 +27,8 @@ public class FindBugsDAO extends GenericDAO {
 		return findOne(Filters.and(clause1, clause2), projection);
 	}
 
+	public void deleteByCommit(String hash) {
+		deleteMany(Filters.eq("commit", hash));
+	}
+	
 }

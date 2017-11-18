@@ -21,6 +21,11 @@ public class RepositoryMinerCheckStyle extends SnapshotAnalysisPlugin<CheckStyle
 	@Override
 	public void run(String snapshot, CheckStyleConfig config) {
 		scm.checkout(snapshot);
+		Commit commit = scm.getHEAD();
+		
+		CheckstyleAuditDAO dao = new CheckstyleAuditDAO();
+		dao.deleteByCommit(commit.getHash());
+		
 		CheckStyleExecutor executor = new CheckStyleExecutor(tmpRepository);
 		
 		if (config != null) {
@@ -43,8 +48,6 @@ public class RepositoryMinerCheckStyle extends SnapshotAnalysisPlugin<CheckStyle
 			throw new RepositoryMinerException("Can not execute checkstyle.", e);
 		}
 
-		Commit commit = scm.getHEAD();
-
 		List<Document> documents = new ArrayList<Document>(result.size());
 		for (Entry<String, List<StyleProblem>> file : result.entrySet()) {
 			Document doc = new Document("commit", commit.getHash()).
@@ -57,7 +60,7 @@ public class RepositoryMinerCheckStyle extends SnapshotAnalysisPlugin<CheckStyle
 			documents.add(doc);
 		}
 
-		new CheckstyleAuditDAO().insertMany(documents);
+		dao.insertMany(documents);
 	}
 
 }

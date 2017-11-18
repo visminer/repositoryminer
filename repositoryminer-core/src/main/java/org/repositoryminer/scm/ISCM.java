@@ -41,13 +41,23 @@ public interface ISCM {
 	public List<Commit> getCommits(int skip, int max);
 
 	/**
-	 * Note: For now, only these commit attributes need to be set: hash and
-	 * committer date.
-	 * 
+	 * Gets the commit which the HEAD is pointed at.
+	 * <p>
+	 * <b>Note: For now, only these commit attributes need to be set: hash and
+	 * committer date.</b> 
 	 * @return the commit of the current HEAD location.
 	 */
 	public Commit getHEAD();
 
+	/**
+	 * Converts a reference to a commit to a commit object.
+	 * <p>
+	 * <b>Note: For now, only these commit attributes need to be set: hash and
+	 * committer date.</b>
+	 * @return the referenced commit.
+	 */
+	public Commit resolve(String reference);
+	
 	/**
 	 * @param reference
 	 *            the reference.

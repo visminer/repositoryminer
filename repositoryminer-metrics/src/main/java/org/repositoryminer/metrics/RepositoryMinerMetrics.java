@@ -14,7 +14,10 @@ import org.repositoryminer.metrics.codemetric.CodeMetric;
 import org.repositoryminer.metrics.codesmell.CodeSmell;
 import org.repositoryminer.metrics.parser.Parser;
 import org.repositoryminer.metrics.persistence.CodeAnalysisConfigDAO;
+import org.repositoryminer.metrics.persistence.CodeAnalysisDAO;
 import org.repositoryminer.plugin.SnapshotAnalysisPlugin;
+
+import com.mongodb.client.model.Projections;
 
 public class RepositoryMinerMetrics extends SnapshotAnalysisPlugin<MetricsConfig> {
 
@@ -26,14 +29,17 @@ public class RepositoryMinerMetrics extends SnapshotAnalysisPlugin<MetricsConfig
 		}
 
 		scm.checkout(snapshot);
-
+		Commit commit = scm.getHEAD();
+		
+		checkDuplicatedAnalysis(commit.getHash());
+		
 		AnalysisRunner runner = new AnalysisRunner(tmpRepository);
 		runner.setCodeMetrics(config.getCodeMetrics());
 		runner.setCodeSmells(config.getCodeSmells());
 		runner.setParsers(config.getParsers());
 
 		ObjectId configId = persistAnalysisConfig(config.getParsers(), runner.getCalculatedMetrics(),
-				runner.getDetectedCodeSmells());
+				runner.getDetectedCodeSmells(), commit);
 		try {
 			runner.run(configId);
 		} catch (IOException e) {
@@ -41,10 +47,18 @@ public class RepositoryMinerMetrics extends SnapshotAnalysisPlugin<MetricsConfig
 		}
 	}
 
-	private ObjectId persistAnalysisConfig(List<Parser> usedParsers, Collection<CodeMetric> calculatedMetrics,
-			Collection<CodeSmell> detectedCodeSmells) {
+	private void checkDuplicatedAnalysis(String hash) {
 		CodeAnalysisConfigDAO configDao = new CodeAnalysisConfigDAO();
-		Commit commit = scm.getHEAD();
+		Document doc = configDao.findByCommitHash(hash, Projections.include("_id"));
+		if (doc != null) {
+			configDao.deleteById(doc.getObjectId("_id"));
+			new CodeAnalysisDAO().deleteByConfig(doc.getObjectId("_id"));
+		}
+	}
+
+	private ObjectId persistAnalysisConfig(List<Parser> usedParsers, Collection<CodeMetric> calculatedMetrics,
+			Collection<CodeSmell> detectedCodeSmells, Commit commit) {
+		CodeAnalysisConfigDAO configDao = new CodeAnalysisConfigDAO();
 
 		List<String> metricsNames = new ArrayList<>();
 		for (CodeMetric cm : calculatedMetrics) {
