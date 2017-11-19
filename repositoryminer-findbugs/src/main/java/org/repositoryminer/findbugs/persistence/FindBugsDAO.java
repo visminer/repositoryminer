@@ -1,5 +1,7 @@
 package org.repositoryminer.findbugs.persistence;
 
+import java.util.List;
+
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.repositoryminer.persistence.GenericDAO;
@@ -29,6 +31,10 @@ public class FindBugsDAO extends GenericDAO {
 
 	public void deleteByCommit(String hash) {
 		deleteMany(Filters.eq("commit", hash));
+	}
+
+	public List<Document> findByCommit(String hash, Bson projection) {
+		return findMany(Filters.eq("commit", hash), projection);
 	}
 	
 }

@@ -1,5 +1,7 @@
 package org.repositoryminer.metrics.persistence;
 
+import java.util.List;
+
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
@@ -37,4 +39,12 @@ public class CodeAnalysisDAO extends GenericDAO {
 		deleteMany(Filters.eq("analysis_config", config));
 	}
 
+	public List<Document> findByCommit(String commit,  Bson projection) {
+		return findMany(Filters.eq("commit", commit), projection);
+	}
+	
+	public List<Document> findByConfig(ObjectId config, Bson projection) {
+		return findMany(Filters.eq("analysis_config", config), projection);
+	}
+	
 }

@@ -2,6 +2,9 @@ package org.repositoryminer.technicaldebt.model;
 
 import static org.repositoryminer.technicaldebt.model.TDIndicator.*;
 
+import java.util.Arrays;
+import java.util.List;
+
 public enum TDType {
 
 	CODE_DEBT(GOD_CLASS, COMPLEX_METHOD, FEATURE_ENVY, DUPLICATED_CODE, BRAIN_METHOD, AUTOMATIC_STATIC_ANALYSIS_ISSUES,
@@ -15,8 +18,8 @@ public enum TDType {
 		this.indicators = indicators;
 	}
 
-	public TDIndicator[] getIndicators() {
-		return indicators;
+	public List<TDIndicator> getIndicators() {
+		return Arrays.asList(indicators);
 	}
 
 }

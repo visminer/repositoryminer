@@ -1,6 +1,10 @@
 package org.repositoryminer.technicaldebt.model;
 
-import static org.repositoryminer.technicaldebt.model.TDType.*;
+import static org.repositoryminer.technicaldebt.model.TDType.CODE_DEBT;
+import static org.repositoryminer.technicaldebt.model.TDType.DESIGN_DEBT;
+
+import java.util.Arrays;
+import java.util.List;
 
 public enum TDIndicator {
 
@@ -31,7 +35,7 @@ public enum TDIndicator {
 		return null;
 	}
 	
-	public TDType[] getTypes() {
-		return types;
+	public List<TDType> getTypes() {
+		return Arrays.asList(types);
 	}
 }
