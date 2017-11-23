@@ -15,14 +15,14 @@ public class TDItem {
 
 	String filename;
 	Map<TDIndicator, Integer> indicators = new HashMap<>();
-	Set<TDType> types = new HashSet<>();
+	Set<TDType> debts = new HashSet<>();
 
 	public TDItem(String filename) {
 		this.filename = filename;
 	}
 
 	public Document toDocument() {
-		setTDTypes();
+		setTDDebts();
 		
 		// MongoDB can't handles enum types.
 		Map<String, Integer> indicators2 = new HashMap<>();
@@ -32,7 +32,7 @@ public class TDItem {
 		
 		// Adding a confirmation flat to TD types and convert them to a document.
 		List<Document> typesDoc = new ArrayList<>();
-		for (TDType type : types) {
+		for (TDType type : debts) {
 			typesDoc.add(new Document().append("name", type.name()).append("value", 0));
 		}
 		
@@ -40,7 +40,7 @@ public class TDItem {
 		doc.append("filename", filename).
 			append("filehash", StringUtils.encodeToCRC32(filename)).
 			append("indicators", indicators2).
-			append("types", typesDoc);
+			append("debts", typesDoc);
 		
 		return doc;
 	}
@@ -66,9 +66,9 @@ public class TDItem {
 		}
 	}
 
-	private void setTDTypes() {
+	private void setTDDebts() {
 		for (TDIndicator indicator : indicators.keySet()) {
-			types.addAll(indicator.getTypes());
+			debts.addAll(indicator.getTypes());
 		}
 	}
 	
@@ -88,12 +88,12 @@ public class TDItem {
 		this.indicators = indicators;
 	}
 
-	public Set<TDType> getTypes() {
-		return types;
+	public Set<TDType> getDebts() {
+		return debts;
 	}
 
-	public void setTypes(Set<TDType> types) {
-		this.types = types;
+	public void setDebts(Set<TDType> debts) {
+		this.debts = debts;
 	}
 
 }
