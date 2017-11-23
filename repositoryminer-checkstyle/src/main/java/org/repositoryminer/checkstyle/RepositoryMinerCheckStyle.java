@@ -22,12 +22,12 @@ public class RepositoryMinerCheckStyle extends SnapshotAnalysisPlugin<CheckStyle
 	public void run(String snapshot, CheckStyleConfig config) {
 		scm.checkout(snapshot);
 		Commit commit = scm.getHEAD();
-		
+
 		CheckstyleAuditDAO dao = new CheckstyleAuditDAO();
 		dao.deleteByCommit(commit.getHash());
-		
+
 		CheckStyleExecutor executor = new CheckStyleExecutor(tmpRepository);
-		
+
 		if (config != null) {
 			if (config.isInsideRepository()) {
 				executor.setConfigFile(config.getConfigFile() != null ?
@@ -39,7 +39,7 @@ public class RepositoryMinerCheckStyle extends SnapshotAnalysisPlugin<CheckStyle
 				executor.setPropertiesFile(config.getPropertiesFile());
 			}
 		}
-		
+
 
 		Map<String, List<StyleProblem>> result = null;
 		try {
@@ -50,12 +50,14 @@ public class RepositoryMinerCheckStyle extends SnapshotAnalysisPlugin<CheckStyle
 
 		List<Document> documents = new ArrayList<Document>(result.size());
 		for (Entry<String, List<StyleProblem>> file : result.entrySet()) {
-			Document doc = new Document("commit", commit.getHash()).
-					append("filehash", StringUtils.encodeToCRC32(file.getKey())).
-					append("commit_date", commit.getCommitterDate()).
-					append("repository", repositoryId).
-					append("filename", file.getKey()).
-					append("style_problems", StyleProblem.toDocumentList(file.getValue()));
+			Document doc = new Document();
+			doc.append("reference", snapshot).
+				append("commit", commit.getHash()).
+				append("filehash", StringUtils.encodeToCRC32(file.getKey())).
+				append("commit_date", commit.getCommitterDate()).
+				append("repository", repositoryId).
+				append("filename", file.getKey()).
+				append("style_problems", StyleProblem.toDocumentList(file.getValue()));
 
 			documents.add(doc);
 		}

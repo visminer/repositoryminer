@@ -38,7 +38,7 @@ public class RepositoryMinerMetrics extends SnapshotAnalysisPlugin<MetricsConfig
 		runner.setCodeSmells(config.getCodeSmells());
 		runner.setParsers(config.getParsers());
 
-		ObjectId configId = persistAnalysisConfig(config.getParsers(), runner.getCalculatedMetrics(),
+		ObjectId configId = persistAnalysisConfig(snapshot, config.getParsers(), runner.getCalculatedMetrics(),
 				runner.getDetectedCodeSmells(), commit);
 		try {
 			runner.run(configId);
@@ -56,8 +56,8 @@ public class RepositoryMinerMetrics extends SnapshotAnalysisPlugin<MetricsConfig
 		}
 	}
 
-	private ObjectId persistAnalysisConfig(List<Parser> usedParsers, Collection<CodeMetric> calculatedMetrics,
-			Collection<CodeSmell> detectedCodeSmells, Commit commit) {
+	private ObjectId persistAnalysisConfig(String reference, List<Parser> usedParsers,
+			Collection<CodeMetric> calculatedMetrics, Collection<CodeSmell> detectedCodeSmells, Commit commit) {
 		CodeAnalysisConfigDAO configDao = new CodeAnalysisConfigDAO();
 
 		List<String> metricsNames = new ArrayList<>();
@@ -76,9 +76,15 @@ public class RepositoryMinerMetrics extends SnapshotAnalysisPlugin<MetricsConfig
 					codeSmell.getThresholds()));
 		}
 
-		Document doc = new Document("commit", commit.getHash()).append("commit_date", commit.getCommitterDate())
-				.append("analysis_date", new Date(System.currentTimeMillis())).append("repository", repositoryId)
-				.append("parsers", parsersNames).append("metrics", metricsNames).append("codesmells", codeSmellsDoc);
+		Document doc = new Document();
+		doc.append("reference", reference).
+			append("commit", commit.getHash()).
+			append("commit_date", commit.getCommitterDate()).
+			append("analysis_date", new Date(System.currentTimeMillis())).
+			append("repository", repositoryId).
+			append("parsers", parsersNames).
+			append("metrics", metricsNames).
+			append("codesmells", codeSmellsDoc);
 
 		configDao.insert(doc);
 

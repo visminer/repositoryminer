@@ -20,14 +20,14 @@ public class RepositoryMinerCPD extends SnapshotAnalysisPlugin<CPDConfig> {
 
 		CPDDAO dao = new CPDDAO();
 		dao.deleteByCommit(commit.getHash());
-		
+
 		CPDExecutor cpdExecutor = new CPDExecutor(tmpRepository);
 		cpdExecutor.setCharset("UTF-8");
-		
+
 		if (config == null) {
 			config = new CPDConfig();
 		}
-		
+
 		cpdExecutor.setLanguages(config.getLanguages());
 		cpdExecutor.setMinTokens(config.getTokensThreshold());
 
@@ -40,10 +40,12 @@ public class RepositoryMinerCPD extends SnapshotAnalysisPlugin<CPDConfig> {
 
 		List<Document> documents = new ArrayList<Document>(matches.size());
 		for (Match match : matches) {
-			Document doc = new Document("commit", commit.getHash()).
-					append("commit_date", commit.getCommitterDate()).
-					append("repository", repositoryId).
-					append("tokens_threshold", config.getTokensThreshold());
+			Document doc = new Document();
+			doc.append("reference", snapshot).
+				append("commit", commit.getHash()).
+				append("commit_date", commit.getCommitterDate()).
+				append("repository", repositoryId).
+				append("tokens_threshold", config.getTokensThreshold());
 
 			doc.putAll(match.toDocument());
 			documents.add(doc);
