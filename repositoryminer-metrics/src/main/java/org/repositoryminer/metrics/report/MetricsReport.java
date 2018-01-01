@@ -17,14 +17,14 @@ public class MetricsReport {
 	private Map<CodeMetricId, Number> codeMetrics = new HashMap<>();
 	private Set<CodeSmellId> codeSmells = new HashSet<>();
 
-	public Document toMetricsDocument() {
-		Document doc = new Document();
+	public List<Document> toMetricsDocument() {
+		List<Document> documents = new ArrayList<Document>();
 		for (Entry<CodeMetricId, Number> entry : codeMetrics.entrySet()) {
-			doc.append(entry.getKey().name(), entry.getValue());
+			documents.add(new Document("name", entry.getKey().name()).append("value", entry.getValue()));
 		}
-		return doc;
+		return documents;
 	}
-	
+
 	public List<String> getCodeSmellsAsString() {
 		List<String> list = new ArrayList<String>();
 		for (CodeSmellId id : codeSmells) {
@@ -32,7 +32,7 @@ public class MetricsReport {
 		}
 		return list;
 	}
-	
+
 	public boolean hasCodeSmell(CodeSmellId id) {
 		return codeSmells.contains(id);
 	}
@@ -40,7 +40,7 @@ public class MetricsReport {
 	public boolean hasCodeMetric(CodeMetricId id) {
 		return codeMetrics.containsKey(id);
 	}
-	
+
 	public Number getCodeMetric(CodeMetricId id) {
 		return codeMetrics.get(id);
 	}
@@ -60,7 +60,7 @@ public class MetricsReport {
 	public void addOneToCodeMetric(CodeMetricId id) {
 		updateMetric(id, 1);
 	}
-	
+
 	public void updateMetric(CodeMetricId id, int value) {
 		int newValue = value;
 		if (codeMetrics.containsKey(id)) {
@@ -76,7 +76,7 @@ public class MetricsReport {
 		}
 		codeMetrics.put(id, newValue);
 	}
-	
+
 	public void updateMetric(CodeMetricId id, float value) {
 		float newValue = value;
 		if (codeMetrics.containsKey(id)) {
@@ -84,7 +84,7 @@ public class MetricsReport {
 		}
 		codeMetrics.put(id, newValue);
 	}
-	
+
 	public void updateMetric(CodeMetricId id, double value) {
 		double newValue = value;
 		if (codeMetrics.containsKey(id)) {
@@ -92,7 +92,7 @@ public class MetricsReport {
 		}
 		codeMetrics.put(id, newValue);
 	}
-	
+
 	public Map<CodeMetricId, Number> getCodeMetrics() {
 		return codeMetrics;
 	}

@@ -23,11 +23,11 @@ public class TDItem {
 
 	public Document toDocument() {
 		setTDDebts();
-		
-		// MongoDB can't handles enum types.
-		Map<String, Integer> indicators2 = new HashMap<>();
+
+		List<Document> indicatorsDoc = new ArrayList<Document>();
 		for (Entry<TDIndicator, Integer> indicator : indicators.entrySet()) {
-			indicators2.put(indicator.getKey().name(), indicator.getValue());
+			indicatorsDoc.add(new Document("name", indicator.getKey().name())
+					.append("occurrences", indicator.getValue()));
 		}
 		
 		// Adding a confirmation flat to TD types and convert them to a document.
@@ -39,7 +39,7 @@ public class TDItem {
 		Document doc = new Document();
 		doc.append("filename", filename).
 			append("filehash", StringUtils.encodeToCRC32(filename)).
-			append("indicators", indicators2).
+			append("indicators", indicatorsDoc).
 			append("debts", typesDoc);
 		
 		return doc;
