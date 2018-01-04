@@ -21,7 +21,7 @@ public class CodeAnalysisDAO extends GenericDAO {
 	}
 
 	/**
-	 * Retrieves an entire analysis by file and commit.
+	 * Retrieves an analyzed file.
 	 * 
 	 * @param fileHash
 	 *            the file hash.

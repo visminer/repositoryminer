@@ -49,10 +49,6 @@ public class TDItem {
 		return indicators.size() > 0;
 	}
 	
-	public void addOneToIndicator(TDIndicator indicator) {
-		addToIndicator(indicator, 1);
-	}
-	
 	public void addToIndicator(TDIndicator indicator, int quantity) {
 		if (indicator == null) {
 			return;
