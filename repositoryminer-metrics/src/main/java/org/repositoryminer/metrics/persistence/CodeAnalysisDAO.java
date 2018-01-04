@@ -35,16 +35,16 @@ public class CodeAnalysisDAO extends GenericDAO {
 		return findOne(Filters.and(Filters.eq("filehash", fileHash), Filters.eq("commit", commit)), projection);
 	}
 
-	public void deleteByConfig(ObjectId config) {
-		deleteMany(Filters.eq("analysis_config", config));
+	public void deleteByReport(ObjectId report) {
+		deleteMany(Filters.eq("analysis_report", report));
 	}
 
 	public List<Document> findByCommit(String commit,  Bson projection) {
 		return findMany(Filters.eq("commit", commit), projection);
 	}
 	
-	public List<Document> findByConfig(ObjectId config, Bson projection) {
-		return findMany(Filters.eq("analysis_config", config), projection);
+	public List<Document> findByReport(ObjectId report, Bson projection) {
+		return findMany(Filters.eq("analysis_report", report), projection);
 	}
 	
 }

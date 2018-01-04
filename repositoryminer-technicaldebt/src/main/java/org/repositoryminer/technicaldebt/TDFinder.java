@@ -56,7 +56,7 @@ public class TDFinder {
 		}
 
 		CodeAnalysisDAO dao = new CodeAnalysisDAO();
-		List<Document> analysisDoc = dao.findByConfig(reportDoc.getObjectId("_id"),
+		List<Document> analysisDoc = dao.findByReport(reportDoc.getObjectId("_id"),
 				Projections.include("filename", "classes.codesmells", "classes.methods.codesmells"));
 
 		for (Document fileDoc : analysisDoc) {

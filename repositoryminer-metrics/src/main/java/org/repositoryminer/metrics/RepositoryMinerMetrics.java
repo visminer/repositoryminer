@@ -52,7 +52,7 @@ public class RepositoryMinerMetrics extends SnapshotAnalysisPlugin<MetricsConfig
 		Document doc = configDao.findByCommitHash(hash, Projections.include("_id"));
 		if (doc != null) {
 			configDao.deleteById(doc.getObjectId("_id"));
-			new CodeAnalysisDAO().deleteByConfig(doc.getObjectId("_id"));
+			new CodeAnalysisDAO().deleteByReport(doc.getObjectId("_id"));
 		}
 	}
 

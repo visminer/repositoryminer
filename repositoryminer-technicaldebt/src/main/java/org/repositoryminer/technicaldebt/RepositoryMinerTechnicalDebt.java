@@ -38,13 +38,7 @@ public class RepositoryMinerTechnicalDebt extends SnapshotAnalysisPlugin<Set<TDI
 
 		for (TDItem item : items) {
 			if (item.isDebt()) {
-				Document doc = new Document();
-				doc.append("reference", snapshot).
-					append("commit", commit.getHash()).
-					append("commit_date", commit.getCommitterDate()).
-					append("repository", repositoryId).
-					append("analysis_report", reportId);
-
+				Document doc = new Document("analysis_report", reportId);
 				doc.putAll(item.toDocument());
 				documents.add(doc);
 			}
@@ -86,7 +80,7 @@ public class RepositoryMinerTechnicalDebt extends SnapshotAnalysisPlugin<Set<TDI
 		Document doc = configDao.findByCommitHash(hash, Projections.include("_id"));
 		if (doc != null) {
 			configDao.deleteById(doc.getObjectId("_id"));
-			new TechnicalDebtDAO().deleteByConfig(doc.getObjectId("_id"));
+			new TechnicalDebtDAO().deleteByReport(doc.getObjectId("_id"));
 		}
 	}
 
