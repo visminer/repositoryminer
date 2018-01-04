@@ -15,7 +15,7 @@ import org.repositoryminer.plugin.SnapshotAnalysisPlugin;
 import org.repositoryminer.technicaldebt.model.TDIndicator;
 import org.repositoryminer.technicaldebt.model.TDItem;
 import org.repositoryminer.technicaldebt.model.TDType;
-import org.repositoryminer.technicaldebt.persistence.TechnicalDebtConfigDAO;
+import org.repositoryminer.technicaldebt.persistence.TechnicalDebtReportDAO;
 import org.repositoryminer.technicaldebt.persistence.TechnicalDebtDAO;
 
 import com.mongodb.client.model.Projections;
@@ -31,7 +31,7 @@ public class RepositoryMinerTechnicalDebt extends SnapshotAnalysisPlugin<Set<TDI
 		Commit commit = scm.resolve(snapshot);
 		checkDuplicatedAnalysis(commit.getHash());
 		
-		ObjectId configId = persistAnalysisConfig(snapshot, commit, indicators);
+		ObjectId reportId = persistAnalysisReport(snapshot, commit, indicators);
 		
 		Collection<TDItem> items = new TDFinder().find(commit.getHash(), indicators);
 		List<Document> documents = new ArrayList<>(items.size());
@@ -43,7 +43,7 @@ public class RepositoryMinerTechnicalDebt extends SnapshotAnalysisPlugin<Set<TDI
 					append("commit", commit.getHash()).
 					append("commit_date", commit.getCommitterDate()).
 					append("repository", repositoryId).
-					append("analysis_config", configId);
+					append("analysis_report", reportId);
 
 				doc.putAll(item.toDocument());
 				documents.add(doc);
@@ -53,8 +53,8 @@ public class RepositoryMinerTechnicalDebt extends SnapshotAnalysisPlugin<Set<TDI
 		new TechnicalDebtDAO().insertMany(documents);
 	}
 	
-	private ObjectId persistAnalysisConfig(String reference, Commit commit, Set<TDIndicator> indicators) {
-		TechnicalDebtConfigDAO configDao = new TechnicalDebtConfigDAO();
+	private ObjectId persistAnalysisReport(String reference, Commit commit, Set<TDIndicator> indicators) {
+		TechnicalDebtReportDAO configDao = new TechnicalDebtReportDAO();
 		
 		List<String> indicatorsList = new ArrayList<String>();
 		for (TDIndicator indicator : indicators) {
@@ -82,7 +82,7 @@ public class RepositoryMinerTechnicalDebt extends SnapshotAnalysisPlugin<Set<TDI
 	}
 
 	private void checkDuplicatedAnalysis(String hash) {
-		TechnicalDebtConfigDAO configDao = new TechnicalDebtConfigDAO();
+		TechnicalDebtReportDAO configDao = new TechnicalDebtReportDAO();
 		Document doc = configDao.findByCommitHash(hash, Projections.include("_id"));
 		if (doc != null) {
 			configDao.deleteById(doc.getObjectId("_id"));

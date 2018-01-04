@@ -13,7 +13,7 @@ import org.repositoryminer.domain.Commit;
 import org.repositoryminer.metrics.codemetric.CodeMetric;
 import org.repositoryminer.metrics.codesmell.CodeSmell;
 import org.repositoryminer.metrics.parser.Parser;
-import org.repositoryminer.metrics.persistence.CodeAnalysisConfigDAO;
+import org.repositoryminer.metrics.persistence.CodeAnalysisReportDAO;
 import org.repositoryminer.metrics.persistence.CodeAnalysisDAO;
 import org.repositoryminer.plugin.SnapshotAnalysisPlugin;
 
@@ -38,17 +38,17 @@ public class RepositoryMinerMetrics extends SnapshotAnalysisPlugin<MetricsConfig
 		runner.setCodeSmells(config.getCodeSmells());
 		runner.setParsers(config.getParsers());
 
-		ObjectId configId = persistAnalysisConfig(snapshot, config.getParsers(), runner.getCalculatedMetrics(),
+		ObjectId reportId = persistAnalysisReport(snapshot, config.getParsers(), runner.getCalculatedMetrics(),
 				runner.getDetectedCodeSmells(), commit);
 		try {
-			runner.run(configId);
+			runner.run(reportId);
 		} catch (IOException e) {
 			throw new RepositoryMinerException(e);
 		}
 	}
 
 	private void checkDuplicatedAnalysis(String hash) {
-		CodeAnalysisConfigDAO configDao = new CodeAnalysisConfigDAO();
+		CodeAnalysisReportDAO configDao = new CodeAnalysisReportDAO();
 		Document doc = configDao.findByCommitHash(hash, Projections.include("_id"));
 		if (doc != null) {
 			configDao.deleteById(doc.getObjectId("_id"));
@@ -56,9 +56,9 @@ public class RepositoryMinerMetrics extends SnapshotAnalysisPlugin<MetricsConfig
 		}
 	}
 
-	private ObjectId persistAnalysisConfig(String reference, List<Parser> usedParsers,
+	private ObjectId persistAnalysisReport(String reference, List<Parser> usedParsers,
 			Collection<CodeMetric> calculatedMetrics, Collection<CodeSmell> detectedCodeSmells, Commit commit) {
-		CodeAnalysisConfigDAO configDao = new CodeAnalysisConfigDAO();
+		CodeAnalysisReportDAO configDao = new CodeAnalysisReportDAO();
 
 		List<String> metricsNames = new ArrayList<>();
 		for (CodeMetric cm : calculatedMetrics) {

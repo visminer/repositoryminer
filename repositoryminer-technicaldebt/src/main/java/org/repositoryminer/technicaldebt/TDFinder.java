@@ -10,7 +10,7 @@ import java.util.Set;
 import org.bson.Document;
 import org.repositoryminer.checkstyle.persistence.CheckstyleAuditDAO;
 import org.repositoryminer.findbugs.persistence.FindBugsDAO;
-import org.repositoryminer.metrics.persistence.CodeAnalysisConfigDAO;
+import org.repositoryminer.metrics.persistence.CodeAnalysisReportDAO;
 import org.repositoryminer.metrics.persistence.CodeAnalysisDAO;
 import org.repositoryminer.pmd.cpd.persistence.CPDDAO;
 import org.repositoryminer.technicaldebt.model.TDIndicator;
@@ -49,14 +49,14 @@ public class TDFinder {
 
 	@SuppressWarnings("unchecked")
 	private void findCodeSmells(String commit) {
-		Document configDoc = new CodeAnalysisConfigDAO().findByCommitHash(commit, Projections.include("_id"));
+		Document reportDoc = new CodeAnalysisReportDAO().findByCommitHash(commit, Projections.include("_id"));
 
-		if (configDoc == null) {
+		if (reportDoc == null) {
 			return;
 		}
 
 		CodeAnalysisDAO dao = new CodeAnalysisDAO();
-		List<Document> analysisDoc = dao.findByConfig(configDoc.getObjectId("_id"),
+		List<Document> analysisDoc = dao.findByConfig(reportDoc.getObjectId("_id"),
 				Projections.include("filename", "classes.codesmells", "classes.methods.codesmells"));
 
 		for (Document fileDoc : analysisDoc) {

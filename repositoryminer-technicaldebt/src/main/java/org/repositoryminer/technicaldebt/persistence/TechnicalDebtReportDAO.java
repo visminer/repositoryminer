@@ -1,4 +1,4 @@
-package org.repositoryminer.metrics.persistence;
+package org.repositoryminer.technicaldebt.persistence;
 
 import org.bson.Document;
 import org.bson.conversions.Bson;
@@ -7,11 +7,11 @@ import org.repositoryminer.persistence.GenericDAO;
 
 import com.mongodb.client.model.Filters;
 
-public class CodeAnalysisConfigDAO extends GenericDAO {
+public class TechnicalDebtReportDAO extends GenericDAO {
 
-	private static final String COLLECTION_NAME = "rm_code_analysis_config";
+	private static final String COLLECTION_NAME = "rm_technical_debt_report";
 
-	public CodeAnalysisConfigDAO() {
+	public TechnicalDebtReportDAO() {
 		super(COLLECTION_NAME);
 	}
 
