@@ -30,13 +30,9 @@ import org.repositoryminer.metrics.ast.AbstractMethodInvocation;
 import org.repositoryminer.metrics.ast.AbstractStatement;
 import org.repositoryminer.metrics.ast.AbstractVariableDeclaration;
 import org.repositoryminer.metrics.ast.NodeType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class MethodVisitor extends ASTVisitor {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(MethodVisitor.class);
-	
 	private List<AbstractStatement> statements = new ArrayList<>();
 	private int maxDepth = 0;
 	private int depth = 0;
@@ -164,7 +160,6 @@ public class MethodVisitor extends ASTVisitor {
 	public boolean visit(SimpleName node) {
 		IBinding bind = node.resolveBinding();
 		if (bind == null) {
-			LOGGER.warn("Bind not solve to "+node.toString()+" at position "+node.getStartPosition()+"= ."+node.toString());
 			return true;
 		}
 		
