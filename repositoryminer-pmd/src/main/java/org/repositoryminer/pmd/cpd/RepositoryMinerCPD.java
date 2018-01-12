@@ -16,7 +16,7 @@ public class RepositoryMinerCPD extends SnapshotAnalysisPlugin<CPDConfig> {
 	@Override
 	public void run(String snapshot, CPDConfig config) {
 		scm.checkout(snapshot);
-		Commit commit = scm.getHEAD();
+		Commit commit = scm.resolve(snapshot);
 
 		CPDDAO dao = new CPDDAO();
 		dao.deleteByCommit(commit.getHash());

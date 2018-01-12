@@ -29,7 +29,7 @@ public class RepositoryMinerMetrics extends SnapshotAnalysisPlugin<MetricsConfig
 		}
 
 		scm.checkout(snapshot);
-		Commit commit = scm.getHEAD();
+		Commit commit = scm.resolve(snapshot);
 		
 		checkDuplicatedAnalysis(commit.getHash());
 		

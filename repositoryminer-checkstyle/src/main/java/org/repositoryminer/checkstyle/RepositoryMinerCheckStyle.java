@@ -21,7 +21,7 @@ public class RepositoryMinerCheckStyle extends SnapshotAnalysisPlugin<CheckStyle
 	@Override
 	public void run(String snapshot, CheckStyleConfig config) {
 		scm.checkout(snapshot);
-		Commit commit = scm.getHEAD();
+		Commit commit = scm.resolve(snapshot);
 
 		CheckstyleAuditDAO dao = new CheckstyleAuditDAO();
 		dao.deleteByCommit(commit.getHash());
