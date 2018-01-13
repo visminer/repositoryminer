@@ -81,8 +81,11 @@ public class RepositoryMinerFindBugs extends SnapshotAnalysisPlugin<FindBugsConf
 		List<Document> documents = new ArrayList<>();
 
 		for (Entry<String, List<ReportedBug>> bug : reportedBugs.entrySet()) {
-			Document doc = new Document("commit", commit.getHash()).append("commit_date", commit.getCommitterDate())
-					.append("repository", repositoryId);
+			Document doc = new Document();
+			doc.append("reference", snapshot).
+				append("commit", commit.getHash()).
+				append("commit_date", commit.getCommitterDate()).
+				append("repository", repositoryId);
 
 			String filename = null;
 			for (String file : files) {

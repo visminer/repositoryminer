@@ -87,7 +87,7 @@ public class AnalysisRunner {
 		}
 	}
 
-	public void run(ObjectId analysisConfigId) throws IOException {
+	public void run(ObjectId analysisReportId) throws IOException {
 		for (File file : FileUtils.listFiles(new File(repository), parsersToUse.keySet().toArray(new String[0]),
 				true)) {
 			analyzeFile(file, repository);
@@ -103,7 +103,7 @@ public class AnalysisRunner {
 			}
 		}
 
-		persistData(analysisConfigId);
+		persistData(analysisReportId);
 	}
 
 	private void analyzeFile(File file, String repository) throws IOException {
@@ -133,14 +133,14 @@ public class AnalysisRunner {
 		}
 	}
 
-	private void persistData(ObjectId analysisConfigId) {
+	private void persistData(ObjectId analysisReportId) {
 		CodeAnalysisDAO dao = new CodeAnalysisDAO();
 		List<Document> documents = new ArrayList<>();
 
 		int i = 0;
 		for (FileReport fr : projectReport.getAllFiles()) {
 			Document doc = fr.toDocument();
-			doc.append("analysis_config", analysisConfigId);
+			doc.append("analysis_report", analysisReportId);
 			documents.add(doc);
 
 			if (i == 1000) {

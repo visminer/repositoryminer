@@ -15,42 +15,38 @@ public class TDItem {
 
 	String filename;
 	Map<TDIndicator, Integer> indicators = new HashMap<>();
-	Set<TDType> types = new HashSet<>();
+	Set<TDType> debts = new HashSet<>();
 
 	public TDItem(String filename) {
 		this.filename = filename;
 	}
 
 	public Document toDocument() {
-		setTDTypes();
-		
-		// MongoDB can't handles enum types.
-		Map<String, Integer> indicators2 = new HashMap<>();
+		setTDDebts();
+
+		List<Document> indicatorsDoc = new ArrayList<Document>();
 		for (Entry<TDIndicator, Integer> indicator : indicators.entrySet()) {
-			indicators2.put(indicator.getKey().name(), indicator.getValue());
+			indicatorsDoc.add(new Document("name", indicator.getKey().name())
+					.append("occurrences", indicator.getValue()));
 		}
 		
 		// Adding a confirmation flat to TD types and convert them to a document.
 		List<Document> typesDoc = new ArrayList<>();
-		for (TDType type : types) {
+		for (TDType type : debts) {
 			typesDoc.add(new Document().append("name", type.name()).append("value", 0));
 		}
 		
 		Document doc = new Document();
 		doc.append("filename", filename).
 			append("filehash", StringUtils.encodeToCRC32(filename)).
-			append("indicators", indicators2).
-			append("types", typesDoc);
+			append("indicators", indicatorsDoc).
+			append("debts", typesDoc);
 		
 		return doc;
 	}
 	
 	public boolean isDebt() {
 		return indicators.size() > 0;
-	}
-	
-	public void addOneToIndicator(TDIndicator indicator) {
-		addToIndicator(indicator, 1);
 	}
 	
 	public void addToIndicator(TDIndicator indicator, int quantity) {
@@ -66,9 +62,9 @@ public class TDItem {
 		}
 	}
 
-	private void setTDTypes() {
+	private void setTDDebts() {
 		for (TDIndicator indicator : indicators.keySet()) {
-			types.addAll(indicator.getTypes());
+			debts.addAll(indicator.getTypes());
 		}
 	}
 	
@@ -88,12 +84,12 @@ public class TDItem {
 		this.indicators = indicators;
 	}
 
-	public Set<TDType> getTypes() {
-		return types;
+	public Set<TDType> getDebts() {
+		return debts;
 	}
 
-	public void setTypes(Set<TDType> types) {
-		this.types = types;
+	public void setDebts(Set<TDType> debts) {
+		this.debts = debts;
 	}
 
 }
