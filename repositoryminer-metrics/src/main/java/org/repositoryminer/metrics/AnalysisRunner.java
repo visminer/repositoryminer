@@ -12,6 +12,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.bson.Document;
 import org.bson.types.ObjectId;
+import org.repositoryminer.domain.Commit;
 import org.repositoryminer.metrics.ast.AST;
 import org.repositoryminer.metrics.ast.AbstractMethod;
 import org.repositoryminer.metrics.ast.AbstractType;
@@ -87,7 +88,7 @@ public class AnalysisRunner {
 		}
 	}
 
-	public void run(ObjectId analysisReportId) throws IOException {
+	public void run(ObjectId analysisReportId, Commit commit, ObjectId repoId) throws IOException {
 		for (File file : FileUtils.listFiles(new File(repository), parsersToUse.keySet().toArray(new String[0]),
 				true)) {
 			analyzeFile(file, repository);
@@ -103,7 +104,7 @@ public class AnalysisRunner {
 			}
 		}
 
-		persistData(analysisReportId);
+		persistData(analysisReportId, commit, repoId);
 	}
 
 	private void analyzeFile(File file, String repository) throws IOException {
@@ -133,14 +134,18 @@ public class AnalysisRunner {
 		}
 	}
 
-	private void persistData(ObjectId analysisReportId) {
+	private void persistData(ObjectId analysisReportId, Commit commit, ObjectId repoId) {
 		CodeAnalysisDAO dao = new CodeAnalysisDAO();
 		List<Document> documents = new ArrayList<>();
 
 		int i = 0;
 		for (FileReport fr : projectReport.getAllFiles()) {
 			Document doc = fr.toDocument();
-			doc.append("analysis_report", analysisReportId);
+			doc.append("analysis_report", analysisReportId).
+				append("commit", commit.getHash()).
+				append("commit_date", commit.getCommitterDate()).
+				append("repository", repoId);
+			
 			documents.add(doc);
 
 			if (i == 1000) {
