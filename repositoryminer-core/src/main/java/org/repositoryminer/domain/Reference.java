@@ -1,6 +1,7 @@
 package org.repositoryminer.domain;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.bson.Document;
@@ -16,6 +17,7 @@ public class Reference {
 	private String name;
 	private String path;
 	private ReferenceType type;
+	private Date lastCommitDate;
 	private List<String> commits;
 
 	/**
@@ -44,8 +46,11 @@ public class Reference {
 	public static Reference parseDocument(Document document) {
 		Reference r = new Reference(document.getObjectId("_id"),
 				document.getObjectId("repository"),
-				document.getString("name"), document.getString("path"),
-				ReferenceType.valueOf(document.getString("type")), document.get("commits", List.class));
+				document.getString("name"),
+				document.getString("path"),
+				ReferenceType.valueOf(document.getString("type")),
+				document.getDate("last_commit_date"),
+				document.get("commits", List.class));
 
 		return r;
 	}
@@ -57,20 +62,25 @@ public class Reference {
 	 */
 	public Document toDocument() {
 		Document doc = new Document();
-		doc.append("repository", repository).append("name", name).append("path", path)
-		.append("type", type.toString()).append("commits", commits);
+		doc.append("repository", repository)
+			.append("name", name)
+			.append("path", path)
+			.append("type", type.toString())
+			.append("last_commit_date", lastCommitDate)
+			.append("commits", commits);
 		return doc;
 	}
 
 	public Reference() {}
 
 	public Reference(ObjectId id, ObjectId repository, String name, String path, ReferenceType type,
-			List<String> commits) {
+			Date lastCommitDate, List<String> commits) {
 		this.id = id;
 		this.repository = repository;
 		this.name = name;
 		this.path = path;
 		this.type = type;
+		this.lastCommitDate = lastCommitDate;
 		this.commits = commits;
 	}
 
@@ -114,6 +124,14 @@ public class Reference {
 		this.type = type;
 	}
 
+	public Date getLastCommitDate() {
+		return lastCommitDate;
+	}
+
+	public void setLastCommitDate(Date lastCommitDate) {
+		this.lastCommitDate = lastCommitDate;
+	}
+	
 	public List<String> getCommits() {
 		return commits;
 	}

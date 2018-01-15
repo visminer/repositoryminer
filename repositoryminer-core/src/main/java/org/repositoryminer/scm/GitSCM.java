@@ -86,7 +86,9 @@ public class GitSCM implements ISCM {
 			}
 
 			int i = b.getName().lastIndexOf("/") + 1;
-			Reference r = new Reference(null, null, b.getName().substring(i), b.getName(), ReferenceType.BRANCH, null);
+			Commit commit = resolve(b.getName());
+			Reference r = new Reference(null, null, b.getName().substring(i), b.getName(), ReferenceType.BRANCH,
+					commit.getCommitterDate(), null);
 			refs.add(r);
 			LOG.info(String.format("Branch %s analyzed.", r.getName()));
 		}
@@ -101,7 +103,9 @@ public class GitSCM implements ISCM {
 
 		for (Ref t : tags) {
 			int i = t.getName().lastIndexOf("/") + 1;
-			Reference r = new Reference(null, null, t.getName().substring(i), t.getName(), ReferenceType.TAG, null);
+			Commit commit = resolve(t.getName());
+			Reference r = new Reference(null, null, t.getName().substring(i), t.getName(), ReferenceType.TAG, 
+					commit.getCommitterDate(), null);
 			refs.add(r);
 			LOG.info(String.format("Tag %s analyzed.", r.getName()));
 		}
