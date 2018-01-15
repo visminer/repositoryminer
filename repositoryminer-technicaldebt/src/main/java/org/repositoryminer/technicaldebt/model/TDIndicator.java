@@ -3,6 +3,7 @@ package org.repositoryminer.technicaldebt.model;
 import static org.repositoryminer.technicaldebt.model.TDType.CODE_DEBT;
 import static org.repositoryminer.technicaldebt.model.TDType.DESIGN_DEBT;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -26,10 +27,10 @@ public enum TDIndicator {
 	MULTITHREAD_CORRECTNESS(CODE_DEBT),
 	SLOW_ALGORITHM(CODE_DEBT);
 
-	private TDType types[];
+	private List<TDType> types;
 	
 	TDIndicator(TDType... types) {
-		this.types = types;
+		this.types = Arrays.asList(types);
 	}
 	
 	public static TDIndicator getTDIndicator(String indicatorName) {
@@ -42,7 +43,23 @@ public enum TDIndicator {
 	}
 	
 	public List<TDType> getTypes() {
-		return Arrays.asList(types);
+		return types;
+	}
+	
+	public static List<TDIndicator> getByType(TDType type) {
+		List<TDIndicator> result = new ArrayList<TDIndicator>();
+		
+		if (type == null) {
+			return result;
+		}
+		
+		for (TDIndicator indicator : TDIndicator.values()) {
+			if (indicator.types.contains(type)) {
+				result.add(indicator);
+			}
+		}
+		
+		return result;
 	}
 	
 }
