@@ -39,7 +39,8 @@ public class RepositoryMinerTechnicalDebt extends SnapshotAnalysisPlugin<Set<TDI
 		for (TDItem item : items) {
 			if (item.isDebt()) {
 				Document doc = new Document("analysis_report", reportId);
-				doc.append("commit", commit.getHash()).
+				doc.append("reference", snapshot).
+					append("commit", commit.getHash()).
 					append("commit_date", commit.getCommitterDate()).
 					append("repository", repositoryId);
 				

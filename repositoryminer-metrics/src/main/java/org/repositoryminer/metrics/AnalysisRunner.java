@@ -88,7 +88,7 @@ public class AnalysisRunner {
 		}
 	}
 
-	public void run(ObjectId analysisReportId, Commit commit, ObjectId repoId) throws IOException {
+	public void run(ObjectId analysisReportId, Commit commit, ObjectId repoId, String reference) throws IOException {
 		for (File file : FileUtils.listFiles(new File(repository), parsersToUse.keySet().toArray(new String[0]),
 				true)) {
 			analyzeFile(file, repository);
@@ -104,7 +104,7 @@ public class AnalysisRunner {
 			}
 		}
 
-		persistData(analysisReportId, commit, repoId);
+		persistData(analysisReportId, commit, repoId, reference);
 	}
 
 	private void analyzeFile(File file, String repository) throws IOException {
@@ -134,7 +134,7 @@ public class AnalysisRunner {
 		}
 	}
 
-	private void persistData(ObjectId analysisReportId, Commit commit, ObjectId repoId) {
+	private void persistData(ObjectId analysisReportId, Commit commit, ObjectId repoId, String reference) {
 		CodeAnalysisDAO dao = new CodeAnalysisDAO();
 		List<Document> documents = new ArrayList<>();
 
@@ -142,6 +142,7 @@ public class AnalysisRunner {
 		for (FileReport fr : projectReport.getAllFiles()) {
 			Document doc = fr.toDocument();
 			doc.append("analysis_report", analysisReportId).
+				append("reference", reference).
 				append("commit", commit.getHash()).
 				append("commit_date", commit.getCommitterDate()).
 				append("repository", repoId);

@@ -41,7 +41,7 @@ public class RepositoryMinerMetrics extends SnapshotAnalysisPlugin<MetricsConfig
 		ObjectId reportId = persistAnalysisReport(snapshot, config.getParsers(), runner.getCalculatedMetrics(),
 				runner.getDetectedCodeSmells(), commit);
 		try {
-			runner.run(reportId, commit, repositoryId);
+			runner.run(reportId, commit, repositoryId, snapshot);
 		} catch (IOException e) {
 			throw new RepositoryMinerException(e);
 		}
