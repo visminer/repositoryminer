@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.bson.Document;
+import org.repositoryminer.util.StringUtils;
 
 public class FileReport {
 
@@ -26,9 +27,11 @@ public class FileReport {
 	}
 	
 	public Document toDocument() {
-		Document doc = new Document("filename", name).
-				append("metrics", metricsReport.toMetricsDocument()).
-				append("classes", ClassReport.toDocumentList(classesReports.values()));
+		Document doc = new Document();
+		doc.append("filename", name).
+			append("filehash", StringUtils.encodeToCRC32(name)).
+			append("metrics", metricsReport.toMetricsDocument()).
+			append("classes", ClassReport.toDocumentList(classesReports.values()));
 		return doc;
 	}
 
