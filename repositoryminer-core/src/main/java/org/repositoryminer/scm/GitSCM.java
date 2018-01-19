@@ -41,7 +41,7 @@ public class GitSCM implements ISCM {
 	private static final Logger LOG = LoggerFactory.getLogger(GitSCM.class);
 
 	private Git git;
-
+	
 	@Override
 	public SCMType getSCM() {
 		return SCMType.GIT;
@@ -186,12 +186,22 @@ public class GitSCM implements ISCM {
 			lockFile.delete();
 		}
 
-		try {
+		try {		
+			Runtime.getRuntime().exec("git checkout --force " + hash, null, 
+					new File(git.getRepository().getWorkTree().getAbsolutePath()));
+		} catch (IOException e) {
+			close();
+			throw new RepositoryMinerException(e);
+		}
+		
+		// This piece of code is the best way to implement this function, but does not work well all the times.
+		// I will keep this code waiting to jgit team to solve this bug.
+		/*try {
 			git.checkout().setStartPoint(hash).setAllPaths(true).setForce(true).call();
 		} catch (GitAPIException e) {
 			close();
 			throw new RepositoryMinerException(e);
-		}
+		}*/
 	}
 
 	@Override
