@@ -9,6 +9,7 @@ import java.util.Scanner;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.LogCommand;
+import org.eclipse.jgit.api.ResetCommand.ResetType;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.diff.DiffEntry;
 import org.eclipse.jgit.diff.DiffFormatter;
@@ -41,6 +42,7 @@ public class GitSCM implements ISCM {
 	private static final Logger LOG = LoggerFactory.getLogger(GitSCM.class);
 
 	private Git git;
+	private int branchCounter = 0;
 	
 	@Override
 	public SCMType getSCM() {
@@ -186,22 +188,16 @@ public class GitSCM implements ISCM {
 			lockFile.delete();
 		}
 
-		try {		
-			Runtime.getRuntime().exec("git checkout --force " + hash, null, 
-					new File(git.getRepository().getWorkTree().getAbsolutePath()));
-		} catch (IOException e) {
-			close();
-			throw new RepositoryMinerException(e);
-		}
-		
-		// This piece of code is the best way to implement this function, but does not work well all the times.
-		// I will keep this code waiting to jgit team to solve this bug.
-		/*try {
-			git.checkout().setStartPoint(hash).setAllPaths(true).setForce(true).call();
+		try {
+			git.reset().setMode(ResetType.HARD).call();
+			git.checkout().setName("master").call();
+			
+			git.checkout().setCreateBranch(true).setName("rm_branch"+branchCounter++)
+			.setStartPoint(hash).setForce(true).setOrphan(true).call();
 		} catch (GitAPIException e) {
 			close();
 			throw new RepositoryMinerException(e);
-		}*/
+		}
 	}
 
 	@Override
