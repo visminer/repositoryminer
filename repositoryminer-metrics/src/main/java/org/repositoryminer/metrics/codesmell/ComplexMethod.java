@@ -37,7 +37,7 @@ public class ComplexMethod extends CodeSmell {
 			for (MethodReport mr : cr.getMethods()) {
 				int cyclo = mr.getMetricsReport().getCodeMetric(CodeMetricId.CYCLO, Integer.class);
 				if (cyclo > cycloThreshold) {
-					cr.getMetricsReport().setCodeSmell(CodeSmellId.COMPLEX_METHOD);
+					mr.getMetricsReport().setCodeSmell(CodeSmellId.COMPLEX_METHOD);
 				}
 			}
 		}
