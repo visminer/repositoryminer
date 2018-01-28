@@ -20,5 +20,5 @@ dependencies {
 	compile group: 'org.mongodb', name: 'mongo-java-driver', version:'3.2.2'
     compile group: 'org.slf4j', name: 'slf4j-simple', version:'1.7.21'
     compile group: 'commons-io', name: 'commons-io', version: '2.5'
-    compile group: 'com.puppycrawl.tools', name: 'checkstyle', version: '8.4'
+    compile group: 'com.puppycrawl.tools', name: 'checkstyle', version: '8.7'
 }
