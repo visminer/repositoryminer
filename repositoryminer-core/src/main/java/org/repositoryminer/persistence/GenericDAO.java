@@ -119,6 +119,19 @@ public class GenericDAO {
 	public Document findById(String id, Bson projection) {
 		return findOne(Filters.eq("_id", new ObjectId(id)), projection);
 	}
+	
+	/**
+	 * Retrieves one document by its id.
+	 * 
+	 * @param id
+	 *            the document id.
+	 * @param projection
+	 *            the query projection.
+	 * @return the found document or null.
+	 */
+	public Document findById(ObjectId id, Bson projection) {
+		return findOne(Filters.eq("_id", id), projection);
+	}
 
 	/**
 	 * Retrieves only the first document from a query.

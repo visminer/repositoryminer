@@ -44,7 +44,7 @@ public class Repository {
 		}
 
 		return new Repository(doc.getObjectId("_id"), doc.getString("key"), doc.getString("name"),
-				doc.getString("path"), SCMType.valueOf(doc.getString("scm")), doc.getString("description"),
+				doc.getString("path"), SCMType.parse(doc.getString("scm")), doc.getString("description"),
 				Developer.parseDocuments(doc.get("contributors", List.class)));
 	}
 
