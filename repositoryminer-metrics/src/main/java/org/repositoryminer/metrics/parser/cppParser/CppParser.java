@@ -45,7 +45,7 @@ public class CppParser extends Parser {
 		ast.setName(filename);
 		ast.setSource(source);
 		
-		FileContent fileContent = FileContent.createForExternalFileLocation("C:/Users/Danniel/Desktop/velha.c");
+		FileContent fileContent = FileContent.createForExternalFileLocation(source);
 			
 			Map definedSymbols = new HashMap();
 			String[] includePaths = new String[0];
@@ -70,6 +70,14 @@ public class CppParser extends Parser {
 				
 		FileVisitor visitor = new FileVisitor();
 		translationUnit.accept(visitor);
+		
+		visitor.shouldVisitNames = true;
+		visitor.shouldVisitDeclarations = false;
+		visitor.shouldVisitDeclarators = true;
+		visitor.shouldVisitAttributes = true;
+		visitor.shouldVisitStatements = true;
+		visitor.shouldVisitTypeIds = true;
+		visitor.shouldVisitExpressions = true;
 		
 		IASTPreprocessorIncludeStatement[] includes = translationUnit.getIncludeDirectives();
 	    for (IASTPreprocessorIncludeStatement include : includes) {
