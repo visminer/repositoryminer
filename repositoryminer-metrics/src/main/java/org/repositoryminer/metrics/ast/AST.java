@@ -13,6 +13,7 @@ public class AST {
 	private String language;
 	private List<AbstractType> types;
 	private List<AbstractImport> imports;
+	private List<AbstractInclude> includs;
 	private String packageDeclaration;
 
 	public String getName() {
@@ -61,6 +62,14 @@ public class AST {
 
 	public void setPackageDeclaration(String packageDeclaration) {
 		this.packageDeclaration = packageDeclaration;
+	}
+
+	public List<AbstractInclude> getIncludes() {
+		return includs;
+	}
+
+	public void setIncludes(String includes) {
+		includs.add(new AbstractInclude(includes));
 	}
 
 }
