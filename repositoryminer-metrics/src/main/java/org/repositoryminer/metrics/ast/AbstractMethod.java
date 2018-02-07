@@ -10,6 +10,7 @@ public class AbstractMethod {
 	private String name;
 	private int startPosition;
 	private int endPosition;
+	private int length;
 	private String returnType;
 	private boolean isConstructor;
 	private boolean isVarargs;
@@ -123,6 +124,14 @@ public class AbstractMethod {
 
 	public void setAccessoredField(String accessoredField) {
 		this.accessoredField = accessoredField;
+	}
+
+	public int getLength() {
+		return length;
+	}
+
+	public void setLength(int length) {
+		this.length = length;
 	}
 
 }

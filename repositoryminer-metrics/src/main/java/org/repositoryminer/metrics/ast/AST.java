@@ -13,7 +13,10 @@ public class AST {
 	private String language;
 	private List<AbstractType> types;
 	private List<AbstractImport> imports;
+	private List<AbstractMethod> methods;
+	
 	private String packageDeclaration;
+	
 
 	public String getName() {
 		return name;
@@ -61,6 +64,14 @@ public class AST {
 
 	public void setPackageDeclaration(String packageDeclaration) {
 		this.packageDeclaration = packageDeclaration;
+	}
+
+	public List<AbstractMethod> getMethods() {
+		return methods;
+	}
+
+	public void setMethods(List<AbstractMethod> methods) {
+		this.methods = methods;
 	}
 
 }
