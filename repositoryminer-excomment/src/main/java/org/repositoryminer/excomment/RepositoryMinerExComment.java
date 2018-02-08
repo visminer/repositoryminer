@@ -32,8 +32,6 @@ public class RepositoryMinerExComment extends SnapshotAnalysisPlugin<ExCommentCo
 		this.repositoryPath = repository.getPath();
 	}
 
-
-
 	@Override
 	public void run(String snapshot, ExCommentConfig config) {
 		if (config == null || !config.isValid()) {

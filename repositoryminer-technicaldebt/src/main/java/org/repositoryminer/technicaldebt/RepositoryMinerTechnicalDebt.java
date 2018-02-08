@@ -42,7 +42,9 @@ public class RepositoryMinerTechnicalDebt extends SnapshotAnalysisPlugin<Set<TDI
 				doc.append("reference", snapshot).
 					append("commit", commit.getHash()).
 					append("commit_date", commit.getCommitterDate()).
-					append("repository", repositoryId);
+					append("repository", repositoryId).
+					append("checked", false).
+					append("intentional", 0);
 				
 				doc.putAll(item.toDocument());
 				documents.add(doc);
