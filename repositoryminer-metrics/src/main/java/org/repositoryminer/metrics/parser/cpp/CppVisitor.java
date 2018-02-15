@@ -2,6 +2,8 @@ package org.repositoryminer.metrics.parser.cpp;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.cdt.core.dom.IName;
 import org.eclipse.cdt.core.dom.ast.ASTVisitor;
@@ -105,7 +107,7 @@ public class CppVisitor extends ASTVisitor {
 		return this.types;
 	}
 	
-	public AbstractMethod generateMethod(CPPASTFunctionDeclarator declarator, IASTDeclSpecifier specifier) {
+	public AbstractMethod generateMethod(CPPASTFunctionDeclarator declarator, IASTDeclSpecifier specifier,String body) {
 		
 		
 		AbstractMethod method = new AbstractMethod();
@@ -135,10 +137,37 @@ public class CppVisitor extends ASTVisitor {
 
 		method.setName(methodname);
 		method.setReturnType(specifier.toString());
-		method.setStartPosition( declarator.getOffset() );
+		method.setStartPosition( declarator.getOffset());
+		
+		
+		
+		
+		
+		if(body.indexOf('{') > 0 ) {
+			
+			method.setBody(body);	
+			Pattern pattern = Pattern.compile("(\r\n)|(\n)|(\r)");
+			
+			int lines = 1;
+			Matcher matcher = pattern.matcher(body.substring( body.indexOf('{') , body.lastIndexOf('}') ));
+			while (matcher.find()) {
+				lines++;
+			}
+			method.setLength( lines );
+			
+			
+		}else {
+			method.setBody("");
+			method.setLength(0);
+		}
+		
+		
+		System.out.println( method.getBody() );
+		System.out.println("=================================");
+		
 		method.setEndPosition(declarator.getOffset() + declarator.getLength());
-		method.setLength(declarator.getLength());
-		method.setConstructor(  ( classe.getName() != null) && (classe.getName().equals(method.getName() ) ) );
+		
+		method.setConstructor(  (classe != null) && ( classe.getName() != null) && (classe.getName().equals(method.getName() ) )  );
 		method.setModifiers(modifiers);
 		
 		List<AbstractParameter> parameters = new ArrayList< AbstractParameter>();
@@ -212,6 +241,10 @@ public class CppVisitor extends ASTVisitor {
 						
 						CPPASTSimpleDeclaration simpDecl = (CPPASTSimpleDeclaration) item;
 						
+						String body = simpDecl.getRawSignature();
+						
+						System.out.println(body);
+						System.out.println("8888888888888888");
 						
 						if(simpDecl.getDeclarators().length > 0) {
 			
@@ -221,7 +254,7 @@ public class CppVisitor extends ASTVisitor {
 							if(declarator instanceof CPPASTFunctionDeclarator ) {
 								
 								CPPASTFunctionDeclarator funcDcl = (CPPASTFunctionDeclarator) declarator;
-								currmethod = generateMethod(funcDcl, specifier);
+								currmethod = generateMethod(funcDcl, specifier, body);
 								
 								if(!visibility.equals(""))
 									currmethod.getModifiers().add(visibility);
@@ -269,10 +302,12 @@ public class CppVisitor extends ASTVisitor {
 						IASTDeclarator declarator =funcDef.getDeclarator();
 						IASTDeclSpecifier specifier = funcDef.getDeclSpecifier();
 						
+												
+						
 						if(declarator instanceof CPPASTFunctionDeclarator ) {
 							
 							CPPASTFunctionDeclarator funcDcl = (CPPASTFunctionDeclarator) declarator;
-							currmethod = generateMethod(funcDcl, specifier);
+							currmethod = generateMethod(funcDcl, specifier,funcDef.getRawSignature().toString());
 							
 							if(!visibility.equals(""))
 								currmethod.getModifiers().add(visibility);
@@ -315,17 +350,21 @@ public class CppVisitor extends ASTVisitor {
 	public int visit(IASTDeclaration declaration)
 	{
 	
+
+		
         if ((declaration instanceof IASTFunctionDefinition)) {
           IASTFunctionDefinition ast = (IASTFunctionDefinition) declaration;
           IScope scope = ast.getScope();
           
+          String body = ast.getRawSignature();
           
           try{
         	  
         	  IName parent = scope.getParent().getScopeName();
         	  CPPASTFunctionDeclarator funcDecl = (CPPASTFunctionDeclarator) ast.getDeclarator();
         	  IASTDeclSpecifier specifier = ast.getDeclSpecifier();
-        	  currmethod  = generateMethod(funcDecl, specifier);
+        	  currmethod  = generateMethod(funcDecl, specifier,body);
+        	  
         	  
         	  if(parent == null) {
         		
@@ -342,16 +381,21 @@ public class CppVisitor extends ASTVisitor {
 							  for (AbstractMethod m : tipo.getMethods()) {
 								  if (areEqual(m, currmethod) ) {
 									  existmethod = true;
+									  
+									  if(m.getBody().length() < currmethod.getBody().length()) {
+											 m.setBody(currmethod.getBody());
+											 m.setLength(currmethod.getLength());
+										 }
+										  
 									  break;
 								  }
 								
 							  }
 								
 							  if(!existmethod) {
-									currmethod.getModifiers().add("Public");
+								    currmethod.getModifiers().add("Public");
 									classe.getMethods().add(currmethod);
-									
-								}
+							}
 								
 							}
 						}
@@ -389,6 +433,13 @@ public class CppVisitor extends ASTVisitor {
   						for (AbstractMethod m : cla.getMethods()) {
 							if (areEqual(m, currmethod ) ) {
 								existmethod = true;
+								 if(m.getBody().length() < currmethod.getBody().length()) {
+									 m.setBody(currmethod.getBody());
+									 m.setLength(currmethod.getLength());
+								 }
+									  	
+								 
+								 
 								break;
 																
 							}
@@ -585,8 +636,7 @@ public class CppVisitor extends ASTVisitor {
 			
 				for (AbstractMethod method : classe.getMethods()) {
 					
-					if (areEqual(method,generateMethod(funcDecl, funcSpec))) {
-						
+					if (areEqual(method,generateMethod(funcDecl, funcSpec,funcDef.getRawSignature().toString()))) {
 						currmethod = method;
 						break;
 						

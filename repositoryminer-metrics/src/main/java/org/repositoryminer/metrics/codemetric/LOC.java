@@ -22,10 +22,14 @@ public class LOC extends CodeMetric {
 
 	@Override
 	public void calculate(AST ast, FileReport fileReport, ProjectReport projectReport) {
+		
 		fileReport.getMetricsReport().setCodeMetric(CodeMetricId.LOC, calculate(ast.getSource()));
+		
 		for (AbstractType type : ast.getTypes()) {
+			
 			ClassReport cr = fileReport.getClass(type.getName());
 			cr.getMetricsReport().setCodeMetric(CodeMetricId.LOC, calculate(ast, type));
+			
 			for (AbstractMethod method : type.getMethods()) {
 				MethodReport mr = cr.getMethodBySignature(method.getName());
 				mr.getMetricsReport().setCodeMetric(CodeMetricId.LOC, calculate(ast, method));

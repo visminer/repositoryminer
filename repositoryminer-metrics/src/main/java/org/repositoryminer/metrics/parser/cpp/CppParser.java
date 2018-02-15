@@ -2,7 +2,9 @@ package org.repositoryminer.metrics.parser.cpp;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Scanner;
 import java.io.File;
+import java.io.FileNotFoundException;
 
 import org.eclipse.cdt.core.dom.ast.IASTPreprocessorIncludeStatement;
 import org.eclipse.cdt.core.dom.ast.IASTTranslationUnit;
@@ -42,17 +44,12 @@ public class CppParser extends Parser{
 		
 		
 		IASTTranslationUnit tu = null;
-		FileContent file = FileContent.createForExternalFileLocation(source+"/"+filename);
+		FileContent file = FileContent.create(filename, source.toCharArray());
 		
 					
 		System.out.println(file.getFileLocation());
-		ICPPParserExtensionConfiguration config = new ANSICPPParserExtensionConfiguration();
-		IScanner scanner = new CPreprocessor(file, new ScannerInfo(), ParserLanguage.CPP, null, new GPPScannerExtensionConfiguration(), null);
 		
 		
-		
-		ISourceCodeParser parser = new GNUCPPSourceParser(scanner,ParserMode.COMPLETE_PARSE, null, config);
-
 		Map<String, String> macroDefinitions = new HashMap<>();
         String[] includeSearchPaths = new String[0];
         
@@ -85,17 +82,29 @@ public class CppParser extends Parser{
 			
 			IASTTranslationUnit tu = generateTu(filename, source);
 			CppVisitor visitor = new CppVisitor();
-	        
+			String folder = filename.substring(0,filename.lastIndexOf("/"));
+       	 
 	        for (IASTPreprocessorIncludeStatement include : tu.getIncludeDirectives()) {
 	
-	        	 String namefile = include.getName().getRawSignature().toString();
-	        	 File f = new File(source+"/"+namefile);
+	        	 String namefile = folder+"/"+include.getName().getRawSignature().toString();
+
+	        	 
+	        	 File f = new File(namefile);
 	        	
+	        	 
 	        	 if(include.getName().getRawSignature().toString().endsWith(".h")  && f.exists() ) {
-	        		
-	        		IASTTranslationUnit tu2 = generateTu(namefile, source);
+	        	   
+	        		 String includesource = "";
+	        	   try {
+	        		  includesource = new Scanner(f).useDelimiter("\\Z").next();
+	        	   } catch (FileNotFoundException e) {
+	        		   e.printStackTrace();
+	        	   }
+	        			
+	        		IASTTranslationUnit tu2 = generateTu(namefile, includesource);
 	        		CppVisitor visitor2 = new CppVisitor();
 	        		tu2.accept(visitor2);
+	        		ast.setSource( includesource+"\r\n"+ast.getSource() );
 	        		visitor.setTypes(visitor2.getTypes());
 	        		visitor.setMethods(visitor2.getMethods());
 	        		
