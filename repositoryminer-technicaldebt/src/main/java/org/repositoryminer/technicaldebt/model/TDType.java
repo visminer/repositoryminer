@@ -2,7 +2,15 @@ package org.repositoryminer.technicaldebt.model;
 
 public enum TDType {
 
+	UNKNOWN_DEBT,
 	CODE_DEBT,
-	DESIGN_DEBT;
+	DESIGN_DEBT,
+	ARCHITECTURE_DEBT,
+	BUILD_DEBT,
+	DEFECT_DEBT,
+	DOCUMENTATION_DEBT,
+	PEOPLE_DEBT,
+	REQUIREMENT_DEBT,
+	TEST_DEBT;
 
 }

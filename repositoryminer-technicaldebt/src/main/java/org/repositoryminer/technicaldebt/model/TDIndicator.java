@@ -1,7 +1,6 @@
 package org.repositoryminer.technicaldebt.model;
 
-import static org.repositoryminer.technicaldebt.model.TDType.CODE_DEBT;
-import static org.repositoryminer.technicaldebt.model.TDType.DESIGN_DEBT;
+import static org.repositoryminer.technicaldebt.model.TDType.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,8 +24,20 @@ public enum TDIndicator {
 	// FindBugs
 	AUTOMATIC_STATIC_ANALYSIS_ISSUES(CODE_DEBT, DESIGN_DEBT),
 	MULTITHREAD_CORRECTNESS(CODE_DEBT),
-	SLOW_ALGORITHM(CODE_DEBT);
+	SLOW_ALGORITHM(CODE_DEBT),
 
+	// eXcomment
+	COMMENT_ANALYSIS_UNKNOWN_DEBT(UNKNOWN_DEBT),
+	COMMENT_ANALYSIS_CODE_DEBT(CODE_DEBT),
+	COMMENT_ANALYSIS_DESIGN_DEBT(DESIGN_DEBT),
+	COMMENT_ANALYSIS_ARCHITECTURE_DEBT(ARCHITECTURE_DEBT),
+	COMMENT_ANALYSIS_BUILD_DEBT(BUILD_DEBT),
+	COMMENT_ANALYSIS_DEFECT_DEBT(DEFECT_DEBT),
+	COMMENT_ANALYSIS_DOCUMENTATION_DEBT(DOCUMENTATION_DEBT),
+	COMMENT_ANALYSIS_PEOPLE_DEBT(PEOPLE_DEBT),
+	COMMENT_ANALYSIS_REQUIREMENT_DEBT(REQUIREMENT_DEBT), 
+	COMMENT_ANALYSIS_TEST_DEBT(TEST_DEBT);
+	
 	private List<TDType> types;
 	
 	TDIndicator(TDType... types) {
