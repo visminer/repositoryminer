@@ -7,7 +7,7 @@ public class AbstractClass extends AbstractType {
 
 	private boolean isInterface;
 	private String superClass;
-
+	
 	public AbstractClass() {
 		setNodeType(NodeType.CLASS_DECLARATION);
 	}
@@ -28,4 +28,5 @@ public class AbstractClass extends AbstractType {
 		this.superClass = superClass;
 	}
 
+	
 }

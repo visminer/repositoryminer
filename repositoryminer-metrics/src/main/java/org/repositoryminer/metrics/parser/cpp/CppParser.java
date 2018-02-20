@@ -1,5 +1,6 @@
 package org.repositoryminer.metrics.parser.cpp;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
@@ -27,6 +28,7 @@ import org.eclipse.cdt.core.parser.ScannerInfo;
 import org.eclipse.cdt.internal.core.dom.parser.cpp.GNUCPPSourceParser;
 import org.eclipse.cdt.internal.core.parser.scanner.CPreprocessor;
 import org.repositoryminer.metrics.ast.AST;
+import org.repositoryminer.metrics.ast.AbstractType;
 import org.repositoryminer.metrics.parser.Language;
 import org.repositoryminer.metrics.parser.Parser;
 
@@ -73,6 +75,7 @@ public class CppParser extends Parser{
 		
 	}
 
+	@SuppressWarnings("resource")
 	@Override
 	public AST generate(String filename, String source, String[] srcFolders) {
 
@@ -82,6 +85,9 @@ public class CppParser extends Parser{
 			
 			IASTTranslationUnit tu = generateTu(filename, source);
 			CppVisitor visitor = new CppVisitor();
+			visitor.setHeaders(new ArrayList<AbstractType>());
+			
+			
 			String folder = filename.substring(0,filename.lastIndexOf("/"));
        	 
 	        for (IASTPreprocessorIncludeStatement include : tu.getIncludeDirectives()) {
@@ -102,11 +108,12 @@ public class CppParser extends Parser{
 	        	   }
 	        			
 	        		IASTTranslationUnit tu2 = generateTu(namefile, includesource);
-	        		CppVisitor visitor2 = new CppVisitor();
-	        		tu2.accept(visitor2);
-	        		ast.setSource( includesource+"\r\n"+ast.getSource() );
-	        		visitor.setTypes(visitor2.getTypes());
-	        		visitor.setMethods(visitor2.getMethods());
+	        		HeaderVisitor visitorHeader = new HeaderVisitor();
+	        		tu2.accept(visitorHeader);
+	        		//ast.setSource( includesource+"\r\n"+ast.getSource() );
+	        		for(AbstractType type: visitorHeader.getTypes()) {
+	        			visitor.getHeaders().add(type);
+	        		}	
 	        		
 	        	}
 				

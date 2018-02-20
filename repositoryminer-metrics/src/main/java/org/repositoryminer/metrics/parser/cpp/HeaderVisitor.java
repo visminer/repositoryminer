@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 import org.eclipse.cdt.core.dom.IName;
 import org.eclipse.cdt.core.dom.ast.ASTVisitor;
 import org.eclipse.cdt.core.dom.ast.DOMException;
+import org.eclipse.cdt.core.dom.ast.ExpansionOverlapsBoundaryException;
 import org.eclipse.cdt.core.dom.ast.IASTCompositeTypeSpecifier;
 import org.eclipse.cdt.core.dom.ast.IASTDeclSpecifier;
 import org.eclipse.cdt.core.dom.ast.IASTDeclaration;
@@ -55,12 +56,11 @@ import org.repositoryminer.metrics.ast.AbstractStatement;
 import org.repositoryminer.metrics.ast.AbstractType;
 import org.repositoryminer.metrics.ast.NodeType;
 
-public class CppVisitor extends ASTVisitor {
+public class HeaderVisitor extends ASTVisitor {
 	
 	private List<AbstractMethod> methods = new ArrayList<AbstractMethod>();
 	private List<AbstractImport> imports = new ArrayList<AbstractImport>();
 	private List<AbstractType>  types = new ArrayList<AbstractType>();
-	private List<AbstractType>  headers = new ArrayList<AbstractType>();
 	private AbstractClass classe;
 	private AbstractMethod currmethod = new AbstractMethod();	
 	
@@ -68,14 +68,9 @@ public class CppVisitor extends ASTVisitor {
 	
 	
 	
-	public CppVisitor() {
+	public HeaderVisitor() {
 		super();
-		this.shouldVisitDeclarations = true;
-		this.shouldVisitDeclarators = true;
-		this.shouldVisitStatements = true;
-		this.shouldVisitNames = true;
-		this.shouldVisitAttributes = true;
-		
+		this.shouldVisitNames = true;		
 	}
 	
 	
@@ -108,18 +103,8 @@ public class CppVisitor extends ASTVisitor {
 		return this.types;
 	}
 	
-	public List<AbstractType> getHeaders() {
-		return headers;
-	}
-
-	public void setHeaders(List<AbstractType> headers) {
-		this.headers = headers;
-	}	
-	
-	
 	
 
-	
 	public AbstractMethod generateMethod(CPPASTFunctionDeclarator declarator, IASTDeclSpecifier specifier,String body) {
 		
 		
@@ -166,6 +151,7 @@ public class CppVisitor extends ASTVisitor {
 			while (matcher.find()) {
 				lines++;
 			}
+			
 			method.setLength( lines );
 			
 			
@@ -360,394 +346,6 @@ public class CppVisitor extends ASTVisitor {
 		return PROCESS_CONTINUE;
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.cdt.core.dom.ast.ASTVisitor#visit(org.eclipse.cdt.core.dom.ast.IASTDeclaration)
-	 * TO DO Extract Search Types and Headers from Method
-	 */
-	
-	@Override
-	public int visit(IASTDeclaration declaration)
-	{
-	
-
-		
-        if ((declaration instanceof IASTFunctionDefinition)) {
-          IASTFunctionDefinition ast = (IASTFunctionDefinition) declaration;
-          IScope scope = ast.getScope();
-          
-          String body = ast.getRawSignature();
-          
-          try{
-        	  
-        	  IName parent = scope.getParent().getScopeName();
-        	  CPPASTFunctionDeclarator funcDecl = (CPPASTFunctionDeclarator) ast.getDeclarator();
-        	  IASTDeclSpecifier specifier = ast.getDeclSpecifier();
-        	  currmethod  = generateMethod(funcDecl, specifier,body);
-        	  
-        	  
-        	  if(parent == null) {
-        		
-        		  if(funcDecl.getName().toString().indexOf("::") > -1) {
-    
-        			  String parentName = funcDecl.getName().toString().split("::")[0];
-      				  boolean existclass = false;
-					  boolean existmethod = false;
-					  
-					  for( AbstractType tipo: this.getTypes() ) {
-						  if(tipo.getName().equals(parentName) ) {
-							  classe = (AbstractClass) tipo;
-							  existclass = true;
-							  for (AbstractMethod m : tipo.getMethods()) {
-								  if (areEqual(m, currmethod) ) {
-									  existmethod = true;
-									  
-									  if(m.getBody().length() < currmethod.getBody().length()) {
-											 m.setBody(currmethod.getBody());
-											 m.setLength(currmethod.getLength());
-										 }
-										  
-									  break;
-								  }
-								
-							  }
-								
-							  if(!existmethod) {
-								    currmethod.getModifiers().add("Public");
-									classe.getMethods().add(currmethod);
-							}
-								break;
-							}
-						}
-					  
-					  if(!existclass) {
-						  
-						for( AbstractType tipo: this.getHeaders()) {
-							  if(tipo.getName().equals(parentName) ) {
-								  
-								  classe = (AbstractClass) tipo;
-								  this.getTypes().add(classe);
-								  existclass = true;
-								  for (AbstractMethod m : tipo.getMethods()) {
-									  if (areEqual(m, currmethod) ) {
-										  existmethod = true;
-										  
-										  if(m.getBody().length() < currmethod.getBody().length()) {
-												 m.setBody(currmethod.getBody());
-												 m.setLength(currmethod.getLength());
-											 }
-											  
-										  break;
-									  }
-									
-								  }
-									
-								  if(!existmethod) {
-									    currmethod.getModifiers().add("Public");
-										classe.getMethods().add(currmethod);
-								}
-									break;
-								}
-							}
-					  					
-					  }	
-						
-						if(!existclass) {
-							
-						
-							
-							classe  = new AbstractClass();					
-							classe.setName(parentName);
-							classe.setInterface(funcDecl.isPureVirtual());
-							classe.setMethods(new ArrayList<AbstractMethod>());
-							currmethod.getModifiers().add("Public");
-							classe.getMethods().add(currmethod);
-							
-							types.add(classe);
-														
-						}
-						
-						
-						
-						
-						
-        		  }else {
-        			  this.methods.add(currmethod);
-        		  }
-        		  
-        		  
-        		 
-        	  }else {
-  				
-        		  
-        		Boolean existmethod = false;
-        		Boolean existclass = false;
-        		
-  				for(AbstractType cla : this.getTypes()) {
-  					
-  					if(cla.getName().equals(parent.toString())) {
-  						existclass = true;
-  						for (AbstractMethod m : cla.getMethods()) {
-							if (areEqual(m, currmethod ) ) {
-								existmethod = true;
-								 if(m.getBody().length() < currmethod.getBody().length()) {
-									 m.setBody(currmethod.getBody());
-									 m.setLength(currmethod.getLength());
-								 }
-									  	
-								 
-								 
-								break;
-																
-							}
-						
-						}
-						
-						if(!existmethod) {
-							currmethod.getModifiers().add("Public");
-							cla.getMethods().add(currmethod);
-						}
-  						
-  					}
-  					
-  					
-  				}
-  				
-  				 if(!existclass) {
-					  
-						for( AbstractType tipo: this.getHeaders()) {
-							  if(tipo.getName().equals(parent.toString()) ) {
-								  
-								  classe = (AbstractClass) tipo;
-								  this.getTypes().add(classe);
-								  existclass = true;
-								  for (AbstractMethod m : tipo.getMethods()) {
-									  if (areEqual(m, currmethod) ) {
-										  existmethod = true;
-										  
-										  if(m.getBody().length() < currmethod.getBody().length()) {
-												 m.setBody(currmethod.getBody());
-												 m.setLength(currmethod.getLength());
-											 }
-											  
-										  break;
-									  }
-									
-								  }
-									
-								  if(!existmethod) {
-									    currmethod.getModifiers().add("Public");
-										classe.getMethods().add(currmethod);
-								}
-									break;
-								}
-							}
-					  					
-					  }
-  				
-  				if(!existclass) {
-
-  					    classe  = new AbstractClass();					
-					
-  						classe.setName(parent.toString());
-  						classe.setInterface(funcDecl.isPureVirtual());
-  						classe.setMethods(new ArrayList<AbstractMethod>());
-  						currmethod.getModifiers().add("Public");
-  						classe.getMethods().add(currmethod);
-  						
-  						types.add(classe);
-  						
-  				}
-  				
-  			}
-        	            }
-          catch (DOMException e) {
-        	  e.printStackTrace();
-          } 
-          	
-        }
-
-        return PROCESS_CONTINUE;
-		
-	}
-	
-	
-	
-	@Override
-	public int visit(IASTStatement statement) {
-		
-			
-		if (statement instanceof CPPASTCompoundStatement) {
-			CPPASTCompoundStatement compElement = (CPPASTCompoundStatement) statement;
-			IASTStatement[] stmts = compElement.getStatements();
-			
-			List<AbstractStatement> statements = new ArrayList<AbstractStatement>();
-			
-						
-			for(IASTStatement stmt: stmts) {
-				
-				
-				if (stmt instanceof CPPASTIfStatement) {
-					CPPASTIfStatement ifStmt = (CPPASTIfStatement) stmt;
-					
-					AbstractStatement ifs = new AbstractStatement(NodeType.IF);
-					ifs.setExpression(ifStmt.getConditionExpression().getRawSignature());
-					statements.add(ifs);
-					
-					IASTStatement elseStmt = ifStmt.getElseClause();
-					while(elseStmt != null) {
-						
-						if( elseStmt instanceof CPPASTIfStatement ) {
-							
-							CPPASTIfStatement elseif = (CPPASTIfStatement) elseStmt;
-							
-							AbstractStatement elsesif = new AbstractStatement(NodeType.IF);
-							elsesif.setExpression(elseif.getConditionExpression().getRawSignature());
-							
-							statements.add(elsesif);		
-							elseStmt = elseif.getElseClause();
-							
-						}else {
-							
-							AbstractStatement elses = new AbstractStatement(NodeType.ELSE);
-							elses.setExpression(null);
-							statements.add(elses);		
-							elseStmt = null;
-							
-						}
-						
-						
-					}
-					
-					
-					
-
-				}else if (stmt instanceof CPPASTForStatement) {
-					CPPASTForStatement forStmt = (CPPASTForStatement) stmt;
-
-					AbstractStatement fors = new AbstractStatement(NodeType.FOR);
-					fors.setExpression(forStmt.getConditionExpression().getRawSignature());
-					statements.add(fors);
-					
-					
-				}else if (stmt instanceof CPPASTWhileStatement) {
-					CPPASTWhileStatement whileStmt = (CPPASTWhileStatement) stmt;
-
-					AbstractStatement whiles = new AbstractStatement(NodeType.WHILE);
-					whiles.setExpression( whileStmt.getCondition().getRawSignature() );
-					
-
-					statements.add(whiles);
-					
-					
-				}else if (stmt instanceof CPPASTDoStatement) {
-					CPPASTDoStatement doStmt = (CPPASTDoStatement) stmt;
-
-					AbstractStatement dowhile = new AbstractStatement(NodeType.DO_WHILE);
-					dowhile.setExpression(doStmt.getCondition().getRawSignature());
-					statements.add(dowhile);
-					
-					
-				}else if (stmt instanceof CPPASTSwitchStatement) {
-					CPPASTSwitchStatement switchStmt = (CPPASTSwitchStatement) stmt;
-
-					AbstractStatement switchs = new AbstractStatement(NodeType.SWITCH);
-					switchs.setExpression(switchStmt.getControllerExpression().toString());
-					statements.add(switchs);
-				
-				}else if(stmt instanceof CPPASTCaseStatement) {
-					CPPASTCaseStatement caseStmt = (CPPASTCaseStatement) stmt;
-					
-					AbstractStatement cases = new AbstractStatement(NodeType.SWITCH_CASE);
-					cases.setExpression(caseStmt.getExpression().toString());
-					statements.add(cases);
-					
-				}else if(stmt instanceof CPPASTDefaultStatement) {
-					
-					AbstractStatement casedefault = new AbstractStatement(NodeType.SWITCH_DEFAULT);
-					casedefault.setExpression(null);
-					statements.add(casedefault);
-					
-					
-				}else if(stmt instanceof CPPASTBreakStatement) {
-					
-					AbstractStatement breaks = new AbstractStatement(NodeType.BREAK);
-					breaks.setExpression(null);
-					statements.add(breaks);
-					
-					
-				}else if(stmt instanceof CPPASTContinueStatement) {
-					
-					AbstractStatement continues = new AbstractStatement(NodeType.CONTINUE);
-					continues.setExpression(null);
-					statements.add(continues);
-
-					
-				}else if(stmt instanceof CPPASTTryBlockStatement) {
-					CPPASTTryBlockStatement tryStmt = (CPPASTTryBlockStatement) stmt;
-					ICPPASTCatchHandler[] catchs = tryStmt.getCatchHandlers();
-					
-					AbstractStatement trys = new AbstractStatement(NodeType.TRY);
-					trys.setExpression(null);
-					statements.add(trys);
-					
-					
-					for(ICPPASTCatchHandler cat : catchs ) {
-						
-						AbstractStatement catchers = new AbstractStatement(NodeType.CATCH);
-						catchers.setExpression(null);
-						statements.add(catchers);
-					}
-	
-					
-				}else if(stmt instanceof CPPASTExpressionStatement) {
-					
-					CPPASTExpressionStatement expressionStmt = (CPPASTExpressionStatement) stmt;
-					
-					IASTExpression expression = expressionStmt.getExpression();
-					
-					if( expression instanceof CPPASTConditionalExpression  ) {
-					
-						AbstractStatement expressions = new AbstractStatement(NodeType.CONDITIONAL_EXPRESSION);
-						expressions.setExpression(expression.getRawSignature().toString());
-						statements.add(expressions);
-					}
-					
-				}
-				
-			}
-			
-			
-			if (statement.getParent() instanceof CPPASTFunctionDefinition) {
-				CPPASTFunctionDefinition funcDef = (CPPASTFunctionDefinition) statement.getParent();
-				CPPASTFunctionDeclarator funcDecl = (CPPASTFunctionDeclarator) funcDef.getDeclarator();
-				IASTDeclSpecifier funcSpec = funcDef.getDeclSpecifier();
-			
-				for (AbstractMethod method : classe.getMethods()) {
-					
-					if (areEqual(method,generateMethod(funcDecl, funcSpec,funcDef.getRawSignature().toString()))) {
-						currmethod = method;
-						break;
-						
-					}
-				}
-			
-			}
-			
-			
-			if (statements.size() > 0) {
-				for(AbstractStatement s: statements) {
-					currmethod.getStatements().add(s);
-				}
-				
-			}
-			
-		}
-		return PROCESS_CONTINUE;
-	}
-
-
-
 	
 	
 }
