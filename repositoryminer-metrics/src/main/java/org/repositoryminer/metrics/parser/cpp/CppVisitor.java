@@ -213,11 +213,16 @@ public class CppVisitor extends ASTVisitor {
 		boolean are = (method1.getName().equals(method2.getName())
 				&& (method1.getReturnType().equals(method1.getReturnType())) 
 				&& (method1.getParameters().size() == method2.getParameters().size()));
+		
+		//System.out.println(method1.getParameters().size());
+		
 
 		if (are) {
 			for (int i = 0; (are) && (i < method1.getParameters().size()); i++) {
+				//System.out.println(method1.getParameters().get(i).getName() + " " + method1.getParameters().get(i).getType());
+				//System.out.println(method2.getParameters().get(i).getName() + " " + method2.getParameters().get(i).getType());
+				
 				are = (are
-						&& (method1.getParameters().get(i).getName().equals(method2.getParameters().get(i).getName())) 
 						&& (method1.getParameters().get(i).getType().equals(method2.getParameters().get(i).getType())));
 			}
 		}
@@ -353,6 +358,7 @@ public class CppVisitor extends ASTVisitor {
 			}
 			
 			enumm.setConstants(constants);
+			enumm.setMethods(new ArrayList<AbstractMethod>());
 
 			types.add(enumm);
 		}
@@ -361,8 +367,7 @@ public class CppVisitor extends ASTVisitor {
 	}
 	
 	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.cdt.core.dom.ast.ASTVisitor#visit(org.eclipse.cdt.core.dom.ast.IASTDeclaration)
+	 * 
 	 * TO DO Extract Search Types and Headers from Method
 	 */
 	
@@ -380,11 +385,15 @@ public class CppVisitor extends ASTVisitor {
           
           try{
         	  
+
+        	  // System.out.println(body);
+        	  //System.out.println(body);
         	  IName parent = scope.getParent().getScopeName();
         	  CPPASTFunctionDeclarator funcDecl = (CPPASTFunctionDeclarator) ast.getDeclarator();
         	  IASTDeclSpecifier specifier = ast.getDeclSpecifier();
         	  currmethod  = generateMethod(funcDecl, specifier,body);
-        	  
+
+        	 
         	  
         	  if(parent == null) {
         		
@@ -394,14 +403,32 @@ public class CppVisitor extends ASTVisitor {
       				  boolean existclass = false;
 					  boolean existmethod = false;
 					  
+					 
+					  //System.out.println("-->"+funcDecl.getName());
+		        	  //System.out.println(body);
+
+					  
 					  for( AbstractType tipo: this.getTypes() ) {
+						  
 						  if(tipo.getName().equals(parentName) ) {
+							  
+							  
 							  classe = (AbstractClass) tipo;
+							  
+							  //System.out.println("=================================");
+							  //System.out.println("@@@"+classe.getName());
+							 // System.out.println(classe.getBody());
+							
+							  
 							  existclass = true;
 							  for (AbstractMethod m : tipo.getMethods()) {
+								  
+								  
+								  
 								  if (areEqual(m, currmethod) ) {
 									  existmethod = true;
-									  
+									  //System.out.println("                 "+m.getName() + "-------->"+ currmethod.getName() );
+										 
 									  if(m.getBody().length() < currmethod.getBody().length()) {
 											 m.setBody(currmethod.getBody());
 											 m.setLength(currmethod.getLength());
@@ -411,6 +438,8 @@ public class CppVisitor extends ASTVisitor {
 								  }
 								
 							  }
+								
+							 // System.out.println(" 00000000000000000000000000" );
 								
 							  if(!existmethod) {
 								    currmethod.getModifiers().add("Public");
@@ -423,10 +452,16 @@ public class CppVisitor extends ASTVisitor {
 					  if(!existclass) {
 						  
 						for( AbstractType tipo: this.getHeaders()) {
-							  if(tipo.getName().equals(parentName) ) {
+							  if( !(tipo instanceof  AbstractEnum) && tipo.getName().equals(parentName) ) {
 								  
 								  classe = (AbstractClass) tipo;
-								  this.getTypes().add(classe);
+
+								  //System.out.println("=================================");
+								  //System.out.println(classe.getBody());
+								  //System.out.println("+++"+classe.getName());
+									 
+								  
+								  
 								  existclass = true;
 								  for (AbstractMethod m : tipo.getMethods()) {
 									  if (areEqual(m, currmethod) ) {
@@ -436,6 +471,7 @@ public class CppVisitor extends ASTVisitor {
 												 m.setBody(currmethod.getBody());
 												 m.setLength(currmethod.getLength());
 											 }
+										  
 											  
 										  break;
 									  }
@@ -446,7 +482,8 @@ public class CppVisitor extends ASTVisitor {
 									    currmethod.getModifiers().add("Public");
 										classe.getMethods().add(currmethod);
 								}
-									break;
+								   this.getTypes().add(classe);
+								   break;
 								}
 							}
 					  					
@@ -516,7 +553,7 @@ public class CppVisitor extends ASTVisitor {
   				 if(!existclass) {
 					  
 						for( AbstractType tipo: this.getHeaders()) {
-							  if(tipo.getName().equals(parent.toString()) ) {
+							  if( !(tipo instanceof  AbstractEnum) &&  tipo.getName().equals(parent.toString()) ) {
 								  
 								  classe = (AbstractClass) tipo;
 								  this.getTypes().add(classe);
@@ -591,7 +628,9 @@ public class CppVisitor extends ASTVisitor {
 					CPPASTIfStatement ifStmt = (CPPASTIfStatement) stmt;
 					
 					AbstractStatement ifs = new AbstractStatement(NodeType.IF);
-					ifs.setExpression(ifStmt.getConditionExpression().getRawSignature());
+					String exp = ifStmt.getConditionExpression() == null ? "" : ifStmt.getConditionExpression().getRawSignature();
+					
+					ifs.setExpression(exp);
 					statements.add(ifs);
 					
 					IASTStatement elseStmt = ifStmt.getElseClause();
@@ -602,7 +641,9 @@ public class CppVisitor extends ASTVisitor {
 							CPPASTIfStatement elseif = (CPPASTIfStatement) elseStmt;
 							
 							AbstractStatement elsesif = new AbstractStatement(NodeType.IF);
-							elsesif.setExpression(elseif.getConditionExpression().getRawSignature());
+							String expElse = elseif.getConditionExpression() == null ? "" : elseif.getConditionExpression().getRawSignature();
+							
+							elsesif.setExpression(expElse);
 							
 							statements.add(elsesif);		
 							elseStmt = elseif.getElseClause();
@@ -626,7 +667,8 @@ public class CppVisitor extends ASTVisitor {
 					CPPASTForStatement forStmt = (CPPASTForStatement) stmt;
 
 					AbstractStatement fors = new AbstractStatement(NodeType.FOR);
-					fors.setExpression(forStmt.getConditionExpression().getRawSignature());
+					String exp = forStmt.getConditionExpression() == null ? ";;" : forStmt.getConditionExpression().getRawSignature();
+					fors.setExpression(exp);
 					statements.add(fors);
 					
 					
@@ -652,7 +694,9 @@ public class CppVisitor extends ASTVisitor {
 					CPPASTSwitchStatement switchStmt = (CPPASTSwitchStatement) stmt;
 
 					AbstractStatement switchs = new AbstractStatement(NodeType.SWITCH);
-					switchs.setExpression(switchStmt.getControllerExpression().toString());
+					String exp = switchStmt.getControllerExpression() == null ? "" : switchStmt.getControllerExpression().toString();
+					
+					switchs.setExpression(exp);
 					statements.add(switchs);
 				
 				}else if(stmt instanceof CPPASTCaseStatement) {
@@ -719,10 +763,17 @@ public class CppVisitor extends ASTVisitor {
 			
 			
 			if (statement.getParent() instanceof CPPASTFunctionDefinition) {
+				
+				
 				CPPASTFunctionDefinition funcDef = (CPPASTFunctionDefinition) statement.getParent();
 				CPPASTFunctionDeclarator funcDecl = (CPPASTFunctionDeclarator) funcDef.getDeclarator();
 				IASTDeclSpecifier funcSpec = funcDef.getDeclSpecifier();
-			
+				
+				//System.out.println(statement.getRawSignature());
+				//System.out.println(funcDef.getRawSignature().toString());
+				
+				if(classe != null) {
+				
 				for (AbstractMethod method : classe.getMethods()) {
 					
 					if (areEqual(method,generateMethod(funcDecl, funcSpec,funcDef.getRawSignature().toString()))) {
@@ -731,6 +782,13 @@ public class CppVisitor extends ASTVisitor {
 						
 					}
 				}
+				
+				}else {
+					
+					currmethod = generateMethod(funcDecl, funcSpec,funcDef.getRawSignature().toString());
+					
+				}
+				
 			
 			}
 			

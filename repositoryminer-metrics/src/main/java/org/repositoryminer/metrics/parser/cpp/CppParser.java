@@ -40,6 +40,7 @@ public class CppParser extends Parser{
 	public CppParser() {
 		super.id = Language.CPP;
 		super.extensions = EXTENSIONS;
+		
 	}
 	
 	public IASTTranslationUnit generateTu(String filename,String source) {
@@ -49,7 +50,7 @@ public class CppParser extends Parser{
 		FileContent file = FileContent.create(filename, source.toCharArray());
 		
 					
-		System.out.println(file.getFileLocation());
+		//System.out.println(file.getFileLocation());
 		
 		
 		Map<String, String> macroDefinitions = new HashMap<>();
@@ -82,40 +83,51 @@ public class CppParser extends Parser{
 			AST ast = new AST();
 			ast.setName(filename);
 			ast.setSource(source);
+			ast.setLanguage("cpp");
 			
 			IASTTranslationUnit tu = generateTu(filename, source);
 			CppVisitor visitor = new CppVisitor();
 			visitor.setHeaders(new ArrayList<AbstractType>());
 			
-			
-			String folder = filename.substring(0,filename.lastIndexOf("/"));
+				
+			//String folder = filename.substring(0,filename.lastIndexOf("/"));
        	 
 	        for (IASTPreprocessorIncludeStatement include : tu.getIncludeDirectives()) {
-	
-	        	 String namefile = folder+"/"+include.getName().getRawSignature().toString();
-
-	        	 
-	        	 File f = new File(namefile);
 	        	
+	        	
+	        	for(String folder: this.getSourceFolders()) {
+					//System.out.println(folder);
+			       	
+				
+		
+		        	 String namefile = folder+"/"+include.getName().getRawSignature().toString();
+	
+		        	 File f = new File(namefile);
+		        	
+		        	 
+		        	 if(include.getName().getRawSignature().toString().endsWith(".h")  && f.exists() ) {
+		        		 //System.out.println("----->"+namefile);
+		 	        	
+		        	   
+		        		 String includesource = "";
+		        	   try {
+		        		  includesource = new Scanner(f).useDelimiter("\\Z").next();
+		        	   } catch (FileNotFoundException e) {
+		        		   e.printStackTrace();
+		        	   }
+		        			
+		        		IASTTranslationUnit tu2 = generateTu(namefile, includesource);
+		        		HeaderVisitor visitorHeader = new HeaderVisitor();
+		        		tu2.accept(visitorHeader);
+		        		//ast.setSource( includesource+"\r\n"+ast.getSource() );
+		        		for(AbstractType type: visitorHeader.getTypes()) {
+		        			visitor.getHeaders().add(type);
+		        		}	
+		        		
+		        		break;
+		        	}
 	        	 
-	        	 if(include.getName().getRawSignature().toString().endsWith(".h")  && f.exists() ) {
-	        	   
-	        		 String includesource = "";
-	        	   try {
-	        		  includesource = new Scanner(f).useDelimiter("\\Z").next();
-	        	   } catch (FileNotFoundException e) {
-	        		   e.printStackTrace();
-	        	   }
-	        			
-	        		IASTTranslationUnit tu2 = generateTu(namefile, includesource);
-	        		HeaderVisitor visitorHeader = new HeaderVisitor();
-	        		tu2.accept(visitorHeader);
-	        		//ast.setSource( includesource+"\r\n"+ast.getSource() );
-	        		for(AbstractType type: visitorHeader.getTypes()) {
-	        			visitor.getHeaders().add(type);
-	        		}	
-	        		
-	        	}
+	        	}	 
 				
 			}
 	        

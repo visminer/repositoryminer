@@ -27,14 +27,49 @@ public class LOC extends CodeMetric {
 		
 		for (AbstractType type : ast.getTypes()) {
 			
-			ClassReport cr = fileReport.getClass(type.getName());
-			cr.getMetricsReport().setCodeMetric(CodeMetricId.LOC, calculate(ast, type));
+			if(type.getBody() == null && !ast.getLanguage().equals("cpp") ) {
+				
+				ClassReport cr = fileReport.getClass(type.getName());
+				cr.getMetricsReport().setCodeMetric(CodeMetricId.LOC, calculate(ast, type));
 			
-			for (AbstractMethod method : type.getMethods()) {
-				MethodReport mr = cr.getMethodBySignature(method.getName());
-				mr.getMetricsReport().setCodeMetric(CodeMetricId.LOC, calculate(ast, method));
+				for (AbstractMethod method : type.getMethods()) {
+					MethodReport mr = cr.getMethodBySignature(method.getName());
+					mr.getMetricsReport().setCodeMetric(CodeMetricId.LOC, calculate(ast, method));
+				}
+				
+				
+			}else if(type.getBody() != null){
+				/*
+				 * o Parser C++ não me permite gravar o PositionStart e PositionEnd dos elementos, 
+				 * forçando assim a salvar o corpo dos elementos
+				 * */
+				ClassReport cr = fileReport.getClass(type.getName());
+				Integer classMetric = calculate(type.getBody().substring(type.getBody().indexOf('{')));
+				Integer totalMethods = 0;
+				
+				for (AbstractMethod method : type.getMethods()) {
+					MethodReport mr = cr.getMethodBySignature(method.getName());
+					
+					Integer bracket = method.getBody().contains("{") ? method.getBody().indexOf('{') : 0;
+					
+					mr.getMetricsReport().setCodeMetric(CodeMetricId.LOC, calculate(method.getBody().substring(bracket)));
+					totalMethods +=  mr.getMetricsReport().getCodeMetric(CodeMetricId.LOC,Integer.class);
+				}
+				
+				cr.getMetricsReport().setCodeMetric(CodeMetricId.LOC, classMetric + totalMethods );
+				
+			}else {
+				ClassReport cr = fileReport.getClass(type.getName());
+				cr.getMetricsReport().setCodeMetric(CodeMetricId.LOC, 0);
+				
+				
 			}
 		}
+		
+		
+		
+		
+		
 	}
 
 	public int calculate(AST ast, AbstractType type) {

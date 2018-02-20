@@ -27,20 +27,23 @@ public class AMLOC extends CodeMetric {
 			System.out.println(type.getName());
 
 			double total = 0.0;
-						
-			for(AbstractMethod method: type.getMethods()) {
-				
-				MethodReport metReport = claReport.getMethodBySignature(method.getName());
-				total += metReport.getMetricsReport().getCodeMetric(CodeMetricId.LOC,Integer.class);
-				
-				
-			}
-			
+			Double amlocValue = 0.0;
 			double numMethods = (double) claReport.getMetricsReport().getCodeMetric(CodeMetricId.NOM,Integer.class);
 			
-			Double amlocValue = 0.0;
-			if(numMethods > 0) {
-				amlocValue =  (total/numMethods);
+			if(type.getMethods().size()>0) {			
+				for(AbstractMethod method: type.getMethods()) {
+					
+					MethodReport metReport = claReport.getMethodBySignature(method.getName());
+					Integer metricMethod = metReport.getMetricsReport().getCodeMetric(CodeMetricId.LOC,Integer.class) == null ? 0 : metReport.getMetricsReport().getCodeMetric(CodeMetricId.LOC,Integer.class);
+					System.out.println(metReport.getMetricsReport().getCodeMetric(CodeMetricId.LOC,Integer.class));
+					
+					total += metricMethod;
+					
+				}
+				
+				if(numMethods > 0) {
+					amlocValue =  (total/numMethods);
+				}
 			}
 			
 			claReport.getMetricsReport().setCodeMetric(CodeMetricId.AMLOC, amlocValue );

@@ -219,12 +219,20 @@ public class HeaderVisitor extends ASTVisitor {
 			
 			CPPASTCompositeTypeSpecifier typeSpe = (CPPASTCompositeTypeSpecifier) name.getParent(); 
 			
+			if(typeSpe.getName().toString().isEmpty())
+				return 3;
+				
 			classe = new AbstractClass();
 			classe.setName(typeSpe.getName().toString());
 			classe.setInterface(typeSpe.isVirtual());
 			classe.setMethods(new ArrayList<AbstractMethod>());
 			classe.setFields(new ArrayList<AbstractField>());
 			classe.setBody(typeSpe.getRawSignature());
+			
+			
+			 //System.out.println("==========@@@@@@@@@@@@@@@@@@@@@@@@@@@@@=======================");
+			  //System.out.println(classe.getName());
+			 // System.out.println(classe.getBody());
 			
 			
 			
