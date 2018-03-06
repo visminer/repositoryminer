@@ -37,7 +37,7 @@ public class LongMethod extends CodeSmell {
 			for (MethodReport mr : cr.getMethods()) {
 				int loc = mr.getMetricsReport().getCodeMetric(CodeMetricId.LOC, Integer.class);
 				if (loc > mlocThreshold) {
-					cr.getMetricsReport().setCodeSmell(CodeSmellId.LONG_METHOD);
+					mr.getMetricsReport().setCodeSmell(CodeSmellId.LONG_METHOD);
 				}
 			}
 		}
