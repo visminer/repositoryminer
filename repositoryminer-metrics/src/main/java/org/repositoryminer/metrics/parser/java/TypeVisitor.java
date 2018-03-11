@@ -90,14 +90,20 @@ public class TypeVisitor extends ASTVisitor {
 	public boolean visit(FieldDeclaration node) {
 		List<AbstractField> fields2 = new ArrayList<>();
 		ITypeBinding bind = node.getType().resolveBinding();
-		String type = bind.getQualifiedName();
-
+		
+		String type = "";
+		boolean primitive = false;
+		
+		if (bind != null) {
+			type = bind.getQualifiedName();
+			primitive = bind.isPrimitive();
+		}
+		
 		List<String> modifiers = new ArrayList<String>();
 		for (Object modifier : node.modifiers()) {
 			modifiers.add(modifier.toString());
 		}
 
-		boolean primitive = bind.isPrimitive();
 		boolean builtIn = type.startsWith("java.") || type.startsWith("javax.") ? true : false;
 		
 		for (VariableDeclarationFragment vdf : (List<VariableDeclarationFragment>) node.fragments()) {
