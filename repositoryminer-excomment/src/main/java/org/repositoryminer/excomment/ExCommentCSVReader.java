@@ -62,8 +62,8 @@ public class ExCommentCSVReader {
 					Double.parseDouble(record.get(3).replaceAll(",", ".")), record.get(4), record.get(6), record.get(7));
 
 			String filename = FilenameUtils.normalize(record.get(5), true);
-			filename = filename.substring(repositoryPath.length() + 1);
 
+			
 			if (!filesMap.containsKey(filename)) {
 				filesMap.put(filename, new ArrayList<Integer>());
 			}
