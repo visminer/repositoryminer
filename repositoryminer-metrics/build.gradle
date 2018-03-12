@@ -13,9 +13,6 @@ sourceSets {
 
 repositories {
      jcenter()
-     flatDir {
-     	dirs 'libs'
-     }
 }
 
 dependencies {
@@ -24,5 +21,4 @@ dependencies {
     compile group: 'org.slf4j', name: 'slf4j-simple', version:'1.7.21'
     compile group: 'commons-io', name: 'commons-io', version: '2.5'
     compile group: 'org.eclipse.jdt', name: 'org.eclipse.jdt.core', version: '3.13.0'
-	compile name: 'org.eclipse.cdt.core_5.8.0'
 }
