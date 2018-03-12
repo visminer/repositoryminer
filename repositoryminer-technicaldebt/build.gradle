@@ -1,4 +1,7 @@
-apply plugin: 'java'
+plugins {
+  id 'com.github.johnrengelman.shadow' version '2.0.2'
+  id 'java'
+}
 
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
@@ -15,14 +18,11 @@ repositories {
     jcenter()
 }
 
-// In this section you declare the dependencies for your production and test code
 dependencies {
-	compile project(':repositoryminer-core')
-	compile project(':repositoryminer-checkstyle')
-	compile project(':repositoryminer-findbugs')
-	compile project(':repositoryminer-metrics')
-	compile project(':repositoryminer-pmd')
-	compile project(':repositoryminer-excomment')
-	compile group: 'org.mongodb', name: 'mongo-java-driver', version:'3.2.2'
-    compile group: 'org.slf4j', name: 'slf4j-simple', version:'1.7.21'
+	shadow project(path: ':repositoryminer-core', configuration: 'shadow')
+	shadow project(':repositoryminer-checkstyle')
+	shadow project(':repositoryminer-findbugs')
+	shadow project(':repositoryminer-metrics')
+	shadow project(':repositoryminer-pmd')
+	shadow project(':repositoryminer-excomment')
 }
