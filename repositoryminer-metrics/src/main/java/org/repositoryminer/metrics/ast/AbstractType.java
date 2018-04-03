@@ -15,6 +15,8 @@ public class AbstractType {
 	private NodeType nodeType;
 	private List<AbstractMethod> methods;
 	private List<AbstractField> fields;
+	private String body;
+
 
 	public String getName() {
 		return name;
@@ -63,5 +65,14 @@ public class AbstractType {
 	public void setFields(List<AbstractField> fields) {
 		this.fields = fields;
 	}
+	
+	public String getBody() {
+		return body;
+	}
+
+	public void setBody(String body) {
+		this.body = body;
+	}
+
 
 }

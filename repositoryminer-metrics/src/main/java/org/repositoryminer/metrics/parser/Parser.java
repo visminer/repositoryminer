@@ -20,6 +20,7 @@ public abstract class Parser {
 	 *            the source folders.
 	 * 
 	 * @return the AST representing the source code.
+	 * @throws Exception 
 	 */
 	public abstract AST generate(String filename, String source, String[] srcFolders);
 

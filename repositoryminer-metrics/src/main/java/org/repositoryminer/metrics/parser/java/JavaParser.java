@@ -25,6 +25,8 @@ public class JavaParser extends Parser {
 	
 	@Override
 	public AST generate(String filename, String source, String[] srcFolders) {
+		
+		
 		AST ast = new AST();
 		ast.setName(filename);
 		ast.setSource(source);
