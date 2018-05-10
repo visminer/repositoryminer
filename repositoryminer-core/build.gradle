@@ -19,8 +19,8 @@ repositories {
 }
 
 dependencies {
-	compile group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '4.10.0.201712302008-r'
-    compile group: 'org.mongodb', name: 'mongo-java-driver', version:'3.2.2'
-    compile group: 'org.slf4j', name: 'slf4j-simple', version:'1.7.21'
-    compile group: 'commons-io', name: 'commons-io', version: '2.5'
+	implementation 'org.eclipse.jgit:org.eclipse.jgit:4.10.0.201712302008-r'
+    implementation 'org.mongodb:mongo-java-driver:3.2.2'
+    implementation 'org.slf4j:slf4j-simple:1.7.21'
+    implementation 'commons-io:commons-io:2.5'
 }

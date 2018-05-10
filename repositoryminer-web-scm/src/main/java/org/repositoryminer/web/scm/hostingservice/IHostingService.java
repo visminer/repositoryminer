@@ -13,10 +13,8 @@ public interface IHostingService {
 	 * password.
 	 * 
 	 * @param config
-	 * @param username
-	 * @param token
 	 */
-	public void connect(WebSCMConfig config, String username, String token);
+	public void connect(WebSCMConfig config);
 
 	/**
 	 * @return All issues from web repository service.

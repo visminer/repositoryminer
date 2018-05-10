@@ -20,5 +20,7 @@ repositories {
 
 dependencies {
     shadow project(path: ':repositoryminer-core', configuration: 'shadow')
-    compile group: 'org.apache.commons', name: 'commons-csv', version: '1.4'
+    implementation 'org.apache.commons:commons-csv:1.4'
+    testImplementation 'org.mongodb:mongo-java-driver:3.2.2'
+    testImplementation 'commons-io:commons-io:2.5'
 }

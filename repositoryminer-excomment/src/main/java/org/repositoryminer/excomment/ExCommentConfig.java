@@ -2,26 +2,37 @@ package org.repositoryminer.excomment;
 
 public class ExCommentConfig {
 
+	private String reference;
 	private String commentsCSV;
 	private String patternsCSV;
 	private String heuristicsCSV;
 	private char delimiter = ';';
 
-	public ExCommentConfig() { }
-	
-	public ExCommentConfig(String commentsCSV, String patternsCSV, String heuristicsCSV) {
+	public ExCommentConfig() {
+	}
+
+	public ExCommentConfig(String reference, String commentsCSV, String patternsCSV, String heuristicsCSV) {
+		this.reference = reference;
 		this.commentsCSV = commentsCSV;
 		this.patternsCSV = patternsCSV;
 		this.heuristicsCSV = heuristicsCSV;
 	}
 
 	public boolean isValid() {
-		return isValidValue(commentsCSV) && isValidValue(heuristicsCSV) && isValidValue(patternsCSV)
-				&& delimiter != '\u0000';
+		return isValidValue(reference) && isValidValue(commentsCSV) && isValidValue(heuristicsCSV)
+				&& isValidValue(patternsCSV) && delimiter != '\u0000';
 	}
 
 	private boolean isValidValue(String value) {
 		return value != null && value.length() > 0;
+	}
+
+	public String getReference() {
+		return reference;
+	}
+
+	public void setReference(String reference) {
+		this.reference = reference;
 	}
 
 	public String getCommentsCSV() {

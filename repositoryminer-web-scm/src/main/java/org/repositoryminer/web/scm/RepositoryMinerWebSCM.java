@@ -23,7 +23,7 @@ public class RepositoryMinerWebSCM extends MiningPlugin<WebSCMConfig>{
 	@Override
 	public void mine(WebSCMConfig config) {
 		service = HostingServiceFactory.getHostingService(config.getServiceType());
-		service.connect(config, config.getUsername(), config.getToken());
+		service.connect(config);
 		
 		List<Issue> issues = service.getAllIssues();
 		List<Milestone> milestones = service.getAllMilestones();
@@ -45,7 +45,7 @@ public class RepositoryMinerWebSCM extends MiningPlugin<WebSCMConfig>{
 					}
 				}
 
-				mile.setRepository(repositoryId);
+				mile.setRepository(repository.getId());
 				milesDocs.add(mile.toDocument());
 			}
 
@@ -59,7 +59,7 @@ public class RepositoryMinerWebSCM extends MiningPlugin<WebSCMConfig>{
 
 		if (issues.size() > 0) {
 			for (Issue issue : issues) {
-				issue.setRepository(repositoryId);
+				issue.setRepository(repository.getId());
 				issuesDocs.add(issue.toDocument());
 			}
 			issueDocHandler.insertMany(issuesDocs);

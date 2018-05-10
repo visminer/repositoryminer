@@ -1,23 +1,23 @@
 package org.repositoryminer.plugin;
 
-import org.bson.types.ObjectId;
+import org.bson.Document;
 import org.repositoryminer.RepositoryMiner;
 import org.repositoryminer.RepositoryMinerException;
+import org.repositoryminer.domain.Repository;
 import org.repositoryminer.persistence.RepositoryDAO;
-
-import com.mongodb.client.model.Projections;
 
 public abstract class MiningPlugin<T> {
 
-	protected ObjectId repositoryId;
+	protected Repository repository;
 	
 	public MiningPlugin(String repositoryKey) {
-		RepositoryDAO dao = new RepositoryDAO();
-		repositoryId = dao.findByKey(repositoryKey, Projections.include("_id")).getObjectId("_id");
+		Document repoDoc = new RepositoryDAO().findByKey(repositoryKey, null);
 		
-		if (repositoryId == null) {
+		if (repoDoc == null) {
 			throw new RepositoryMinerException("Repository not found.");
 		}
+		
+		repository = Repository.parseDocument(repoDoc);
 	}
 	
 	/**

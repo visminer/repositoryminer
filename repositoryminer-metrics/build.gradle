@@ -20,5 +20,7 @@ repositories {
 
 dependencies {
     shadow project(path: ':repositoryminer-core', configuration: 'shadow')
-    compile group: 'org.eclipse.jdt', name: 'org.eclipse.jdt.core', version: '3.13.0'
+    implementation 'org.eclipse.jdt:org.eclipse.jdt.core:3.13.0'
+    testImplementation 'org.mongodb:mongo-java-driver:3.2.2'
+    testImplementation 'commons-io:commons-io:2.5'
 }

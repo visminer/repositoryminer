@@ -30,9 +30,9 @@ public class GitHubService implements IHostingService {
 
 
 	@Override
-	public void connect(WebSCMConfig config, String username, String token) {
+	public void connect(WebSCMConfig config) {
 		GitHubClient client = new GitHubClient();
-		client.setCredentials(username, token);
+		client.setCredentials(config.getUsername(), config.getToken());
 		
 		this.repositoryId = new RepositoryId(config.getOwner(), config.getName());
 		this.issueServ = new IssueService(client);

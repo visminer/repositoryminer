@@ -25,4 +25,6 @@ dependencies {
 	shadow project(':repositoryminer-metrics')
 	shadow project(':repositoryminer-pmd')
 	shadow project(':repositoryminer-excomment')
+	testImplementation 'org.mongodb:mongo-java-driver:3.2.2'
+    testImplementation 'commons-io:commons-io:2.5'
 }

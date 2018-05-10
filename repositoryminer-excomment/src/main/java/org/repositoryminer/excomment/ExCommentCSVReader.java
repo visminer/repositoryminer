@@ -30,11 +30,9 @@ public class ExCommentCSVReader {
 	// keeps the relationship between files and comments
 	private Map<String, List<Integer>> filesMap = new HashMap<String, List<Integer>>();
 
-	private String repositoryPath;
 	private ExCommentConfig config;
 
-	public ExCommentCSVReader(String repositoryPath, ExCommentConfig config) {
-		this.repositoryPath = repositoryPath;
+	public ExCommentCSVReader(ExCommentConfig config) {
 		this.config = config;
 	}
 
