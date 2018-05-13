@@ -7,6 +7,9 @@ import java.util.zip.Checksum;
 
 import org.repositoryminer.RepositoryMinerException;
 
+/**
+ * Contains some utilities operations for strings.
+ */
 public class StringUtils {
 
 	/**

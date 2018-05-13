@@ -21,12 +21,16 @@ import org.repositoryminer.scm.SCMFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
+/**
+ * This class is responsible for extract informations from a SCM.
+ */
 public class ExtractionProcessor {
 
 	private static final Logger LOG = LoggerFactory.getLogger(ExtractionProcessor.class);
 	private static final int MAX_COMMITS = 1000; 
 	
-	private ISCM scm;
+	private static ISCM scm;
 
 	/**
 	 * Starts the mining process
@@ -37,15 +41,15 @@ public class ExtractionProcessor {
 	 *            parameters for the source-code analysis and persistence
 	 * @throws IOException
 	 */
-	public void extract(RepositoryMiner rm) throws IOException {
+	public static void extract(RepositoryMiner rm) throws IOException {
 		LOG.info("Starting extraction process.");
 		
-		File repositoryFolder = new File(rm.getRepositoryPath());
+		File repositoryFolder = new File(rm.getPath());
 		scm = SCMFactory.getSCM(rm.getSCM());
-		scm.open(rm.getRepositoryPath());
+		scm.open(rm.getPath());
 
-		Repository repository = new Repository(null, rm.getRepositoryKey(), rm.getRepositoryName(),
-				rm.getRepositoryPath(), rm.getSCM(), rm.getRepositoryDescription(),
+		Repository repository = new Repository(null, rm.getKey(), rm.getName(),
+				rm.getPath(), rm.getSCM(), rm.getDescription(),
 				new ArrayList<Developer>());
 
 		repository.setPath(repositoryFolder.getAbsolutePath().replace("\\", "/"));
@@ -55,15 +59,15 @@ public class ExtractionProcessor {
 		repoHandler.insert(repoDoc);
 		repository.setId(repoDoc.getObjectId("_id"));
 
-		saveReferences(repository.getId());
+		extractReferences(repository.getId());
 		repoHandler.updateOnlyContributors(repository.getId(),
-				Developer.toDocumentList(saveCommits(repository.getId())));
+				Developer.toDocumentList(extractCommits(repository.getId())));
 
 		scm.close();
 		LOG.info("Extraction finished.");
 	}
 
-	private void saveReferences(ObjectId repository) {
+	private static void extractReferences(ObjectId repository) {
 		LOG.info("Start references extraction process.");
 		
 		ReferenceDAO refDocumentHandler = new ReferenceDAO();
@@ -80,7 +84,7 @@ public class ExtractionProcessor {
 		LOG.info("References extraction process Finished.");
 	}
 
-	private Set<Developer> saveCommits(ObjectId repository) {
+	private static Set<Developer> extractCommits(ObjectId repository) {
 		LOG.info("Start commits extraction process.");
 		
 		CommitDAO documentHandler = new CommitDAO();

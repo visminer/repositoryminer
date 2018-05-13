@@ -10,65 +10,71 @@ import org.repositoryminer.persistence.RepositoryDAO;
  */
 public class RepositoryMiner {
 
-	private String repositoryKey;
-	private String repositoryPath;
-	private String repositoryName;
-	private String repositoryDescription;
+	private String key;
+	private String path;
+	private String name;
+	private String description;
 	private SCMType scm;
 
+	/**
+	 * Starts the SCM data extraction process. If a repository was analyzed before,
+	 * its informations will be updated.
+	 * 
+	 * @throws IOException
+	 */
 	public void mine() throws IOException {
 		RepositoryDAO repoDocHandler = new RepositoryDAO();
-		if (!repoDocHandler.wasMined(repositoryKey)) {
-			ExtractionProcessor processor = new ExtractionProcessor();
-			processor.extract(this);
+		if (!repoDocHandler.wasMined(key)) {
+			ExtractionProcessor.extract(this);
 		}
 		// TODO: update repository mining feature.
 	}
 
-	public RepositoryMiner() {}
-	
-	public RepositoryMiner(String repositoryKey, String repositoryPath, String repositoryName,
-			String repositoryDescription, SCMType scm) {
-		super();
-		this.repositoryKey = repositoryKey;
-		this.repositoryPath = repositoryPath;
-		this.repositoryName = repositoryName;
-		this.repositoryDescription = repositoryDescription;
+	public RepositoryMiner(String key) {
+		this.key = key;
+	}
+
+	public RepositoryMiner(String key, String path, String name,
+			String description, SCMType scm) {
+		this.key = key;
+		this.path = path;
+		this.name = name;
+		this.description = description;
 		this.scm = scm;
 	}
 
 	/*** Getters and Setters ***/
-	
-	public String getRepositoryKey() {
-		return repositoryKey;
+
+	public String getKey() {
+		return key;
 	}
 
-	public void setRepositoryKey(String repositoryKey) {
-		this.repositoryKey = repositoryKey;
+	public void setKey(String key) {
+		this.key = key;
 	}
 
-	public String getRepositoryPath() {
-		return repositoryPath;
+	public String getPath() {
+		return path;
 	}
 
-	public void setRepositoryPath(String repositoryPath) {
-		this.repositoryPath = repositoryPath;
+	public void setPath(String path) {
+		this.path = path;
 	}
 
-	public String getRepositoryName() {
-		return repositoryName;
+	public String getName() {
+		return name;
 	}
 
-	public void setRepositoryName(String repositoryName) {
-		this.repositoryName = repositoryName;
+	public void setName(String name) {
+		this.name = name;
 	}
 
-	public String getRepositoryDescription() {
-		return repositoryDescription;
+	public String getDescription() {
+		return description;
 	}
 
-	public void setRepositoryDescription(String repositoryDescription) {
-		this.repositoryDescription = repositoryDescription;
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
 	public SCMType getSCM() {

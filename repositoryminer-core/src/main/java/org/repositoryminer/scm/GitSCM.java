@@ -37,6 +37,9 @@ import org.repositoryminer.domain.SCMType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Implements support for Git repositories.
+ */
 public class GitSCM implements ISCM {
 
 	private static final Logger LOG = LoggerFactory.getLogger(GitSCM.class);

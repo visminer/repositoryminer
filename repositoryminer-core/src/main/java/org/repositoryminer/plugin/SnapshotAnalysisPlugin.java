@@ -14,12 +14,28 @@ import org.repositoryminer.util.StringUtils;
 
 import com.mongodb.client.model.Projections;
 
+/**
+ * This extension point is interesting for plugins that want to access the
+ * repository and perform some sort of analysis in one or more of its versions,
+ * such as static code analysis.
+ *
+ * @param <T>
+ *            some configuration.
+ */
 public abstract class SnapshotAnalysisPlugin<T> {
 
 	protected String tmpRepository;
 	protected ObjectId repositoryId;
 	protected ISCM scm;
 
+	/**
+	 * This method is responsible for preparing the repository to run the plugin,
+	 * and should be called only once.
+	 * 
+	 * @param repositoryKey
+	 *            the repository key
+	 * @throws IOException
+	 */
 	public void init(String repositoryKey) throws IOException {
 		Document repoDoc = new RepositoryDAO().findByKey(repositoryKey, Projections.include("_id", "path", "scm"));
 		if (repoDoc == null) {
@@ -34,8 +50,23 @@ public abstract class SnapshotAnalysisPlugin<T> {
 		scm.open(tmpRepository);
 	}
 
+	/**
+	 * This method is the plugin entry point, by calling it, the plugin will execute
+	 * its analysis in a given repository version.
+	 * 
+	 * @param snapshot
+	 *            the commit reference
+	 * @param config
+	 *            some configuration
+	 */
 	public abstract void run(String snapshot, T config);
 
+	/**
+	 * This method is responsible for releasing the resources allocated to the
+	 * plugin execution, and should be called only once.
+	 * 
+	 * @throws IOException
+	 */
 	public void finish() throws IOException {
 		scm.close();
 		RMFileUtils.deleteFolder(tmpRepository);

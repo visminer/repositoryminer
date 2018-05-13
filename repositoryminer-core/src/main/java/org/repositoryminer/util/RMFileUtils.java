@@ -12,6 +12,9 @@ import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.commons.io.filefilter.NotFileFilter;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 
+/**
+ * Contains some utilities operations for files.
+ */
 public class RMFileUtils {
 
 	/**
