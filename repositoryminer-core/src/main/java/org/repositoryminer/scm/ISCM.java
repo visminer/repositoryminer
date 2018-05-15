@@ -1,6 +1,7 @@
 package org.repositoryminer.scm;
 
 import java.util.List;
+import java.util.Set;
 
 import org.repositoryminer.domain.Commit;
 import org.repositoryminer.domain.Reference;
@@ -41,10 +42,20 @@ public interface ISCM {
 	public List<Commit> getCommits(int skip, int max);
 
 	/**
+	 * Returns the commits with hash in the given list of hashes.
+	 * 
+	 * @param selectedCommits
+	 *            a list of commits hashes.
+	 * @return a set of selected commits
+	 */
+	public List<Commit> getCommits(Set<String> selectedCommits);
+
+	/**
 	 * Gets the commit which the HEAD is pointed at.
 	 * <p>
 	 * <b>Note: For now, only these commit attributes need to be set: hash and
-	 * committer date.</b> 
+	 * committer date.</b>
+	 * 
 	 * @return the commit of the current HEAD location.
 	 */
 	public Commit getHEAD();
@@ -54,16 +65,22 @@ public interface ISCM {
 	 * <p>
 	 * <b>Note: For now, only these commit attributes need to be set: hash and
 	 * committer date.</b>
+	 * 
 	 * @return the referenced commit.
 	 */
 	public Commit resolve(String reference);
-	
+
 	/**
 	 * @param reference
 	 *            the reference.
-	 * @return all commits associated to the reference.
+	 * @return the hashes of commits associated to a reference.
 	 */
 	public List<String> getCommitsNames(Reference reference);
+
+	/**
+	 * @return the hashes of all commits.
+	 */
+	public List<String> getCommitsNames();
 
 	/**
 	 * Does a checkout to a given point.

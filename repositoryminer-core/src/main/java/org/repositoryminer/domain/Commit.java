@@ -24,6 +24,7 @@ public class Commit {
 	private boolean merge;
 	private ObjectId repository;
 
+
 	/**
 	 * Converts database documents to commits.
 	 * 
@@ -48,8 +49,8 @@ public class Commit {
 	 */
 	@SuppressWarnings("unchecked")
 	public static Commit parseDocument(Document document) {
-		Commit commit = new Commit(document.getObjectId("_id"),
-				document.getString("hash"), Developer.parseDocument(document.get("author", Document.class)),
+		Commit commit = new Commit(document.getObjectId("_id"), document.getString("hash"),
+				Developer.parseDocument(document.get("author", Document.class)),
 				Developer.parseDocument(document.get("committer", Document.class)), document.getString("message"),
 				Change.parseDocuments(document.get("changes", List.class)), document.get("parents", List.class),
 				document.getDate("author_date"), document.getDate("committer_date"),
@@ -64,21 +65,16 @@ public class Commit {
 	 */
 	public Document toDocument() {
 		Document doc = new Document();
-		doc.append("hash", hash).
-			append("author", author.toDocument()).
-			append("committer", committer.toDocument()).
-			append("message", message).
-			append("changes", Change.toDocumentList(changes)).
-			append("parents", parents).
-			append("author_date", authorDate.getTime()).
-			append("committer_date", committerDate.getTime()).
-			append("merge", merge).
-			append("repository", repository);
+		doc.append("hash", hash).append("author", author.toDocument()).append("committer", committer.toDocument())
+				.append("message", message).append("changes", Change.toDocumentList(changes)).append("parents", parents)
+				.append("author_date", authorDate.getTime()).append("committer_date", committerDate.getTime())
+				.append("merge", merge).append("repository", repository);
 		return doc;
 	}
 
-	public Commit() {}
-	
+	public Commit() {
+	}
+
 	public Commit(String hash, Date committerDate) {
 		this.hash = hash;
 		this.committerDate = committerDate;

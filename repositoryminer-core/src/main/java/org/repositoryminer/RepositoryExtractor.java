@@ -25,15 +25,15 @@ import org.slf4j.LoggerFactory;
 /**
  * This class is responsible for extract informations from a SCM.
  */
-public class ExtractionProcessor {
+public class RepositoryExtractor {
 
-	private static final Logger LOG = LoggerFactory.getLogger(ExtractionProcessor.class);
+	private static final Logger LOG = LoggerFactory.getLogger(RepositoryExtractor.class);
 	private static final int MAX_COMMITS = 1000; 
 	
 	private static ISCM scm;
 
 	/**
-	 * Starts the mining process
+	 * Starts the repository data extraction process.
 	 * 
 	 * @param rm
 	 *            instance of {@link org.repositoryminer.RepositoryMiner} .
@@ -41,7 +41,7 @@ public class ExtractionProcessor {
 	 *            parameters for the source-code analysis and persistence
 	 * @throws IOException
 	 */
-	public static void extract(RepositoryMiner rm) throws IOException {
+	public static void run(RepositoryMiner rm) throws IOException {
 		LOG.info("Starting extraction process.");
 		
 		File repositoryFolder = new File(rm.getPath());
@@ -103,7 +103,7 @@ public class ExtractionProcessor {
 			commits = scm.getCommits(skip, MAX_COMMITS);
 		}
 		
-		LOG.info("Commits extraction process Finished.");
+		LOG.info("Commits extraction process finished.");
 		return contributors;
 	}
 

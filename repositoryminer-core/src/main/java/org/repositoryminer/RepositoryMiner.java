@@ -25,9 +25,10 @@ public class RepositoryMiner {
 	public void mine() throws IOException {
 		RepositoryDAO repoDocHandler = new RepositoryDAO();
 		if (!repoDocHandler.wasMined(key)) {
-			ExtractionProcessor.extract(this);
+			RepositoryExtractor.run(this);
+		} else {
+			IncrementalRepositoryExtractor.run(key);
 		}
-		// TODO: update repository mining feature.
 	}
 
 	public RepositoryMiner(String key) {

@@ -1,6 +1,7 @@
 package org.repositoryminer.persistence;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import org.bson.Document;
@@ -46,8 +47,8 @@ public class ReferenceDAO extends GenericDAO {
 	 *            the query projection.
 	 * @return list of references.
 	 */
-	public List<Document> findByRepository(String repositoryId, Bson projection) {
-		return findMany(Filters.eq("repository", new ObjectId(repositoryId)), projection);
+	public List<Document> findByRepository(ObjectId repositoryId, Bson projection) {
+		return findMany(Filters.eq("repository", repositoryId), projection);
 	}
 
 	/**
@@ -77,6 +78,43 @@ public class ReferenceDAO extends GenericDAO {
 	public void updateOnlyCommits(String id, List<String> commits) {
 		collection.updateOne(Filters.eq("_id", new ObjectId(id)),
 				new Document("$set", new Document("commits", commits)));
+	}
+
+	/**
+	 * Updates a reference.
+	 * 
+	 * @param id
+	 *            reference id.
+	 * @param doc
+	 *            the reference document.
+	 */
+	public void update(ObjectId id, Document doc) {
+		collection.updateOne(Filters.eq("_id", id), doc);
+	}
+
+	/**
+	 * Updates the commits and last commit date in a reference.
+	 * 
+	 * @param id
+	 *            reference id.
+	 * @param commits
+	 *            the new commits.
+	 * @param lastCommitDate
+	 *            the new last commit date.
+	 */
+	public void updateCommitsAndLastCommitDate(ObjectId id, List<String> commits, Date lastCommitDate) {
+		collection.updateOne(Filters.eq("_id", id),
+				new Document("$set", new Document("commits", commits).append("last_commit_date", lastCommitDate)));
+	}
+
+	/**
+	 * Deletes a reference by its id.
+	 * 
+	 * @param id
+	 *            reference id.
+	 */
+	public void delete(ObjectId id) {
+		collection.deleteOne(Filters.eq("_id", id));
 	}
 
 	/**

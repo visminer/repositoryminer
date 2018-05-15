@@ -36,6 +36,18 @@ public class CommitDAO extends GenericDAO {
 	}
 
 	/**
+	 * Deletes a commit by its hash.
+	 * 
+	 * @param hash
+	 *            the commit hash.
+	 * @param repositoryId
+	 *            the repository id.
+	 */
+	public void delete(String hash, ObjectId repositoryId) {
+		deleteOne(new BasicDBObject("repository", repositoryId).append("hash", hash));
+	}
+	
+	/**
 	 * Retrieves commits from a repository.
 	 * 
 	 * @param repositoryId
@@ -44,9 +56,8 @@ public class CommitDAO extends GenericDAO {
 	 *            the query projection.
 	 * @return a list of commits.
 	 */
-	public List<Document> findByRepository(String repositoryId, Bson projection) {
-		BasicDBObject whereClause = new BasicDBObject("repository", new ObjectId(repositoryId));
-		return findMany(whereClause, projection);
+	public List<Document> findByRepository(ObjectId repositoryId, Bson projection) {
+		return findMany(new BasicDBObject("repository", repositoryId), projection);
 	}
 
 	/**

@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Set;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.LogCommand;
@@ -46,7 +47,7 @@ public class GitSCM implements ISCM {
 
 	private Git git;
 	private int branchCounter = 0;
-	
+
 	@Override
 	public SCMType getSCM() {
 		return SCMType.GIT;
@@ -109,7 +110,7 @@ public class GitSCM implements ISCM {
 		for (Ref t : tags) {
 			int i = t.getName().lastIndexOf("/") + 1;
 			Commit commit = resolve(t.getName());
-			Reference r = new Reference(null, null, t.getName().substring(i), t.getName(), ReferenceType.TAG, 
+			Reference r = new Reference(null, null, t.getName().substring(i), t.getName(), ReferenceType.TAG,
 					commit.getCommitterDate(), null);
 			refs.add(r);
 			LOG.info(String.format("Tag %s analyzed.", r.getName()));
@@ -127,6 +128,26 @@ public class GitSCM implements ISCM {
 			for (RevCommit revCommit : git.log().all().setSkip(skip).setMaxCount(max).call()) {
 				LOG.info(String.format("Analyzing commit %s.", revCommit.getName()));
 				commits.add(processCommit(revCommit));
+			}
+		} catch (GitAPIException | IOException e) {
+			close();
+			throw new RepositoryMinerException(e);
+		}
+
+		return commits;
+	}
+
+	@Override
+	public List<Commit> getCommits(Set<String> selectedCommits) {
+		LOG.info("Extracting commits.");
+		List<Commit> commits = new ArrayList<Commit>();
+		
+		try {
+			for (RevCommit revCommit : git.log().all().call()) {
+				if (selectedCommits.contains(revCommit.getName())) {
+					LOG.info(String.format("Analyzing commit %s.", revCommit.getName()));
+					commits.add(processCommit(revCommit));
+				}
 			}
 		} catch (GitAPIException | IOException e) {
 			close();
@@ -159,10 +180,10 @@ public class GitSCM implements ISCM {
 			}
 		}
 	}
-	
+
 	@Override
 	public List<String> getCommitsNames(Reference reference) {
-		LOG.info(String.format("Extracting the commit from reference %s.", reference.getName()));
+		LOG.info(String.format("Extracting the commits names from reference %s.", reference.getName()));
 
 		Iterable<RevCommit> revCommits;
 		if (reference.getType() == ReferenceType.BRANCH) {
@@ -184,6 +205,24 @@ public class GitSCM implements ISCM {
 	}
 
 	@Override
+	public List<String> getCommitsNames() {
+		LOG.info(String.format("Extracting the commits names"));
+
+		List<String> names = new ArrayList<String>();
+
+		try {
+			for (RevCommit revCommit : git.log().all().call()) {
+				names.add(revCommit.getName());
+			}
+		} catch (GitAPIException | IOException e) {
+			close();
+			throw new RepositoryMinerException(e);
+		}
+
+		return names;
+	}
+
+	@Override
 	public void checkout(String hash) {
 		LOG.info(String.format("Checking out %s.", hash));
 		File lockFile = new File(git.getRepository().getDirectory(), "git/index.lock");
@@ -194,9 +233,9 @@ public class GitSCM implements ISCM {
 		try {
 			git.reset().setMode(ResetType.HARD).call();
 			git.checkout().setName("master").call();
-			
-			git.checkout().setCreateBranch(true).setName("rm_branch"+branchCounter++)
-			.setStartPoint(hash).setForce(true).setOrphan(true).call();
+
+			git.checkout().setCreateBranch(true).setName("rm_branch" + branchCounter++).setStartPoint(hash)
+					.setForce(true).setOrphan(true).call();
 		} catch (GitAPIException e) {
 			close();
 			throw new RepositoryMinerException(e);
@@ -245,27 +284,27 @@ public class GitSCM implements ISCM {
 
 		RevCommit parentCommit = commit.getParentCount() > 0
 				? revWalk.parseCommit(ObjectId.fromString(commit.getParent(0).getName()))
-						: null;
+				: null;
 
-				DiffFormatter df = new DiffFormatter(DisabledOutputStream.INSTANCE);
-				df.setBinaryFileThreshold(2048);
-				df.setRepository(git.getRepository());
-				df.setDiffComparator(RawTextComparator.DEFAULT);
-				df.setDetectRenames(true);
+		DiffFormatter df = new DiffFormatter(DisabledOutputStream.INSTANCE);
+		df.setBinaryFileThreshold(2048);
+		df.setRepository(git.getRepository());
+		df.setDiffComparator(RawTextComparator.DEFAULT);
+		df.setDetectRenames(true);
 
-				List<DiffEntry> diffEntries = df.scan(parentCommit, commit);
-				df.close();
-				revWalk.close();
+		List<DiffEntry> diffEntries = df.scan(parentCommit, commit);
+		df.close();
+		revWalk.close();
 
-				List<Change> changes = new ArrayList<Change>();
-				for (DiffEntry entry : diffEntries) {
-					Change change = new Change(entry.getNewPath(), entry.getOldPath(), 0, 0,
-							ChangeType.valueOf(entry.getChangeType().name()));
-					analyzeDiff(change, entry);
-					changes.add(change);
-				}
+		List<Change> changes = new ArrayList<Change>();
+		for (DiffEntry entry : diffEntries) {
+			Change change = new Change(entry.getNewPath(), entry.getOldPath(), 0, 0,
+					ChangeType.valueOf(entry.getChangeType().name()));
+			analyzeDiff(change, entry);
+			changes.add(change);
+		}
 
-				return changes;
+		return changes;
 	}
 
 	private void analyzeDiff(Change change, DiffEntry diff) throws IOException {
