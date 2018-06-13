@@ -81,12 +81,6 @@ public class RepositoryMinerFindBugs extends SnapshotAnalysisPlugin<FindBugsConf
 		List<Document> documents = new ArrayList<>();
 
 		for (Entry<String, List<ReportedBug>> bug : reportedBugs.entrySet()) {
-			Document doc = new Document();
-			doc.append("reference", snapshot).
-				append("commit", commit.getHash()).
-				append("commit_date", commit.getCommitterDate()).
-				append("repository", repositoryId);
-
 			String filename = null;
 			for (String file : files) {
 				if (file.endsWith(bug.getKey())) {
@@ -94,11 +88,18 @@ public class RepositoryMinerFindBugs extends SnapshotAnalysisPlugin<FindBugsConf
 					break;
 				}
 			}
-
-			doc.append("filename", filename);
-			doc.append("filehash", StringUtils.encodeToCRC32(filename));
-			doc.append("bugs", ReportedBug.toDocumentList(bug.getValue()));
-			documents.add(doc);
+			
+			if (filename != null) {
+				Document doc = new Document();
+				doc.append("reference", snapshot).
+					append("commit", commit.getHash()).
+					append("commit_date", commit.getCommitterDate()).
+					append("repository", repositoryId).
+					append("filename", filename).
+					append("filehash", StringUtils.encodeToCRC32(filename)).
+					append("bugs", ReportedBug.toDocumentList(bug.getValue()));
+				documents.add(doc);
+			}
 		}
 
 		dao.insertMany(documents);
