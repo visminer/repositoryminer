@@ -2,25 +2,27 @@ package org.repositoryminer.metrics.ast;
 
 import java.util.List;
 
+import org.repositoryminer.metrics.parser.Language;
+
 /**
  * This class represents the file and is also the Abstract Syntax Tree root
  * node.
  */
 public class AST {
 
-	private String name;
+	private String filename;
 	private String source;
-	private String language;
+	private Language language;
 	private List<AbstractType> types;
 	private List<AbstractImport> imports;
 	private String packageDeclaration;
 
-	public String getName() {
-		return name;
+	public String getFileName() {
+		return filename;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setFileName(String filename) {
+		this.filename = filename;
 	}
 
 	public String getSource() {
@@ -31,11 +33,11 @@ public class AST {
 		this.source = source;
 	}
 
-	public String getLanguage() {
+	public Language getLanguage() {
 		return language;
 	}
 
-	public void setLanguage(String language) {
+	public void setLanguage(Language language) {
 		this.language = language;
 	}
 

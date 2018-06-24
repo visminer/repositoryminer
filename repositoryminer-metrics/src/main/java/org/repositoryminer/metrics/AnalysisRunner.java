@@ -118,7 +118,7 @@ public class AnalysisRunner {
 		AST ast = parser.generate(filename, FileUtils.readFileToString(file, "UTF-8"),
 				sourceFolders.get(parser.getId()));
 
-		FileReport fr = new FileReport(ast.getName());
+		FileReport fr = new FileReport(ast.getFileName());
 		for (AbstractType type : ast.getTypes()) {
 			ClassReport cr = new ClassReport(type.getName(), type.getNodeType().toString());
 			fr.getClassesReports().put(type.getName(), cr);

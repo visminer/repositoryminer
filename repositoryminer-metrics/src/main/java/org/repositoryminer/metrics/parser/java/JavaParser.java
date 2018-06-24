@@ -26,10 +26,10 @@ public class JavaParser extends Parser {
 	@Override
 	public AST generate(String filename, String source, String[] srcFolders) {
 		AST ast = new AST();
-		ast.setName(filename);
+		ast.setFileName(filename);
 		ast.setSource(source);
 
-		ASTParser parser = ASTParser.newParser(org.eclipse.jdt.core.dom.AST.JLS8);
+		ASTParser parser = ASTParser.newParser(org.eclipse.jdt.core.dom.AST.JLS10);
 		parser.setResolveBindings(true);
 		parser.setKind(ASTParser.K_COMPILATION_UNIT);
 		parser.setBindingsRecovery(true);
@@ -47,6 +47,7 @@ public class JavaParser extends Parser {
 		ast.setImports(visitor.getImports());
 		ast.setPackageDeclaration(visitor.getPackageName());
 		ast.setTypes(visitor.getTypes());
+		ast.setLanguage(Language.JAVA);
 
 		return ast;
 	}

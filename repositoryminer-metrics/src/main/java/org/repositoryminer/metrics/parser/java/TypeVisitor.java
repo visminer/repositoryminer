@@ -156,7 +156,6 @@ public class TypeVisitor extends ASTVisitor {
 		}
 		method.setModifiers(modifiers);
 
-		
 		if (node.getBody() != null) {
 			MethodVisitor visitor = new MethodVisitor();
 			node.getBody().accept(visitor);
