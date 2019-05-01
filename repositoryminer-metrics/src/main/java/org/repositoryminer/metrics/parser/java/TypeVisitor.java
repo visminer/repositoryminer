@@ -190,6 +190,11 @@ public class TypeVisitor extends ASTVisitor {
 			return;
 		}
 
+		int paramListPosition = field.indexOf("(");
+		if (paramListPosition >= 0) {
+			field = field.substring(0, paramListPosition);
+		}
+
 		char c[] = field.toCharArray();
 		c[0] = Character.toLowerCase(c[0]);
 		String field2 = new String(c);
