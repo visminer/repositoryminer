@@ -11,6 +11,7 @@ import org.eclipse.jdt.core.dom.ConditionalExpression;
 import org.eclipse.jdt.core.dom.ContinueStatement;
 import org.eclipse.jdt.core.dom.DoStatement;
 import org.eclipse.jdt.core.dom.EnhancedForStatement;
+import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ExpressionStatement;
 import org.eclipse.jdt.core.dom.ForStatement;
 import org.eclipse.jdt.core.dom.IBinding;
@@ -18,6 +19,7 @@ import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
+import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.SwitchCase;
@@ -83,15 +85,15 @@ public class MethodVisitor extends ASTVisitor {
 
 	@Override
 	public boolean visit(EnhancedForStatement node) {
-		statements.add(new AbstractStatement(NodeType.FOR,
-				node.getExpression() != null ? node.getExpression().toString() : ""));
+		statements
+				.add(new AbstractStatement(NodeType.FOR, node.getExpression() != null ? node.getExpression().toString() : ""));
 		return true;
 	}
 
 	@Override
 	public boolean visit(ForStatement node) {
-		statements.add(new AbstractStatement(NodeType.FOR,
-				node.getExpression() != null ? node.getExpression().toString() : ""));
+		statements
+				.add(new AbstractStatement(NodeType.FOR, node.getExpression() != null ? node.getExpression().toString() : ""));
 		return true;
 	}
 
@@ -148,7 +150,7 @@ public class MethodVisitor extends ASTVisitor {
 		String type = null;
 		if (bind != null)
 			type = bind.getQualifiedName();
-			
+
 		for (VariableDeclarationFragment frag : (List<VariableDeclarationFragment>) node.fragments()) {
 			statements.add(new AbstractVariableDeclaration(frag.getName().getIdentifier(), type,
 					frag.getInitializer() != null ? frag.getInitializer().toString() : null));
@@ -162,20 +164,52 @@ public class MethodVisitor extends ASTVisitor {
 		if (bind == null) {
 			return true;
 		}
-		
+
 		if (bind.getKind() == IBinding.VARIABLE) {
 			IVariableBinding varBind = (IVariableBinding) bind;
 			if (varBind.isField()) {
 				String type = varBind.getType().getQualifiedName();
 				statements.add(new AbstractFieldAccess(varBind.getName(), type,
 						varBind.getDeclaringClass() != null ? varBind.getDeclaringClass().getQualifiedName() : null,
-						varBind.getType().isPrimitive(),
-						type.startsWith("java") || type.startsWith("javax") ? true : false));
+						varBind.getType().isPrimitive(), type.startsWith("java") || type.startsWith("javax") ? true : false));
 			}
 		} else if (bind.getKind() == IBinding.METHOD) {
 			IMethodBinding mBind = (IMethodBinding) bind;
 			analyzeMethodInvocation(mBind);
 		}
+		return true;
+	}
+
+	@Override
+	public boolean visit(MethodInvocation node) {
+		String methodName = node.getName().toString();
+		ITypeBinding typeBinding = node.getExpression().resolveTypeBinding();
+		String declaringClass = typeBinding.getQualifiedName();
+		StringBuilder parameters = new StringBuilder();
+
+		for (Object o : node.arguments()) {
+			Expression exp = (Expression) o;
+			ITypeBinding type = exp.resolveTypeBinding();
+			String typeName = "java.lang.Object";
+			if (type != null) {
+				typeName = type.getQualifiedName();
+			}
+			parameters.append(typeName + ",");
+		}
+		if (node.arguments().size() > 0) {
+			parameters.deleteCharAt(parameters.length() - 1);
+		}
+		AbstractMethodInvocation methodInv = new AbstractMethodInvocation();
+		methodInv.setDeclaringClass(declaringClass);
+		methodInv.setExpression(methodName + '(' + parameters.toString() + ')');
+		String fieldName = getMethodAccessorField(node.getName().toString());
+		if (fieldName == null) {
+			statements.add(methodInv);
+			return true;
+		}
+		methodInv.setAccessor(true);
+		methodInv.setAccessedField(Character.toLowerCase(fieldName.charAt(0)) + fieldName.substring(1));
+		statements.add(methodInv);
 		return true;
 	}
 
@@ -193,12 +227,8 @@ public class MethodVisitor extends ASTVisitor {
 		}
 		methodInv.setExpression(mBind.getName() + '(' + parameters.toString() + ')');
 
-		String fieldName = null;
-		if ((mBind.getName().startsWith("get") || mBind.getName().startsWith("set")) && mBind.getName().length() > 3) {
-			fieldName = mBind.getName().substring(3);
-		} else if (mBind.getName().startsWith("is") && mBind.getName().length() > 2) {
-			fieldName = mBind.getName().substring(2);
-		} else {
+		String fieldName = getMethodAccessorField(mBind.getName());
+		if (fieldName == null) {
 			statements.add(methodInv);
 			return;
 		}
@@ -206,6 +236,18 @@ public class MethodVisitor extends ASTVisitor {
 		methodInv.setAccessor(true);
 		methodInv.setAccessedField(Character.toLowerCase(fieldName.charAt(0)) + fieldName.substring(1));
 		statements.add(methodInv);
+	}
+
+	private String getMethodAccessorField(String methodName) {
+		String fieldName = null;
+		if ((methodName.startsWith("get") || methodName.startsWith("set")) && methodName.length() > 3) {
+			fieldName = methodName.substring(3);
+		} else if (methodName.startsWith("is") && methodName.length() > 2) {
+			fieldName = methodName.substring(2);
+		} else {
+			return null;
+		}
+		return fieldName;
 	}
 
 }
