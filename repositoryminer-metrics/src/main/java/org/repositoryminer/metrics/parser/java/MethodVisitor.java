@@ -183,7 +183,11 @@ public class MethodVisitor extends ASTVisitor {
 	@Override
 	public boolean visit(MethodInvocation node) {
 		String methodName = node.getName().toString();
+		if (node.getExpression() == null)
+			return true;
 		ITypeBinding typeBinding = node.getExpression().resolveTypeBinding();
+		if (typeBinding == null)
+			return true;
 		String declaringClass = typeBinding.getQualifiedName();
 		StringBuilder parameters = new StringBuilder();
 
