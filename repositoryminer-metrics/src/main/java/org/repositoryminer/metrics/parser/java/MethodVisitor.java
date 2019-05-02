@@ -182,15 +182,14 @@ public class MethodVisitor extends ASTVisitor {
 
 	@Override
 	public boolean visit(MethodInvocation node) {
-		String methodName = node.getName().toString();
-		if (node.getExpression() == null)
+		if (node.getExpression() == null || node.getExpression().resolveTypeBinding() == null)
 			return true;
-		ITypeBinding typeBinding = node.getExpression().resolveTypeBinding();
-		if (typeBinding == null)
-			return true;
-		String declaringClass = typeBinding.getQualifiedName();
-		StringBuilder parameters = new StringBuilder();
 
+		ITypeBinding typeBinding = node.getExpression().resolveTypeBinding();
+		String declaringClass = typeBinding.getQualifiedName();
+		String methodName = node.getName().toString();
+
+		ArrayList<String> parameterTypes = new ArrayList<>();
 		for (Object o : node.arguments()) {
 			Expression exp = (Expression) o;
 			ITypeBinding type = exp.resolveTypeBinding();
@@ -198,47 +197,40 @@ public class MethodVisitor extends ASTVisitor {
 			if (type != null) {
 				typeName = type.getQualifiedName();
 			}
-			parameters.append(typeName + ",");
+			parameterTypes.add(typeName);
 		}
-		if (node.arguments().size() > 0) {
-			parameters.deleteCharAt(parameters.length() - 1);
-		}
-		AbstractMethodInvocation methodInv = new AbstractMethodInvocation();
-		methodInv.setDeclaringClass(declaringClass);
-		methodInv.setExpression(methodName + '(' + parameters.toString() + ')');
-		String fieldName = getMethodAccessorField(node.getName().toString());
-		if (fieldName == null) {
-			statements.add(methodInv);
-			return true;
-		}
-		methodInv.setAccessor(true);
-		methodInv.setAccessedField(Character.toLowerCase(fieldName.charAt(0)) + fieldName.substring(1));
-		statements.add(methodInv);
+		String accessorField = getMethodAccessorField(node.getName().toString());
+		addMethodInvocation(declaringClass, methodName, parameterTypes, accessorField);
 		return true;
 	}
 
 	private void analyzeMethodInvocation(IMethodBinding mBind) {
+		String declaringClass = mBind.getDeclaringClass().getQualifiedName();
+		String methodName = mBind.getName();
+		ArrayList<String> parameterTypes = new ArrayList<>();
+		for (ITypeBinding type : mBind.getParameterTypes()) {
+			parameterTypes.add(type.getQualifiedName());
+		}
+		String accessorField = getMethodAccessorField(mBind.getName());
+		addMethodInvocation(declaringClass, methodName, parameterTypes, accessorField);
+	}
+
+	private void addMethodInvocation(String declaringClass, String methodName, List<String> parameterTypes,
+			String accessorField) {
 		AbstractMethodInvocation methodInv = new AbstractMethodInvocation();
-		methodInv.setDeclaringClass(mBind.getDeclaringClass().getQualifiedName());
 
 		StringBuilder parameters = new StringBuilder();
-		for (ITypeBinding type : mBind.getParameterTypes()) {
-			parameters.append(type.getQualifiedName() + ",");
+		for (String parameterType : parameterTypes) {
+			parameters.append(parameterType + ",");
 		}
-
-		if (mBind.getParameterTypes().length > 0) {
+		if (parameterTypes.size() > 0) {
 			parameters.deleteCharAt(parameters.length() - 1);
 		}
-		methodInv.setExpression(mBind.getName() + '(' + parameters.toString() + ')');
-
-		String fieldName = getMethodAccessorField(mBind.getName());
-		if (fieldName == null) {
-			statements.add(methodInv);
-			return;
+		methodInv.setExpression(methodName + '(' + parameters.toString() + ')');
+		if (accessorField != null) {
+			methodInv.setAccessor(true);
+			methodInv.setAccessedField(Character.toLowerCase(accessorField.charAt(0)) + accessorField.substring(1));
 		}
-
-		methodInv.setAccessor(true);
-		methodInv.setAccessedField(Character.toLowerCase(fieldName.charAt(0)) + fieldName.substring(1));
 		statements.add(methodInv);
 	}
 
